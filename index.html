@@ -478,7 +478,6 @@
     let carrinhoTemp = [];
 
     function initApp() {
-      // Sincronização inicial da lista de usuários de suporte / admin
       db.collection("usuarios").get().then(snapshot => {
         state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         if (state.usuarios.length === 0) {
@@ -515,8 +514,19 @@
         render();
       }, err => console.error("Erro produtos:", err));
 
-      const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).orderBy("dataCriacao", "desc").onSnapshot(snapshot => {
-        state.pedidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // CORRIGIDO: Busca os pedidos filtrados por empresa e faz a ordenação segura localmente
+      const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.pedidos = snapshot.docs.map(doc => {
+          const dataDoc = doc.data();
+          let dataCriacaoParsed = new Date();
+          if (dataDoc.dataCriacao && dataDoc.dataCriacao.toDate) {
+            dataCriacaoParsed = dataDoc.dataCriacao.toDate();
+          } else if (dataDoc.dataCriacao) {
+            dataCriacaoParsed = new Date(dataDoc.dataCriacao);
+          }
+          return { id: doc.id, ...dataDoc, dataCriacao: dataCriacaoParsed };
+        }).sort((a, b) => b.dataCriacao - a.dataCriacao);
+
         render();
       }, err => console.error("Erro pedidos:", err));
 
@@ -864,6 +874,7 @@
         }
       });
 
+      // CORRIGIDO: Usa o timestamp oficial do servidor Firebase para garantir integridade e persistência correta
       const p = {
         numPedido: pedidoNum,
         cliente: cli ? cli.nome : 'Cliente Desconhecido', 
@@ -877,12 +888,13 @@
         status: status,
         obs: obs,
         empresaId: state.currentUser.empresaId,
-        dataCriacao: new Date()
+        dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-      // Grava no Firestore
+      // Grava no Firestore permanentemente para consulta
       db.collection("pedidos").add(p).then(docRef => {
         p.id = docRef.id;
+        p.dataCriacao = new Date(); // Atribui data local temporária para o recibo imediato
         
         carrinhoTemp = [];
         renderCarrinho();
@@ -1152,7 +1164,7 @@
             <td><b>${p.qtd}</b></td>
             <td>
               <button class="btn-warning" type="button" onclick="prepararEdicaoProduto('${p.id}')">✏️</button>
-              <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑️️</button>
+              <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑</button>
             </td>
           </tr>`).join('');
       }
