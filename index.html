@@ -76,6 +76,10 @@
 
     .btn { background: var(--accent); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.9rem; text-align: center; text-decoration: none; display: inline-block; transition: 0.2s; }
     .btn:hover { background: var(--accent-light); }
+    .btn-secondary { background: #64748b; }
+    .btn-secondary:hover { background: #475569; }
+    .btn-danger { background: var(--danger); }
+    .btn-danger:hover { background: #dc2626; }
     .btn-back { background: #475569; padding: 6px 12px; width: auto; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
@@ -148,6 +152,73 @@
       </div>
     </div>
 
+    <!-- TELA: PEDIDOS (VENDAS) -->
+    <div id="view-pedidos" class="view-content" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🛒 Novo Pedido de Venda</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        <form onsubmit="finalizarPedido(event)">
+          <div class="form-group">
+            <label>Selecione o Cliente</label>
+            <select id="ped-cliente" required>
+              <option value="">-- Selecione um Cliente --</option>
+            </select>
+          </div>
+
+          <div style="border:1px solid #cbd5e1; padding:12px; border-radius:8px; margin-bottom:12px; background:#f8fafc;">
+            <div style="font-size:0.85rem; font-weight:700; margin-bottom:8px;">Adicionar Item</div>
+            <div class="form-group">
+              <label>Produto / Categoria</label>
+              <select id="ped-prod" onchange="atualizarPrecoUnitario()">
+                <option value="">-- Selecione o Produto --</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <div class="form-group" style="flex:1;">
+                <label>Qtd (Caixas/Dúzias)</label>
+                <input type="number" id="ped-qtd" min="1" value="1">
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label>Preço Unit. (R$)</label>
+                <input type="number" id="ped-preco" step="0.01" placeholder="0.00">
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="adicionarItemAoPedido()">+ Adicionar Item</button>
+          </div>
+
+          <!-- Tabela de Itens do Pedido -->
+          <div class="card-title" style="font-size:0.9rem; margin-top:10px;">Itens do Pedido</div>
+          <table>
+            <thead>
+              <tr><th>Item</th><th>Qtd</th><th>Unit.</th><th>Total</th><th>#</th></tr>
+            </thead>
+            <tbody id="lista-itens-pedido">
+              <tr><td colspan="5" style="text-align:center; color:#94a3b8;">Nenhum item adicionado</td></tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top:15px; text-align:right; font-size:1.1rem; font-weight:800; color:#0f172a;">
+            Total: R$ <span id="ped-total-valor">0.00</span>
+          </div>
+
+          <button type="submit" class="btn" style="margin-top:15px; background:var(--success);">Finalizar e Gerar Nota</button>
+        </form>
+      </div>
+
+      <!-- Pedidos Salvos -->
+      <div class="card">
+        <div class="card-title">Histórico de Pedidos</div>
+        <table>
+          <thead>
+            <tr><th>Data/Cliente</th><th>Total</th><th>Ação</th></tr>
+          </thead>
+          <tbody id="lista-pedidos-salvos"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- TELA: CLIENTES -->
     <div id="view-clientes" class="view-content" style="display:none;">
       <div class="card">
@@ -171,10 +242,44 @@
         </table>
       </div>
     </div>
+
+    <!-- TELA: PRODUTOS (ESTOQUE) -->
+    <div id="view-produtos" class="view-content" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Cadastrar Produto / Ovo</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        <form onsubmit="cadastrarProduto(event)">
+          <div class="form-group"><label>Nome do Produto (Ex: Ovo Vermelho Grande - Cxa)</label><input type="text" id="prod-nome" required></div>
+          <div class="form-group"><label>Preço Padrão (R$)</label><input type="number" id="prod-preco" step="0.01" required></div>
+          <button type="submit" class="btn">Salvar Produto</button>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-title">Produtos / Estoque</div>
+        <table>
+          <thead><tr><th>Produto</th><th>Preço</th></tr></thead>
+          <tbody id="lista-produtos"></tbody>
+        </table>
+      </div>
+    </div>
   </main>
 
+  <!-- MODAL NOTA DE COMPROVANTE -->
+  <div id="modal-nota" class="modal">
+    <div class="modal-content">
+      <div class="card-title" style="margin-bottom:10px;">Comprovante de Venda</div>
+      <div id="printable-receipt" class="receipt-box"></div>
+      <div style="display:flex; gap:8px;">
+        <button type="button" class="btn btn-secondary" onclick="fecharModalNota()">Fechar</button>
+        <button type="button" class="btn" onclick="window.print()">Imprimir / PDF</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // ⚠️ IMPORTANTE: RESTAURE AQUI AS CREDENCIAIS DO BANCO DE DADOS DA SUA EMPRESA ORIGINAL!
+    // ⚠️ RESTAURE AQUI AS CREDENCIAIS DO BANCO DE DADOS DA SUA EMPRESA ORIGINAL!
     const firebaseConfig = {
       apiKey: "SUA_API_KEY_ORIGINAL",
       authDomain: "SEU_PROJECT_ID.firebaseapp.com",
@@ -192,6 +297,7 @@
       produtos: [],
       clientes: [],
       pedidos: [],
+      itensPedidoAtual: [],
       currentUser: null,
       listenersUnsubscribe: []
     };
@@ -200,17 +306,24 @@
       state.listenersUnsubscribe.forEach(unsub => unsub());
       state.listenersUnsubscribe = [];
 
-      // Carrega diretamente sem filtrar por empresaId
       const unsubClientes = db.collection("clientes").onSnapshot(snapshot => {
         state.clientes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderClientes();
+        atualizarSelectClientes();
       });
 
       const unsubProdutos = db.collection("produtos").onSnapshot(snapshot => {
         state.produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderProdutos();
+        atualizarSelectProdutos();
       });
 
-      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos);
+      const unsubPedidos = db.collection("pedidos").onSnapshot(snapshot => {
+        state.pedidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderPedidosSalvos();
+      });
+
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubPedidos);
     }
 
     async function autenticar(e) {
@@ -219,10 +332,8 @@
       const p = document.getElementById('login-pass').value.trim();
       
       try {
-        // Tenta buscar o usuário no Firestore
         const snapshot = await db.collection("usuarios").where("login", "==", u).get();
 
-        // Se a coleção de usuários estiver vazia e a pessoa tentar entrar com admin/1234, cria automaticamente
         if (snapshot.empty) {
           if (u === 'admin' && p === '1234') {
             const newAdmin = { login: 'admin', pass: '1234', role: 'admin' };
@@ -284,6 +395,7 @@
       }
     }
 
+    /* CLIENTES */
     function cadastrarCliente(e) {
       e.preventDefault();
       const novoCliente = {
@@ -308,6 +420,183 @@
           <td>${c.tel}</td>
         </tr>
       `).join('');
+    }
+
+    function atualizarSelectClientes() {
+      const select = document.getElementById('ped-cliente');
+      if (!select) return;
+      select.innerHTML = `<option value="">-- Selecione um Cliente --</option>` + 
+        state.clientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+    }
+
+    /* PRODUTOS */
+    function cadastrarProduto(e) {
+      e.preventDefault();
+      const novoProd = {
+        nome: document.getElementById('prod-nome').value.trim(),
+        preco: parseFloat(document.getElementById('prod-preco').value) || 0
+      };
+
+      db.collection("produtos").add(novoProd).then(() => {
+        alert('Produto cadastrado!');
+        e.target.reset();
+      }).catch(err => alert('Erro ao cadastrar produto: ' + err.message));
+    }
+
+    function renderProdutos() {
+      const tbody = document.getElementById('lista-produtos');
+      if (!tbody) return;
+      tbody.innerHTML = state.produtos.map(p => `
+        <tr>
+          <td><b>${p.nome}</b></td>
+          <td>R$ ${parseFloat(p.preco || 0).toFixed(2)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function atualizarSelectProdutos() {
+      const select = document.getElementById('ped-prod');
+      if (!select) return;
+      select.innerHTML = `<option value="">-- Selecione o Produto --</option>` + 
+        state.produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+    }
+
+    function atualizarPrecoUnitario() {
+      const pId = document.getElementById('ped-prod').value;
+      const prod = state.produtos.find(p => p.id === pId);
+      if (prod) {
+        document.getElementById('ped-preco').value = parseFloat(prod.preco || 0).toFixed(2);
+      }
+    }
+
+    /* LÓGICA DE PEDIDOS DE VENDA */
+    function adicionarItemAoPedido() {
+      const pId = document.getElementById('ped-prod').value;
+      const qtd = parseInt(document.getElementById('ped-qtd').value) || 1;
+      const preco = parseFloat(document.getElementById('ped-preco').value) || 0;
+
+      const prod = state.produtos.find(p => p.id === pId);
+      if (!prod) return alert('Selecione um produto!');
+
+      state.itensPedidoAtual.push({
+        produtoId: prod.id,
+        nome: prod.nome,
+        qtd: qtd,
+        precoUnit: preco,
+        subtotal: qtd * preco
+      });
+
+      renderItensPedido();
+    }
+
+    function removerItemPedido(index) {
+      state.itensPedidoAtual.splice(index, 1);
+      renderItensPedido();
+    }
+
+    function renderItensPedido() {
+      const tbody = document.getElementById('lista-itens-pedido');
+      let total = 0;
+
+      if (state.itensPedidoAtual.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8;">Nenhum item adicionado</td></tr>`;
+        document.getElementById('ped-total-valor').innerText = '0.00';
+        return;
+      }
+
+      tbody.innerHTML = state.itensPedidoAtual.map((item, idx) => {
+        total += item.subtotal;
+        return `
+          <tr>
+            <td>${item.nome}</td>
+            <td>${item.qtd}</td>
+            <td>${item.precoUnit.toFixed(2)}</td>
+            <td>${item.subtotal.toFixed(2)}</td>
+            <td><button type="button" onclick="removerItemPedido(${idx})" style="color:red; background:none; border:none; cursor:pointer;">❌</button></td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('ped-total-valor').innerText = total.toFixed(2);
+    }
+
+    async function finalizarPedido(e) {
+      e.preventDefault();
+      const cliId = document.getElementById('ped-cliente').value;
+      if (!cliId) return alert('Selecione um cliente!');
+      if (state.itensPedidoAtual.length === 0) return alert('Adicione pelo menos um item ao pedido!');
+
+      const cliente = state.clientes.find(c => c.id === cliId);
+      const total = state.itensPedidoAtual.reduce((acc, i) => acc + i.subtotal, 0);
+
+      const novoPedido = {
+        clienteId: cliente.id,
+        clienteNome: cliente.nome,
+        clienteTel: cliente.tel,
+        clienteEnd: cliente.end,
+        itens: state.itensPedidoAtual,
+        total: total,
+        data: new Date().toISOString(),
+        vendedor: state.currentUser ? state.currentUser.login : 'admin'
+      };
+
+      try {
+        const docRef = await db.collection("pedidos").add(novoPedido);
+        alert('Pedido salvo com sucesso!');
+        gerarComprovante({ id: docRef.id, ...novoPedido });
+        
+        // Limpar tela de pedido
+        state.itensPedidoAtual = [];
+        renderItensPedido();
+        document.getElementById('ped-cliente').value = '';
+      } catch (err) {
+        alert('Erro ao salvar pedido: ' + err.message);
+      }
+    }
+
+    function renderPedidosSalvos() {
+      const tbody = document.getElementById('lista-pedidos-salvos');
+      if (!tbody) return;
+      tbody.innerHTML = state.pedidos.map(p => `
+        <tr>
+          <td><b>${p.clienteNome}</b><br><small>${new Date(p.data).toLocaleDateString('pt-BR')}</small></td>
+          <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
+          <td><button type="button" class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick='visualizarPedido("${p.id}")'>🖨️ Ver Nota</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function visualizarPedido(id) {
+      const ped = state.pedidos.find(p => p.id === id);
+      if (ped) gerarComprovante(ped);
+    }
+
+    function gerarComprovante(ped) {
+      const box = document.getElementById('printable-receipt');
+      const dataFmt = new Date(ped.data).toLocaleString('pt-BR');
+
+      box.innerHTML = `
+        <div style="text-align:center; font-weight:bold; font-size:1.1rem; margin-bottom:8px;">HAPPY EGGS - AVICULTURA</div>
+        <div style="text-align:center; margin-bottom:12px;">Comprovante de Pedido #${ped.id.substring(0,6)}</div>
+        ----------------------------------------<br>
+        <b>DATA:</b> ${dataFmt}<br>
+        <b>CLIENTE:</b> ${ped.clienteNome}<br>
+        <b>TEL:</b> ${ped.clienteTel || '-'}<br>
+        <b>ENDEREÇO:</b> ${ped.clienteEnd || '-'}<br>
+        ----------------------------------------<br>
+        <b>ITENS DO PEDIDO:</b><br>
+        ${ped.itens.map(i => `${i.qtd}x${i.nome} - R$ ${i.subtotal.toFixed(2)}`).join('<br>')}<br>
+        ----------------------------------------<br>
+        <div style="font-size:1.1rem; font-weight:bold; margin-top:8px;">TOTAL: R$ ${parseFloat(ped.total).toFixed(2)}</div>
+        ----------------------------------------<br>
+        <div style="text-align:center; margin-top:10px; font-size:0.75rem;">Obrigado pela preferência!</div>
+      `;
+
+      document.getElementById('modal-nota').style.display = 'flex';
+    }
+
+    function fecharModalNota() {
+      document.getElementById('modal-nota').style.display = 'none';
     }
   </script>
 </body>
