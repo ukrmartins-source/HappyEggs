@@ -77,13 +77,6 @@
     .btn { background: var(--accent); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.9rem; text-align: center; text-decoration: none; display: inline-block; transition: 0.2s; }
     .btn:hover { background: var(--accent-light); }
     .btn-back { background: #475569; padding: 6px 12px; width: auto; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px; }
-    .btn-danger { background: var(--danger); width: auto; padding: 5px 10px; font-size: 0.75rem; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .btn-warning { background: var(--warning); width: auto; padding: 5px 10px; font-size: 0.75rem; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
-
-    .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; cursor: pointer; display: inline-block; }
-    .badge-pago { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-    .badge-pendente { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-    .badge-cancelado { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
@@ -106,67 +99,16 @@
       box-sizing: border-box;
     }
 
-    .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
-    .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
-
-    .stat-card { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
-    .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
-    .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
-
-    /* --- REGRAS DE IMPRESSÃO CORRIGIDAS (EXATAMENTE 1 PÁGINA) --- */
+    /* REGRAS DE IMPRESSÃO (AJUSTADAS PARA 1 PÁGINA A4) */
     @media print {
-      @page {
-        size: A4 portrait;
-        margin: 5mm;
-      }
-      body * {
-        visibility: hidden !important;
-      }
-      body {
-        background: #fff !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-      #modal-nota, #modal-nota * {
-        visibility: visible !important;
-      }
-      #modal-nota {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        height: auto !important;
-        background: #fff !important;
-        display: block !important;
-        backdrop-filter: none !important;
-      }
-      .modal-content {
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        max-height: none !important;
-      }
-      #printable-receipt, #printable-receipt * {
-        visibility: visible !important;
-      }
-      #printable-receipt { 
-        position: relative !important; 
-        left: 0 !important; 
-        top: 0 !important; 
-        width: 100% !important; 
-        border: none !important; 
-        padding: 8px !important;
-        margin: 0 !important;
-        text-align: left !important;
-        font-size: 10pt !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-      }
-      .modal button, .card-title { 
-        display: none !important; 
-      }
+      @page { size: A4 portrait; margin: 5mm; }
+      body * { visibility: hidden !important; }
+      body { background: #fff !important; padding: 0 !important; margin: 0 !important; }
+      #modal-nota, #modal-nota * { visibility: visible !important; }
+      #modal-nota { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; background: #fff !important; display: block !important; }
+      .modal-content { box-shadow: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+      #printable-receipt { border: none !important; padding: 8px !important; margin: 0 !important; page-break-inside: avoid !important; }
+      .modal button, .card-title { display: none !important; }
     }
   </style>
 </head>
@@ -185,7 +127,7 @@
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
-      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura</p>
       <form onsubmit="autenticar(event)">
         <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password"></div>
@@ -203,23 +145,6 @@
         <button class="grid-btn" type="button" onclick="navTo('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navTo('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navTo('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendasDia()">
-          <span class="icon">📊</span><span class="label">RESUMO DE VENDAS DO DIA</span>
-        </button>
-      </div>
-
-      <div class="card" style="margin-top: 15px;">
-        <div class="card-header">
-          <div class="card-title">📋 Busca Rápida de Clientes</div>
-          <button class="btn btn-back" type="button" onclick="navTo('clientes')">➕ Cadastrar</button>
-        </div>
-        <div class="form-group" style="margin-bottom: 10px;">
-          <input type="text" id="dash-busca-cliente" placeholder="🔎 Digite para buscar cliente..." oninput="filtrarClientesDashboard()">
-        </div>
-        <table>
-          <thead><tr><th>Nome / Doc</th><th>Contato</th></tr></thead>
-          <tbody id="lista-clientes-dash"></tbody>
-        </table>
       </div>
     </div>
 
@@ -232,273 +157,31 @@
         </div>
         <form onsubmit="cadastrarCliente(event)">
           <div class="form-group"><label>Nome / Razão Social</label><input type="text" id="cli-nome" required></div>
-          <div class="form-group"><label>Documento (CPF / RG / CNPJ)</label><input type="text" id="cli-doc" placeholder="Ex: 000.000.000-00"></div>
-          <div class="form-group"><label>WhatsApp / Telefone</label><input type="tel" id="cli-tel" placeholder="Ex: 5511999998888" required></div>
-          <div class="form-group"><label>Endereço Completo</label><input type="text" id="cli-end" placeholder="Rua, Nº, Bairro, Cidade" required></div>
+          <div class="form-group"><label>Documento (CPF / CNPJ)</label><input type="text" id="cli-doc"></div>
+          <div class="form-group"><label>WhatsApp / Telefone</label><input type="tel" id="cli-tel" required></div>
+          <div class="form-group"><label>Endereço Completo</label><input type="text" id="cli-end" required></div>
           <button type="submit" class="btn">Salvar Cliente na Nuvem</button>
         </form>
       </div>
       <div class="card">
         <div class="card-title">Clientes Cadastrados</div>
         <table>
-          <thead><tr><th>Nome / Doc</th><th>Contato</th><th>Ação</th></tr></thead>
+          <thead><tr><th>Nome / Doc</th><th>Contato</th></tr></thead>
           <tbody id="lista-clientes"></tbody>
         </table>
       </div>
     </div>
-
-    <!-- TELA: PEDIDOS -->
-    <div id="view-pedidos" class="view-content" style="display:none;">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Novo Pedido</div>
-          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
-        </div>
-        
-        <form onsubmit="finalizarPedido(event)">
-          <div class="form-group">
-            <label>🔎 Buscar Cliente</label>
-            <input type="text" id="ped-busca-cliente" placeholder="Filtrar por nome, doc ou fone..." oninput="filtrarClientesDropdown()">
-          </div>
-          <div class="form-group">
-            <label>Selecione o Cliente</label>
-            <select id="ped-cliente" required></select>
-          </div>
-
-          <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
-
-          <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border:1px solid #e2e8f0;">
-            <div class="form-group">
-              <label>Selecione o Produto</label>
-              <select id="ped-produto"></select>
-            </div>
-            <div style="display: flex; gap: 8px; align-items: flex-end;">
-              <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label>Quantidade</label>
-                <input type="number" id="ped-qtd" min="1" value="1">
-              </div>
-              <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">➕ Adicionar</button>
-            </div>
-          </div>
-
-          <div class="carrinho-box">
-            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛍 ITENS SELECIONADOS:</div>
-            <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
-            <div style="font-size: 1rem; font-weight: bold; text-align: right; margin-top: 10px; color: var(--accent);">Total: R$ <span id="ped-total-valor">0.00</span></div>
-          </div>
-
-          <div class="form-group">
-            <label>Forma de Pagamento</label>
-            <select id="ped-forma-pagamento" required>
-              <option value="Pix">📱 Pix</option>
-              <option value="Cartão de Crédito/Débito">💳 Cartão de Crédito / Débito</option>
-              <option value="Transferência Bancária">🏦 Transferência Bancária</option>
-              <option value="Dinheiro">💵 Dinheiro</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Dados do Pagamento (Opcional)</label>
-            <input type="text" id="ped-dados-pagamento" placeholder="Ex: Chave Pix ou Banco">
-          </div>
-
-          <div class="form-group">
-            <label>Status do Pagamento</label>
-            <select id="ped-status" required>
-              <option value="Pago">🟢 Pago</option>
-              <option value="Pendente">🔴 Pendente (A Pagar)</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Observações do Pedido (Sairá na Nota)</label>
-            <textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Deixar com a portaria"></textarea>
-          </div>
-
-          <button type="submit" class="btn" style="background:var(--success);">Finalizar Pedido</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Histórico de Pedidos</div>
-        <table>
-          <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th></tr></thead>
-          <tbody id="lista-pedidos"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TELA: PRODUTOS / ESTOQUE & ENTRADA DE PRODUÇÃO -->
-    <div id="view-produtos" class="view-content" style="display:none;">
-      <div class="card" style="border-left: 4px solid var(--accent);">
-        <div class="card-header">
-          <div class="card-title">🥚 Registrar Entrada de Produção (Diário)</div>
-          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
-        </div>
-        <form onsubmit="registrarEntradaProducao(event)">
-          <div class="form-group">
-            <label>Selecione o Produto para Entrada</label>
-            <select id="prod-ent-item" required></select>
-          </div>
-          <div class="form-group">
-            <label>Quantidade Coletada/Produzida</label>
-            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 50 ou 100" required>
-          </div>
-          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Coleta de Produção</button>
-        </form>
-
-        <div style="margin-top: 15px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Produção de Hoje</div>
-          <table>
-            <thead><tr><th>Hora</th><th>Item</th><th>Qtd</th></tr></thead>
-            <tbody id="lista-producao-hoje"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title" id="form-prod-title">Cadastrar Novo Produto</div>
-        </div>
-        <form id="form-produto" onsubmit="salvarProduto(event)">
-          <input type="hidden" id="prod-id-edit" value="">
-          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: Ovos Dúzia / Cartela 30" required></div>
-          <div class="form-group"><label>Preço Unitário (R$)</label><input type="number" step="0.01" id="prod-preco" required></div>
-          <div class="form-group"><label>Estoque Inicial/Atual</label><input type="number" id="prod-qtd" required></div>
-          <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
-          <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Estoque Atual</div>
-        <table>
-          <thead><tr><th>Produto</th><th>Preço</th><th>Qtd</th><th>Ações</th></tr></thead>
-          <tbody id="lista-produtos"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TELA: GESTÃO DE USUÁRIOS -->
-    <div id="view-usuarios" class="view-content" style="display:none;">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Adicionar Usuário</div>
-          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
-        </div>
-        <form onsubmit="cadastrarUsuario(event)">
-          <div class="form-group"><label>Login / Nome</label><input type="text" id="usr-login" required autocomplete="username"></div>
-          <div class="form-group"><label>Senha de Acesso</label><input type="password" id="usr-pass" required autocomplete="new-password"></div>
-          <div class="form-group">
-            <label>Nível de Permissão</label>
-            <select id="usr-role">
-              <option value="vendedor">Vendedor (Apenas Vendas/Clientes)</option>
-              <option value="admin">Administrador (Acesso Total)</option>
-            </select>
-          </div>
-          <button type="submit" class="btn">Cadastrar Usuário</button>
-        </form>
-      </div>
-      <div class="card">
-        <div class="card-title">Usuários do Sistema</div>
-        <table>
-          <thead><tr><th>Usuário</th><th>Permissão</th><th>Ação</th></tr></thead>
-          <tbody id="lista-usuarios"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TELA: EMPRESA & MINHA SENHA -->
-    <div id="view-empresa" class="view-content" style="display:none;">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🔒 Alterar Minha Senha</div>
-          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
-        </div>
-        <form onsubmit="alterarMinhaSenha(event)">
-          <div class="form-group"><label>Nova Senha</label><input type="password" id="minha-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
-          <button type="submit" class="btn" style="background:var(--warning);">Atualizar Minha Senha</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Dados da Empresa (Rodapé da Nota)</div>
-        <form onsubmit="salvarEmpresa(event)">
-          <div class="form-group"><label>Nome Fantasia</label><input type="text" id="emp-nome" required></div>
-          <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="emp-cnpj" required></div>
-          <div class="form-group"><label>Telefone / WhatsApp Comercial</label><input type="text" id="emp-tel" placeholder="Ex: (11) 99999-8888" required></div>
-          <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
-          <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @happyeggs | www.happyeggs.com"></div>
-          <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
-          <button type="submit" class="btn" style="background:var(--success);">Salvar Dados da Empresa</button>
-        </form>
-      </div>
-    </div>
   </main>
 
-  <!-- MODAL DE COMPROVANTE / NOTA FISCAL (AJUSTADO PARA IMPRESSÃO/PDF) -->
-  <div class="modal" id="modal-nota">
-    <div class="modal-content">
-      <div class="card-title" style="margin-bottom:10px;">Comprovante do Pedido</div>
-      <div class="receipt-box" id="printable-receipt"></div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
-        <button class="btn" type="button" style="background:#2563eb; flex:1;" onclick="gerarImpressaoNativa()">🖨️ Imprimir</button>
-        <button class="btn" type="button" style="background:#0284c7; flex:1;" onclick="baixarArquivoPDF()">📥 Baixar PDF</button>
-        <button class="btn" type="button" style="background:#10b981; flex:1;" onclick="enviarWhats()">💬 WhatsApp</button>
-      </div>
-      <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:8px;">Fechar Nota</button>
-    </div>
-  </div>
-
-  <!-- MODAL: RESUMO DE VENDAS DO DIA -->
-  <div class="modal" id="modal-resumo">
-    <div class="modal-content">
-      <div class="card-title" style="margin-bottom:12px;">📊 Resumo de Vendas Hoje</div>
-      <div id="resumo-data-hoje" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; font-weight:bold;"></div>
-
-      <div class="stat-card">
-        <div class="stat-title">Total Vendido Hoje</div>
-        <div class="stat-value" id="resumo-total-hoje">R$ 0,00</div>
-      </div>
-
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-        <div class="stat-card" style="margin:0;">
-          <div class="stat-title">Nº de Pedidos</div>
-          <div class="stat-value" id="resumo-qtd-pedidos">0</div>
-        </div>
-        <div class="stat-card" style="margin:0;">
-          <div class="stat-title">Ticket Médio</div>
-          <div class="stat-value" id="resumo-ticket-medio">R$ 0,00</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-title" style="margin-bottom:6px;">Recebimento por Forma de Pagamento</div>
-        <div id="resumo-detalhe-formas" style="font-size:0.85rem; line-height:1.4;"></div>
-      </div>
-
-      <div style="margin-top:15px;">
-        <div class="stat-title" style="margin-bottom:6px;">Vendas Realizadas Hoje</div>
-        <table>
-          <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
-          <tbody id="resumo-tabela-hoje"></tbody>
-        </table>
-      </div>
-
-      <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b; margin-top:15px;">Fechar Resumo</button>
-    </div>
-  </div>
-
   <script>
-    // --- CONFIGURAÇÃO DO NOVO FIREBASE HAPPY EGGS ---
+    // ⚠️ IMPORTANTE: RESTAURE AQUI AS CREDENCIAIS DO BANCO DE DADOS DA SUA EMPRESA ORIGINAL!
     const firebaseConfig = {
-      apiKey: "AIzaSyAYmxniwbHyi4HmTH-aVlHo2zp-7pXY_lg",
-      authDomain: "happyeggs-534f2.firebaseapp.com",
-      projectId: "happyeggs-534f2",
-      storageBucket: "happyeggs-534f2.firebasestorage.app",
-      messagingSenderId: "682226137910",
-      appId: "1:682226137910:web:2aaca1393954e3be875197",
-      measurementId: "G-CEBF9P0K94"
+      apiKey: "SUA_API_KEY_ORIGINAL",
+      authDomain: "SEU_PROJECT_ID.firebaseapp.com",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_PROJECT_ID.appspot.com",
+      messagingSenderId: "SEU_SENDER_ID",
+      appId: "SEU_APP_ID"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -506,101 +189,30 @@
 
     let state = {
       usuarios: [],
-      empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "" },
       produtos: [],
       clientes: [],
       pedidos: [],
-      producao: [],
       currentUser: null,
-      pedidoAtual: null,
       listenersUnsubscribe: []
     };
 
-    let carrinhoTemp = [];
-
-    function initApp() {
-      db.collection("usuarios").get().then(snapshot => {
-        state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (state.usuarios.length === 0) {
-          db.collection("usuarios").doc("admin").set({ 
-            login: "admin", 
-            pass: "1234", 
-            role: "admin",
-            empresaId: "empresa_demo"
-          });
-          db.collection("empresas").doc("empresa_demo").set({
-            nome: "Granja Demonstração",
-            status: "Ativo"
-          });
-        }
-      }).catch(err => console.error("Erro na inicialização:", err));
-    }
-
-    // --- ESCUTADORES EM TEMPO REAL ISOLADOS POR EMPRESA ---
     function initListeners() {
       state.listenersUnsubscribe.forEach(unsub => unsub());
       state.listenersUnsubscribe = [];
 
-      if (!state.currentUser || !state.currentUser.empresaId) return;
-
-      const empresaId = state.currentUser.empresaId;
-
-      const unsubClientes = db.collection("clientes").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+      // Carrega diretamente sem filtrar por empresaId
+      const unsubClientes = db.collection("clientes").onSnapshot(snapshot => {
         state.clientes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        render();
-      }, err => console.error("Erro clientes:", err));
+        renderClientes();
+      });
 
-      const unsubProdutos = db.collection("produtos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+      const unsubProdutos = db.collection("produtos").onSnapshot(snapshot => {
         state.produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        render();
-      }, err => console.error("Erro produtos:", err));
-
-      const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.pedidos = snapshot.docs.map(doc => {
-          const dataDoc = doc.data();
-          let dataCriacaoParsed = new Date();
-          if (dataDoc.dataCriacao && dataDoc.dataCriacao.toDate) {
-            dataCriacaoParsed = dataDoc.dataCriacao.toDate();
-          } else if (dataDoc.dataCriacao) {
-            dataCriacaoParsed = new Date(dataDoc.dataCriacao);
-          }
-          return { id: doc.id, ...dataDoc, dataCriacao: dataCriacaoParsed };
-        }).sort((a, b) => b.dataCriacao - a.dataCriacao);
-
-        render();
-      }, err => console.error("Erro pedidos:", err));
-
-      const unsubProducao = db.collection("producao").where("empresaId", "==", empresaId).orderBy("dataHora", "desc").limit(50).onSnapshot(snapshot => {
-        state.producao = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderProducaoHoje();
-      }, err => console.error("Erro producao:", err));
-
-      const unsubEmpresa = db.collection("config").doc(empresaId).onSnapshot(doc => {
-        if (doc.exists) {
-          state.empresa = doc.data();
-          carregarEmpresaCampos();
-        }
       });
 
-      const unsubUsuarios = db.collection("usuarios").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        render();
-      });
-
-      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios);
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos);
     }
 
-    function carregarEmpresaCampos() {
-      if (!document.getElementById('emp-nome')) return;
-      document.getElementById('emp-nome').value = state.empresa.nome || '';
-      document.getElementById('emp-cnpj').value = state.empresa.cnpj || '';
-      document.getElementById('emp-tel').value = state.empresa.tel || '';
-      document.getElementById('emp-end').value = state.empresa.end || '';
-      document.getElementById('emp-social').value = state.empresa.social || '';
-      document.getElementById('emp-pix').value = state.empresa.pix || '';
-    }
-
-    // --- AUTENTICAÇÃO COM VERIFICAÇÃO DE LICENÇA ---
     async function autenticar(e) {
       e.preventDefault();
       const u = document.getElementById('login-user').value.trim().toLowerCase();
@@ -608,34 +220,17 @@
       
       try {
         const snapshot = await db.collection("usuarios").where("login", "==", u).get();
-        if (snapshot.empty) {
-          alert('Usuário ou senha incorretos!');
-          return;
-        }
+        if (snapshot.empty) return alert('Usuário ou senha incorretos!');
 
         const userDoc = snapshot.docs[0];
         const found = { id: userDoc.id, ...userDoc.data() };
 
-        if (found.pass !== p) {
-          alert('Usuário ou senha incorretos!');
-          return;
-        }
-
-        const empresaId = found.empresaId || "empresa_demo";
-        const empDoc = await db.collection("empresas").doc(empresaId).get();
-        if (empDoc.exists) {
-          const empData = empDoc.data();
-          if (empData.status !== "Ativo") {
-            alert("A conta da sua empresa está inativa ou pendente de pagamento. Entre em contato com o suporte.");
-            return;
-          }
-        }
+        if (found.pass !== p) return alert('Usuário ou senha incorretos!');
 
         state.currentUser = found;
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('app-header').style.display = 'flex';
         document.getElementById('user-display').innerText = `👤 ${found.login.toUpperCase()}`;
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
         
         initListeners();
         navTo('dashboard');
@@ -652,7 +247,6 @@
       document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
       document.getElementById('view-dashboard').style.display = 'none';
       document.getElementById('view-login').style.display = 'block';
-      document.getElementById('login-pass').value = '';
     }
 
     function navTo(screen) {
@@ -662,73 +256,31 @@
       else document.getElementById(`view-${screen}`).style.display = 'block';
     }
 
-    function alterarMinhaSenha(e) {
+    function cadastrarCliente(e) {
       e.preventDefault();
-      const novaSenha = document.getElementById('minha-nova-senha').value.trim();
-      if (!novaSenha) return alert('Por favor, introduza uma nova senha.');
-
-      if (state.currentUser) {
-        const docId = state.currentUser.id || state.currentUser.login;
-        db.collection("usuarios").doc(docId).update({ pass: novaSenha })
-        .then(() => {
-          state.currentUser.pass = novaSenha;
-          alert('Sua senha foi alterada com sucesso!');
-          document.getElementById('minha-nova-senha').value = '';
-        }).catch(err => alert('Erro ao mudar a senha: ' + err.message));
-      }
-    }
-
-    function alterarSenhaUsuario(docId, login) {
-      const novaSenha = prompt(`Digite a nova senha para o usuário ${login.toUpperCase()}:`);
-      if (novaSenha && novaSenha.trim() !== "") {
-        db.collection("usuarios").doc(docId).update({ pass: novaSenha.trim() })
-        .then(() => alert('Senha alterada com sucesso!'))
-        .catch(err => alert('Erro ao alterar senha: ' + err.message));
-      }
-    }
-
-    // --- FUNÇÕES DE IMPRESSÃO E PDF CORRIGIDAS ---
-    function gerarImpressaoNativa() {
-      window.print();
-    }
-
-    function baixarArquivoPDF() {
-      const elemento = document.getElementById('printable-receipt');
-      if (!elemento) return;
-
-      const numPedido = state.pedidoAtual ? state.pedidoAtual.id.slice(-6) : 'comprovante';
-      
-      const opcoes = {
-        margin:       [5, 5, 5, 5],
-        filename:     `pedido_${numPedido}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, logging: false },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      const novoCliente = {
+        nome: document.getElementById('cli-nome').value.trim(),
+        doc: document.getElementById('cli-doc').value.trim(),
+        tel: document.getElementById('cli-tel').value.trim(),
+        end: document.getElementById('cli-end').value.trim()
       };
 
-      html2pdf().set(opcoes).from(elemento).save();
+      db.collection("clientes").add(novoCliente).then(() => {
+        alert('Cliente cadastrado com sucesso!');
+        e.target.reset();
+      }).catch(err => alert('Erro ao cadastrar cliente: ' + err.message));
     }
 
-    function render() {
-      // Função padrão de renderização das tabelas/conteúdos do sistema
+    function renderClientes() {
+      const tbody = document.getElementById('lista-clientes');
+      if (!tbody) return;
+      tbody.innerHTML = state.clientes.map(c => `
+        <tr>
+          <td><b>${c.nome}</b><br><small>${c.doc || '-'}</small></td>
+          <td>${c.tel}</td>
+        </tr>
+      `).join('');
     }
-
-    function renderProducaoHoje() {
-      // Função para atualizar tabela de produção diária
-    }
-
-    function abrirResumoVendasDia() {
-      document.getElementById('modal-resumo').style.display = 'flex';
-    }
-
-    function enviarWhats() {
-      if (!state.pedidoAtual) return;
-      const fone = state.pedidoAtual.clienteTel ? state.pedidoAtual.clienteTel.replace(/\D/g, '') : '';
-      const msg = encodeURIComponent(`Olá! Segue o comprovante do seu pedido #${state.pedidoAtual.id.slice(-6)}.`);
-      window.open(`https://wa.me/${fone}?text=${msg}`, '_blank');
-    }
-
-    window.onload = initApp;
   </script>
 </body>
 </html>
