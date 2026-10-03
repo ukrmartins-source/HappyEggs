@@ -13,6 +13,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+  <!-- HTML2PDF PARA GERAR PDF DIRETO NO NAVEGADOR -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <style>
     :root {
       --primary: #1e293b;
@@ -71,7 +74,7 @@
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #f8fafc; }
     .form-group input:focus, .form-group select:focus { border-color: var(--accent); outline: none; background: #fff; }
 
-    .btn { background: var(--accent); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.9rem; text-align: center; text-decoration: none; display: inline-block; transition: 0.2s; }
+    .btn { background: var(--accent); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.9rem; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
     .btn:hover { background: var(--accent-light); }
     .btn-back { background: #475569; padding: 6px 12px; width: auto; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px; }
     .btn-danger { background: var(--danger); width: auto; padding: 5px 10px; font-size: 0.75rem; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
@@ -85,20 +88,29 @@
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
     th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
 
+    /* ESTILOS DO MODAL DE NOTA E CUPOM (IMAGEM 1) */
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.7); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
-    .modal-content { background: white; width: 92%; max-width: 480px; border-radius: 12px; padding: 22px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+    .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
     .receipt-box { 
-      border: 1px dashed #000; 
-      padding: 16px; 
-      font-family: 'Courier New', monospace; 
-      font-size: 0.85rem; 
-      background: #fff; 
-      margin-bottom: 12px; 
-      color: #000;
+      border: 1.5px dashed #4b5563; 
+      border-radius: 8px;
+      padding: 18px; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 0.9rem; 
+      background: #ffffff; 
+      margin-bottom: 16px; 
+      color: #1f2937;
       text-align: left;
       width: 100%;
       word-wrap: break-word;
+      line-height: 1.4;
+    }
+
+    .dashed-divider {
+      border: none;
+      border-top: 1.5px dashed #9ca3af;
+      margin: 10px 0;
     }
 
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
@@ -108,24 +120,30 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
+    /* CORREÇÃO PARA A IMPRESSÃO (RESOLVE O PROBLEMA DA IMAGEM 2) */
     @media print {
       body * { visibility: hidden; }
-      #modal-nota, #modal-nota * { visibility: visible; }
       #printable-receipt, #printable-receipt * { visibility: visible; }
       #printable-receipt { 
         position: absolute; 
         left: 0; 
         top: 0; 
-        width: 100% !important; 
-        border: none; 
-        padding: 0;
-        margin: 0;
-        text-align: left !important;
-        font-size: 11pt;
+        width: 80mm !important; 
+        border: none !important; 
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 10pt;
       }
-      .modal-content { box-shadow: none; padding: 0; width: 100%; max-width: 100%; }
-      .modal { position: absolute; left: 0; top: 0; background: none; }
-      .modal button { display: none !important; }
+      .modal, .modal-content { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        background: none !important; 
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+      }
+      .no-print { display: none !important; }
     }
   </style>
 </head>
@@ -289,7 +307,6 @@
 
     <!-- TELA: ESTOQUE E EMBALAGENS -->
     <div id="view-produtos" class="view-content" style="display:none;">
-      <!-- CARD 1: SALDO DE ESTOQUE E ENTRADA DE PRODUÇÃO -->
       <div class="card" style="border-left: 4px solid var(--accent);">
         <div class="card-header">
           <div class="card-title">🥚 Registrar Entrada de Produção</div>
@@ -318,7 +335,6 @@
         </div>
       </div>
 
-      <!-- CARD 2: CADASTRAR/EDITAR PRODUTOS/EMBALAGENS -->
       <div class="card">
         <div class="card-header">
           <div class="card-title" id="form-prod-title">Cadastrar Novo Produto / Embalagem</div>
@@ -343,7 +359,6 @@
         </form>
       </div>
 
-      <!-- CARD 3: TABELA DE EMBALAGENS CADASTRADAS -->
       <div class="card">
         <div class="card-title">Produtos / Apresentações Disponíveis</div>
         <table>
@@ -410,16 +425,33 @@
     </div>
   </main>
 
-  <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
+  <!-- MODAL DE COMPROVANTE / NOTA FISCAL (LAYOUT DA IMAGEM 1 COM OPÇÕES) -->
   <div class="modal" id="modal-nota">
     <div class="modal-content">
-      <div class="card-title" style="margin-bottom:10px;">Comprovante do Pedido</div>
+      <div class="card-title no-print" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
+      
+      <!-- RECIBO COM BORDA TRACEJADA -->
       <div class="receipt-box" id="printable-receipt"></div>
-      <div style="display:flex; gap:8px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarImpressaoOuPDF()">📄 Imprimir / PDF</button>
-        <button class="btn" type="button" style="background:#10b981;" onclick="enviarWhats()">💬 WhatsApp</button>
+      
+      <!-- PAINEL DE AÇÕES E BOTÕES -->
+      <div class="no-print" style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <button class="btn" type="button" style="background:#2563eb;" onclick="salvarNotaPDF()">
+            💾 Salvar PDF
+          </button>
+          <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirNota()">
+            🖨️ Imprimir
+          </button>
+        </div>
+        
+        <button class="btn" type="button" style="background:#10b981;" onclick="enviarWhats()">
+          💬 WhatsApp
+        </button>
+
+        <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:4px;">
+          Fechar Nota
+        </button>
       </div>
-      <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:8px;">Fechar Nota</button>
     </div>
   </div>
 
@@ -510,7 +542,7 @@
       }).catch(err => console.error("Erro na inicialização:", err));
     }
 
-    // --- ESCUTADORES EM TEMPO REAL ISOLADOS POR EMPRESA ---
+    // --- ESCUTADORES EM TEMPO REAL ---
     function initListeners() {
       state.listenersUnsubscribe.forEach(unsub => unsub());
       state.listenersUnsubscribe = [];
@@ -640,184 +672,272 @@
     function navTo(screen) {
       document.getElementById('view-dashboard').style.display = 'none';
       document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
-      if (screen === 'dashboard') document.getElementById('view-dashboard').style.display = 'block';
-      else document.getElementById(`view-${screen}`).style.display = 'block';
-    }
-
-    function alterarMinhaSenha(e) {
-      e.preventDefault();
-      const novaSenha = document.getElementById('minha-nova-senha').value.trim();
-      if (!novaSenha) return alert('Por favor, introduza uma nova senha.');
-
-      if (state.currentUser) {
-        const docId = state.currentUser.id || state.currentUser.login;
-        db.collection("usuarios").doc(docId).update({ pass: novaSenha })
-        .then(() => {
-          state.currentUser.pass = novaSenha;
-          alert('Sua senha foi alterada com sucesso!');
-          document.getElementById('minha-nova-senha').value = '';
-        }).catch(err => alert('Erro ao mudar a senha: ' + err.message));
+      if (screen === 'dashboard') {
+        document.getElementById('view-dashboard').style.display = 'block';
+      } else {
+        const target = document.getElementById(`view-${screen}`);
+        if(target) target.style.display = 'block';
       }
     }
 
-    function alterarSenhaUsuario(docId, login) {
-      const novaSenha = prompt(`Digite a nova senha para o usuário ${login.toUpperCase()}:`);
-      if (novaSenha && novaSenha.trim() !== "") {
-        db.collection("usuarios").doc(docId).update({ pass: novaSenha.trim() })
-        .then(() => alert(`Senha do usuário ${login} atualizada!`))
-        .catch(err => alert('Erro: ' + err.message));
+    function render() {
+      renderClientes();
+      renderProdutos();
+      renderPedidos();
+      renderUsuarios();
+    }
+
+    function renderClientes() {
+      const tbDash = document.getElementById('lista-clientes-dash');
+      const tbFull = document.getElementById('lista-clientes');
+      const selectPed = document.getElementById('ped-cliente');
+
+      if (tbDash) {
+        tbDash.innerHTML = state.clientes.map(c => `
+          <tr>
+            <td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td>
+            <td><a href="https://wa.me/${(c.tel||'').replace(/\D/g,'')}" target="_blank" style="color:#10b981; font-weight:bold; text-decoration:none;">📱 ${c.tel}</a></td>
+          </tr>
+        `).join('');
+      }
+
+      if (tbFull) {
+        tbFull.innerHTML = state.clientes.map(c => `
+          <tr>
+            <td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td>
+            <td>${c.tel}</td>
+            <td><button class="btn-danger" onclick="excluirCliente('${c.id}')">Excluir</button></td>
+          </tr>
+        `).join('');
+      }
+
+      if (selectPed) {
+        selectPed.innerHTML = `<option value="">-- Selecione o Cliente --</option>` + 
+          state.clientes.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
       }
     }
 
-    // --- ENTRADA DE PRODUÇÃO DIRETO PARA O ESTOQUE GERAL DE OVOS ---
-    function registrarEntradaProducao(e) {
-      e.preventDefault();
-      const qtdInput = document.getElementById('prod-ent-qtd');
-      const quantidade = parseInt(qtdInput.value, 10);
+    function renderProdutos() {
+      const tb = document.getElementById('lista-produtos');
+      const selectPed = document.getElementById('ped-produto');
 
-      if (!quantidade || quantidade <= 0) return alert('Informe uma quantidade válida!');
+      if (tb) {
+        tb.innerHTML = state.produtos.map(p => `
+          <tr>
+            <td><strong>${p.nome}</strong></td>
+            <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
+            <td>${p.ovosPorUnidade || 0} un.</td>
+            <td>
+              <button class="btn-warning" onclick="editarProduto('${p.id}')">Editar</button>
+              <button class="btn-danger" onclick="excluirProduto('${p.id}')">Excluir</button>
+            </td>
+          </tr>
+        `).join('');
+      }
 
-      const empresaId = state.currentUser.empresaId;
-      const novoTotal = state.estoqueGeralOvos + quantidade;
+      if (selectPed) {
+        selectPed.innerHTML = `<option value="">-- Selecione o Produto --</option>` + 
+          state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)}</option>`).join('');
+      }
+    }
 
-      db.collection("estoque_geral").doc(empresaId).set({
-        qtdOvos: novoTotal,
-        empresaId: empresaId
-      }, { merge: true }).then(() => {
-        registrarLogProducao(quantidade);
-        qtdInput.value = '';
-        alert(`Sucesso! ${quantidade.toLocaleString('pt-BR')} ovos foram adicionados ao Saldo Geral.`);
-      }).catch(err => alert('Erro ao registrar entrada: ' + err.message));
+    function renderPedidos() {
+      const tb = document.getElementById('lista-pedidos');
+      if (!tb) return;
+
+      tb.innerHTML = state.pedidos.slice().reverse().map(p => {
+        const isPago = p.status === 'Pago';
+        return `
+          <tr>
+            <td><strong>#${p.numeroPedido || '---'}</strong></td>
+            <td>${p.clienteNome}</td>
+            <td>R$ ${parseFloat(p.total).toFixed(2)}</td>
+            <td>
+              <span class="badge ${isPago ? 'badge-pago' : 'badge-pendente'}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">
+                ${isPago ? '🟢 Pago' : '🔴 Pendente'}
+              </span>
+            </td>
+            <td>
+              <button class="btn" style="padding:4px 8px; font-size:0.75rem; width:auto; display:inline-block;" onclick="abrirModalNota('${p.id}')">📄 Nota</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     function renderEstoqueGeral() {
       const el = document.getElementById('estoque-geral-ovos');
-      if (el) {
-        el.innerText = `${(state.estoqueGeralOvos || 0).toLocaleString('pt-BR')} Ovos`;
-      }
-    }
-
-    function registrarLogProducao(qtd) {
-      const agora = new Date();
-      db.collection("producao").add({
-        dataHora: firebase.firestore.Timestamp.fromDate(agora),
-        qtd: qtd,
-        empresaId: state.currentUser.empresaId
-      });
+      if (el) el.innerText = `${state.estoqueGeralOvos.toLocaleString('pt-BR')} Ovos`;
     }
 
     function renderProducaoHoje() {
-      const tbody = document.getElementById('lista-producao-hoje');
-      if (!tbody) return;
-      
-      const hojeStr = new Date().toDateString();
-      const producaoHoje = state.producao.filter(item => {
-        if (!item.dataHora) return false;
-        const d = item.dataHora.toDate ? item.dataHora.toDate() : new Date(item.dataHora);
-        return d.toDateString() === hojeStr;
+      const tb = document.getElementById('lista-producao-hoje');
+      if (!tb) return;
+
+      const hojeStr = new Date().toLocaleDateString('pt-BR');
+      const producaoHoje = state.producao.filter(p => {
+        const d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
+        return d.toLocaleDateString('pt-BR') === hojeStr;
       });
 
-      if (producaoHoje.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#64748b;">Nenhuma coleta registrada hoje.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = producaoHoje.map(p => {
-        const d = p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
-        const horaStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        return `<tr>
-          <td>${horaStr}</td>
-          <td><strong>+${p.qtd.toLocaleString('pt-BR')} ovos</strong></td>
-        </tr>`;
+      tb.innerHTML = producaoHoje.map(p => {
+        const d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
+        return `<tr><td>${d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</td><td>+${p.qtd} ovos</td></tr>`;
       }).join('');
     }
 
-    // --- CADASTRO DE EMBALAGENS (SEM CAMPO DE ESTOQUE INDIVIDUAL) ---
-    function salvarProduto(e) {
+    function renderUsuarios() {
+      const tb = document.getElementById('lista-usuarios');
+      if (!tb) return;
+      tb.innerHTML = state.usuarios.map(u => `
+        <tr>
+          <td><strong>${u.login}</strong></td>
+          <td>${u.role}</td>
+          <td><button class="btn-danger" onclick="excluirUsuario('${u.id}')">Excluir</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // --- FUNÇÕES DE CADASTRO E AÇÕES ---
+    async function cadastrarCliente(e) {
+      e.preventDefault();
+      const nome = document.getElementById('cli-nome').value.trim();
+      const doc = document.getElementById('cli-doc').value.trim();
+      const tel = document.getElementById('cli-tel').value.trim();
+      const end = document.getElementById('cli-end').value.trim();
+
+      await db.collection("clientes").add({
+        empresaId: state.currentUser.empresaId,
+        nome, doc, tel, end
+      });
+
+      alert('Cliente cadastrado com sucesso!');
+      e.target.reset();
+    }
+
+    async function excluirCliente(id) {
+      if (confirm('Deseja realmente remover este cliente?')) {
+        await db.collection("clientes").doc(id).delete();
+      }
+    }
+
+    async function salvarProduto(e) {
       e.preventDefault();
       const id = document.getElementById('prod-id-edit').value;
       const nome = document.getElementById('prod-nome').value.trim();
       const preco = parseFloat(document.getElementById('prod-preco').value);
-      const ovosPorEmbalagem = parseInt(document.getElementById('prod-ovos-unid').value, 10);
-
-      const payload = {
-        nome: nome,
-        preco: preco,
-        ovosPorEmbalagem: ovosPorEmbalagem,
-        empresaId: state.currentUser.empresaId
-      };
+      const ovosPorUnidade = parseInt(document.getElementById('prod-ovos-unid').value);
 
       if (id) {
-        db.collection("produtos").doc(id).update(payload)
-        .then(() => {
-          alert('Produto/Embalagem atualizado!');
-          limparFormProduto();
-        });
+        await db.collection("produtos").doc(id).update({ nome, preco, ovosPorUnidade });
+        alert('Produto atualizado!');
       } else {
-        db.collection("produtos").add(payload)
-        .then(() => {
-          alert('Produto/Embalagem cadastrado na nuvem!');
-          limparFormProduto();
+        await db.collection("produtos").add({
+          empresaId: state.currentUser.empresaId,
+          nome, preco, ovosPorUnidade
         });
+        alert('Produto cadastrado!');
       }
+      limparFormProduto();
     }
 
     function editarProduto(id) {
-      const prod = state.produtos.find(p => p.id === id);
-      if (!prod) return;
-      document.getElementById('prod-id-edit').value = prod.id;
-      document.getElementById('prod-nome').value = prod.nome;
-      document.getElementById('prod-preco').value = prod.preco;
-      document.getElementById('prod-ovos-unid').value = prod.ovosPorEmbalagem || 1;
-      
-      document.getElementById('form-prod-title').innerText = "Editar Produto / Embalagem";
+      const p = state.produtos.find(prod => prod.id === id);
+      if (!p) return;
+      document.getElementById('prod-id-edit').value = p.id;
+      document.getElementById('prod-nome').value = p.nome;
+      document.getElementById('prod-preco').value = p.preco;
+      document.getElementById('prod-ovos-unid').value = p.ovosPorUnidade;
+      document.getElementById('form-prod-title').innerText = "Editar Produto";
       document.getElementById('btn-salvar-prod').innerText = "Atualizar Produto";
       document.getElementById('btn-cancelar-edit').style.display = "block";
     }
 
     function limparFormProduto() {
-      document.getElementById('prod-id-edit').value = "";
       document.getElementById('form-produto').reset();
+      document.getElementById('prod-id-edit').value = "";
       document.getElementById('form-prod-title').innerText = "Cadastrar Novo Produto / Embalagem";
       document.getElementById('btn-salvar-prod').innerText = "Salvar Produto na Nuvem";
       document.getElementById('btn-cancelar-edit').style.display = "none";
     }
 
-    function deletarProduto(id) {
-      if (confirm('Deseja excluir este produto/embalagem?')) {
-        db.collection("produtos").doc(id).delete();
+    async function excluirProduto(id) {
+      if (confirm('Excluir este produto?')) {
+        await db.collection("produtos").doc(id).delete();
       }
     }
 
-    // --- CARRINHO E CRIAÇÃO DE PEDIDOS ---
-    function adicionarItemAoPedido() {
-      const sel = document.getElementById('ped-produto');
-      const prodId = sel.value;
-      const qtdVendida = parseInt(document.getElementById('ped-qtd').value, 10);
+    async function registrarEntradaProducao(e) {
+      e.preventDefault();
+      const qtd = parseInt(document.getElementById('prod-ent-qtd').value);
+      if (!qtd || qtd <= 0) return;
 
-      if (!prodId || !qtdVendida || qtdVendida <= 0) return alert('Selecione uma embalagem e quantidade válida.');
+      const empresaId = state.currentUser.empresaId;
+      const novoTotal = state.estoqueGeralOvos + qtd;
+
+      await db.collection("estoque_geral").doc(empresaId).set({ qtdOvos: novoTotal }, { merge: true });
+      await db.collection("producao").add({
+        empresaId,
+        qtd,
+        dataHora: new Date()
+      });
+
+      alert(`+${qtd} ovos adicionados ao estoque!`);
+      e.target.reset();
+    }
+
+    function adicionarItemAoPedido() {
+      const prodId = document.getElementById('ped-produto').value;
+      const qtd = parseInt(document.getElementById('ped-qtd').value);
+
+      if (!prodId || !qtd || qtd <= 0) {
+        alert('Selecione um produto e uma quantidade válida!');
+        return;
+      }
 
       const prod = state.produtos.find(p => p.id === prodId);
       if (!prod) return;
-
-      const ovosPorEmb = prod.ovosPorEmbalagem || 1;
-      const totalOvosNecessarios = qtdVendida * ovosPorEmb;
-
-      if (state.estoqueGeralOvos < totalOvosNecessarios) {
-        alert(`Estoque insuficiente! Saldo em estoque geral: ${state.estoqueGeralOvos.toLocaleString('pt-BR')} ovos. Necessário: ${totalOvosNecessarios.toLocaleString('pt-BR')} ovos.`);
-        return;
-      }
 
       carrinhoTemp.push({
         produtoId: prod.id,
         nome: prod.nome,
         precoUnitario: prod.preco,
-        quantidade: qtdVendida,
-        ovosPorEmbalagem: ovosPorEmb,
-        subtotal: prod.preco * qtdVendida
+        qtd: qtd,
+        ovosPorUnidade: prod.ovosPorUnidade || 0,
+        subtotal: prod.preco * qtd
       });
 
       renderCarrinho();
+    }
+
+    function renderCarrinho() {
+      const el = document.getElementById('itens-pedido-lista');
+      const totalEl = document.getElementById('ped-total-valor');
+
+      if (carrinhoTemp.length === 0) {
+        el.innerHTML = `<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>`;
+        totalEl.innerText = "0.00";
+        return;
+      }
+
+      let total = 0;
+      el.innerHTML = carrinhoTemp.map((item, index) => {
+        total += item.subtotal;
+        return `
+          <div class="carrinho-item">
+            <div>
+              <strong>${item.qtd}x ${item.nome}</strong><br>
+              <small>R$ ${item.precoUnitario.toFixed(2)} un.</small>
+            </div>
+            <div>
+              <strong>R$ ${item.subtotal.toFixed(2)}</strong>
+              <button class="btn-danger" style="margin-left:8px;" type="button" onclick="removerItemCarrinho(${index})">X</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      totalEl.innerText = total.toFixed(2);
     }
 
     function removerItemCarrinho(index) {
@@ -825,415 +945,279 @@
       renderCarrinho();
     }
 
-    function renderCarrinho() {
-      const container = document.getElementById('itens-pedido-lista');
-      const totalSpan = document.getElementById('ped-total-valor');
-
-      if (carrinhoTemp.length === 0) {
-        container.innerHTML = `<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>`;
-        totalSpan.innerText = "0.00";
-        return;
-      }
-
-      let total = 0;
-      container.innerHTML = carrinhoTemp.map((item, index) => {
-        total += item.subtotal;
-        return `<div class="carrinho-item">
-          <div>
-            <strong>${item.nome}</strong><br>
-            <span style="font-size:0.75rem; color:#64748b;">${item.quantidade}x R$ ${item.precoUnitario.toFixed(2)} (${item.quantidade * item.ovosPorEmbalagem} ovos)</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <strong>R$ ${item.subtotal.toFixed(2)}</strong>
-            <button class="btn-danger" type="button" onclick="removerItemCarrinho(${index})">✕</button>
-          </div>
-        </div>`;
-      }).join('');
-
-      totalSpan.innerText = total.toFixed(2);
-    }
-
-    function finalizarPedido(e) {
+    async function finalizarPedido(e) {
       e.preventDefault();
-      if (carrinhoTemp.length === 0) return alert('Adicione pelo menos um produto ao pedido.');
+      const clienteId = document.getElementById('ped-cliente').value;
+      if (!clienteId) { alert('Selecione um cliente!'); return; }
+      if (carrinhoTemp.length === 0) { alert('Adicione pelo menos um item ao pedido!'); return; }
 
-      const cliId = document.getElementById('ped-cliente').value;
-      const cliente = state.clientes.find(c => c.id === cliId);
-      if (!cliente) return alert('Selecione um cliente válido.');
-
-      const formaPag = document.getElementById('ped-forma-pagamento').value;
-      const dadosPag = document.getElementById('ped-dados-pagamento').value.trim();
-      const statusPag = document.getElementById('ped-status').value;
+      const cliente = state.clientes.find(c => c.id === clienteId);
+      const formaPgto = document.getElementById('ped-forma-pagamento').value;
+      const dadosPgto = document.getElementById('ped-dados-pagamento').value.trim();
+      const status = document.getElementById('ped-status').value;
       const obs = document.getElementById('ped-obs').value.trim();
+      const total = carrinhoTemp.reduce((acc, i) => acc + i.subtotal, 0);
 
-      let totalValor = 0;
+      const empresaId = state.currentUser.empresaId;
+
+      // Calcular número sequencial do pedido
+      const totalPedidosDoc = await db.collection("pedidos").where("empresaId", "==", empresaId).get();
+      const proximoNumero = totalPedidosDoc.size + 1;
+
+      // Descontar do estoque geral
       let totalOvosConsumidos = 0;
-
-      carrinhoTemp.forEach(i => {
-        totalValor += i.subtotal;
-        totalOvosConsumidos += (i.quantidade * i.ovosPorEmbalagem);
+      carrinhoTemp.forEach(item => {
+        totalOvosConsumidos += (item.ovosPorUnidade * item.qtd);
       });
 
-      if (state.estoqueGeralOvos < totalOvosConsumidos) {
-        return alert(`Estoque geral de ovos insuficiente! Saldo: ${state.estoqueGeralOvos} ovos. Pedido requer: ${totalOvosConsumidos} ovos.`);
-      }
-
-      const proximoNumero = state.pedidos.length > 0 
-        ? Math.max(...state.pedidos.map(p => p.numeroPedido || 0)) + 1 
-        : 1;
+      const novoEstoque = Math.max(0, state.estoqueGeralOvos - totalOvosConsumidos);
+      await db.collection("estoque_geral").doc(empresaId).set({ qtdOvos: novoEstoque }, { merge: true });
 
       const novoPedido = {
+        empresaId,
         numeroPedido: proximoNumero,
         clienteId: cliente.id,
         clienteNome: cliente.nome,
+        clienteDoc: cliente.doc || 'N/I',
         clienteTel: cliente.tel || '',
         clienteEnd: cliente.end || '',
         itens: carrinhoTemp,
-        total: totalValor,
-        totalOvos: totalOvosConsumidos,
-        formaPagamento: formaPag,
-        dadosPagamento: dadosPag,
-        status: statusPag,
-        obs: obs,
-        dataCriacao: firebase.firestore.Timestamp.fromDate(new Date()),
-        empresaId: state.currentUser.empresaId
+        total,
+        formaPgto,
+        dadosPgto,
+        status,
+        obs,
+        dataCriacao: new Date()
       };
 
-      const batch = db.batch();
+      const docRef = await db.collection("pedidos").add(novoPedido);
+      alert(`Pedido #${proximoNumero} gerado com sucesso!`);
 
-      // Desconto no Saldo Geral de Ovos
-      const estoqueRef = db.collection("estoque_geral").doc(state.currentUser.empresaId);
-      const novoSaldoOvos = Math.max(0, state.estoqueGeralOvos - totalOvosConsumidos);
-      batch.update(estoqueRef, { qtdOvos: novoSaldoOvos });
+      carrinhoTemp = [];
+      renderCarrinho();
+      e.target.reset();
 
-      const pedidoRef = db.collection("pedidos").doc();
-      batch.set(pedidoRef, novoPedido);
-
-      batch.commit().then(() => {
-        alert(`Pedido Nº ${proximoNumero} finalizado com sucesso! (${totalOvosConsumidos} ovos abatidos do estoque geral)`);
-        carrinhoTemp = [];
-        renderCarrinho();
-        document.getElementById('ped-obs').value = '';
-        document.getElementById('ped-dados-pagamento').value = '';
-        
-        abrirComprovante({ id: pedidoRef.id, ...novoPedido, dataCriacao: new Date() });
-      }).catch(err => alert('Erro ao finalizar pedido: ' + err.message));
+      abrirModalNota(docRef.id);
     }
 
-    async function cancelarEExcluirPedido(pedidoId, numeroPedidoExcluido) {
-      if (!confirm(`Tem certeza que deseja CANCELAR/EXCLUIR o Pedido Nº ${numeroPedidoExcluido}?\n\nOs ovos do pedido serão devolvidos ao estoque geral.`)) {
-        return;
-      }
-
-      try {
-        const pedido = state.pedidos.find(p => p.id === pedidoId);
-        const batch = db.batch();
-
-        if (pedido && pedido.totalOvos) {
-          const estoqueRef = db.collection("estoque_geral").doc(state.currentUser.empresaId);
-          batch.update(estoqueRef, { qtdOvos: state.estoqueGeralOvos + pedido.totalOvos });
-        }
-
-        const pedRef = db.collection("pedidos").doc(pedidoId);
-        batch.delete(pedRef);
-
-        const pedidosAjustar = state.pedidos.filter(p => (p.numeroPedido || 0) > numeroPedidoExcluido);
-        pedidosAjustar.forEach(p => {
-          const pRef = db.collection("pedidos").doc(p.id);
-          batch.update(pRef, { numeroPedido: p.numeroPedido - 1 });
-        });
-
-        await batch.commit();
-        alert(`Pedido Nº ${numeroPedidoExcluido} foi cancelado com sucesso!`);
-      } catch (err) {
-        alert("Erro ao excluir pedido: " + err.message);
-      }
-    }
-
-    // --- RENDERIZAÇÕES ---
-    function render() {
-      renderClientes();
-      renderProdutos();
-      renderPedidos();
-      renderUsuarios();
-      renderDropdowns();
-      renderEstoqueGeral();
-    }
-
-    function renderClientes() {
-      const tbody = document.getElementById('lista-clientes');
-      const tbodyDash = document.getElementById('lista-clientes-dash');
-      
-      if (tbody) {
-        tbody.innerHTML = state.clientes.map(c => `<tr>
-          <td><strong>${c.nome}</strong><br><span style="font-size:0.75rem; color:#64748b;">${c.doc || 'Sem Doc'}</span></td>
-          <td>${c.tel}</td>
-          <td><button class="btn-danger" type="button" onclick="deletarCliente('${c.id}')">Excluir</button></td>
-        </tr>`).join('');
-      }
-
-      if (tbodyDash) {
-        tbodyDash.innerHTML = state.clientes.map(c => `<tr>
-          <td><strong>${c.nome}</strong><br><span style="font-size:0.75rem; color:#64748b;">${c.doc || 'Sem Doc'}</span></td>
-          <td>${c.tel}</td>
-        </tr>`).join('');
-      }
-    }
-
-    function filtrarClientesDashboard() {
-      const termo = document.getElementById('dash-busca-cliente').value.toLowerCase();
-      const tbodyDash = document.getElementById('lista-clientes-dash');
-      const filtrados = state.clientes.filter(c => 
-        c.nome.toLowerCase().includes(termo) || 
-        (c.doc && c.doc.toLowerCase().includes(termo)) || 
-        (c.tel && c.tel.includes(termo))
-      );
-
-      tbodyDash.innerHTML = filtrados.map(c => `<tr>
-        <td><strong>${c.nome}</strong><br><span style="font-size:0.75rem; color:#64748b;">${c.doc || 'Sem Doc'}</span></td>
-        <td>${c.tel}</td>
-      </tr>`).join('');
-    }
-
-    function cadastrarCliente(e) {
-      e.preventDefault();
-      const nome = document.getElementById('cli-nome').value.trim();
-      const doc = document.getElementById('cli-doc').value.trim();
-      const tel = document.getElementById('cli-tel').value.trim();
-      const end = document.getElementById('cli-end').value.trim();
-
-      db.collection("clientes").add({
-        nome, doc, tel, end,
-        empresaId: state.currentUser.empresaId
-      }).then(() => {
-        alert('Cliente cadastrado com sucesso!');
-        e.target.reset();
-      });
-    }
-
-    function deletarCliente(id) {
-      if (confirm('Remover este cliente?')) {
-        db.collection("clientes").doc(id).delete();
-      }
-    }
-
-    function renderProdutos() {
-      const tbody = document.getElementById('lista-produtos');
-      if (!tbody) return;
-
-      tbody.innerHTML = state.produtos.map(p => `<tr>
-        <td><strong>${p.nome}</strong></td>
-        <td>R$ ${p.preco.toFixed(2)}</td>
-        <td>${p.ovosPorEmbalagem || 1} ovos</td>
-        <td>
-          <button class="btn-warning" type="button" onclick="editarProduto('${p.id}')">✏️</button>
-          <button class="btn-danger" type="button" onclick="deletarProduto('${p.id}')">✕</button>
-        </td>
-      </tr>`).join('');
-    }
-
-    function renderDropdowns() {
-      const selCli = document.getElementById('ped-cliente');
-      if (selCli) {
-        selCli.innerHTML = state.clientes.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
-      }
-
-      const selProd = document.getElementById('ped-produto');
-      if (selProd) {
-        selProd.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${p.preco.toFixed(2)} (${p.ovosPorEmbalagem || 1} ovos/emb)</option>`).join('');
-      }
-    }
-
-    function filtrarClientesDropdown() {
-      const termo = document.getElementById('ped-busca-cliente').value.toLowerCase();
-      const selCli = document.getElementById('ped-cliente');
-      const filtrados = state.clientes.filter(c => 
-        c.nome.toLowerCase().includes(termo) || 
-        (c.doc && c.doc.toLowerCase().includes(termo)) || 
-        (c.tel && c.tel.includes(termo))
-      );
-
-      selCli.innerHTML = filtrados.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
-    }
-
-    function renderPedidos() {
-      const tbody = document.getElementById('lista-pedidos');
-      if (!tbody) return;
-
-      tbody.innerHTML = state.pedidos.map(p => `<tr>
-        <td><strong>Pedido #${p.numeroPedido || 'N/A'}</strong></td>
-        <td><strong>${p.clienteNome}</strong></td>
-        <td>R$ ${p.total.toFixed(2)}</td>
-        <td>
-          <span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">
-            ${p.status}
-          </span>
-        </td>
-        <td>
-          <div style="display:flex; gap:4px;">
-            <button class="btn" type="button" style="padding:4px 6px; font-size:0.75rem; width:auto;" onclick="verComprovantePedido('${p.id}')">📄 Nota</button>
-            <button class="btn-danger" type="button" onclick="cancelarEExcluirPedido('${p.id}', ${p.numeroPedido || 0})">✕ Cancelar</button>
-          </div>
-        </td>
-      </tr>`).join('');
-    }
-
-    function alternarStatusPedido(id, statusAtual) {
+    async function alternarStatusPedido(id, statusAtual) {
       const novoStatus = statusAtual === 'Pago' ? 'Pendente' : 'Pago';
-      db.collection("pedidos").doc(id).update({ status: novoStatus });
+      await db.collection("pedidos").doc(id).update({ status: novoStatus });
     }
 
-    function verComprovantePedido(id) {
-      const p = state.pedidos.find(item => item.id === id);
-      if (p) abrirComprovante(p);
-    }
+    // --- MONTAGEM DO RECIBO / NOTA FISCAL (LAYOUT FIEL À IMAGEM 1) ---
+    function abrirModalNota(pedidoId) {
+      const ped = state.pedidos.find(p => p.id === pedidoId);
+      if (!ped) return;
 
-    function abrirComprovante(pedido) {
-      state.pedidoAtual = pedido;
-      const box = document.getElementById('printable-receipt');
+      state.pedidoAtual = ped;
+      const receipt = document.getElementById('printable-receipt');
       const emp = state.empresa;
 
-      const dataStr = pedido.dataCriacao ? new Date(pedido.dataCriacao).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR');
+      const isPago = ped.status === 'Pago';
+      const statusSymbol = isPago ? '🟢' : '🔴';
 
-      let itensStr = pedido.itens.map(i => `${i.quantidade}x ${i.nome}\n   R$ ${i.precoUnitario.toFixed(2)} UN -> R$ ${i.subtotal.toFixed(2)}`).join('\n');
+      receipt.innerHTML = `
+        <div style="text-align:center; margin-bottom:8px;">
+          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'RAPHAEL'}</h2>
+          <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'Nsjand'}</p>
+          <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'Jandbahs'}</p>
+        </div>
 
-      box.innerHTML = `
-========================================
-       ${emp.nome.toUpperCase()}
-========================================
-CNPJ/CPF: ${emp.cnpj || 'N/A'}
-TEL: ${emp.tel || 'N/A'}
-END: ${emp.end || 'N/A'}
-----------------------------------------
-COMPROVANTE DE PEDIDO Nº ${pedido.numeroPedido || ''}
-DATA: ${dataStr}
-----------------------------------------
-CLIENTE: ${pedido.clienteNome}
-TEL: ${pedido.clienteTel || 'N/A'}
-----------------------------------------
-ITENS DO PEDIDO:
-${itensStr}
-----------------------------------------
-TOTAL DO PEDIDO: R$ ${pedido.total.toFixed(2)}
-FORMA DE PAGAMENTO: ${pedido.formaPagamento}
-STATUS: ${pedido.status.toUpperCase()}
-${pedido.dadosPagamento ? `CHAVE/DADOS: ${pedido.dadosPagamento}\n` : ''}
-${pedido.obs ? `OBS: ${pedido.obs}\n` : ''}----------------------------------------
-CHAVE PIX OFICIAL: ${emp.pix || 'N/A'}
-${emp.social ? `${emp.social}\n` : ''}========================================
-       Obrigado pela preferência!
+        <hr class="dashed-divider">
+
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
+          COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}
+        </div>
+        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+        <div style="margin-bottom:2px;"><strong>Documento:</strong> ${ped.clienteDoc}</div>
+        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd}</div>
+
+        <hr class="dashed-divider">
+
+        <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
+        ${(ped.itens || []).map(i => `
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>${i.qtd}x${i.nome}</span>
+            <span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span>
+          </div>
+        `).join('')}
+
+        <hr class="dashed-divider">
+
+        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
+          <span>VALOR TOTAL:</span>
+          <span>R$ ${parseFloat(ped.total).toFixed(2)}</span>
+        </div>
+        <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${ped.formaPgto}</div>
+        ${ped.dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${ped.dadosPgto}</div>` : ''}
+        <div style="margin-bottom:2px;">
+          <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
+        </div>
+        ${ped.obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${ped.obs}</div>` : ''}
+
+        <hr class="dashed-divider">
+
+        <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
+          <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Raphael'}</div>
+          ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
+          ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
+          <p style="margin-top:4px;">Obrigado pela preferência!</p>
+        </div>
       `;
 
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    function gerarImpressaoOuPDF() {
+    // AÇÃO 1: IMPRIMIR NOTA
+    function imprimirNota() {
       window.print();
     }
 
+    // AÇÃO 2: SALVAR EM PDF (UTILIZA HTML2PDF.JS)
+    function salvarNotaPDF() {
+      const element = document.getElementById('printable-receipt');
+      const num = state.pedidoAtual ? state.pedidoAtual.numeroPedido : '000';
+      
+      const opt = {
+        margin:       [10, 10, 10, 10],
+        filename:     `Comprovante_Pedido_${num}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }
+
+    // AÇÃO 3: ENVIAR WHATSAPP
     function enviarWhats() {
       if (!state.pedidoAtual) return;
-      const p = state.pedidoAtual;
-      const tel = p.clienteTel.replace(/\D/g, '');
-      if (!tel) return alert('Cliente não possui telefone cadastrado.');
+      const ped = state.pedidoAtual;
+      const telClean = (ped.clienteTel || '').replace(/\D/g, '');
 
-      let msg = `*COMPROVANTE DE PEDIDO Nº ${p.numeroPedido || ''} - ${state.empresa.nome}*\n\n`;
-      msg += `*Cliente:* ${p.clienteNome}\n`;
-      msg += `*Total:* R$ ${p.total.toFixed(2)}\n`;
-      msg += `*Pagamento:* ${p.formaPagamento} (${p.status})\n\n`;
-      msg += `*Itens:*\n`;
-      p.itens.forEach(i => {
-        msg += `- ${i.quantidade}x ${i.nome} = R$ ${i.subtotal.toFixed(2)}\n`;
-      });
-      if (state.empresa.pix) msg += `\n*Chave Pix:* ${state.empresa.pix}`;
+      let msg = `*COMPROVANTE DE PEDIDO #${ped.numeroPedido}*\n\n`;
+      msg += `*Cliente:* ${ped.clienteNome}\n`;
+      msg += `*Total:* R$ ${parseFloat(ped.total).toFixed(2)}\n`;
+      msg += `*Pagamento:* ${ped.formaPgto}\n`;
+      msg += `*Situação:* ${ped.status === 'Pago' ? '🟢 Confirmado' : '🔴 Pendente'}\n\n`;
+      msg += `Obrigado pela preferência!`;
 
-      const url = `https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msg)}`;
-      window.open(url, '_blank');
+      const link = telClean 
+        ? `https://api.whatsapp.com/send?phone=${telClean}&text=${encodeURIComponent(msg)}`
+        : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+
+      window.open(link, '_blank');
     }
 
     function abrirResumoVendasDia() {
-      const hojeStr = new Date().toDateString();
-      const pedidosHoje = state.pedidos.filter(p => {
-        if (!p.dataCriacao) return false;
-        const d = new Date(p.dataCriacao);
-        return d.toDateString() === hojeStr;
+      const hojeStr = new Date().toLocaleDateString('pt-BR');
+      document.getElementById('resumo-data-hoje').innerText = `Data: ${hojeStr}`;
+
+      const vendasHoje = state.pedidos.filter(p => {
+        const d = p.dataCriacao && p.dataCriacao.toDate ? p.dataCriacao.toDate() : new Date(p.dataCriacao);
+        return d.toLocaleDateString('pt-BR') === hojeStr;
       });
 
-      let totalVendido = 0;
-      let formas = {};
+      const totalHoje = vendasHoje.reduce((acc, p) => acc + parseFloat(p.total), 0);
+      const qtdPedidos = vendasHoje.length;
+      const ticketMedio = qtdPedidos > 0 ? totalHoje / qtdPedidos : 0;
 
-      pedidosHoje.forEach(p => {
-        totalVendido += p.total;
-        formas[p.formaPagamento] = (formas[p.formaPagamento] || 0) + p.total;
+      document.getElementById('resumo-total-hoje').innerText = `R$ ${totalHoje.toFixed(2)}`;
+      document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
+      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
+
+      const porForma = {};
+      vendasHoje.forEach(p => {
+        porForma[p.formaPgto] = (porForma[p.formaPgto] || 0) + parseFloat(p.total);
       });
 
-      const qtd = pedidosHoje.length;
-      const ticket = qtd > 0 ? totalVendido / qtd : 0;
+      const detalheEl = document.getElementById('resumo-detalhe-formas');
+      detalheEl.innerHTML = Object.keys(porForma).length > 0
+        ? Object.keys(porForma).map(f => `<div><strong>${f}:</strong> R$ ${porForma[f].toFixed(2)}</div>`).join('')
+        : `<div style="color:#64748b;">Nenhuma venda hoje ainda.</div>`;
 
-      document.getElementById('resumo-data-hoje').innerText = `Data: ${new Date().toLocaleDateString('pt-BR')}`;
-      document.getElementById('resumo-total-hoje').innerText = `R$ ${totalVendido.toFixed(2)}`;
-      document.getElementById('resumo-qtd-pedidos').innerText = qtd;
-      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticket.toFixed(2)}`;
-
-      let detalheFormas = '';
-      for (let f in formas) {
-        detalheFormas += `<div><strong>${f}:</strong> R$ ${formas[f].toFixed(2)}</div>`;
-      }
-      document.getElementById('resumo-detalhe-formas').innerHTML = detalheFormas || 'Nenhuma venda hoje.';
-
-      const tbody = document.getElementById('resumo-tabela-hoje');
-      tbody.innerHTML = pedidosHoje.map(p => `<tr>
-        <td><strong>Pedido #${p.numeroPedido || ''}</strong></td>
-        <td>${p.clienteNome}</td>
-        <td>R$ ${p.total.toFixed(2)}</td>
-        <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
-      </tr>`).join('');
+      const tb = document.getElementById('resumo-tabela-hoje');
+      tb.innerHTML = vendasHoje.map(p => `
+        <tr>
+          <td>#${p.numeroPedido}</td>
+          <td>${p.clienteNome}</td>
+          <td>R$ ${parseFloat(p.total).toFixed(2)}</td>
+          <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
+        </tr>
+      `).join('');
 
       document.getElementById('modal-resumo').style.display = 'flex';
     }
 
-    function renderUsuarios() {
-      const tbody = document.getElementById('lista-usuarios');
-      if (!tbody) return;
-
-      tbody.innerHTML = state.usuarios.map(u => `<tr>
-        <td><strong>${u.login}</strong></td>
-        <td>${u.role}</td>
-        <td>
-          <button class="btn-warning" type="button" onclick="alterarSenhaUsuario('${u.id}', '${u.login}')">Senha</button>
-        </td>
-      </tr>`).join('');
-    }
-
-    function cadastrarUsuario(e) {
+    async function cadastrarUsuario(e) {
       e.preventDefault();
       const login = document.getElementById('usr-login').value.trim().toLowerCase();
       const pass = document.getElementById('usr-pass').value.trim();
       const role = document.getElementById('usr-role').value;
 
-      db.collection("usuarios").add({
-        login, pass, role,
-        empresaId: state.currentUser.empresaId
-      }).then(() => {
-        alert('Usuário criado!');
-        e.target.reset();
+      await db.collection("usuarios").add({
+        empresaId: state.currentUser.empresaId,
+        login, pass, role
+      });
+
+      alert('Usuário cadastrado!');
+      e.target.reset();
+    }
+
+    async function excluirUsuario(id) {
+      if (confirm('Remover usuário?')) {
+        await db.collection("usuarios").doc(id).delete();
+      }
+    }
+
+    async function alterarMinhaSenha(e) {
+      e.preventDefault();
+      const novaSenha = document.getElementById('minha-nova-senha').value.trim();
+      if (!novaSenha) return;
+
+      await db.collection("usuarios").doc(state.currentUser.id).update({ pass: novaSenha });
+      alert('Sua senha foi alterada com sucesso!');
+      e.target.reset();
+    }
+
+    async function salvarEmpresa(e) {
+      e.preventDefault();
+      const nome = document.getElementById('emp-nome').value.trim();
+      const cnpj = document.getElementById('emp-cnpj').value.trim();
+      const tel = document.getElementById('emp-tel').value.trim();
+      const end = document.getElementById('emp-end').value.trim();
+      const social = document.getElementById('emp-social').value.trim();
+      const pix = document.getElementById('emp-pix').value.trim();
+
+      const empresaId = state.currentUser.empresaId;
+      await db.collection("config").doc(empresaId).set({
+        nome, cnpj, tel, end, social, pix
+      });
+
+      alert('Dados da empresa salvos com sucesso!');
+    }
+
+    function filtrarClientesDashboard() {
+      const termo = document.getElementById('dash-busca-cliente').value.toLowerCase();
+      const linhas = document.querySelectorAll('#lista-clientes-dash tr');
+      linhas.forEach(l => {
+        const txt = l.innerText.toLowerCase();
+        l.style.display = txt.includes(termo) ? '' : 'none';
       });
     }
 
-    function salvarEmpresa(e) {
-      e.preventDefault();
-      const empData = {
-        nome: document.getElementById('emp-nome').value.trim(),
-        cnpj: document.getElementById('emp-cnpj').value.trim(),
-        tel: document.getElementById('emp-tel').value.trim(),
-        end: document.getElementById('emp-end').value.trim(),
-        social: document.getElementById('emp-social').value.trim(),
-        pix: document.getElementById('emp-pix').value.trim(),
-      };
+    function filtrarClientesDropdown() {
+      const termo = document.getElementById('ped-busca-cliente').value.toLowerCase();
+      const select = document.getElementById('ped-cliente');
+      const filtrados = state.clientes.filter(c => 
+        c.nome.toLowerCase().includes(termo) || 
+        (c.doc && c.doc.toLowerCase().includes(termo)) ||
+        (c.tel && c.tel.toLowerCase().includes(termo))
+      );
 
-      db.collection("config").doc(state.currentUser.empresaId).set(empData)
-      .then(() => alert('Dados da empresa salvos!'))
-      .catch(err => alert('Erro: ' + err.message));
+      select.innerHTML = `<option value="">-- Selecione o Cliente --</option>` + 
+        filtrados.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
     }
 
     window.onload = initApp;
