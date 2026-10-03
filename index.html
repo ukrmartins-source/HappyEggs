@@ -88,7 +88,7 @@
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
     th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
 
-    /* ESTILOS DO MODAL DE NOTA E CUPOM (IMAGEM 1) */
+    /* ESTILOS DO MODAL DE NOTA E CUPOM */
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.7); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
@@ -120,7 +120,7 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
-    /* CORREÇÃO PARA A IMPRESSÃO (RESOLVE O PROBLEMA DA IMAGEM 2) */
+    /* CORREÇÃO PARA A IMPRESSÃO */
     @media print {
       body * { visibility: hidden; }
       #printable-receipt, #printable-receipt * { visibility: visible; }
@@ -425,7 +425,7 @@
     </div>
   </main>
 
-  <!-- MODAL DE COMPROVANTE / NOTA FISCAL (LAYOUT DA IMAGEM 1 COM OPÇÕES) -->
+  <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
   <div class="modal" id="modal-nota">
     <div class="modal-content">
       <div class="card-title no-print" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
@@ -580,7 +580,7 @@
             dataCriacaoParsed = new Date(dataDoc.dataCriacao);
           }
           return { id: doc.id, ...dataDoc, dataCriacao: dataCriacaoParsed };
-        }).sort((a, b) => (a.numeroPedido || 0) - (b.numeroPedido || 0));
+        }).sort((a, b) => (b.numeroPedido || 0) - (a.numeroPedido || 0));
 
         render();
       }, err => console.error("Erro pedidos:", err));
@@ -653,191 +653,207 @@
         
         initListeners();
         navTo('dashboard');
-      } catch (err) {
-        alert('Erro ao realizar login: ' + err.message);
+      } catch (error) {
+        console.error("Erro na autenticação:", error);
+        alert("Erro ao tentar entrar. Tente novamente.");
       }
     }
 
     function logout() {
+      state.currentUser = null;
       state.listenersUnsubscribe.forEach(unsub => unsub());
       state.listenersUnsubscribe = [];
-      state.currentUser = null;
       document.getElementById('app-header').style.display = 'none';
       document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
       document.getElementById('view-dashboard').style.display = 'none';
       document.getElementById('view-login').style.display = 'block';
-      document.getElementById('login-pass').value = '';
     }
 
-    function navTo(screen) {
-      document.getElementById('view-dashboard').style.display = 'none';
+    function navTo(view) {
       document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
-      if (screen === 'dashboard') {
+      document.getElementById('view-dashboard').style.display = 'none';
+
+      if (view === 'dashboard') {
         document.getElementById('view-dashboard').style.display = 'block';
+        filtrarClientesDashboard();
       } else {
-        const target = document.getElementById(`view-${screen}`);
-        if(target) target.style.display = 'block';
+        const el = document.getElementById(`view-${view}`);
+        if (el) el.style.display = 'block';
       }
+      render();
     }
 
+    // --- RENDERIZAÇÃO DA INTERFACE ---
     function render() {
       renderClientes();
       renderProdutos();
       renderPedidos();
       renderUsuarios();
+      renderDropdowns();
+    }
+
+    function renderEstoqueGeral() {
+      const el = document.getElementById('estoque-geral-ovos');
+      if (el) el.innerText = `${(state.estoqueGeralOvos || 0).toLocaleString('pt-BR')} Ovos`;
     }
 
     function renderClientes() {
-      const tbDash = document.getElementById('lista-clientes-dash');
-      const tbFull = document.getElementById('lista-clientes');
-      const selectPed = document.getElementById('ped-cliente');
+      const tbody = document.getElementById('lista-clientes');
+      if (!tbody) return;
+      tbody.innerHTML = state.clientes.map(c => `
+        <tr>
+          <td><strong>${c.nome}</strong><br><small style="color:#64748b;">${c.doc || 'Sem Doc'}</small></td>
+          <td>${c.tel}<br><small style="color:#64748b;">${c.end || ''}</small></td>
+          <td><button class="btn-danger" onclick="excluirCliente('${c.id}')">Excluir</button></td>
+        </tr>
+      `).join('');
+    }
 
-      if (tbDash) {
-        tbDash.innerHTML = state.clientes.map(c => `
-          <tr>
-            <td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td>
-            <td><a href="https://wa.me/${(c.tel||'').replace(/\D/g,'')}" target="_blank" style="color:#10b981; font-weight:bold; text-decoration:none;">📱 ${c.tel}</a></td>
-          </tr>
-        `).join('');
-      }
+    function filtrarClientesDashboard() {
+      const termo = (document.getElementById('dash-busca-cliente')?.value || '').toLowerCase();
+      const tbody = document.getElementById('lista-clientes-dash');
+      if (!tbody) return;
 
-      if (tbFull) {
-        tbFull.innerHTML = state.clientes.map(c => `
-          <tr>
-            <td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td>
-            <td>${c.tel}</td>
-            <td><button class="btn-danger" onclick="excluirCliente('${c.id}')">Excluir</button></td>
-          </tr>
-        `).join('');
-      }
+      const filtrados = state.clientes.filter(c => 
+        c.nome.toLowerCase().includes(termo) || 
+        (c.doc && c.doc.toLowerCase().includes(termo)) ||
+        (c.tel && c.tel.toLowerCase().includes(termo))
+      );
 
-      if (selectPed) {
-        selectPed.innerHTML = `<option value="">-- Selecione o Cliente --</option>` + 
-          state.clientes.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
-      }
+      tbody.innerHTML = filtrados.slice(0, 10).map(c => `
+        <tr>
+          <td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td>
+          <td>📞 ${c.tel}</td>
+        </tr>
+      `).join('');
     }
 
     function renderProdutos() {
-      const tb = document.getElementById('lista-produtos');
-      const selectPed = document.getElementById('ped-produto');
-
-      if (tb) {
-        tb.innerHTML = state.produtos.map(p => `
-          <tr>
-            <td><strong>${p.nome}</strong></td>
-            <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
-            <td>${p.ovosPorUnidade || 0} un.</td>
-            <td>
-              <button class="btn-warning" onclick="editarProduto('${p.id}')">Editar</button>
-              <button class="btn-danger" onclick="excluirProduto('${p.id}')">Excluir</button>
-            </td>
-          </tr>
-        `).join('');
-      }
-
-      if (selectPed) {
-        selectPed.innerHTML = `<option value="">-- Selecione o Produto --</option>` + 
-          state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)}</option>`).join('');
-      }
+      const tbody = document.getElementById('lista-produtos');
+      if (!tbody) return;
+      tbody.innerHTML = state.produtos.map(p => `
+        <tr>
+          <td><strong>${p.nome}</strong></td>
+          <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
+          <td>${p.ovosUnid} ovos</td>
+          <td>
+            <button class="btn-warning" onclick="editarProduto('${p.id}')">✏️</button>
+            <button class="btn-danger" onclick="excluirProduto('${p.id}')">🗑️️</button>
+          </td>
+        </tr>
+      `).join('');
     }
 
     function renderPedidos() {
-      const tb = document.getElementById('lista-pedidos');
-      if (!tb) return;
+      const tbody = document.getElementById('lista-pedidos');
+      if (!tbody) return;
 
-      tb.innerHTML = state.pedidos.slice().reverse().map(p => {
+      tbody.innerHTML = state.pedidos.map(p => {
         const isPago = p.status === 'Pago';
+        const badgeClass = isPago ? 'badge-pago' : 'badge-pendente';
+        
         return `
           <tr>
             <td><strong>#${p.numeroPedido || '---'}</strong></td>
-            <td>${p.clienteNome}</td>
-            <td>R$ ${parseFloat(p.total).toFixed(2)}</td>
+            <td>${p.clienteNome || 'Cliente'}<br><small style="color:#64748b;">${p.formaPgto || ''}</small></td>
+            <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
             <td>
-              <span class="badge ${isPago ? 'badge-pago' : 'badge-pendente'}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">
+              <span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">
                 ${isPago ? '🟢 Pago' : '🔴 Pendente'}
               </span>
             </td>
             <td>
-              <button class="btn" style="padding:4px 8px; font-size:0.75rem; width:auto; display:inline-block;" onclick="abrirModalNota('${p.id}')">📄 Nota</button>
+              <button class="btn" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb; margin-bottom:2px;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
+              <button class="btn-danger" title="Excluir Pedido" onclick="excluirPedido('${p.id}', ${p.numeroPedido})">🗑️</button>
             </td>
           </tr>
         `;
       }).join('');
     }
 
-    function renderEstoqueGeral() {
-      const el = document.getElementById('estoque-geral-ovos');
-      if (el) el.innerText = `${state.estoqueGeralOvos.toLocaleString('pt-BR')} Ovos`;
-    }
-
-    function renderProducaoHoje() {
-      const tb = document.getElementById('lista-producao-hoje');
-      if (!tb) return;
-
-      const hojeStr = new Date().toLocaleDateString('pt-BR');
-      const producaoHoje = state.producao.filter(p => {
-        const d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
-        return d.toLocaleDateString('pt-BR') === hojeStr;
-      });
-
-      tb.innerHTML = producaoHoje.map(p => {
-        const d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
-        return `<tr><td>${d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</td><td>+${p.qtd} ovos</td></tr>`;
-      }).join('');
-    }
-
     function renderUsuarios() {
-      const tb = document.getElementById('lista-usuarios');
-      if (!tb) return;
-      tb.innerHTML = state.usuarios.map(u => `
+      const tbody = document.getElementById('lista-usuarios');
+      if (!tbody) return;
+      tbody.innerHTML = state.usuarios.map(u => `
         <tr>
           <td><strong>${u.login}</strong></td>
-          <td>${u.role}</td>
-          <td><button class="btn-danger" onclick="excluirUsuario('${u.id}')">Excluir</button></td>
+          <td><span class="badge" style="background:#e2e8f0; color:#334155;">${u.role}</span></td>
+          <td>${u.login !== 'admin' ? `<button class="btn-danger" onclick="excluirUsuario('${u.id}')">Excluir</button>` : '---'}</td>
         </tr>
       `).join('');
     }
 
-    // --- FUNÇÕES DE CADASTRO E AÇÕES ---
+    function renderDropdowns() {
+      filtrarClientesDropdown();
+
+      const prodSelect = document.getElementById('ped-produto');
+      if (prodSelect) {
+        prodSelect.innerHTML = state.produtos.map(p => `
+          <option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)} (${p.ovosUnid} ovos)</option>
+        `).join('');
+      }
+    }
+
+    function filtrarClientesDropdown() {
+      const termo = (document.getElementById('ped-busca-cliente')?.value || '').toLowerCase();
+      const cliSelect = document.getElementById('ped-cliente');
+      if (!cliSelect) return;
+
+      const filtrados = state.clientes.filter(c => 
+        c.nome.toLowerCase().includes(termo) || 
+        (c.doc && c.doc.toLowerCase().includes(termo)) ||
+        (c.tel && c.tel.toLowerCase().includes(termo))
+      );
+
+      if (filtrados.length === 0) {
+        cliSelect.innerHTML = `<option value="">Nenhum cliente encontrado</option>`;
+      } else {
+        cliSelect.innerHTML = filtrados.map(c => `
+          <option value="${c.id}">${c.nome} (${c.tel})</option>
+        `).join('');
+      }
+    }
+
+    // --- AÇÕES DE CADASTRO E SISTEMA ---
     async function cadastrarCliente(e) {
       e.preventDefault();
-      const nome = document.getElementById('cli-nome').value.trim();
-      const doc = document.getElementById('cli-doc').value.trim();
-      const tel = document.getElementById('cli-tel').value.trim();
-      const end = document.getElementById('cli-end').value.trim();
-
-      await db.collection("clientes").add({
+      const novo = {
         empresaId: state.currentUser.empresaId,
-        nome, doc, tel, end
-      });
+        nome: document.getElementById('cli-nome').value.trim(),
+        doc: document.getElementById('cli-doc').value.trim(),
+        tel: document.getElementById('cli-tel').value.trim(),
+        end: document.getElementById('cli-end').value.trim()
+      };
 
-      alert('Cliente cadastrado com sucesso!');
+      await db.collection("clientes").add(novo);
       e.target.reset();
+      alert('Cliente cadastrado com sucesso!');
     }
 
     async function excluirCliente(id) {
-      if (confirm('Deseja realmente remover este cliente?')) {
+      if (confirm('Deseja realmente excluir este cliente?')) {
         await db.collection("clientes").doc(id).delete();
       }
     }
 
     async function salvarProduto(e) {
       e.preventDefault();
-      const id = document.getElementById('prod-id-edit').value;
-      const nome = document.getElementById('prod-nome').value.trim();
-      const preco = parseFloat(document.getElementById('prod-preco').value);
-      const ovosPorUnidade = parseInt(document.getElementById('prod-ovos-unid').value);
+      const idEdit = document.getElementById('prod-id-edit').value;
+      const dados = {
+        empresaId: state.currentUser.empresaId,
+        nome: document.getElementById('prod-nome').value.trim(),
+        preco: parseFloat(document.getElementById('prod-preco').value || 0),
+        ovosUnid: parseInt(document.getElementById('prod-ovos-unid').value || 0)
+      };
 
-      if (id) {
-        await db.collection("produtos").doc(id).update({ nome, preco, ovosPorUnidade });
+      if (idEdit) {
+        await db.collection("produtos").doc(idEdit).update(dados);
         alert('Produto atualizado!');
       } else {
-        await db.collection("produtos").add({
-          empresaId: state.currentUser.empresaId,
-          nome, preco, ovosPorUnidade
-        });
-        alert('Produto cadastrado!');
+        await db.collection("produtos").add(dados);
+        alert('Produto cadastrado com sucesso!');
       }
+
       limparFormProduto();
     }
 
@@ -847,7 +863,7 @@
       document.getElementById('prod-id-edit').value = p.id;
       document.getElementById('prod-nome').value = p.nome;
       document.getElementById('prod-preco').value = p.preco;
-      document.getElementById('prod-ovos-unid').value = p.ovosPorUnidade;
+      document.getElementById('prod-ovos-unid').value = p.ovosUnid;
       document.getElementById('form-prod-title').innerText = "Editar Produto";
       document.getElementById('btn-salvar-prod').innerText = "Atualizar Produto";
       document.getElementById('btn-cancelar-edit').style.display = "block";
@@ -862,82 +878,39 @@
     }
 
     async function excluirProduto(id) {
-      if (confirm('Excluir este produto?')) {
+      if (confirm('Deseja excluir este produto?')) {
         await db.collection("produtos").doc(id).delete();
       }
     }
 
-    async function registrarEntradaProducao(e) {
-      e.preventDefault();
-      const qtd = parseInt(document.getElementById('prod-ent-qtd').value);
-      if (!qtd || qtd <= 0) return;
-
-      const empresaId = state.currentUser.empresaId;
-      const novoTotal = state.estoqueGeralOvos + qtd;
-
-      await db.collection("estoque_geral").doc(empresaId).set({ qtdOvos: novoTotal }, { merge: true });
-      await db.collection("producao").add({
-        empresaId,
-        qtd,
-        dataHora: new Date()
-      });
-
-      alert(`+${qtd} ovos adicionados ao estoque!`);
-      e.target.reset();
-    }
-
     function adicionarItemAoPedido() {
       const prodId = document.getElementById('ped-produto').value;
-      const qtd = parseInt(document.getElementById('ped-qtd').value);
+      const qtd = parseInt(document.getElementById('ped-qtd').value || 1);
+      const prod = state.produtos.find(p => p.id === prodId);
 
-      if (!prodId || !qtd || qtd <= 0) {
-        alert('Selecione um produto e uma quantidade válida!');
+      if (!prod || qtd <= 0) {
+        alert('Selecione um produto e quantidade válida.');
         return;
       }
 
-      const prod = state.produtos.find(p => p.id === prodId);
-      if (!prod) return;
-
-      carrinhoTemp.push({
-        produtoId: prod.id,
-        nome: prod.nome,
-        precoUnitario: prod.preco,
-        qtd: qtd,
-        ovosPorUnidade: prod.ovosPorUnidade || 0,
-        subtotal: prod.preco * qtd
-      });
+      const itemExistente = carrinhoTemp.find(i => i.produtoId === prodId);
+      if (itemExistente) {
+        itemExistente.qtd += qtd;
+        itemExistente.subtotal = itemExistente.qtd * prod.preco;
+        itemExistente.totalOvos = itemExistente.qtd * prod.ovosUnid;
+      } else {
+        carrinhoTemp.push({
+          produtoId: prod.id,
+          nome: prod.nome,
+          preco: prod.preco,
+          qtd: qtd,
+          ovosUnid: prod.ovosUnid,
+          totalOvos: qtd * prod.ovosUnid,
+          subtotal: qtd * prod.preco
+        });
+      }
 
       renderCarrinho();
-    }
-
-    function renderCarrinho() {
-      const el = document.getElementById('itens-pedido-lista');
-      const totalEl = document.getElementById('ped-total-valor');
-
-      if (carrinhoTemp.length === 0) {
-        el.innerHTML = `<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>`;
-        totalEl.innerText = "0.00";
-        return;
-      }
-
-      let total = 0;
-      el.innerHTML = carrinhoTemp.map((item, index) => {
-        total += item.subtotal;
-        return `
-          <div class="carrinho-item">
-            <div>
-              <strong>${item.qtd}x ${item.nome}</strong><br>
-              <small>R$ ${item.precoUnitario.toFixed(2)} un.</small>
-            </div>
-            <div>
-              <strong>R$ ${item.subtotal.toFixed(2)}</strong>
-              <button class="btn-danger" style="margin-left:8px;" type="button" onclick="removerItemCarrinho(${index})">X</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      totalEl.innerText = total.toFixed(2);
     }
 
     function removerItemCarrinho(index) {
@@ -945,59 +918,102 @@
       renderCarrinho();
     }
 
+    function renderCarrinho() {
+      const lista = document.getElementById('itens-pedido-lista');
+      const totalSpan = document.getElementById('ped-total-valor');
+
+      if (carrinhoTemp.length === 0) {
+        lista.innerHTML = `<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>`;
+        totalSpan.innerText = "0.00";
+        return;
+      }
+
+      let totalGeral = 0;
+      lista.innerHTML = carrinhoTemp.map((item, idx) => {
+        totalGeral += item.subtotal;
+        return `
+          <div class="carrinho-item">
+            <div>
+              <strong>${item.qtd}x ${item.nome}</strong><br>
+              <small style="color:#64748b;">R$ ${item.preco.toFixed(2)} un | Total Ovos: ${item.totalOvos}</small>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <strong>R$ ${item.subtotal.toFixed(2)}</strong>
+              <button class="btn-danger" style="padding:2px 6px;" onclick="removerItemCarrinho(${idx})">✕</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      totalSpan.innerText = totalGeral.toFixed(2);
+    }
+
     async function finalizarPedido(e) {
       e.preventDefault();
-      const clienteId = document.getElementById('ped-cliente').value;
-      if (!clienteId) { alert('Selecione um cliente!'); return; }
-      if (carrinhoTemp.length === 0) { alert('Adicione pelo menos um item ao pedido!'); return; }
+      if (carrinhoTemp.length === 0) {
+        alert('Adicione pelo menos um produto ao pedido!');
+        return;
+      }
 
-      const cliente = state.clientes.find(c => c.id === clienteId);
-      const formaPgto = document.getElementById('ped-forma-pagamento').value;
-      const dadosPgto = document.getElementById('ped-dados-pagamento').value.trim();
-      const status = document.getElementById('ped-status').value;
-      const obs = document.getElementById('ped-obs').value.trim();
-      const total = carrinhoTemp.reduce((acc, i) => acc + i.subtotal, 0);
+      const cliId = document.getElementById('ped-cliente').value;
+      const cliente = state.clientes.find(c => c.id === cliId);
 
-      const empresaId = state.currentUser.empresaId;
+      if (!cliente) {
+        alert('Selecione um cliente válido!');
+        return;
+      }
 
-      // Calcular número sequencial do pedido
-      const totalPedidosDoc = await db.collection("pedidos").where("empresaId", "==", empresaId).get();
-      const proximoNumero = totalPedidosDoc.size + 1;
+      // Calcula a numeração sequencial sem reordenar histórico anterior
+      const maiorNum = state.pedidos.reduce((max, p) => Math.max(max, p.numeroPedido || 0), 0);
+      const proximoNumero = maiorNum + 1;
 
-      // Descontar do estoque geral
-      let totalOvosConsumidos = 0;
-      carrinhoTemp.forEach(item => {
-        totalOvosConsumidos += (item.ovosPorUnidade * item.qtd);
-      });
-
-      const novoEstoque = Math.max(0, state.estoqueGeralOvos - totalOvosConsumidos);
-      await db.collection("estoque_geral").doc(empresaId).set({ qtdOvos: novoEstoque }, { merge: true });
+      const totalPedido = carrinhoTemp.reduce((acc, i) => acc + i.subtotal, 0);
+      const totalOvosPedido = carrinhoTemp.reduce((acc, i) => acc + i.totalOvos, 0);
 
       const novoPedido = {
-        empresaId,
+        empresaId: state.currentUser.empresaId,
         numeroPedido: proximoNumero,
         clienteId: cliente.id,
         clienteNome: cliente.nome,
         clienteDoc: cliente.doc || 'N/I',
+        clienteEnd: cliente.end || 'Não informado',
         clienteTel: cliente.tel || '',
-        clienteEnd: cliente.end || '',
         itens: carrinhoTemp,
-        total,
-        formaPgto,
-        dadosPgto,
-        status,
-        obs,
+        total: totalPedido,
+        totalOvos: totalOvosPedido,
+        formaPgto: document.getElementById('ped-forma-pagamento').value,
+        dadosPgto: document.getElementById('ped-dados-pagamento').value.trim(),
+        status: document.getElementById('ped-status').value,
+        obs: document.getElementById('ped-obs').value.trim(),
         dataCriacao: new Date()
       };
 
-      const docRef = await db.collection("pedidos").add(novoPedido);
-      alert(`Pedido #${proximoNumero} gerado com sucesso!`);
+      try {
+        const docRef = await db.collection("pedidos").add(novoPedido);
 
-      carrinhoTemp = [];
-      renderCarrinho();
-      e.target.reset();
+        // Atualização do Estoque Geral no Firestore
+        const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+        await db.runTransaction(async (transaction) => {
+          const sfDoc = await transaction.get(refEstoque);
+          let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
+          let novoSaldo = atual - totalOvosPedido;
+          transaction.set(refEstoque, { qtdOvos: novoSaldo }, { merge: true });
+        });
 
-      abrirModalNota(docRef.id);
+        alert(`Pedido #${proximoNumero} gerado com sucesso!`);
+        
+        // Atribui o id recém gerado e abre nota imediatamente
+        novoPedido.id = docRef.id;
+
+        carrinhoTemp = [];
+        renderCarrinho();
+        e.target.reset();
+
+        abrirModalNota(novoPedido);
+      } catch (err) {
+        console.error("Erro ao gerar pedido:", err);
+        alert("Erro ao salvar pedido na nuvem.");
+      }
     }
 
     async function alternarStatusPedido(id, statusAtual) {
@@ -1005,149 +1021,62 @@
       await db.collection("pedidos").doc(id).update({ status: novoStatus });
     }
 
-    // --- MONTAGEM DO RECIBO / NOTA FISCAL (LAYOUT FIEL À IMAGEM 1) ---
-    function abrirModalNota(pedidoId) {
-      const ped = state.pedidos.find(p => p.id === pedidoId);
-      if (!ped) return;
-
-      state.pedidoAtual = ped;
-      const receipt = document.getElementById('printable-receipt');
-      const emp = state.empresa;
-
-      const isPago = ped.status === 'Pago';
-      const statusSymbol = isPago ? '🟢' : '🔴';
-
-      receipt.innerHTML = `
-        <div style="text-align:center; margin-bottom:8px;">
-          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'RAPHAEL'}</h2>
-          <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'Nsjand'}</p>
-          <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'Jandbahs'}</p>
-        </div>
-
-        <hr class="dashed-divider">
-
-        <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
-          COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}
-        </div>
-        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-        <div style="margin-bottom:2px;"><strong>Documento:</strong> ${ped.clienteDoc}</div>
-        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd}</div>
-
-        <hr class="dashed-divider">
-
-        <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
-        ${(ped.itens || []).map(i => `
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span>${i.qtd}x${i.nome}</span>
-            <span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span>
-          </div>
-        `).join('')}
-
-        <hr class="dashed-divider">
-
-        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
-          <span>VALOR TOTAL:</span>
-          <span>R$ ${parseFloat(ped.total).toFixed(2)}</span>
-        </div>
-        <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${ped.formaPgto}</div>
-        ${ped.dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${ped.dadosPgto}</div>` : ''}
-        <div style="margin-bottom:2px;">
-          <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
-        </div>
-        ${ped.obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${ped.obs}</div>` : ''}
-
-        <hr class="dashed-divider">
-
-        <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
-          <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Raphael'}</div>
-          ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
-          ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
-          <p style="margin-top:4px;">Obrigado pela preferência!</p>
-        </div>
-      `;
-
-      document.getElementById('modal-nota').style.display = 'flex';
+    // EXCLUSÃO DE PEDIDO PRESERVANDO NUMERAÇÃO
+    async function excluirPedido(id, numero) {
+      if (!confirm(`Tem certeza que deseja excluir o Pedido #${numero || ''}?\nEsta ação não alterará a numeração dos outros pedidos.`)) {
+        return;
+      }
+      try {
+        await db.collection("pedidos").doc(id).delete();
+        alert(`Pedido #${numero || ''} excluído com sucesso!`);
+      } catch (err) {
+        console.error("Erro ao excluir pedido:", err);
+        alert("Erro ao excluir o pedido.");
+      }
     }
 
-    // AÇÃO 1: IMPRIMIR NOTA
-    function imprimirNota() {
-      window.print();
-    }
+    async function registrarEntradaProducao(e) {
+      e.preventDefault();
+      const qtd = parseInt(document.getElementById('prod-ent-qtd').value || 0);
+      if (qtd <= 0) return;
 
-    // AÇÃO 2: SALVAR EM PDF (UTILIZA HTML2PDF.JS)
-    function salvarNotaPDF() {
-      const element = document.getElementById('printable-receipt');
-      const num = state.pedidoAtual ? state.pedidoAtual.numeroPedido : '000';
+      const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
       
-      const opt = {
-        margin:       [10, 10, 10, 10],
-        filename:     `Comprovante_Pedido_${num}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
-      };
-
-      html2pdf().set(opt).from(element).save();
-    }
-
-    // AÇÃO 3: ENVIAR WHATSAPP
-    function enviarWhats() {
-      if (!state.pedidoAtual) return;
-      const ped = state.pedidoAtual;
-      const telClean = (ped.clienteTel || '').replace(/\D/g, '');
-
-      let msg = `*COMPROVANTE DE PEDIDO #${ped.numeroPedido}*\n\n`;
-      msg += `*Cliente:* ${ped.clienteNome}\n`;
-      msg += `*Total:* R$ ${parseFloat(ped.total).toFixed(2)}\n`;
-      msg += `*Pagamento:* ${ped.formaPgto}\n`;
-      msg += `*Situação:* ${ped.status === 'Pago' ? '🟢 Confirmado' : '🔴 Pendente'}\n\n`;
-      msg += `Obrigado pela preferência!`;
-
-      const link = telClean 
-        ? `https://api.whatsapp.com/send?phone=${telClean}&text=${encodeURIComponent(msg)}`
-        : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-
-      window.open(link, '_blank');
-    }
-
-    function abrirResumoVendasDia() {
-      const hojeStr = new Date().toLocaleDateString('pt-BR');
-      document.getElementById('resumo-data-hoje').innerText = `Data: ${hojeStr}`;
-
-      const vendasHoje = state.pedidos.filter(p => {
-        const d = p.dataCriacao && p.dataCriacao.toDate ? p.dataCriacao.toDate() : new Date(p.dataCriacao);
-        return d.toLocaleDateString('pt-BR') === hojeStr;
+      await db.runTransaction(async (transaction) => {
+        const sfDoc = await transaction.get(refEstoque);
+        let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
+        transaction.set(refEstoque, { qtdOvos: atual + qtd }, { merge: true });
       });
 
-      const totalHoje = vendasHoje.reduce((acc, p) => acc + parseFloat(p.total), 0);
-      const qtdPedidos = vendasHoje.length;
-      const ticketMedio = qtdPedidos > 0 ? totalHoje / qtdPedidos : 0;
-
-      document.getElementById('resumo-total-hoje').innerText = `R$ ${totalHoje.toFixed(2)}`;
-      document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
-      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
-
-      const porForma = {};
-      vendasHoje.forEach(p => {
-        porForma[p.formaPgto] = (porForma[p.formaPgto] || 0) + parseFloat(p.total);
+      await db.collection("producao").add({
+        empresaId: state.currentUser.empresaId,
+        qtdOvos: qtd,
+        dataHora: new Date()
       });
 
-      const detalheEl = document.getElementById('resumo-detalhe-formas');
-      detalheEl.innerHTML = Object.keys(porForma).length > 0
-        ? Object.keys(porForma).map(f => `<div><strong>${f}:</strong> R$ ${porForma[f].toFixed(2)}</div>`).join('')
-        : `<div style="color:#64748b;">Nenhuma venda hoje ainda.</div>`;
+      e.target.reset();
+      alert('Entrada de produção registrada!');
+    }
 
-      const tb = document.getElementById('resumo-tabela-hoje');
-      tb.innerHTML = vendasHoje.map(p => `
-        <tr>
-          <td>#${p.numeroPedido}</td>
-          <td>${p.clienteNome}</td>
-          <td>R$ ${parseFloat(p.total).toFixed(2)}</td>
-          <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
-        </tr>
-      `).join('');
+    function renderProducaoHoje() {
+      const tbody = document.getElementById('lista-producao-hoje');
+      if (!tbody) return;
 
-      document.getElementById('modal-resumo').style.display = 'flex';
+      const hoje = new Date().toDateString();
+      const doDia = state.producao.filter(p => {
+        let d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
+        return d.toDateString() === hoje;
+      });
+
+      tbody.innerHTML = doDia.map(p => {
+        let d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
+        return `
+          <tr>
+            <td>${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+            <td><strong>+ ${p.qtdOvos.toLocaleString('pt-BR')} ovos</strong></td>
+          </tr>
+        `;
+      }).join('');
     }
 
     async function cadastrarUsuario(e) {
@@ -1161,66 +1090,222 @@
         login, pass, role
       });
 
-      alert('Usuário cadastrado!');
       e.target.reset();
+      alert('Usuário cadastrado com sucesso!');
     }
 
     async function excluirUsuario(id) {
-      if (confirm('Remover usuário?')) {
+      if (confirm('Deseja excluir este usuário?')) {
         await db.collection("usuarios").doc(id).delete();
       }
     }
 
     async function alterarMinhaSenha(e) {
       e.preventDefault();
-      const novaSenha = document.getElementById('minha-nova-senha').value.trim();
-      if (!novaSenha) return;
+      const nova = document.getElementById('minha-nova-senha').value.trim();
+      if (!nova) return;
 
-      await db.collection("usuarios").doc(state.currentUser.id).update({ pass: novaSenha });
-      alert('Sua senha foi alterada com sucesso!');
+      await db.collection("usuarios").doc(state.currentUser.id).update({ pass: nova });
+      state.currentUser.pass = nova;
       e.target.reset();
+      alert('Sua senha foi alterada com sucesso!');
     }
 
     async function salvarEmpresa(e) {
       e.preventDefault();
-      const nome = document.getElementById('emp-nome').value.trim();
-      const cnpj = document.getElementById('emp-cnpj').value.trim();
-      const tel = document.getElementById('emp-tel').value.trim();
-      const end = document.getElementById('emp-end').value.trim();
-      const social = document.getElementById('emp-social').value.trim();
-      const pix = document.getElementById('emp-pix').value.trim();
+      const dados = {
+        nome: document.getElementById('emp-nome').value.trim(),
+        cnpj: document.getElementById('emp-cnpj').value.trim(),
+        tel: document.getElementById('emp-tel').value.trim(),
+        end: document.getElementById('emp-end').value.trim(),
+        social: document.getElementById('emp-social').value.trim(),
+        pix: document.getElementById('emp-pix').value.trim()
+      };
 
-      const empresaId = state.currentUser.empresaId;
-      await db.collection("config").doc(empresaId).set({
-        nome, cnpj, tel, end, social, pix
-      });
-
+      await db.collection("config").doc(state.currentUser.empresaId).set(dados, { merge: true });
+      state.empresa = dados;
       alert('Dados da empresa salvos com sucesso!');
     }
 
-    function filtrarClientesDashboard() {
-      const termo = document.getElementById('dash-busca-cliente').value.toLowerCase();
-      const linhas = document.querySelectorAll('#lista-clientes-dash tr');
-      linhas.forEach(l => {
-        const txt = l.innerText.toLowerCase();
-        l.style.display = txt.includes(termo) ? '' : 'none';
+    // --- MONTAGEM DO RECIBO / NOTA FISCAL (GARANTIA TOTAL DE DADOS) ---
+    function abrirModalNota(pedidoOuId) {
+      let ped = null;
+
+      if (typeof pedidoOuId === 'string') {
+        ped = state.pedidos.find(p => p.id === pedidoOuId);
+      } else {
+        ped = pedidoOuId;
+      }
+
+      if (!ped) {
+        alert('Erro ao carregar os dados do pedido.');
+        return;
+      }
+
+      state.pedidoAtual = ped;
+      const receipt = document.getElementById('printable-receipt');
+      const emp = state.empresa || {};
+
+      const isPago = ped.status === 'Pago';
+      const statusSymbol = isPago ? '🟢' : '🔴';
+
+      // Tratamento e validação de todos os dados do comprovante
+      const numPedido = ped.numeroPedido || '---';
+      const clienteNome = ped.clienteNome || 'Cliente não informado';
+      const clienteDoc = ped.clienteDoc || 'N/I';
+      const clienteEnd = ped.clienteEnd || 'Não informado';
+      const totalValor = parseFloat(ped.total || 0).toFixed(2);
+      const formaPgto = ped.formaPgto || 'Não especificada';
+      const dadosPgto = ped.dadosPgto || '';
+      const obs = ped.obs || '';
+      const itens = ped.itens || [];
+
+      receipt.innerHTML = `
+        <div style="text-align:center; margin-bottom:8px;">
+          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
+          <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
+          <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
+        </div>
+
+        <hr class="dashed-divider">
+
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
+          COMPROVANTE DE PEDIDO #${numPedido}
+        </div>
+        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${clienteNome}</div>
+        <div style="margin-bottom:2px;"><strong>Documento:</strong> ${clienteDoc}</div>
+        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${clienteEnd}</div>
+
+        <hr class="dashed-divider">
+
+        <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
+        ${itens.length > 0 ? itens.map(i => `
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>${i.qtd}x${i.nome}</span>
+            <span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span>
+          </div>
+        `).join('') : '<div style="font-size:0.8rem; color:#64748b;">Nenhum item registrado</div>'}
+
+        <hr class="dashed-divider">
+
+        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
+          <span>VALOR TOTAL:</span>
+          <span>R$ ${totalValor}</span>
+        </div>
+        <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${formaPgto}</div>
+        ${dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${dadosPgto}</div>` : ''}
+        <div style="margin-bottom:2px;">
+          <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
+        </div>
+        ${obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${obs}</div>` : ''}
+
+        <hr class="dashed-divider">
+
+        <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
+          <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
+          ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
+          ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
+          <p style="margin-top:4px;">Obrigado pela preferência!</p>
+        </div>
+      `;
+
+      document.getElementById('modal-nota').style.display = 'flex';
+    }
+
+    function imprimirNota() {
+      window.print();
+    }
+
+    function salvarNotaPDF() {
+      const el = document.getElementById('printable-receipt');
+      const ped = state.pedidoAtual || {};
+      const num = ped.numeroPedido || 'comprovante';
+      
+      const opt = {
+        margin:       [5, 5, 5, 5],
+        filename:     `Pedido_${num}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: [80, 200], orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(el).save();
+    }
+
+    function enviarWhats() {
+      const ped = state.pedidoAtual;
+      if (!ped) return;
+
+      let fone = (ped.clienteTel || '').replace(/\D/g, '');
+      if (!fone.startsWith('55') && fone.length >= 10) fone = '55' + fone;
+
+      let msg = `*COMPROVANTE DE PEDIDO #${ped.numeroPedido || ''}*\n`;
+      msg += `*Empresa:* ${state.empresa.nome || 'HappyEggs'}\n`;
+      msg += `--------------------------------\n`;
+      msg += `*Cliente:* ${ped.clienteNome}\n`;
+      msg += `*Status:* ${ped.status === 'Pago' ? '🟢 PAGAMENTO CONFIRMADO' : '🔴 AGUARDANDO PAGAMENTO'}\n\n`;
+      msg += `*ITENS:*\n`;
+      (ped.itens || []).forEach(i => {
+        msg += `• ${i.qtd}x ${i.nome} - R$ ${parseFloat(i.subtotal).toFixed(2)}\n`;
       });
+      msg += `\n*TOTAL: R$ ${parseFloat(ped.total).toFixed(2)}*\n`;
+      msg += `*Forma de Pgto:* ${ped.formaPgto}\n`;
+
+      if (state.empresa.pix) {
+        msg += `*Chave Pix:* ${state.empresa.pix}\n`;
+      }
+
+      msg += `\nAgradecemos a preferência! 🥚`;
+
+      const link = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(msg)}`;
+      window.open(link, '_blank');
     }
 
-    function filtrarClientesDropdown() {
-      const termo = document.getElementById('ped-busca-cliente').value.toLowerCase();
-      const select = document.getElementById('ped-cliente');
-      const filtrados = state.clientes.filter(c => 
-        c.nome.toLowerCase().includes(termo) || 
-        (c.doc && c.doc.toLowerCase().includes(termo)) ||
-        (c.tel && c.tel.toLowerCase().includes(termo))
-      );
+    function abrirResumoVendasDia() {
+      const hojeStr = new Date().toDateString();
+      const pedidosHoje = state.pedidos.filter(p => {
+        let d = p.dataCriacao;
+        return d && d.toDateString && d.toDateString() === hojeStr;
+      });
 
-      select.innerHTML = `<option value="">-- Selecione o Cliente --</option>` + 
-        filtrados.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
+      const totalHoje = pedidosHoje.reduce((acc, p) => acc + (p.total || 0), 0);
+      const qtdPedidos = pedidosHoje.length;
+      const ticketMedio = qtdPedidos > 0 ? (totalHoje / qtdPedidos) : 0;
+
+      const porForma = {};
+      pedidosHoje.forEach(p => {
+        const forma = p.formaPgto || 'Não especificada';
+        porForma[forma] = (porForma[forma] || 0) + (p.total || 0);
+      });
+
+      document.getElementById('resumo-data-hoje').innerText = `Data: ${new Date().toLocaleDateString('pt-BR')}`;
+      document.getElementById('resumo-total-hoje').innerText = `R$ ${totalHoje.toFixed(2)}`;
+      document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
+      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
+
+      const htmlFormas = Object.keys(porForma).map(f => `
+        <div style="display:flex; justify-space-between; margin-bottom:2px;">
+          <span>${f}:</span>
+          <strong>R$ ${porForma[f].toFixed(2)}</strong>
+        </div>
+      `).join('');
+      document.getElementById('resumo-detalhe-formas').innerHTML = htmlFormas || 'Nenhuma venda hoje.';
+
+      const tbody = document.getElementById('resumo-tabela-hoje');
+      tbody.innerHTML = pedidosHoje.map(p => `
+        <tr>
+          <td>#${p.numeroPedido || ''}</td>
+          <td>${p.clienteNome}</td>
+          <td>R$ ${parseFloat(p.total).toFixed(2)}</td>
+          <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
+        </tr>
+      `).join('');
+
+      document.getElementById('modal-resumo').style.display = 'flex';
     }
 
-    window.onload = initApp;
+    // Inicialização da Aplicação
+    initApp();
   </script>
 </body>
 </html>
