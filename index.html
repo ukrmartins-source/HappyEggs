@@ -1079,3 +1079,537 @@
   </script>
 </body>
 </html>
+db.collection("usuarios").doc(docId).update({ pass: novaSenha.trim() })
+        .then(() => alert(`Senha do usuário ${login} atualizada com sucesso!`))
+        .catch(err => alert('Erro ao alterar senha: ' + err.message));
+      }
+    }
+
+    function excluirUsuario(docId, login) {
+      if (login === state.currentUser.login) return alert("Você não pode excluir seu próprio usuário em uso!");
+      if (confirm(`Deseja realmente excluir o usuário "${login}"?`)) {
+        db.collection("usuarios").doc(docId).delete()
+        .then(() => alert("Usuário excluído com sucesso!"))
+        .catch(err => alert("Erro ao excluir usuário: " + err.message));
+      }
+    }
+
+    function cadastrarUsuario(e) {
+      e.preventDefault();
+      const login = document.getElementById('usr-login').value.trim().toLowerCase();
+      const pass = document.getElementById('usr-pass').value.trim();
+      const role = document.getElementById('usr-role').value;
+      const empresaId = state.currentUser.empresaId;
+
+      if (state.usuarios.some(u => u.login === login)) {
+        return alert('Este login já existe na sua empresa.');
+      }
+
+      db.collection("usuarios").add({ login, pass, role, empresaId })
+      .then(() => {
+        alert('Usuário cadastrado com sucesso!');
+        document.getElementById('usr-login').value = '';
+        document.getElementById('usr-pass').value = '';
+      }).catch(err => alert('Erro ao cadastrar usuário: ' + err.message));
+    }
+
+    // --- GESTÃO DE CLIENTES ---
+    function cadastrarCliente(e) {
+      e.preventDefault();
+      const nome = document.getElementById('cli-nome').value.trim();
+      const doc = document.getElementById('cli-doc').value.trim();
+      const tel = document.getElementById('cli-tel').value.trim();
+      const end = document.getElementById('cli-end').value.trim();
+      const empresaId = state.currentUser.empresaId;
+
+      db.collection("clientes").add({ nome, doc, tel, end, empresaId })
+      .then(() => {
+        alert('Cliente cadastrado com sucesso!');
+        document.getElementById('cli-nome').value = '';
+        document.getElementById('cli-doc').value = '';
+        document.getElementById('cli-tel').value = '';
+        document.getElementById('cli-end').value = '';
+      }).catch(err => alert('Erro ao cadastrar cliente: ' + err.message));
+    }
+
+    function excluirCliente(docId, nome) {
+      if (confirm(`Deseja remover o cliente "${nome}"?`)) {
+        db.collection("clientes").doc(docId).delete();
+      }
+    }
+
+    function filtrarClientesDashboard() {
+      const busca = document.getElementById('dash-busca-cliente').value.toLowerCase();
+      const tbody = document.getElementById('lista-clientes-dash');
+      const filtrados = state.clientes.filter(c => 
+        (c.nome && c.nome.toLowerCase().includes(busca)) || 
+        (c.doc && c.doc.toLowerCase().includes(busca)) ||
+        (c.tel && c.tel.includes(busca))
+      );
+
+      tbody.innerHTML = filtrados.slice(0, 5).map(c => `
+        <tr>
+          <td><b>${c.nome}</b><br><small style="color:var(--text-muted);">${c.doc || 'Sem Doc'}</small></td>
+          <td>${c.tel}<br><small style="color:var(--text-muted);">${c.end || ''}</small></td>
+        </tr>
+      `).join('') || '<tr><td colspan="2" style="text-align:center; color:#64748b;">Nenhum cliente encontrado.</td></tr>';
+    }
+
+    function filtrarClientesDropdown() {
+      const busca = document.getElementById('ped-busca-cliente').value.toLowerCase();
+      const select = document.getElementById('ped-cliente');
+      const filtrados = state.clientes.filter(c => 
+        (c.nome && c.nome.toLowerCase().includes(busca)) || 
+        (c.doc && c.doc.toLowerCase().includes(busca)) ||
+        (c.tel && c.tel.includes(busca))
+      );
+
+      select.innerHTML = filtrados.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
+    }
+
+    // --- GESTÃO DE PRODUTOS & ESTOQUE ---
+    function salvarProduto(e) {
+      e.preventDefault();
+      const idEdit = document.getElementById('prod-id-edit').value;
+      const nome = document.getElementById('prod-nome').value.trim();
+      const preco = parseFloat(document.getElementById('prod-preco').value) || 0;
+      const qtd = parseInt(document.getElementById('prod-qtd').value) || 0;
+      const empresaId = state.currentUser.empresaId;
+
+      if (idEdit) {
+        db.collection("produtos").doc(idEdit).update({ nome, preco, qtd })
+        .then(() => {
+          alert("Produto atualizado!");
+          limparFormProduto();
+        });
+      } else {
+        db.collection("produtos").add({ nome, preco, qtd, empresaId })
+        .then(() => {
+          alert("Produto cadastrado!");
+          limparFormProduto();
+        });
+      }
+    }
+
+    function editarProduto(p) {
+      document.getElementById('prod-id-edit').value = p.id;
+      document.getElementById('prod-nome').value = p.nome;
+      document.getElementById('prod-preco').value = p.preco;
+      document.getElementById('prod-qtd').value = p.qtd;
+      document.getElementById('form-prod-title').innerText = "Editar Produto";
+      document.getElementById('btn-salvar-prod').innerText = "Atualizar Produto";
+      document.getElementById('btn-cancelar-edit').style.display = "block";
+    }
+
+    function limparFormProduto() {
+      document.getElementById('prod-id-edit').value = "";
+      document.getElementById('form-produto').reset();
+      document.getElementById('form-prod-title').innerText = "Cadastrar Novo Produto";
+      document.getElementById('btn-salvar-prod').innerText = "Salvar Produto na Nuvem";
+      document.getElementById('btn-cancelar-edit').style.display = "none";
+    }
+
+    function excluirProduto(docId, nome) {
+      if (confirm(`Deseja remover o produto "${nome}"?`)) {
+        db.collection("produtos").doc(docId).delete();
+      }
+    }
+
+    // --- REGISTRO DE PRODUÇÃO DIÁRIA ---
+    function registrarEntradaProducao(e) {
+      e.preventDefault();
+      const prodId = document.getElementById('prod-ent-item').value;
+      const qtdEntrada = parseInt(document.getElementById('prod-ent-qtd').value) || 0;
+      const empresaId = state.currentUser.empresaId;
+
+      if (!prodId || qtdEntrada <= 0) return alert("Selecione um produto e uma quantidade válida.");
+
+      const produto = state.produtos.find(p => p.id === prodId);
+      if (!produto) return alert("Produto não encontrado.");
+
+      const novaQtd = (produto.qtd || 0) + qtdEntrada;
+
+      db.collection("produtos").doc(prodId).update({ qtd: novaQtd }).then(() => {
+        db.collection("producao").add({
+          produtoId: prodId,
+          produtoNome: produto.nome,
+          qtd: qtdEntrada,
+          empresaId: empresaId,
+          dataHora: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert(`Lançamento efetuado! ${qtdEntrada} unidades adicionadas ao estoque.`);
+        document.getElementById('prod-ent-qtd').value = '';
+      }).catch(err => alert("Erro ao lançar produção: " + err.message));
+    }
+
+    function renderProducaoHoje() {
+      const tbody = document.getElementById('lista-producao-hoje');
+      if (!tbody) return;
+
+      const hojeStr = new Date().toDateString();
+      const producoesHoje = state.producao.filter(item => {
+        if (!item.dataHora) return false;
+        const d = item.dataHora.toDate ? item.dataHora.toDate() : new Date(item.dataHora);
+        return d.toDateString() === hojeStr;
+      });
+
+      tbody.innerHTML = producoesHoje.map(p => {
+        const d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date();
+        const horaStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `<tr><td>${horaStr}</td><td>${p.produtoNome}</td><td><b>+${p.qtd}</b></td></tr>`;
+      }).join('') || '<tr><td colspan="3" style="text-align:center; color:#64748b;">Nenhuma produção lançada hoje.</td></tr>';
+    }
+
+    // --- CARRINHO E PEDIDOS ---
+    function adicionarItemAoPedido() {
+      const prodSelect = document.getElementById('ped-produto');
+      const prodId = prodSelect.value;
+      const qtd = parseInt(document.getElementById('ped-qtd').value) || 1;
+
+      if (!prodId) return alert("Selecione um produto.");
+      const produto = state.produtos.find(p => p.id === prodId);
+      if (!produto) return;
+
+      if (qtd > produto.qtd) {
+        if (!confirm(`Estoque insuficiente (${produto.qtd} disponíveis). Deseja adicionar assim mesmo?`)) return;
+      }
+
+      const itemExistente = carrinhoTemp.find(i => i.id === prodId);
+      if (itemExistente) {
+        itemExistente.qtd += qtd;
+        itemExistente.subtotal = itemExistente.qtd * itemExistente.preco;
+      } else {
+        carrinhoTemp.push({
+          id: produto.id,
+          nome: produto.nome,
+          preco: produto.preco,
+          qtd: qtd,
+          subtotal: qtd * produto.preco
+        });
+      }
+
+      renderCarrinho();
+    }
+
+    function removerItemCarrinho(index) {
+      carrinhoTemp.splice(index, 1);
+      renderCarrinho();
+    }
+
+    function renderCarrinho() {
+      const listaEl = document.getElementById('itens-pedido-lista');
+      const totalEl = document.getElementById('ped-total-valor');
+
+      if (carrinhoTemp.length === 0) {
+        listaEl.innerHTML = '<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>';
+        totalEl.innerText = "0.00";
+        return;
+      }
+
+      let total = 0;
+      listaEl.innerHTML = carrinhoTemp.map((item, idx) => {
+        total += item.subtotal;
+        return `
+          <div class="carrinho-item">
+            <div>
+              <b>${item.nome}</b><br>
+              <small>${item.qtd}x R$ ${item.preco.toFixed(2)} = R$ ${item.subtotal.toFixed(2)}</small>
+            </div>
+            <button type="button" class="btn-danger" onclick="removerItemCarrinho(${idx})">✖</button>
+          </div>
+        `;
+      }).join('');
+
+      totalEl.innerText = total.toFixed(2);
+    }
+
+    async function finalizarPedido(e) {
+      e.preventDefault();
+      if (carrinhoTemp.length === 0) return alert("Adicione pelo menos um produto ao pedido.");
+
+      const clienteId = document.getElementById('ped-cliente').value;
+      const cliente = state.clientes.find(c => c.id === clienteId);
+      if (!cliente) return alert("Selecione um cliente válido.");
+
+      const formaPagamento = document.getElementById('ped-forma-pagamento').value;
+      const dadosPagamento = document.getElementById('ped-dados-pagamento').value.trim();
+      const status = document.getElementById('ped-status').value;
+      const obs = document.getElementById('ped-obs').value.trim();
+      const total = carrinhoTemp.reduce((acc, item) => acc + item.subtotal, 0);
+      const empresaId = state.currentUser.empresaId;
+
+      const novoPedido = {
+        clienteId: cliente.id,
+        clienteNome: cliente.nome,
+        clienteTel: cliente.tel,
+        clienteEnd: cliente.end,
+        itens: carrinhoTemp,
+        total: total,
+        formaPagamento: formaPagamento,
+        dadosPagamento: dadosPagamento,
+        status: status,
+        obs: obs,
+        empresaId: empresaId,
+        vendedor: state.currentUser.login,
+        dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      try {
+        const docRef = await db.collection("pedidos").add(novoPedido);
+        
+        // Dar baixa no estoque
+        for (const item of carrinhoTemp) {
+          const prodRef = db.collection("produtos").doc(item.id);
+          const prodSnap = await prodRef.get();
+          if (prodSnap.exists) {
+            const qtdAtual = prodSnap.data().qtd || 0;
+            await prodRef.update({ qtd: Math.max(0, qtdAtual - item.qtd) });
+          }
+        }
+
+        alert("Pedido efetuado com sucesso!");
+        carrinhoTemp = [];
+        renderCarrinho();
+        document.getElementById('ped-obs').value = '';
+        document.getElementById('ped-dados-pagamento').value = '';
+
+        // Abrir nota fiscal/comprovante
+        abrirComprovante({ id: docRef.id, ...novoPedido, dataCriacao: new Date() });
+      } catch (err) {
+        alert("Erro ao finalizar pedido: " + err.message);
+      }
+    }
+
+    function alternarStatusPedido(pedidoId, statusAtual) {
+      const novoStatus = statusAtual === 'Pago' ? 'Pendente' : 'Pago';
+      db.collection("pedidos").doc(pedidoId).update({ status: novoStatus });
+    }
+
+    function cancelarPedido(pedidoId) {
+      if (confirm("Deseja alterar o status deste pedido para CANCELADO?")) {
+        db.collection("pedidos").doc(pedidoId).update({ status: 'Cancelado' });
+      }
+    }
+
+    // --- COMPROVANTE & IMPRESSÃO ---
+    function abrirComprovante(pedido) {
+      state.pedidoAtual = pedido;
+      const dataFormatada = pedido.dataCriacao instanceof Date ? pedido.dataCriacao.toLocaleString() : new Date().toLocaleString();
+      const emp = state.empresa;
+
+      let itensHtml = (pedido.itens || []).map(i => 
+        `${i.qtd}x ${i.nome.padEnd(22, '.').slice(0, 22)} R$ ${i.subtotal.toFixed(2)}`
+      ).join('<br>');
+
+      const reciboText = `
+========================================
+           ${emp.nome || 'HAPPY EGGS'}
+========================================
+CNPJ/CPF: ${emp.cnpj || 'Não informado'}
+TEL: ${emp.tel || ''}
+${emp.end || ''}
+${emp.social || ''}
+----------------------------------------
+COMPROVANTE DE PEDIDO #${pedido.id ? pedido.id.slice(-6).toUpperCase() : 'NOVO'}
+DATA: ${dataFormatada}
+VENDEDOR: ${pedido.vendedor || 'Sistema'}
+----------------------------------------
+CLIENTE: ${pedido.clienteNome}
+FONE: ${pedido.clienteTel || '-'}
+END: ${pedido.clienteEnd || '-'}
+----------------------------------------
+ITENS DO PEDIDO:
+${itensHtml}
+----------------------------------------
+TOTAL: R$ ${(pedido.total || 0).toFixed(2)}
+FORMA DE PAGTO: ${pedido.formaPagamento}
+STATUS: ${pedido.status.toUpperCase()}
+${pedido.dadosPagamento ? 'DADOS PAGTO: ' + pedido.dadosPagamento : ''}
+${emp.pix ? 'CHAVE PIX: ' + emp.pix : ''}
+----------------------------------------
+${pedido.obs ? 'OBS: ' + pedido.obs + '\n----------------------------------------' : ''}
+    Agradecemos a sua preferência!
+========================================
+      `;
+
+      document.getElementById('printable-receipt').innerHTML = `<pre style="font-family: monospace; white-space: pre-wrap; margin:0;">${reciboText}</pre>`;
+      document.getElementById('modal-nota').style.display = 'flex';
+    }
+
+    function gerarImpressaoOuPDF() {
+      window.print();
+    }
+
+    function enviarWhats() {
+      if (!state.pedidoAtual) return;
+      const p = state.pedidoAtual;
+      const fone = p.clienteTel ? p.clienteTel.replace(/\D/g, '') : '';
+      const emp = state.empresa;
+
+      let texto = `*--- ${emp.nome || 'HAPPY EGGS'} ---*\n`;
+      texto += `Olá *${p.clienteNome}*, segue o resumo do seu pedido:\n\n`;
+      p.itens.forEach(i => {
+        texto += `• ${i.qtd}x ${i.nome} - R$ ${i.subtotal.toFixed(2)}\n`;
+      });
+      texto += `\n*Total: R$ ${p.total.toFixed(2)}*`;
+      texto += `\nForma de Pagamento: ${p.formaPagamento}`;
+      texto += `\nStatus: ${p.status}`;
+      if (emp.pix) texto += `\n\n*Chave Pix:* ${emp.pix}`;
+      texto += `\n\nObrigado pela preferência! 🥚`;
+
+      const url = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(texto)}`;
+      window.open(url, '_blank');
+    }
+
+    // --- RESUMO DE VENDAS DO DIA ---
+    function abrirResumoVendasDia() {
+      const hoje = new Date();
+      const hojeStr = hoje.toDateString();
+      document.getElementById('resumo-data-hoje').innerText = `Data: ${hoje.toLocaleDateString()}`;
+
+      const pedidosHoje = state.pedidos.filter(p => {
+        const d = p.dataCriacao instanceof Date ? p.dataCriacao : new Date(p.dataCriacao);
+        return d.toDateString() === hojeStr && p.status !== 'Cancelado';
+      });
+
+      const totalVendido = pedidosHoje.reduce((acc, p) => acc + (p.total || 0), 0);
+      const qtdPedidos = pedidosHoje.length;
+      const ticketMedio = qtdPedidos > 0 ? totalVendido / qtdPedidos : 0;
+
+      const formasMap = {};
+      pedidosHoje.forEach(p => {
+        const forma = p.formaPagamento || 'Outros';
+        formasMap[forma] = (formasMap[forma] || 0) + p.total;
+      });
+
+      document.getElementById('resumo-total-hoje').innerText = `R$ ${totalVendido.toFixed(2)}`;
+      document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
+      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
+
+      let detalheFormas = '';
+      for (const [forma, valor] of Object.entries(formasMap)) {
+        detalheFormas += `<div>• <b>${forma}:</b> R$ ${valor.toFixed(2)}</div>`;
+      }
+      document.getElementById('resumo-detalhe-formas').innerHTML = detalheFormas || '<div style="color:#64748b;">Nenhuma venda hoje.</div>';
+
+      const tbody = document.getElementById('resumo-tabela-hoje');
+      tbody.innerHTML = pedidosHoje.map(p => `
+        <tr>
+          <td>#${p.id.slice(-4).toUpperCase()}</td>
+          <td>${p.clienteNome}</td>
+          <td>R$ ${(p.total || 0).toFixed(2)}</td>
+          <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
+        </tr>
+      `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhuma venda realizada hoje.</td></tr>';
+
+      document.getElementById('modal-resumo').style.display = 'flex';
+    }
+
+    // --- CONFIGURAÇÕES DA EMPRESA ---
+    function salvarEmpresa(e) {
+      e.preventDefault();
+      const empresaId = state.currentUser.empresaId;
+      const configData = {
+        nome: document.getElementById('emp-nome').value.trim(),
+        cnpj: document.getElementById('emp-cnpj').value.trim(),
+        tel: document.getElementById('emp-tel').value.trim(),
+        end: document.getElementById('emp-end').value.trim(),
+        social: document.getElementById('emp-social').value.trim(),
+        pix: document.getElementById('emp-pix').value.trim()
+      };
+
+      db.collection("config").doc(empresaId).set(configData)
+      .then(() => alert("Dados da empresa salvos com sucesso!"))
+      .catch(err => alert("Erro ao salvar dados: " + err.message));
+    }
+
+    // --- RENDERIZAÇÃO GERAL DA INTERFACE ---
+    function render() {
+      // Render Clientes
+      filtrarClientesDashboard();
+      filtrarClientesDropdown();
+
+      const listClientes = document.getElementById('lista-clientes');
+      if (listClientes) {
+        listClientes.innerHTML = state.clientes.map(c => `
+          <tr>
+            <td><b>${c.nome}</b><br><small style="color:var(--text-muted);">${c.doc || 'Sem Doc'}</small></td>
+            <td>${c.tel}<br><small style="color:var(--text-muted);">${c.end || ''}</small></td>
+            <td><button type="button" class="btn-danger" onclick="excluirCliente('${c.id}', '${c.nome}')">🗑</button></td>
+          </tr>
+        `).join('') || '<tr><td colspan="3" style="text-align:center; color:#64748b;">Nenhum cliente cadastrado.</td></tr>';
+      }
+
+      // Render Produtos
+      const pedProdSelect = document.getElementById('ped-produto');
+      const prodEntSelect = document.getElementById('prod-ent-item');
+      if (pedProdSelect) {
+        pedProdSelect.innerHTML = state.produtos.map(p => 
+          `<option value="${p.id}">${p.nome} - R$ ${p.preco.toFixed(2)} (Estoque: ${p.qtd})</option>`
+        ).join('');
+      }
+      if (prodEntSelect) {
+        prodEntSelect.innerHTML = state.produtos.map(p => 
+          `<option value="${p.id}">${p.nome} (Atual: ${p.qtd})</option>`
+        ).join('');
+      }
+
+      const listProds = document.getElementById('lista-produtos');
+      if (listProds) {
+        listProds.innerHTML = state.produtos.map(p => `
+          <tr>
+            <td><b>${p.nome}</b></td>
+            <td>R$ ${p.preco.toFixed(2)}</td>
+            <td><b>${p.qtd}</b></td>
+            <td>
+              <button type="button" class="btn-warning" onclick='editarProduto(${JSON.stringify(p)})'>✏️</button>
+              <button type="button" class="btn-danger" onclick="excluirProduto('${p.id}', '${p.nome}')">🗑</button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum produto em estoque.</td></tr>';
+      }
+
+      // Render Pedidos
+      const listPedidos = document.getElementById('lista-pedidos');
+      if (listPedidos) {
+        listPedidos.innerHTML = state.pedidos.map(p => {
+          const isCancelado = p.status === 'Cancelado';
+          const badgeClass = isCancelado ? 'badge-cancelado' : (p.status === 'Pago' ? 'badge-pago' : 'badge-pendente');
+          return `
+            <tr>
+              <td>#${p.id.slice(-4).toUpperCase()}</td>
+              <td><b>${p.clienteNome}</b></td>
+              <td>R$ ${(p.total || 0).toFixed(2)}</td>
+              <td>
+                <span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">${p.status}</span>
+              </td>
+              <td>
+                <button type="button" class="btn" style="padding:4px 8px; width:auto; font-size:0.75rem;" onclick='abrirComprovante(${JSON.stringify(p)})'>📄</button>
+                ${!isCancelado ? `<button type="button" class="btn-danger" style="margin-top:2px;" onclick="cancelarPedido('${p.id}')">🚫</button>` : ''}
+              </td>
+            </tr>
+          `;
+        }).join('') || '<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhum pedido cadastrado.</td></tr>';
+      }
+
+      // Render Usuarios
+      const listUsrs = document.getElementById('lista-usuarios');
+      if (listUsrs) {
+        listUsrs.innerHTML = state.usuarios.map(u => `
+          <tr>
+            <td><b>${u.login}</b></td>
+            <td>${u.role === 'admin' ? 'Administrador' : 'Vendedor'}</td>
+            <td>
+              <button type="button" class="btn-warning" onclick="alterarSenhaUsuario('${u.id}', '${u.login}')">🔑</button>
+              <button type="button" class="btn-danger" onclick="excluirUsuario('${u.id}', '${u.login}')">🗑</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // Inicializa app ao carregar
+    window.onload = initApp;
+  </script>
+</body>
+</html>
