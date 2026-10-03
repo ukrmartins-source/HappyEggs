@@ -120,7 +120,7 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
-    /* CORREÇÃO DEFINITIVA DE IMPRESSÃO - IMPRIME APENAS O RECIBO PERFEITO */
+    /* CORREÇÃO DE IMPRESSÃO */
     @media print {
       body {
         background: #ffffff !important;
@@ -1132,7 +1132,7 @@
       alert('Dados da empresa salvos com sucesso!');
     }
 
-    // --- MONTAGEM DO RECIBO / NOTA FISCAL (GARANTIA TOTAL DE DADOS) ---
+    // --- MONTAGEM DO RECIBO / NOTA FISCAL ---
     function abrirModalNota(pedidoOuId) {
       let ped = null;
 
@@ -1216,39 +1216,48 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    // IMPRESSÃO CORRIGIDA DEDICADA
     function imprimirNota() {
       window.print();
     }
 
-    // GERAÇÃO DE PDF FORMATADA EM A4
+    // GERAÇÃO DE PDF DEFINITIVAMENTE CORRIGIDA
     function salvarNotaPDF() {
       const receiptElement = document.getElementById('printable-receipt');
       const ped = state.pedidoAtual || {};
       const num = ped.numeroPedido || 'comprovante';
 
-      // Cria container temporário para formatar a página A4 perfeitamente sem afetar a modal
-      const tempWrapper = document.createElement('div');
-      tempWrapper.style.padding = '20px';
-      tempWrapper.style.fontFamily = 'Arial, sans-serif';
-      
-      const clone = receiptElement.cloneNode(true);
-      clone.style.border = '1px dashed #000';
-      clone.style.padding = '20px';
-      clone.style.maxWidth = '450px';
-      clone.style.margin = '0 auto';
-      
-      tempWrapper.appendChild(clone);
+      // Cria elemento container visível para o html2canvas fora do modal
+      const pdfContainer = document.createElement('div');
+      pdfContainer.style.position = 'absolute';
+      pdfContainer.style.left = '-9999px';
+      pdfContainer.style.top = '0';
+      pdfContainer.style.width = '380px';
+      pdfContainer.style.backgroundColor = '#ffffff';
+      pdfContainer.style.padding = '15px';
+
+      // Clona o recibo preenchido
+      pdfContainer.innerHTML = receiptElement.innerHTML;
+      pdfContainer.className = 'receipt-box';
+      pdfContainer.style.border = '1px dashed #000';
+
+      document.body.appendChild(pdfContainer);
 
       const opt = {
-        margin:       10,
+        margin:       [10, 10, 10, 10],
         filename:     `Pedido_${num}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
+        html2canvas:  { scale: 2, logging: false, useCORS: true },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      html2pdf().set(opt).from(tempWrapper).save();
+      html2pdf().set(opt).from(pdfContainer).save().then(() => {
+        document.body.removeChild(pdfContainer);
+      }).catch(err => {
+        console.error('Erro ao gerar PDF:', err);
+        if (pdfContainer.parentNode) {
+          document.body.removeChild(pdfContainer);
+        }
+      });
     }
 
     function enviarWhats() {
@@ -1303,7 +1312,7 @@
       document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
 
       const htmlFormas = Object.keys(porForma).map(f => `
-        <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+        <div style="display:flex; justify-space-between; margin-bottom:2px;">
           <span>${f}:</span>
           <strong>R$ ${porForma[f].toFixed(2)}</strong>
         </div>
