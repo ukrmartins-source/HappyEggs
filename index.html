@@ -80,7 +80,6 @@
     .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; cursor: pointer; display: inline-block; }
     .badge-pago { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
     .badge-pendente { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-    .badge-cancelado { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
@@ -229,12 +228,12 @@
 
           <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border:1px solid #e2e8f0;">
             <div class="form-group">
-              <label>Selecione o Produto</label>
+              <label>Selecione a Embalagem / Produto</label>
               <select id="ped-produto"></select>
             </div>
             <div style="display: flex; gap: 8px; align-items: flex-end;">
               <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label>Quantidade</label>
+                <label>Quantidade de Embalagens</label>
                 <input type="number" id="ped-qtd" min="1" value="1">
               </div>
               <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">➕ Adicionar</button>
@@ -288,23 +287,30 @@
       </div>
     </div>
 
-    <!-- TELA: PRODUTOS / ESTOQUE & ENTRADA DE PRODUÇÃO -->
+    <!-- TELA: ESTOQUE E EMBALAGENS -->
     <div id="view-produtos" class="view-content" style="display:none;">
+      <!-- CARD 1: SALDO DE ESTOQUE E ENTRADA DE PRODUÇÃO -->
       <div class="card" style="border-left: 4px solid var(--accent);">
         <div class="card-header">
-          <div class="card-title">🥚 Registrar Entrada de Produção (Diário)</div>
+          <div class="card-title">🥚 Registrar Entrada de Produção</div>
           <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
         </div>
+
+        <div class="stat-card" style="background: #eff6ff; border-color: #bfdbfe;">
+          <div class="stat-title">Saldo Geral de Ovos em Estoque</div>
+          <div class="stat-value" id="estoque-geral-ovos" style="font-size: 1.8rem;">0 Ovos</div>
+        </div>
+
         <form onsubmit="registrarEntradaProducao(event)">
           <div class="form-group">
-            <label>Quantidade Coletada/Produzida (Unidades de Ovos)</label>
-            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 1000 ovos/dia" required>
+            <label>Quantidade Coletada/Produzida (Ovos Individuais)</label>
+            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 5000" required>
           </div>
-          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Coleta de Produção</button>
+          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Direto para o Estoque Geral</button>
         </form>
 
         <div style="margin-top: 15px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Produção de Hoje</div>
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Coletas de Hoje</div>
           <table>
             <thead><tr><th>Hora</th><th>Unidades</th></tr></thead>
             <tbody id="lista-producao-hoje"></tbody>
@@ -312,24 +318,36 @@
         </div>
       </div>
 
+      <!-- CARD 2: CADASTRAR/EDITAR PRODUTOS/EMBALAGENS -->
       <div class="card">
         <div class="card-header">
           <div class="card-title" id="form-prod-title">Cadastrar Novo Produto / Embalagem</div>
         </div>
         <form id="form-produto" onsubmit="salvarProduto(event)">
           <input type="hidden" id="prod-id-edit" value="">
-          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: Cartela 30 Ovos / Caixa 360 / Ovo Avulso" required></div>
-          <div class="form-group"><label>Preço Unitário (R$)</label><input type="number" step="0.01" id="prod-preco" required></div>
-          <div class="form-group"><label>Estoque Atual (Ovos Indivudiais)</label><input type="number" id="prod-qtd" required></div>
+          <div class="form-group">
+            <label>Descrição do Item</label>
+            <input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / CAIXA 360 OVOS" required>
+          </div>
+          <div class="form-group">
+            <label>Preço Unitário (R$)</label>
+            <input type="number" step="0.01" id="prod-preco" placeholder="Ex: 12.00" required>
+          </div>
+          <div class="form-group">
+            <label>Quantidade de Ovos nesta Embalagem</label>
+            <input type="number" id="prod-ovos-unid" min="1" placeholder="Ex: 12 (para cartela de 12), 30 (para cartela de 30)" required>
+            <span style="font-size: 0.75rem; color: #64748b; margin-top: 3px; display: block;">Serve apenas para calcular quantos ovos descontar do Estoque Geral no pedido.</span>
+          </div>
           <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
           <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
         </form>
       </div>
 
+      <!-- CARD 3: TABELA DE EMBALAGENS CADASTRADAS -->
       <div class="card">
-        <div class="card-title">Estoque Atual de Ovos</div>
+        <div class="card-title">Produtos / Apresentações Disponíveis</div>
         <table>
-          <thead><tr><th>Produto</th><th>Preço</th><th>Qtd (Ovos)</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Descrição</th><th>Preço</th><th>Ovos/Emb</th><th>Ações</th></tr></thead>
           <tbody id="lista-produtos"></tbody>
         </table>
       </div>
@@ -466,28 +484,13 @@
       clientes: [],
       pedidos: [],
       producao: [],
+      estoqueGeralOvos: 0,
       currentUser: null,
       pedidoAtual: null,
       listenersUnsubscribe: []
     };
 
     let carrinhoTemp = [];
-
-    function calcularOvosPorEmbalagem(nomeProduto) {
-      if (!nomeProduto) return 1;
-      const str = nomeProduto.toLowerCase();
-      
-      if (str.includes("caixa 360") || str.includes("caixa de 360") || str.includes("360 ovos")) return 360;
-      if (str.includes("cartela 30") || str.includes("cartela de 30") || str.includes("30 ovos")) return 30;
-      if (str.includes("dúzia") || str.includes("duzia") || str.includes("12 ovos")) return 12;
-      
-      const match = str.match(/\d+/);
-      if (match) {
-        const val = parseInt(match[0], 10);
-        if (val > 0) return val;
-      }
-      return 1;
-    }
 
     function initApp() {
       db.collection("usuarios").get().then(snapshot => {
@@ -526,6 +529,15 @@
         render();
       }, err => console.error("Erro produtos:", err));
 
+      const unsubEstoque = db.collection("estoque_geral").doc(empresaId).onSnapshot(doc => {
+        if (doc.exists) {
+          state.estoqueGeralOvos = doc.data().qtdOvos || 0;
+        } else {
+          state.estoqueGeralOvos = 0;
+        }
+        renderEstoqueGeral();
+      });
+
       const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.pedidos = snapshot.docs.map(doc => {
           const dataDoc = doc.data();
@@ -558,7 +570,7 @@
         render();
       });
 
-      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios);
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios);
     }
 
     function carregarEmpresaCampos() {
@@ -596,7 +608,7 @@
         if (empDoc.exists) {
           const empData = empDoc.data();
           if (empData.status !== "Ativo") {
-            alert("A conta da sua empresa está inativa ou pendente de pagamento. Entre em contato com o suporte.");
+            alert("A conta da sua empresa está inativa. Entre em contato com o suporte.");
             return;
           }
         }
@@ -657,7 +669,7 @@
       }
     }
 
-    // --- ENTRADA DE PRODUÇÃO (ESTOQUE COLETADO) ---
+    // --- ENTRADA DE PRODUÇÃO DIRETO PARA O ESTOQUE GERAL DE OVOS ---
     function registrarEntradaProducao(e) {
       e.preventDefault();
       const qtdInput = document.getElementById('prod-ent-qtd');
@@ -665,31 +677,24 @@
 
       if (!quantidade || quantidade <= 0) return alert('Informe uma quantidade válida!');
 
-      if (state.produtos.length === 0) {
-        const novoProd = {
-          nome: "Ovos (Unidade / Estoque Geral)",
-          preco: 0.50,
-          qtd: quantidade,
-          empresaId: state.currentUser.empresaId
-        };
-        db.collection("produtos").add(novoProd).then(() => {
-          registrarLogProducao(quantidade);
-          qtdInput.value = '';
-          alert(`Entrada de ${quantidade} ovos registrada e estoque inicial criado!`);
-        });
-        return;
-      }
+      const empresaId = state.currentUser.empresaId;
+      const novoTotal = state.estoqueGeralOvos + quantidade;
 
-      const prodTarget = state.produtos[0];
-      const novaQtd = (prodTarget.qtd || 0) + quantidade;
-
-      db.collection("produtos").doc(prodTarget.id).update({
-        qtd: novaQtd
-      }).then(() => {
+      db.collection("estoque_geral").doc(empresaId).set({
+        qtdOvos: novoTotal,
+        empresaId: empresaId
+      }, { merge: true }).then(() => {
         registrarLogProducao(quantidade);
         qtdInput.value = '';
-        alert(`Entrada de ${quantidade} ovos registrada com sucesso no estoque!`);
+        alert(`Sucesso! ${quantidade.toLocaleString('pt-BR')} ovos foram adicionados ao Saldo Geral.`);
       }).catch(err => alert('Erro ao registrar entrada: ' + err.message));
+    }
+
+    function renderEstoqueGeral() {
+      const el = document.getElementById('estoque-geral-ovos');
+      if (el) {
+        el.innerText = `${(state.estoqueGeralOvos || 0).toLocaleString('pt-BR')} Ovos`;
+      }
     }
 
     function registrarLogProducao(qtd) {
@@ -722,36 +727,36 @@
         const horaStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         return `<tr>
           <td>${horaStr}</td>
-          <td><strong>+${p.qtd} ovos</strong></td>
+          <td><strong>+${p.qtd.toLocaleString('pt-BR')} ovos</strong></td>
         </tr>`;
       }).join('');
     }
 
-    // --- CADASTRO E EDIÇÃO DE PRODUTOS ---
+    // --- CADASTRO DE EMBALAGENS (SEM CAMPO DE ESTOQUE INDIVIDUAL) ---
     function salvarProduto(e) {
       e.preventDefault();
       const id = document.getElementById('prod-id-edit').value;
       const nome = document.getElementById('prod-nome').value.trim();
       const preco = parseFloat(document.getElementById('prod-preco').value);
-      const qtd = parseInt(document.getElementById('prod-qtd').value, 10);
+      const ovosPorEmbalagem = parseInt(document.getElementById('prod-ovos-unid').value, 10);
 
       const payload = {
         nome: nome,
         preco: preco,
-        qtd: qtd,
+        ovosPorEmbalagem: ovosPorEmbalagem,
         empresaId: state.currentUser.empresaId
       };
 
       if (id) {
         db.collection("produtos").doc(id).update(payload)
         .then(() => {
-          alert('Produto atualizado!');
+          alert('Produto/Embalagem atualizado!');
           limparFormProduto();
         });
       } else {
         db.collection("produtos").add(payload)
         .then(() => {
-          alert('Produto cadastrado com sucesso!');
+          alert('Produto/Embalagem cadastrado na nuvem!');
           limparFormProduto();
         });
       }
@@ -763,7 +768,7 @@
       document.getElementById('prod-id-edit').value = prod.id;
       document.getElementById('prod-nome').value = prod.nome;
       document.getElementById('prod-preco').value = prod.preco;
-      document.getElementById('prod-qtd').value = prod.qtd;
+      document.getElementById('prod-ovos-unid').value = prod.ovosPorEmbalagem || 1;
       
       document.getElementById('form-prod-title').innerText = "Editar Produto / Embalagem";
       document.getElementById('btn-salvar-prod').innerText = "Atualizar Produto";
@@ -779,27 +784,27 @@
     }
 
     function deletarProduto(id) {
-      if (confirm('Deseja excluir este produto do catálogo?')) {
+      if (confirm('Deseja excluir este produto/embalagem?')) {
         db.collection("produtos").doc(id).delete();
       }
     }
 
-    // --- CARRINHO E CRIAÇÃO SEQUENCIAL DE PEDIDOS ---
+    // --- CARRINHO E CRIAÇÃO DE PEDIDOS ---
     function adicionarItemAoPedido() {
       const sel = document.getElementById('ped-produto');
       const prodId = sel.value;
       const qtdVendida = parseInt(document.getElementById('ped-qtd').value, 10);
 
-      if (!prodId || !qtdVendida || qtdVendida <= 0) return alert('Selecione um produto e quantidade válida.');
+      if (!prodId || !qtdVendida || qtdVendida <= 0) return alert('Selecione uma embalagem e quantidade válida.');
 
       const prod = state.produtos.find(p => p.id === prodId);
       if (!prod) return;
 
-      const ovosPorEmb = calcularOvosPorEmbalagem(prod.nome);
+      const ovosPorEmb = prod.ovosPorEmbalagem || 1;
       const totalOvosNecessarios = qtdVendida * ovosPorEmb;
 
-      if ((prod.qtd || 0) < totalOvosNecessarios) {
-        alert(`Estoque insuficiente! Saldo atual: ${prod.qtd || 0} ovos. Necessário para este pedido: ${totalOvosNecessarios} ovos.`);
+      if (state.estoqueGeralOvos < totalOvosNecessarios) {
+        alert(`Estoque insuficiente! Saldo em estoque geral: ${state.estoqueGeralOvos.toLocaleString('pt-BR')} ovos. Necessário: ${totalOvosNecessarios.toLocaleString('pt-BR')} ovos.`);
         return;
       }
 
@@ -862,9 +867,17 @@
       const obs = document.getElementById('ped-obs').value.trim();
 
       let totalValor = 0;
-      carrinhoTemp.forEach(i => totalValor += i.subtotal);
+      let totalOvosConsumidos = 0;
 
-      // Calcula o próximo número sequencial de pedido para esta empresa
+      carrinhoTemp.forEach(i => {
+        totalValor += i.subtotal;
+        totalOvosConsumidos += (i.quantidade * i.ovosPorEmbalagem);
+      });
+
+      if (state.estoqueGeralOvos < totalOvosConsumidos) {
+        return alert(`Estoque geral de ovos insuficiente! Saldo: ${state.estoqueGeralOvos} ovos. Pedido requer: ${totalOvosConsumidos} ovos.`);
+      }
+
       const proximoNumero = state.pedidos.length > 0 
         ? Math.max(...state.pedidos.map(p => p.numeroPedido || 0)) + 1 
         : 1;
@@ -877,6 +890,7 @@
         clienteEnd: cliente.end || '',
         itens: carrinhoTemp,
         total: totalValor,
+        totalOvos: totalOvosConsumidos,
         formaPagamento: formaPag,
         dadosPagamento: dadosPag,
         status: statusPag,
@@ -887,21 +901,16 @@
 
       const batch = db.batch();
 
-      carrinhoTemp.forEach(item => {
-        const prodRef = db.collection("produtos").doc(item.produtoId);
-        const prodAtual = state.produtos.find(p => p.id === item.produtoId);
-        if (prodAtual) {
-          const abatimentoOvos = item.quantidade * item.ovosPorEmbalagem;
-          const novoSaldo = Math.max(0, (prodAtual.qtd || 0) - abatimentoOvos);
-          batch.update(prodRef, { qtd: novoSaldo });
-        }
-      });
+      // Desconto no Saldo Geral de Ovos
+      const estoqueRef = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+      const novoSaldoOvos = Math.max(0, state.estoqueGeralOvos - totalOvosConsumidos);
+      batch.update(estoqueRef, { qtdOvos: novoSaldoOvos });
 
       const pedidoRef = db.collection("pedidos").doc();
       batch.set(pedidoRef, novoPedido);
 
       batch.commit().then(() => {
-        alert(`Pedido Nº ${proximoNumero} finalizado com sucesso!`);
+        alert(`Pedido Nº ${proximoNumero} finalizado com sucesso! (${totalOvosConsumidos} ovos abatidos do estoque geral)`);
         carrinhoTemp = [];
         renderCarrinho();
         document.getElementById('ped-obs').value = '';
@@ -911,9 +920,8 @@
       }).catch(err => alert('Erro ao finalizar pedido: ' + err.message));
     }
 
-    // --- REORGANIZAÇÃO SEQUENCIAL AO EXCLUIR / CANCELAR PEDIDO ---
     async function cancelarEExcluirPedido(pedidoId, numeroPedidoExcluido) {
-      if (!confirm(`Tem certeza que deseja CANCELAR/EXCLUIR o Pedido Nº ${numeroPedidoExcluido}?\n\nIsto irá estornar o estoque e reordenar a sequência de todos os pedidos subsequentes.`)) {
+      if (!confirm(`Tem certeza que deseja CANCELAR/EXCLUIR o Pedido Nº ${numeroPedidoExcluido}?\n\nOs ovos do pedido serão devolvidos ao estoque geral.`)) {
         return;
       }
 
@@ -921,23 +929,14 @@
         const pedido = state.pedidos.find(p => p.id === pedidoId);
         const batch = db.batch();
 
-        // 1. Devolve a quantidade de ovos vendida de volta ao Estoque (Estorno)
-        if (pedido && pedido.itens) {
-          pedido.itens.forEach(item => {
-            const prodRef = db.collection("produtos").doc(item.produtoId);
-            const prodAtual = state.produtos.find(p => p.id === item.produtoId);
-            if (prodAtual) {
-              const devolucaoOvos = item.quantidade * item.ovosPorEmbalagem;
-              batch.update(prodRef, { qtd: (prodAtual.qtd || 0) + devolucaoOvos });
-            }
-          });
+        if (pedido && pedido.totalOvos) {
+          const estoqueRef = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+          batch.update(estoqueRef, { qtdOvos: state.estoqueGeralOvos + pedido.totalOvos });
         }
 
-        // 2. Apaga o pedido selecionado do banco
         const pedRef = db.collection("pedidos").doc(pedidoId);
         batch.delete(pedRef);
 
-        // 3. Reorganiza todos os pedidos subsequentes (Reduz 1 no número dos pedidos posteriores)
         const pedidosAjustar = state.pedidos.filter(p => (p.numeroPedido || 0) > numeroPedidoExcluido);
         pedidosAjustar.forEach(p => {
           const pRef = db.collection("pedidos").doc(p.id);
@@ -945,19 +944,20 @@
         });
 
         await batch.commit();
-        alert(`Pedido Nº ${numeroPedidoExcluido} foi cancelado e a sequência de pedidos foi reajustada com sucesso!`);
+        alert(`Pedido Nº ${numeroPedidoExcluido} foi cancelado com sucesso!`);
       } catch (err) {
-        alert("Erro ao excluir e reordenar pedidos: " + err.message);
+        alert("Erro ao excluir pedido: " + err.message);
       }
     }
 
-    // --- RENDERIZAÇÃO GERAL ---
+    // --- RENDERIZAÇÕES ---
     function render() {
       renderClientes();
       renderProdutos();
       renderPedidos();
       renderUsuarios();
       renderDropdowns();
+      renderEstoqueGeral();
     }
 
     function renderClientes() {
@@ -1024,7 +1024,7 @@
       tbody.innerHTML = state.produtos.map(p => `<tr>
         <td><strong>${p.nome}</strong></td>
         <td>R$ ${p.preco.toFixed(2)}</td>
-        <td><span class="badge ${p.qtd > 50 ? 'badge-pago' : 'badge-pendente'}">${p.qtd} ovos</span></td>
+        <td>${p.ovosPorEmbalagem || 1} ovos</td>
         <td>
           <button class="btn-warning" type="button" onclick="editarProduto('${p.id}')">✏️</button>
           <button class="btn-danger" type="button" onclick="deletarProduto('${p.id}')">✕</button>
@@ -1040,7 +1040,7 @@
 
       const selProd = document.getElementById('ped-produto');
       if (selProd) {
-        selProd.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${p.preco.toFixed(2)} (Estoque: ${p.qtd} ovos)</option>`).join('');
+        selProd.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${p.preco.toFixed(2)} (${p.ovosPorEmbalagem || 1} ovos/emb)</option>`).join('');
       }
     }
 
