@@ -297,6 +297,10 @@
         </div>
         <form onsubmit="registrarEntradaProducao(event)">
           <div class="form-group">
+            <label>Selecione o Produto para Entrada</label>
+            <select id="prod-ent-item" required></select>
+          </div>
+          <div class="form-group">
             <label>Quantidade Coletada/Produzida</label>
             <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 50 ou 100" required>
           </div>
@@ -473,9 +477,9 @@
 
     let carrinhoTemp = [];
 
-    // --- CARREGAR USUÁRIOS E SEED INICIAL ---
     function initApp() {
-      db.collection("usuarios").onSnapshot(snapshot => {
+      // Sincronização inicial da lista de usuários de suporte / admin
+      db.collection("usuarios").get().then(snapshot => {
         state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         if (state.usuarios.length === 0) {
           db.collection("usuarios").doc("admin").set({ 
@@ -489,8 +493,7 @@
             status: "Ativo"
           });
         }
-        render();
-      }, err => console.error("Erro usuarios:", err));
+      }).catch(err => console.error("Erro na inicialização:", err));
     }
 
     // --- ESCUTADORES EM TEMPO REAL ISOLADOS POR EMPRESA ---
@@ -529,10 +532,16 @@
         }
       });
 
-      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubPedidos, unsubProducao, unsubEmpresa);
+      const unsubUsuarios = db.collection("usuarios").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        render();
+      });
+
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios);
     }
 
     function carregarEmpresaCampos() {
+      if (!document.getElementById('emp-nome')) return;
       document.getElementById('emp-nome').value = state.empresa.nome || '';
       document.getElementById('emp-cnpj').value = state.empresa.cnpj || '';
       document.getElementById('emp-tel').value = state.empresa.tel || '';
@@ -547,10 +556,22 @@
       const u = document.getElementById('login-user').value.trim().toLowerCase();
       const p = document.getElementById('login-pass').value.trim();
       
-      const found = state.usuarios.find(user => user.login.toLowerCase() === u && user.pass === p);
-      if (found) {
+      try {
+        const snapshot = await db.collection("usuarios").where("login", "==", u).get();
+        if (snapshot.empty) {
+          alert('Usuário ou senha incorretos!');
+          return;
+        }
+
+        const userDoc = snapshot.docs[0];
+        const found = { id: userDoc.id, ...userDoc.data() };
+
+        if (found.pass !== p) {
+          alert('Usuário ou senha incorretos!');
+          return;
+        }
+
         const empresaId = found.empresaId || "empresa_demo";
-        
         const empDoc = await db.collection("empresas").doc(empresaId).get();
         if (empDoc.exists) {
           const empData = empDoc.data();
@@ -568,8 +589,8 @@
         
         initListeners();
         navTo('dashboard');
-      } else {
-        alert('Usuário ou senha incorretos! Verifique os seus dados de acesso.');
+      } catch (err) {
+        alert('Erro ao realizar login: ' + err.message);
       }
     }
 
@@ -646,6 +667,7 @@
     function filtrarClientesDropdown() {
       const termo = document.getElementById('ped-busca-cliente').value.toLowerCase();
       const selectCli = document.getElementById('ped-cliente');
+      if (!selectCli) return;
       const clientesFiltrados = state.clientes.filter(c => 
         c.nome.toLowerCase().includes(termo) || 
         (c.doc && c.doc.toLowerCase().includes(termo)) || 
@@ -695,15 +717,14 @@
 
     function registrarEntradaProducao(e) {
       e.preventDefault();
+      const prodId = document.getElementById('prod-ent-item').value;
       const qtd = parseInt(document.getElementById('prod-ent-qtd').value) || 0;
 
+      if (!prodId) return alert('Selecione um produto.');
       if (qtd <= 0) return alert('Digite uma quantidade válida.');
 
-      if (state.produtos.length === 0) {
-        return alert('Nenhum produto cadastrado no estoque para receber a produção.');
-      }
-
-      const prod = state.produtos[0];
+      const prod = state.produtos.find(p => p.id === prodId);
+      if (!prod) return alert('Produto não encontrado.');
 
       db.collection("produtos").doc(prod.id).update({
         qtd: firebase.firestore.FieldValue.increment(qtd)
@@ -801,6 +822,8 @@
     function renderCarrinho() {
       const container = document.getElementById('itens-pedido-lista');
       const totalSpan = document.getElementById('ped-total-valor');
+      if (!container || !totalSpan) return;
+
       if (carrinhoTemp.length === 0) {
         container.innerHTML = '<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>';
         totalSpan.innerText = '0.00';
@@ -843,10 +866,10 @@
 
       const p = {
         numPedido: pedidoNum,
-        cliente: cli.nome, 
-        doc: cli.doc || '', 
-        tel: cli.tel, 
-        end: cli.end,
+        cliente: cli ? cli.nome : 'Cliente Desconhecido', 
+        doc: cli ? (cli.doc || '') : '', 
+        tel: cli ? cli.tel : '', 
+        end: cli ? cli.end : '',
         itens: [...carrinhoTemp],
         total: totalPedido,
         formaPagamento: formaPag,
@@ -867,7 +890,6 @@
         document.getElementById('ped-obs').value = '';
         document.getElementById('ped-dados-pagamento').value = '';
         
-        // Exibe o comprovante diretamente usando os dados que já temos
         exibirComprovanteDireto(p);
       }).catch(err => alert('Erro ao finalizar pedido: ' + err.message));
     }
@@ -1042,55 +1064,69 @@
 
     // --- RENDERIZAÇÃO GERAL ---
     function render() {
-      document.getElementById('lista-clientes').innerHTML = state.clientes.map(c => `
-        <tr>
-          <td><b>${c.nome}</b><br><small style="color:#64748b;">Doc: ${c.doc || 'Não informado'}</small></td>
-          <td>${c.tel}</td>
-          <td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">🗑</button></td>
-        </tr>`).join('');
+      if (!state.currentUser) return;
 
-      document.getElementById('lista-produtos').innerHTML = state.produtos.map(p => `
-        <tr>
-          <td>${p.nome}</td>
-          <td>R$ ${Number(p.preco).toFixed(2)}</td>
-          <td><b>${p.qtd}</b></td>
-          <td>
-            <button class="btn-warning" type="button" onclick="prepararEdicaoProduto('${p.id}')">✏️</button>
-            <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑️</button>
-          </td>
-        </tr>`).join('');
+      const elClientes = document.getElementById('lista-clientes');
+      if (elClientes) {
+        elClientes.innerHTML = state.clientes.map(c => `
+          <tr>
+            <td><b>${c.nome}</b><br><small style="color:#64748b;">Doc: ${c.doc || 'Não informado'}</small></td>
+            <td>${c.tel}</td>
+            <td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">🗑</button></td>
+          </tr>`).join('');
+      }
 
-      document.getElementById('lista-pedidos').innerHTML = state.pedidos.map(p => {
-        let badgeClass = 'badge-pendente';
-        let badgeTxt = '🔴 PENDENTE';
-        if (p.status === 'Pago') { badgeClass = 'badge-pago'; badgeTxt = '🟢 PAGO'; }
-        if (p.status === 'Cancelado') { badgeClass = 'badge-cancelado'; badgeTxt = '⚪ CANCELADO'; }
+      const elProdutos = document.getElementById('lista-produtos');
+      if (elProdutos) {
+        elProdutos.innerHTML = state.produtos.map(p => `
+          <tr>
+            <td>${p.nome}</td>
+            <td>R$ ${Number(p.preco).toFixed(2)}</td>
+            <td><b>${p.qtd}</b></td>
+            <td>
+              <button class="btn-warning" type="button" onclick="prepararEdicaoProduto('${p.id}')">✏️</button>
+              <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑️</button>
+            </td>
+          </tr>`).join('');
+      }
 
-        return `
-        <tr>
-          <td>#${p.numPedido || '----'}</td>
-          <td>${p.cliente}</td>
-          <td>R$ ${Number(p.total).toFixed(2)}</td>
-          <td><span class="badge ${badgeClass}" onclick="alternarStatus('${p.id}')">${badgeTxt}</span></td>
-          <td>
-            <button class="btn" type="button" style="padding:3px 6px; font-size:0.75rem;" onclick="verNota('${p.id}')">📄 Nota</button>
-            ${p.status !== 'Cancelado' ? `<button class="btn-danger" type="button" style="padding:3px 6px; font-size:0.75rem;" onclick="cancelarPedido('${p.id}')">❌</button>` : ''}
-          </td>
-        </tr>`;
-      }).join('');
+      const elPedidos = document.getElementById('lista-pedidos');
+      if (elPedidos) {
+        elPedidos.innerHTML = state.pedidos.map(p => {
+          let badgeClass = 'badge-pendente';
+          let badgeTxt = '🔴 PENDENTE';
+          if (p.status === 'Pago') { badgeClass = 'badge-pago'; badgeTxt = '🟢 PAGO'; }
+          if (p.status === 'Cancelado') { badgeClass = 'badge-cancelado'; badgeTxt = '⚪ CANCELADO'; }
 
-      document.getElementById('lista-usuarios').innerHTML = state.usuarios.map(u => {
-        const uId = u.id || u.login;
-        return `
-        <tr>
-          <td><b>${u.login}</b></td>
-          <td>${u.role}</td>
-          <td>
-            <button class="btn-warning" type="button" title="Alterar Senha" onclick="alterarSenhaUsuario('${uId}', '${u.login}')">🔑</button>
-            <button class="btn-danger" type="button" title="Excluir Usuário" onclick="excluirUsuario('${uId}')">🗑</button>
-          </td>
-        </tr>`;
-      }).join('');
+          return `
+          <tr>
+            <td>#${p.numPedido || '----'}</td>
+            <td>${p.cliente}</td>
+            <td>R$ ${Number(p.total).toFixed(2)}</td>
+            <td><span class="badge ${badgeClass}" onclick="alternarStatus('${p.id}')">${badgeTxt}</span></td>
+            <td>
+              <button class="btn" type="button" style="padding:3px 6px; font-size:0.75rem;" onclick="verNota('${p.id}')">📄 Nota</button>
+              ${p.status !== 'Cancelado' ? `<button class="btn-danger" type="button" style="padding:3px 6px; font-size:0.75rem;" onclick="cancelarPedido('${p.id}')">❌</button>` : ''}
+            </td>
+          </tr>`;
+        }).join('');
+      }
+
+      const elUsuarios = document.getElementById('lista-usuarios');
+      if (elUsuarios) {
+        elUsuarios.innerHTML = state.usuarios.map(u => {
+          const uId = u.id || u.login;
+          return `
+          <tr>
+            <td><b>${u.login}</b></td>
+            <td>${u.role}</td>
+            <td>
+              <button class="btn-warning" type="button" title="Alterar Senha" onclick="alterarSenhaUsuario('${uId}', '${u.login}')">🔑</button>
+              <button class="btn-danger" type="button" title="Excluir Usuário" onclick="excluirUsuario('${uId}')">🗑</button>
+            </td>
+          </tr>`;
+        }).join('');
+      }
 
       filtrarClientesDropdown();
       renderClientesDashboard();
@@ -1099,7 +1135,11 @@
         `<option value="${p.id}" ${p.qtd <= 0 ? 'disabled' : ''}>${p.nome} - R$ ${Number(p.preco).toFixed(2)} (${p.qtd <= 0 ? 'SEM ESTOQUE' : 'Estoque: ' + p.qtd})</option>`
       ).join('');
 
-      document.getElementById('ped-produto').innerHTML = prodOptions;
+      const elPedProd = document.getElementById('ped-produto');
+      if (elPedProd) elPedProd.innerHTML = prodOptions;
+
+      const elEntProd = document.getElementById('prod-ent-item');
+      if (elEntProd) elEntProd.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
     }
 
     // --- COMPROVANTE DE PEDIDO ---
