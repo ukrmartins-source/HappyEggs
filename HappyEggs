@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <title>HappyEggs - ERP Avicultura</title>
+  
+  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="icon" href="logo.png">
+
+  <!-- SDKs DO FIREBASE -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --primary: #1e293b;
+      --primary-dark: #0f172a;
+      --accent: #2563eb;
+      --accent-light: #3b82f6;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 30px; }
+
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 14px 18px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.25);
+      border-bottom: 2px solid var(--accent);
+    }
+    .brand h1 { font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+    .user-info { font-size: 0.8rem; display: flex; align-items: center; gap: 10px; }
+    .btn-logout { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: 0.2s; }
+    .btn-logout:hover { background: var(--danger); border-color: var(--danger); }
+
+    main { max-width: 580px; margin: 20px auto; padding: 0 12px; }
+
+    .login-card {
+      background: white; padding: 30px 25px; border-radius: 14px; box-shadow: 0 10px 25px rgba(15,23,42,0.12);
+      max-width: 380px; margin: 50px auto; text-align: center; border: 1px solid var(--border);
+    }
+    .login-card h2 { color: var(--primary-dark); margin-bottom: 6px; font-size: 1.5rem; font-weight: 800; }
+
+    .grid-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
+    .grid-btn {
+      background: linear-gradient(145deg, #1e293b, #0f172a); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+      padding: 20px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(15,23,42,0.15); transition: all 0.2s ease;
+    }
+    .grid-btn:active { transform: scale(0.97); background: var(--primary-dark); }
+    .grid-btn .icon { font-size: 2rem; }
+    .grid-btn .label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+    .grid-btn.full-width { grid-column: span 2; background: linear-gradient(145deg, #2563eb, #1d4ed8); border-color: var(--accent-light); }
+
+    .card { background: white; border-radius: 12px; padding: 18px; border: 1px solid var(--border); margin-bottom: 15px; box-shadow: 0 2px 8px rgba(15,23,42,0.05); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+    .card-title { font-size: 1rem; font-weight: 700; color: var(--primary-dark); display: flex; align-items: center; gap: 6px; }
+    
+    .form-group { margin-bottom: 12px; text-align: left; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #f8fafc; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); outline: none; background: #fff; }
+
+    .btn { background: var(--accent); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.9rem; text-align: center; text-decoration: none; display: inline-block; transition: 0.2s; }
+    .btn:hover { background: var(--accent-light); }
+    .btn-back { background: #475569; padding: 6px 12px; width: auto; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px; }
+    .btn-danger { background: var(--danger); width: auto; padding: 5px 10px; font-size: 0.75rem; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .btn-warning { background: var(--warning); width: auto; padding: 5px 10px; font-size: 0.75rem; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+    .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; cursor: pointer; display: inline-block; }
+    .badge-pago { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .badge-pendente { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .badge-cancelado { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
+    th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
+
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.7); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
+    .modal-content { background: white; width: 92%; max-width: 480px; border-radius: 12px; padding: 22px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+    
+    .receipt-box { 
+      border: 1px dashed #000; 
+      padding: 16px; 
+      font-family: 'Courier New', monospace; 
+      font-size: 0.85rem; 
+      background: #fff; 
+      margin-bottom: 12px; 
+      color: #000;
+      text-align: left;
+      width: 100%;
+      word-wrap: break-word;
+    }
+
+    .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
+    .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
+
+    .stat-card { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
+    .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
+    .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
+
+    @media print {
+      body * { visibility: hidden; }
+      #modal-nota, #modal-nota * { visibility: visible; }
+      #printable-receipt, #printable-receipt * { visibility: visible; }
+      #printable-receipt { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100% !important; 
+        border: none; 
+        padding: 0;
+        margin: 0;
+        text-align: left !important;
+        font-size: 11pt;
+      }
+      .modal-content { box-shadow: none; padding: 0; width: 100%; max-width: 100%; }
+      .modal { position: absolute; left: 0; top: 0; background: none; }
+      .modal button { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header id="app-header" style="display:none;">
+    <div class="brand"><span id="header-title">🥚 HAPPY EGGS</span></div>
+    <div class="user-info">
+      <span id="user-display">👤 Admin</span>
+      <button class="btn-logout" type="button" onclick="logout()">Sair</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- TELA DE LOGIN -->
+    <div id="view-login" class="login-card">
+      <h2>HAPPY EGGS</h2>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
+      <form onsubmit="autenticar(event)">
+        <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
+        <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password"></div>
+        <button type="submit" class="btn" style="margin-top:10px;">Entrar no Sistema</button>
+      </form>
+    </div>
+
+    <!-- MENU PRINCIPAL (DASHBOARD) -->
+    <div id="view-dashboard" style="display:none;">
+      <div class="grid-menu">
+        <button class="grid-btn full-width" type="button" onclick="navTo('pedidos')">
+          <span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span>
+        </button>
+        <button class="grid-btn" type="button" onclick="navTo('clientes')"><span class="icon">👥</span><span class="label">CLIENTES</span></button>
+        <button class="grid-btn" type="button" onclick="navTo('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
+        <button class="grid-btn admin-only" type="button" onclick="navTo('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
+        <button class="grid-btn admin-only" type="button" onclick="navTo('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendasDia()">
+          <span class="icon">📊</span><span class="label">RESUMO DE VENDAS DO DIA</span>
+        </button>
+      </div>
+
+      <div class="card" style="margin-top: 15px;">
+        <div class="card-header">
+          <div class="card-title">📋 Busca Rápida de Clientes</div>
+          <button class="btn btn-back" type="button" onclick="navTo('clientes')">➕ Cadastrar</button>
+        </div>
+        <div class="form-group" style="margin-bottom: 10px;">
+          <input type="text" id="dash-busca-cliente" placeholder="🔎 Digite para buscar cliente..." oninput="filtrarClientesDashboard()">
+        </div>
+        <table>
+          <thead><tr><th>Nome / Doc</th><th>Contato</th></tr></thead>
+          <tbody id="lista-clientes-dash"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA: CLIENTES -->
+    <div id="view-clientes" class="view-content" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Cadastrar Cliente</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        <form onsubmit="cadastrarCliente(event)">
+          <div class="form-group"><label>Nome / Razão Social</label><input type="text" id="cli-nome" required></div>
+          <div class="form-group"><label>Documento (CPF / RG / CNPJ)</label><input type="text" id="cli-doc" placeholder="Ex: 000.000.000-00"></div>
+          <div class="form-group"><label>WhatsApp / Telefone</label><input type="tel" id="cli-tel" placeholder="Ex: 5511999998888" required></div>
+          <div class="form-group"><label>Endereço Completo</label><input type="text" id="cli-end" placeholder="Rua, Nº, Bairro, Cidade" required></div>
+          <button type="submit" class="btn">Salvar Cliente na Nuvem</button>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-title">Clientes Cadastrados</div>
+        <table>
+          <thead><tr><th>Nome / Doc</th><th>Contato</th><th>Ação</th></tr></thead>
+          <tbody id="lista-clientes"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA: PEDIDOS -->
+    <div id="view-pedidos" class="view-content" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Novo Pedido</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        
+        <form onsubmit="finalizarPedido(event)">
+          <div class="form-group">
+            <label>🔎 Buscar Cliente</label>
+            <input type="text" id="ped-busca-cliente" placeholder="Filtrar por nome, doc ou fone..." oninput="filtrarClientesDropdown()">
+          </div>
+          <div class="form-group">
+            <label>Selecione o Cliente</label>
+            <select id="ped-cliente" required></select>
+          </div>
+
+          <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+
+          <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border:1px solid #e2e8f0;">
+            <div class="form-group">
+              <label>Selecione o Produto</label>
+              <select id="ped-produto"></select>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: flex-end;">
+              <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>Quantidade</label>
+                <input type="number" id="ped-qtd" min="1" value="1">
+              </div>
+              <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">➕ Adicionar</button>
+            </div>
+          </div>
+
+          <div class="carrinho-box">
+            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛍️️ ITENS SELECIONADOS:</div>
+            <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
+            <div style="font-size: 1rem; font-weight: bold; text-align: right; margin-top: 10px; color: var(--accent);">Total: R$ <span id="ped-total-valor">0.00</span></div>
+          </div>
+
+          <div class="form-group">
+            <label>Forma de Pagamento</label>
+            <select id="ped-forma-pagamento" required>
+              <option value="Pix">📱 Pix</option>
+              <option value="Cartão de Crédito/Débito">💳 Cartão de Crédito / Débito</option>
+              <option value="Transferência Bancária">🏦 Transferência Bancária</option>
+              <option value="Dinheiro">💵 Dinheiro</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Dados do Pagamento (Opcional)</label>
+            <input type="text" id="ped-dados-pagamento" placeholder="Ex: Chave Pix ou Banco">
+          </div>
+
+          <div class="form-group">
+            <label>Status do Pagamento</label>
+            <select id="ped-status" required>
+              <option value="Pago">🟢 Pago</option>
+              <option value="Pendente">🔴 Pendente (A Pagar)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Observações do Pedido (Sairá na Nota)</label>
+            <textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Deixar com a portaria"></textarea>
+          </div>
+
+          <button type="submit" class="btn" style="background:var(--success);">Finalizar Pedido</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Histórico de Pedidos</div>
+        <table>
+          <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="lista-pedidos"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA: PRODUTOS / ESTOQUE & ENTRADA DE PRODUÇÃO -->
+    <div id="view-produtos" class="view-content" style="display:none;">
+      <div class="card" style="border-left: 4px solid var(--accent);">
+        <div class="card-header">
+          <div class="card-title">🥚 Registrar Entrada de Produção (Diário)</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        <form onsubmit="registrarEntradaProducao(event)">
+          <div class="form-group">
+            <label>Quantidade Coletada/Produzida</label>
+            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 50 ou 100" required>
+          </div>
+          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Coleta de Produção</button>
+        </form>
+
+        <div style="margin-top: 15px;">
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Produção de Hoje</div>
+          <table>
+            <thead><tr><th>Hora</th><th>Item</th><th>Qtd</th></tr></thead>
+            <tbody id="lista-producao-hoje"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title" id="form-prod-title">Cadastrar Novo Produto</div>
+        </div>
+        <form id="form-produto" onsubmit="salvarProduto(event)">
+          <input type="hidden" id="prod-id-edit" value="">
+          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: Ovos Dúzia / Cartela 30" required></div>
+          <div class="form-group"><label>Preço Unitário (R$)</label><input type="number" step="0.01" id="prod-preco" required></div>
+          <div class="form-group"><label>Estoque Inicial/Atual</label><input type="number" id="prod-qtd" required></div>
+          <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
+          <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Estoque Atual</div>
+        <table>
+          <thead><tr><th>Produto</th><th>Preço</th><th>Qtd</th><th>Ações</th></tr></thead>
+          <tbody id="lista-produtos"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA: GESTÃO DE USUÁRIOS -->
+    <div id="view-usuarios" class="view-content" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Adicionar Usuário</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        <form onsubmit="cadastrarUsuario(event)">
+          <div class="form-group"><label>Login / Nome</label><input type="text" id="usr-login" required autocomplete="username"></div>
+          <div class="form-group"><label>Senha de Acesso</label><input type="password" id="usr-pass" required autocomplete="new-password"></div>
+          <div class="form-group">
+            <label>Nível de Permissão</label>
+            <select id="usr-role">
+              <option value="vendedor">Vendedor (Apenas Vendas/Clientes)</option>
+              <option value="admin">Administrador (Acesso Total)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn">Cadastrar Usuário</button>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-title">Usuários do Sistema</div>
+        <table>
+          <thead><tr><th>Usuário</th><th>Permissão</th><th>Ação</th></tr></thead>
+          <tbody id="lista-usuarios"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA: EMPRESA & MINHA SENHA -->
+    <div id="view-empresa" class="view-content" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔒 Alterar Minha Senha</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        <form onsubmit="alterarMinhaSenha(event)">
+          <div class="form-group"><label>Nova Senha</label><input type="password" id="minha-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
+          <button type="submit" class="btn" style="background:var(--warning);">Atualizar Minha Senha</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Dados da Empresa (Rodapé da Nota)</div>
+        <form onsubmit="salvarEmpresa(event)">
+          <div class="form-group"><label>Nome Fantasia</label><input type="text" id="emp-nome" required></div>
+          <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="emp-cnpj" required></div>
+          <div class="form-group"><label>Telefone / WhatsApp Comercial</label><input type="text" id="emp-tel" placeholder="Ex: (11) 99999-8888" required></div>
+          <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
+          <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @happyeggs | www.happyeggs.com"></div>
+          <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
+          
+          <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border);">
+          <div class="form-group"><label>Token Bot Telegram (Notificações)</label><input type="text" id="emp-bot-token" placeholder="Opcional"></div>
+          <div class="form-group"><label>Chat ID Telegram</label><input type="text" id="emp-chat-id" placeholder="Opcional"></div>
+          <button type="submit" class="btn" style="background:var(--success);">Salvar Dados da Empresa</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
+  <div class="modal" id="modal-nota">
+    <div class="modal-content">
+      <div class="card-title" style="margin-bottom:10px;">Comprovante do Pedido</div>
+      <div class="receipt-box" id="printable-receipt"></div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" type="button" style="background:#2563eb;" onclick="window.print()">📄 Imprimir / PDF</button>
+        <button class="btn" type="button" style="background:#10b981;" onclick="enviarWhats()">💬 WhatsApp</button>
+      </div>
+      <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:8px;">Fechar Nota</button>
+    </div>
+  </div>
+
+  <!-- MODAL: RESUMO DE VENDAS DO DIA -->
+  <div class="modal" id="modal-resumo">
+    <div class="modal-content">
+      <div class="card-title" style="margin-bottom:12px;">📊 Resumo de Vendas Hoje</div>
+      <div id="resumo-data-hoje" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; font-weight:bold;"></div>
+
+      <div class="stat-card">
+        <div class="stat-title">Total Vendido Hoje</div>
+        <div class="stat-value" id="resumo-total-hoje">R$ 0,00</div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+        <div class="stat-card" style="margin:0;">
+          <div class="stat-title">Nº de Pedidos</div>
+          <div class="stat-value" id="resumo-qtd-pedidos">0</div>
+        </div>
+        <div class="stat-card" style="margin:0;">
+          <div class="stat-title">Ticket Médio</div>
+          <div class="stat-value" id="resumo-ticket-medio">R$ 0,00</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-title" style="margin-bottom:6px;">Recebimento por Forma de Pagamento</div>
+        <div id="resumo-detalhe-formas" style="font-size:0.85rem; line-height:1.4;"></div>
+      </div>
+
+      <div style="margin-top:15px;">
+        <div class="stat-title" style="margin-bottom:6px;">Vendas Realizadas Hoje</div>
+        <table>
+          <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="resumo-tabela-hoje"></tbody>
+        </table>
+      </div>
+
+      <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b; margin-top:15px;">Fechar Resumo</button>
+    </div>
+  </div>
+
+  <script>
+    // --- CONFIGURAÇÃO DO NOVO FIREBASE HAPPY EGGS ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAYmxniwbHyi4HmTH-aVlHo2zp-7pXY_lg",
+      authDomain: "happyeggs-534f2.firebaseapp.com",
+      projectId: "happyeggs-534f2",
+      storageBucket: "happyeggs-534f2.firebasestorage.app",
+      messagingSenderId: "682226137910",
+      appId: "1:682226137910:web:2aaca1393954e3be875197",
+      measurementId: "G-CEBF9P0K94"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let state = {
+      usuarios: [],
+      empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "", botToken: "", chatId: "" },
+      produtos: [],
+      clientes: [],
+      pedidos: [],
+      producao: [],
+      currentUser: null,
+      pedidoAtual: null,
+      listenersUnsubscribe: []
+    };
+
+    let carrinhoTemp = [];
+
+    // --- CARREGAR USUÁRIOS E SEED INICIAL ---
+    function initApp() {
+      db.collection("usuarios").onSnapshot(snapshot => {
+        state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (state.usuarios.length === 0) {
+          // Usuário padrão inicial caso a base esteja limpa
+          db.collection("usuarios").doc("admin").set({ 
+            login: "admin", 
+            pass: "1234", 
+            role: "admin",
+            empresaId: "empresa_demo"
+          });
+          db.collection("empresas").doc("empresa_demo").set({
+            nome: "Granja Demonstração",
+            status: "Ativo"
+          });
+        }
+        render();
+      }, err => console.error("Erro usuarios:", err));
+    }
+
+    // --- ESCUTADORES EM TEMPO REAL ISOLADOS POR EMPRESA ---
+    function initListeners() {
+      // Limpa os escutadores anteriores se existirem
+      state.listenersUnsubscribe.forEach(unsub => unsub());
+      state.listenersUnsubscribe = [];
+
+      if (!state.currentUser || !state.currentUser.empresaId) return;
+
+      const empresaId = state.currentUser.empresaId;
+
+      const unsubClientes = db.collection("clientes").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.clientes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        render();
+      }, err => console.error("Erro clientes:", err));
+
+      const unsubProdutos = db.collection("produtos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        render();
+      }, err => console.error("Erro produtos:", err));
+
+      const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).orderBy("dataCriacao", "desc").onSnapshot(snapshot => {
+        state.pedidos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        render();
+      }, err => console.error("Erro pedidos:", err));
+
+      const unsubProducao = db.collection("producao").where("empresaId", "==", empresaId).orderBy("dataHora", "desc").limit(50).onSnapshot(snapshot => {
+        state.producao = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderProducaoHoje();
+      }, err => console.error("Erro producao:", err));
+
+      const unsubEmpresa = db.collection("config").doc(empresaId).onSnapshot(doc => {
+        if (doc.exists) {
+          state.empresa = doc.data();
+          carregarEmpresaCampos();
+        }
+      });
+
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubPedidos, unsubProducao, unsubEmpresa);
+    }
+
+    function carregarEmpresaCampos() {
+      document.getElementById('emp-nome').value = state.empresa.nome || '';
+      document.getElementById('emp-cnpj').value = state.empresa.cnpj || '';
+      document.getElementById('emp-tel').value = state.empresa.tel || '';
+      document.getElementById('emp-end').value = state.empresa.end || '';
+      document.getElementById('emp-social').value = state.empresa.social || '';
+      document.getElementById('emp-pix').value = state.empresa.pix || '';
+      document.getElementById('emp-bot-token').value = state.empresa.botToken || '';
+      document.getElementById('emp-chat-id').value = state.empresa.chatId || '';
+    }
+
+    // --- AUTENTICAÇÃO COM VERIFICAÇÃO DE LICENÇA ---
+    async function autenticar(e) {
+      e.preventDefault();
+      const u = document.getElementById('login-user').value.trim().toLowerCase();
+      const p = document.getElementById('login-pass').value.trim();
+      
+      const found = state.usuarios.find(user => user.login.toLowerCase() === u && user.pass === p);
+      if (found) {
+        const empresaId = found.empresaId || "empresa_demo";
+        
+        // Validação da assinatura/licença da empresa
+        const empDoc = await db.collection("empresas").doc(empresaId).get();
+        if (empDoc.exists) {
+          const empData = empDoc.data();
+          if (empData.status !== "Ativo") {
+            alert("A conta da sua empresa está inativa ou pendente de pagamento. Entre em contato com o suporte.");
+            return;
+          }
+        }
+
+        state.currentUser = found;
+        document.getElementById('view-login').style.display = 'none';
+        document.getElementById('app-header').style.display = 'flex';
+        document.getElementById('user-display').innerText = `👤 ${found.login.toUpperCase()}`;
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
+        
+        initListeners();
+        navTo('dashboard');
+      } else {
+        alert('Usuário ou senha incorretos! Verifique os seus dados de acesso.');
+      }
+    }
+
+    function logout() {
+      state.listenersUnsubscribe.forEach(unsub => unsub());
+      state.listenersUnsubscribe = [];
+      state.currentUser = null;
+      document.getElementById('app-header').style.display = 'none';
+      document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
+      document.getElementById('view-dashboard').style.display = 'none';
+      document.getElementById('view-login').style.display = 'block';
+      document.getElementById('login-pass').value = '';
+    }
+
+    function navTo(screen) {
+      document.getElementById('view-dashboard').style.display = 'none';
+      document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
+      if (screen === 'dashboard') document.getElementById('view-dashboard').style.display = 'block';
+      else document.getElementById(`view-${screen}`).style.display = 'block';
+    }
+
+    function alterarMinhaSenha(e) {
+      e.preventDefault();
+      const novaSenha = document.getElementById('minha-nova-senha').value.trim();
+      if (!novaSenha) return alert('Por favor, introduza uma nova senha.');
+
+      if (state.currentUser) {
+        const docId = state.currentUser.id || state.currentUser.login;
+        db.collection("usuarios").doc(docId).update({ pass: novaSenha })
+        .then(() => {
+          state.currentUser.pass = novaSenha;
+          alert('Sua senha foi alterada com sucesso!');
+          document.getElementById('minha-nova-senha').value = '';
+        }).catch(err => alert('Erro ao mudar a senha: ' + err.message));
+      }
+    }
+
+    function alterarSenhaUsuario(docId, login) {
+      const novaSenha = prompt(`Digite a nova senha para o usuário ${login.toUpperCase()}:`);
+      if (novaSenha && novaSenha.trim() !== '') {
+        db.collection("usuarios").doc(docId).update({ pass: novaSenha.trim() })
+          .then(() => {
+            alert(`Senha do usuário ${login} alterada com sucesso!`);
+            if (state.currentUser && (state.currentUser.id === docId || state.currentUser.login === login)) {
+              state.currentUser.pass = novaSenha.trim();
+            }
+          })
+          .catch(err => alert('Erro ao alterar senha: ' + err.message));
+      }
+    }
+
+    // --- CLIENTES ---
+    function cadastrarCliente(e) {
+      e.preventDefault();
+      const nome = document.getElementById('cli-nome').value.trim();
+      const doc = document.getElementById('cli-doc').value.trim();
+      const tel = document.getElementById('cli-tel').value.trim();
+      const end = document.getElementById('cli-end').value.trim();
+
+      db.collection("clientes").add({ 
+        nome, doc, tel, end,
+        empresaId: state.currentUser.empresaId 
+      })
+        .then(() => { alert('Cliente gravado na Nuvem!'); e.target.reset(); })
+        .catch(err => alert('Erro ao salvar cliente: ' + err.message));
+    }
+
+    function excluirCliente(id) {
+      if (confirm('Deseja excluir este cliente?')) {
+        db.collection("clientes").doc(id).delete().catch(err => alert('Erro ao excluir: ' + err.message));
+      }
+    }
+
+    function filtrarClientesDropdown() {
+      const termo = document.getElementById('ped-busca-cliente').value.toLowerCase();
+      const selectCli = document.getElementById('ped-cliente');
+      const clientesFiltrados = state.clientes.filter(c => 
+        c.nome.toLowerCase().includes(termo) || 
+        (c.doc && c.doc.toLowerCase().includes(termo)) || 
+        (c.tel && c.tel.includes(termo))
+      );
+      if (clientesFiltrados.length === 0) selectCli.innerHTML = '<option value="">Nenhum cliente encontrado...</option>';
+      else selectCli.innerHTML = clientesFiltrados.map(c => `<option value="${c.id}">${c.nome} ${c.doc ? `(${c.doc})` : ''} - ${c.tel}</option>`).join('');
+    }
+
+    function filtrarClientesDashboard() { renderClientesDashboard(); }
+
+    function renderClientesDashboard() {
+      const termo = document.getElementById('dash-busca-cliente')?.value.toLowerCase() || '';
+      const tbody = document.getElementById('lista-clientes-dash');
+      if (!tbody) return;
+      const filtrados = state.clientes.filter(c => 
+        c.nome.toLowerCase().includes(termo) || 
+        (c.doc && c.doc.toLowerCase().includes(termo)) || 
+        (c.tel && c.tel.includes(termo))
+      );
+      if (filtrados.length === 0) tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#64748b;">Nenhum cliente encontrado</td></tr>';
+      else tbody.innerHTML = filtrados.map(c => `<tr><td><b>${c.nome}</b><br><small style="color:#64748b;">${c.doc || 'Sem doc'}</small></td><td>${c.tel}</td></tr>`).join('');
+    }
+
+    // --- PRODUTOS & PRODUÇÃO DIÁRIA ---
+    function salvarProduto(e) {
+      e.preventDefault();
+      const idEdit = document.getElementById('prod-id-edit').value;
+      const nome = document.getElementById('prod-nome').value.trim();
+      const preco = parseFloat(document.getElementById('prod-preco').value) || 0;
+      const qtd = parseInt(document.getElementById('prod-qtd').value) || 0;
+
+      if (idEdit) {
+        db.collection("produtos").doc(idEdit).update({ nome, preco, qtd })
+          .then(() => alert('Produto atualizado na Nuvem!'))
+          .catch(err => alert('Erro ao atualizar: ' + err.message));
+      } else {
+        db.collection("produtos").add({ 
+          nome, preco, qtd,
+          empresaId: state.currentUser.empresaId
+        })
+          .then(() => alert('Produto adicionado na Nuvem!'))
+          .catch(err => alert('Erro ao adicionar: ' + err.message));
+      }
+      limparFormProduto();
+    }
+
+    function registrarEntradaProducao(e) {
+      e.preventDefault();
+      const qtd = parseInt(document.getElementById('prod-ent-qtd').value) || 0;
+
+      if (qtd <= 0) return alert('Digite uma quantidade válida.');
+
+      if (state.produtos.length === 0) {
+        return alert('Nenhum produto cadastrado no estoque para receber a produção.');
+      }
+
+      const prod = state.produtos[0];
+
+      db.collection("produtos").doc(prod.id).update({
+        qtd: firebase.firestore.FieldValue.increment(qtd)
+      }).then(() => {
+        return db.collection("producao").add({
+          prodId: prod.id,
+          nomeItem: prod.nome,
+          qtd: qtd,
+          empresaId: state.currentUser.empresaId,
+          dataHora: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }).then(() => {
+        alert(`Entrada de ${qtd} un para "${prod.nome}" registrada com sucesso!`);
+        document.getElementById('prod-ent-qtd').value = '';
+      }).catch(err => alert('Erro ao registrar entrada: ' + err.message));
+    }
+
+    function renderProducaoHoje() {
+      const tbody = document.getElementById('lista-producao-hoje');
+      if (!tbody) return;
+
+      const hoje = new Date();
+      const inicioHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+
+      const lancamentosHoje = state.producao.filter(item => {
+        if (!item.dataHora) return false;
+        const d = item.dataHora.toDate ? item.dataHora.toDate() : new Date(item.dataHora);
+        return d >= inicioHoje;
+      });
+
+      if (lancamentosHoje.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#64748b;">Nenhuma entrada registrada hoje.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = lancamentosHoje.map(item => {
+        const d = item.dataHora.toDate ? item.dataHora.toDate() : new Date();
+        const horaStr = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        return `<tr>
+          <td><b>${horaStr}</b></td>
+          <td>${item.nomeItem || 'Ovos'}</td>
+          <td><b style="color:var(--success);">+${item.qtd}</b></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function prepararEdicaoProduto(id) {
+      const prod = state.produtos.find(p => p.id === id);
+      if (!prod) return;
+      document.getElementById('prod-id-edit').value = prod.id;
+      document.getElementById('prod-nome').value = prod.nome;
+      document.getElementById('prod-preco').value = prod.preco;
+      document.getElementById('prod-qtd').value = prod.qtd;
+      document.getElementById('form-prod-title').innerText = 'Editar Produto';
+      document.getElementById('btn-salvar-prod').innerText = 'Atualizar Produto';
+      document.getElementById('btn-cancelar-edit').style.display = 'block';
+    }
+
+    function limparFormProduto() {
+      document.getElementById('prod-id-edit').value = '';
+      document.getElementById('form-produto').reset();
+      document.getElementById('form-prod-title').innerText = 'Cadastrar Novo Produto';
+      document.getElementById('btn-salvar-prod').innerText = 'Salvar Produto na Nuvem';
+      document.getElementById('btn-cancelar-edit').style.display = 'none';
+    }
+
+    function excluirProduto(id) {
+      if (confirm('Excluir este produto da nuvem?')) {
+        db.collection("produtos").doc(id).delete().catch(err => alert('Erro ao excluir: ' + err.message));
+      }
+    }
+
+    // --- CARRINHO & PEDIDOS ---
+    function adicionarItemAoPedido() {
+      const prodId = document.getElementById('ped-produto').value;
+      const qtd = parseInt(document.getElementById('ped-qtd').value);
+      if (!prodId || isNaN(qtd) || qtd <= 0) return alert('Selecione um produto e quantidade válida.');
+
+      const prod = state.produtos.find(p => p.id === prodId);
+      if(!prod) return alert('Produto inválido.');
+
+      const qtdNoCarrinho = carrinhoTemp.filter(i => i.prodId === prodId).reduce((a, b) => a + b.qtd, 0);
+      if (prod.qtd < (qtdNoCarrinho + qtd)) return alert(`Estoque insuficiente! Disponível: ${prod.qtd}`);
+
+      carrinhoTemp.push({ prodId: prod.id, nome: prod.nome, preco: prod.preco, qtd: qtd, subtotal: prod.preco * qtd });
+      document.getElementById('ped-qtd').value = 1;
+      renderCarrinho();
+    }
+
+    function removerItemCarrinho(index) {
+      carrinhoTemp.splice(index, 1);
+      renderCarrinho();
+    }
+
+    function renderCarrinho() {
+      const container = document.getElementById('itens-pedido-lista');
+      const totalSpan = document.getElementById('ped-total-valor');
+      if (carrinhoTemp.length === 0) {
+        container.innerHTML = '<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>';
+        totalSpan.innerText = '0.00';
+        return;
+      }
+      let total = 0;
+      container.innerHTML = carrinhoTemp.map((item, index) => {
+        total += item.subtotal;
+        return `<div class="carrinho-item">
+            <div><b>${item.qtd}x</b> ${item.nome}<br><small style="color:#64748b;">R$ ${item.preco.toFixed(2)} un = R$ ${item.subtotal.toFixed(2)}</small></div>
+            <button type="button" class="btn-danger" onclick="removerItemCarrinho(${index})">🗑</button>
+          </div>`;
+      }).join('');
+      totalSpan.innerText = total.toFixed(2);
+    }
+
+    function finalizarPedido(e) {
+      e.preventDefault();
+      const cliId = document.getElementById('ped-cliente').value;
+      if (!cliId) return alert('Selecione um cliente.');
+      if (carrinhoTemp.length === 0) return alert('Adicione pelo menos um produto!');
+
+      const cli = state.clientes.find(c => c.id === cliId);
+      const formaPag = document.getElementById('ped-forma-pagamento').value;
+      const dadosPag = document.getElementById('ped-dados-pagamento').value.trim() || state.empresa.pix;
+      const status = document.getElementById('ped-status').value;
+      const obs = document.getElementById('ped-obs').value.trim();
+      const totalPedido = carrinhoTemp.reduce((sum, item) => sum + item.subtotal, 0);
+      const pedidoNum = Math.floor(1000 + Math.random() * 9000);
+
+      carrinhoTemp.forEach(item => {
+        const prod = state.produtos.find(p => p.id === item.prodId);
+        if (prod) {
+          db.collection("produtos").doc(prod.id).update({
+            qtd: firebase.firestore.FieldValue.increment(-item.qtd)
+          });
+        }
+      });
+
+      const p = {
+        numPedido: pedidoNum,
+        cliente: cli.nome, doc: cli.doc || '', tel: cli.tel, end: cli.end,
+        itens: [...carrinhoTemp],
+        total: totalPedido,
+        formaPagamento: formaPag,
+        dadosPagamento: dadosPag,
+        status: status,
+        obs: obs,
+        empresaId: state.currentUser.empresaId,
+        dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      db.collection("pedidos").add(p).then(docRef => {
+        carrinhoTemp = [];
+        renderCarrinho();
+        document.getElementById('ped-busca-cliente').value = '';
+        document.getElementById('ped-obs').value = '';
+        document.getElementById('ped-dados-pagamento').value = '';
+        
+        notificarTelegram({ ...p, id: pedidoNum });
+        verNota(docRef.id);
+      }).catch(err => alert('Erro ao finalizar pedido: ' + err.message));
+    }
+
+    function cancelarPedido(id) {
+      const p = state.pedidos.find(item => item.id === id);
+      if (!p) return;
+      if (p.status === 'Cancelado') return alert('Este pedido já foi cancelado.');
+
+      if (confirm(`Deseja cancelar o pedido #${p.numPedido}? Os produtos retornarão ao estoque.`)) {
+        if (p.itens && p.itens.length > 0) {
+          p.itens.forEach(item => {
+            db.collection("produtos").doc(item.prodId).update({
+              qtd: firebase.firestore.FieldValue.increment(item.qtd)
+            });
+          });
+        }
+        db.collection("pedidos").doc(id).update({ status: 'Cancelado' });
+      }
+    }
+
+    function alternarStatus(id) {
+      const p = state.pedidos.find(item => item.id === id);
+      if (p) {
+        if (p.status === 'Cancelado') return alert('Pedidos cancelados não podem ter status alterado.');
+        const novoStatus = p.status === 'Pago' ? 'Pendente' : 'Pago';
+        db.collection("pedidos").doc(id).update({ status: novoStatus });
+      }
+    }
+
+    // --- EMPRESA E USUÁRIOS ---
+    function salvarEmpresa(e) {
+      e.preventDefault();
+      const empresaData = {
+        nome: document.getElementById('emp-nome').value.trim(),
+        cnpj: document.getElementById('emp-cnpj').value.trim(),
+        tel: document.getElementById('emp-tel').value.trim(),
+        end: document.getElementById('emp-end').value.trim(),
+        social: document.getElementById('emp-social').value.trim(),
+        pix: document.getElementById('emp-pix').value.trim(),
+        botToken: document.getElementById('emp-bot-token').value.trim(),
+        chatId: document.getElementById('emp-chat-id').value.trim()
+      };
+      db.collection("config").doc(state.currentUser.empresaId).set(empresaData)
+        .then(() => alert('Dados da Empresa salvos na Nuvem!'))
+        .catch(err => alert('Erro ao salvar empresa: ' + err.message));
+    }
+
+    function cadastrarUsuario(e) {
+      e.preventDefault();
+      const login = document.getElementById('usr-login').value.trim().toLowerCase();
+      const pass = document.getElementById('usr-pass').value.trim();
+      const role = document.getElementById('usr-role').value;
+
+      if (!login || !pass) return alert('Preencha login e senha.');
+
+      db.collection("usuarios").doc(login).set({ 
+        login, pass, role,
+        empresaId: state.currentUser.empresaId
+      })
+        .then(() => { alert('Utilizador adicionado!'); e.target.reset(); })
+        .catch(err => alert('Erro ao cadastrar usuário: ' + err.message));
+    }
+
+    function excluirUsuario(id) {
+      if (confirm(`Tem certeza de que deseja remover o utilizador "${id}"?`)) {
+        db.collection("usuarios").doc(id).delete()
+          .then(() => {
+            alert('Usuário excluído com sucesso!');
+            if (state.currentUser && (state.currentUser.id === id || state.currentUser.login === id)) {
+              logout();
+            }
+          })
+          .catch(err => alert('Erro ao excluir: ' + err.message));
+      }
+    }
+
+    function notificarTelegram(p) {
+      if (state.empresa.botToken && state.empresa.chatId) {
+        let resumoItens = p.itens.map(i => `• ${i.qtd}x ${i.nome}`).join('%0A');
+        const texto = `🚨 *NOVO PEDIDO #${p.id}*%0A%0A👤 *Cliente:* ${p.cliente}%0A📄 *Doc:* ${p.doc || 'Não informado'}%0A%0A📦 *Itens:*%0A${resumoItens}%0A%0A💰 *Total:* R$ ${p.total.toFixed(2)}%0A💳 *Pagamento:* ${p.formaPagamento}%0A📌 *Status:* ${p.status}`;
+        fetch(`https://api.telegram.org/bot${state.empresa.botToken}/sendMessage?chat_id=${state.empresa.chatId}&text=${texto}&parse_mode=Markdown`).catch(() => {});
+      }
+    }
+
+    // --- RESUMO DE VENDAS DO DIA ---
+    function abrirResumoVendasDia() {
+      const hoje = new Date();
+      const inicioHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+
+      const pedidosHoje = state.pedidos.filter(p => {
+        if (!p.dataCriacao) return false;
+        const dataPed = p.dataCriacao.toDate ? p.dataCriacao.toDate() : new Date(p.dataCriacao);
+        return dataPed >= inicioHoje && p.status !== 'Cancelado';
+      });
+
+      const totalVendido = pedidosHoje.reduce((sum, p) => sum + p.total, 0);
+      const qtdPedidos = pedidosHoje.length;
+      const ticketMedio = qtdPedidos > 0 ? (totalVendido / qtdPedidos) : 0;
+
+      const porForma = {};
+      pedidosHoje.forEach(p => {
+        const forma = p.formaPagamento || 'Outros';
+        porForma[forma] = (porForma[forma] || 0) + p.total;
+      });
+
+      document.getElementById('resumo-data-hoje').innerText = `Data: ${hoje.toLocaleDateString('pt-BR')}`;
+      document.getElementById('resumo-total-hoje').innerText = `R$ ${totalVendido.toFixed(2)}`;
+      document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
+      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
+
+      let formasHtml = Object.keys(porForma).length > 0 
+        ? Object.entries(porForma).map(([forma, val]) => `• <b>${forma}:</b> R$ ${val.toFixed(2)}`).join('<br>')
+        : '<span style="color:#64748b;">Nenhuma venda registrada hoje.</span>';
+      
+      document.getElementById('resumo-detalhe-formas').innerHTML = formasHtml;
+
+      const tbody = document.getElementById('resumo-tabela-hoje');
+      if (pedidosHoje.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhuma venda hoje</td></tr>';
+      } else {
+        tbody.innerHTML = pedidosHoje.map(p => `
+          <tr>
+            <td>#${p.numPedido || '----'}</td>
+            <td>${p.cliente}</td>
+            <td>R$ ${p.total.toFixed(2)}</td>
+            <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      document.getElementById('modal-resumo').style.display = 'flex';
+    }
+
+    // --- RENDERIZAÇÃO GERAL ---
+    function render() {
+      document.getElementById('lista-clientes').innerHTML = state.clientes.map(c => `
+        <tr>
+          <td><b>${c.nome}</b><br><small style="color:#64748b;">Doc: ${c.doc || 'Não informado'}</small></td>
+          <td>${c.tel}</td>
+          <td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">🗑</button></td>
+        </tr>`).join('');
+
+      document.getElementById('lista-produtos').innerHTML = state.produtos.map(p => `
+        <tr>
+          <td>${p.nome}</td>
+          <td>R$ ${Number(p.preco).toFixed(2)}</td>
+          <td><b>${p.qtd}</b></td>
+          <td>
+            <button class="btn-warning" type="button" onclick="prepararEdicaoProduto('${p.id}')">✏️</button>
+            <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑️</button>
+          </td>
+        </tr>`).join('');
+
+      document.getElementById('lista-pedidos').innerHTML = state.pedidos.map(p => {
+        let badgeClass = 'badge-pendente';
+        let badgeTxt = '🔴 PENDENTE';
+        if (p.status === 'Pago') { badgeClass = 'badge-pago'; badgeTxt = '🟢 PAGO'; }
+        if (p.status === 'Cancelado') { badgeClass = 'badge-cancelado'; badgeTxt = '⚪ CANCELADO'; }
+
+        return `
+        <tr>
+          <td>#${p.numPedido || '----'}</td>
+          <td>${p.cliente}</td>
+          <td>R$ ${Number(p.total).toFixed(2)}</td>
+          <td><span class="badge ${badgeClass}" onclick="alternarStatus('${p.id}')">${badgeTxt}</span></td>
+          <td>
+            <button class="btn" type="button" style="padding:3px 6px; font-size:0.75rem;" onclick="verNota('${p.id}')">📄 Nota</button>
+            ${p.status !== 'Cancelado' ? `<button class="btn-danger" type="button" style="padding:3px 6px; font-size:0.75rem;" onclick="cancelarPedido('${p.id}')">❌</button>` : ''}
+          </td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('lista-usuarios').innerHTML = state.usuarios.map(u => {
+        const uId = u.id || u.login;
+        return `
+        <tr>
+          <td><b>${u.login}</b></td>
+          <td>${u.role}</td>
+          <td>
+            <button class="btn-warning" type="button" title="Alterar Senha" onclick="alterarSenhaUsuario('${uId}', '${u.login}')">🔑</button>
+            <button class="btn-danger" type="button" title="Excluir Usuário" onclick="excluirUsuario('${uId}')">🗑</button>
+          </td>
+        </tr>`;
+      }).join('');
+
+      filtrarClientesDropdown();
+      renderClientesDashboard();
+      
+      const prodOptions = state.produtos.map(p => 
+        `<option value="${p.id}" ${p.qtd <= 0 ? 'disabled' : ''}>${p.nome} - R$ ${Number(p.preco).toFixed(2)} (${p.qtd <= 0 ? 'SEM ESTOQUE' : 'Estoque: ' + p.qtd})</option>`
+      ).join('');
+
+      document.getElementById('ped-produto').innerHTML = prodOptions;
+    }
+
+    // --- COMPROVANTE DE PEDIDO ---
+    function verNota(id) {
+      const p = state.pedidos.find(i => i.id === id);
+      if(!p) return;
+      state.pedidoAtual = p;
+
+      let statusTag = '[🔴 PAGAMENTO PENDENTE]';
+      if (p.status === 'Pago') statusTag = '[🟢 PAGAMENTO CONFIRMADO]';
+      if (p.status === 'Cancelado') statusTag = '[⚪ PEDIDO CANCELADO]';
+
+      let listaItensTxt = p.itens ? p.itens.map(i => `
+        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+          <span>${i.qtd}x ${i.nome}</span>
+          <span>R$ ${Number(i.subtotal).toFixed(2)}</span>
+        </div>
+      `).join('') : '';
+
+      let obsHtml = p.obs ? `<b>OBSERVAÇÕES:</b><br>${p.obs}<br>--------------------------------------------------<br>` : '';
+
+      document.getElementById('printable-receipt').innerHTML = `
+        <div style="text-align:center; margin-bottom:8px;">
+          <b style="font-size:1.1rem;">${(state.empresa.nome || 'HAPPY EGGS').toUpperCase()}</b><br>
+          CNPJ/CPF: ${state.empresa.cnpj || '-'}<br>
+          Tel/Whats: ${state.empresa.tel || ''}
+        </div>
+        --------------------------------------------------<br>
+        <b>COMPROVANTE DE PEDIDO #${p.numPedido || ''}</b><br>
+        <b>Cliente:</b> ${p.cliente}<br>
+        <b>Documento:</b> ${p.doc || 'Não Informado'}<br>
+        <b>Endereço:</b> ${p.end}<br>
+        --------------------------------------------------<br>
+        <b>ITENS DO PEDIDO:</b><br>
+        ${listaItensTxt}
+        --------------------------------------------------<br>
+        <div style="display:flex; justify-content:space-between; font-size:1rem;"><b>VALOR TOTAL:</b><b>R$ ${Number(p.total).toFixed(2)}</b></div>
+        <b>FORMA DE PGTO:</b> ${p.formaPagamento || 'Pix'}<br>
+        <b>DADOS PGTO:</b> ${p.dadosPagamento || state.empresa.pix}<br>
+        <b>SITUAÇÃO:</b> ${statusTag}<br>
+        --------------------------------------------------<br>
+        ${obsHtml}
+        <div style="text-align:center; font-size: 0.75rem; margin-top: 10px;">
+          <b>${state.empresa.nome}</b><br>
+          📍 ${state.empresa.end}<br>
+          🌐 ${state.empresa.social}<br>
+          Obrigado pela preferência!
+        </div>
+      `;
+      document.getElementById('modal-nota').style.display = 'flex';
+    }
+
+    function enviarWhats() {
+      const p = state.pedidoAtual;
+      if (!p) return;
+
+      let itensWhats = p.itens ? p.itens.map(i => `• ${i.qtd}x ${i.nome} (R$ ${Number(i.subtotal).toFixed(2)})`).join('%0A') : '';
+      let obsWhats = p.obs ? `%0A*Obs:* ${p.obs}` : '';
+
+      const text = `Olá *${p.cliente}*, segue o comprovante do *Pedido #${p.numPedido}* do ${state.empresa.nome}:%0A%0A*Doc:* ${p.doc || 'Não informado'}%0A*Itens:*%0A${itensWhats}%0A%0A*Total:* R$ ${Number(p.total).toFixed(2)}%0A*Forma de Pagamento:* ${p.formaPagamento}%0A*Dados de Pago:* ${p.dadosPagamento}%0A*Status:* ${p.status}${obsWhats}%0A%0A📍 ${state.empresa.end}%0A🌐 ${state.empresa.social}`;
+      window.open(`https://wa.me/${p.tel.replace(/\D/g, '')}?text=${text}`, '_blank');
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
