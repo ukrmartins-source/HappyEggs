@@ -296,13 +296,10 @@
           <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
         </div>
         <form onsubmit="registrarEntradaProducao(event)">
+          <!-- REMOVIDO: Opção de selecionar produto -->
           <div class="form-group">
-            <label>Selecione o Produto para Entrada</label>
-            <select id="prod-ent-item" required></select>
-          </div>
-          <div class="form-group">
-            <label>Quantidade Coletada/Produzida</label>
-            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 50 ou 100" required>
+            <label>Quantidade Coletada/Produzida (Unidades de Ovos)</label>
+            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 1000 ovos/dia" required>
           </div>
           <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Coleta de Produção</button>
         </form>
@@ -310,7 +307,7 @@
         <div style="margin-top: 15px;">
           <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Produção de Hoje</div>
           <table>
-            <thead><tr><th>Hora</th><th>Item</th><th>Qtd</th></tr></thead>
+            <thead><tr><th>Hora</th><th>Unidades</th></tr></thead>
             <tbody id="lista-producao-hoje"></tbody>
           </table>
         </div>
@@ -318,22 +315,22 @@
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title" id="form-prod-title">Cadastrar Novo Produto</div>
+          <div class="card-title" id="form-prod-title">Cadastrar Novo Produto / Embalagem</div>
         </div>
         <form id="form-produto" onsubmit="salvarProduto(event)">
           <input type="hidden" id="prod-id-edit" value="">
-          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: Ovos Dúzia / Cartela 30" required></div>
+          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: Cartela 30 Ovos / Caixa 360 / Ovo Avulso" required></div>
           <div class="form-group"><label>Preço Unitário (R$)</label><input type="number" step="0.01" id="prod-preco" required></div>
-          <div class="form-group"><label>Estoque Inicial/Atual</label><input type="number" id="prod-qtd" required></div>
+          <div class="form-group"><label>Estoque Atual (Ovos Indivudiais)</label><input type="number" id="prod-qtd" required></div>
           <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
           <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
         </form>
       </div>
 
       <div class="card">
-        <div class="card-title">Estoque Atual</div>
+        <div class="card-title">Estoque Atual de Ovos</div>
         <table>
-          <thead><tr><th>Produto</th><th>Preço</th><th>Qtd</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Produto</th><th>Preço</th><th>Qtd (Ovos)</th><th>Ações</th></tr></thead>
           <tbody id="lista-produtos"></tbody>
         </table>
       </div>
@@ -449,7 +446,7 @@
   </div>
 
   <script>
-    // --- CONFIGURAÇÃO DO NOVO FIREBASE HAPPY EGGS ---
+    // --- CONFIGURAÇÃO DO FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyAYmxniwbHyi4HmTH-aVlHo2zp-7pXY_lg",
       authDomain: "happyeggs-534f2.firebaseapp.com",
@@ -476,6 +473,24 @@
     };
 
     let carrinhoTemp = [];
+
+    // Função utilitária para obter a quantidade de ovos por embalagem
+    function calcularOvosPorEmbalagem(nomeProduto) {
+      if (!nomeProduto) return 1;
+      const str = nomeProduto.toLowerCase();
+      
+      if (str.includes("caixa 360") || str.includes("caixa de 360") || str.includes("360 ovos")) return 360;
+      if (str.includes("cartela 30") || str.includes("cartela de 30") || str.includes("30 ovos")) return 30;
+      if (str.includes("dúzia") || str.includes("duzia") || str.includes("12 ovos")) return 12;
+      
+      // Procura por números no texto da embalagem (ex: Cartela 20 -> 20)
+      const match = str.match(/\d+/);
+      if (match) {
+        const val = parseInt(match[0], 10);
+        if (val > 0) return val;
+      }
+      return 1; // Padrão individual
+    }
 
     function initApp() {
       db.collection("usuarios").get().then(snapshot => {
@@ -641,9 +656,263 @@
       const novaSenha = prompt(`Digite a nova senha para o usuário ${login.toUpperCase()}:`);
       if (novaSenha && novaSenha.trim() !== "") {
         db.collection("usuarios").doc(docId).update({ pass: novaSenha.trim() })
-        .then(() => alert('Senha alterada com sucesso!'))
-        .catch(err => alert('Erro ao alterar senha: ' + err.message));
+        .then(() => alert(`Senha do usuário ${login} atualizada!`))
+        .catch(err => alert('Erro: ' + err.message));
       }
+    }
+
+    // --- ENTRADA DE PRODUÇÃO (ESTOQUE COLETADO) ---
+    function registrarEntradaProducao(e) {
+      e.preventDefault();
+      const qtdInput = document.getElementById('prod-ent-qtd');
+      const quantidade = parseInt(qtdInput.value, 10);
+
+      if (!quantidade || quantidade <= 0) return alert('Informe uma quantidade válida!');
+
+      // Se não houver produtos cadastrados, cria o produto padrão de estoque
+      if (state.produtos.length === 0) {
+        const novoProd = {
+          nome: "Ovos (Unidade / Estoque Geral)",
+          preco: 0.50,
+          qtd: quantidade,
+          empresaId: state.currentUser.empresaId
+        };
+        db.collection("produtos").add(novoProd).then(() => {
+          registrarLogProducao(quantidade);
+          qtdInput.value = '';
+          alert(`Entrada de ${quantidade} ovos registrada e estoque inicial criado!`);
+        });
+        return;
+      }
+
+      // Adiciona a quantidade de ovos coletados ao estoque
+      // Creditamos ao primeiro produto cadastrado ou a todos que forem tipo base
+      const prodTarget = state.produtos[0];
+      const novaQtd = (prodTarget.qtd || 0) + quantidade;
+
+      db.collection("produtos").doc(prodTarget.id).update({
+        qtd: novaQtd
+      }).then(() => {
+        registrarLogProducao(quantidade);
+        qtdInput.value = '';
+        alert(`Entrada de ${quantidade} ovos registrada com sucesso no estoque!`);
+      }).catch(err => alert('Erro ao registrar entrada: ' + err.message));
+    }
+
+    function registrarLogProducao(qtd) {
+      const agora = new Date();
+      db.collection("producao").add({
+        dataHora: firebase.firestore.Timestamp.fromDate(agora),
+        qtd: qtd,
+        empresaId: state.currentUser.empresaId
+      });
+    }
+
+    function renderProducaoHoje() {
+      const tbody = document.getElementById('lista-producao-hoje');
+      if (!tbody) return;
+      
+      const hojeStr = new Date().toDateString();
+      const producaoHoje = state.producao.filter(item => {
+        if (!item.dataHora) return false;
+        const d = item.dataHora.toDate ? item.dataHora.toDate() : new Date(item.dataHora);
+        return d.toDateString() === hojeStr;
+      });
+
+      if (producaoHoje.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#64748b;">Nenhuma coleta registrada hoje.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = producaoHoje.map(p => {
+        const d = p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
+        const horaStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `<tr>
+          <td>${horaStr}</td>
+          <td><strong>+${p.qtd} ovos</strong></td>
+        </tr>`;
+      }).join('');
+    }
+
+    // --- CADASTRO E EDIÇÃO DE PRODUTOS/EMBALAGENS ---
+    function salvarProduto(e) {
+      e.preventDefault();
+      const id = document.getElementById('prod-id-edit').value;
+      const nome = document.getElementById('prod-nome').value.trim();
+      const preco = parseFloat(document.getElementById('prod-preco').value);
+      const qtd = parseInt(document.getElementById('prod-qtd').value, 10);
+
+      const payload = {
+        nome: nome,
+        preco: preco,
+        qtd: qtd,
+        empresaId: state.currentUser.empresaId
+      };
+
+      if (id) {
+        db.collection("produtos").doc(id).update(payload)
+        .then(() => {
+          alert('Produto atualizado!');
+          limparFormProduto();
+        });
+      } else {
+        db.collection("produtos").add(payload)
+        .then(() => {
+          alert('Produto cadastrado com sucesso!');
+          limparFormProduto();
+        });
+      }
+    }
+
+    function editarProduto(id) {
+      const prod = state.produtos.find(p => p.id === id);
+      if (!prod) return;
+      document.getElementById('prod-id-edit').value = prod.id;
+      document.getElementById('prod-nome').value = prod.nome;
+      document.getElementById('prod-preco').value = prod.preco;
+      document.getElementById('prod-qtd').value = prod.qtd;
+      
+      document.getElementById('form-prod-title').innerText = "Editar Produto / Embalagem";
+      document.getElementById('btn-salvar-prod').innerText = "Atualizar Produto";
+      document.getElementById('btn-cancelar-edit').style.display = "block";
+    }
+
+    function limparFormProduto() {
+      document.getElementById('prod-id-edit').value = "";
+      document.getElementById('form-produto').reset();
+      document.getElementById('form-prod-title').innerText = "Cadastrar Novo Produto / Embalagem";
+      document.getElementById('btn-salvar-prod').innerText = "Salvar Produto na Nuvem";
+      document.getElementById('btn-cancelar-edit').style.display = "none";
+    }
+
+    function deletarProduto(id) {
+      if (confirm('Deseja excluir este produto do catálogo?')) {
+        db.collection("produtos").doc(id).delete();
+      }
+    }
+
+    // --- CARRINHO DE PEDIDO E BAIXA DE ESTOQUE PROPORCIONAL ---
+    function adicionarItemAoPedido() {
+      const sel = document.getElementById('ped-produto');
+      const prodId = sel.value;
+      const qtdVendida = parseInt(document.getElementById('ped-qtd').value, 10);
+
+      if (!prodId || !qtdVendida || qtdVendida <= 0) return alert('Selecione um produto e quantidade válida.');
+
+      const prod = state.produtos.find(p => p.id === prodId);
+      if (!prod) return;
+
+      const ovosPorEmb = calcularOvosPorEmbalagem(prod.nome);
+      const totalOvosNecessarios = qtdVendida * ovosPorEmb;
+
+      // Verifica se há estoque em unidades de ovos
+      if ((prod.qtd || 0) < totalOvosNecessarios) {
+        alert(`Estoque insuficiente! Saldo atual: ${prod.qtd || 0} ovos. Necessário para este pedido: ${totalOvosNecessarios} ovos.`);
+        return;
+      }
+
+      carrinhoTemp.push({
+        produtoId: prod.id,
+        nome: prod.nome,
+        precoUnitario: prod.preco,
+        quantidade: qtdVendida,
+        ovosPorEmbalagem: ovosPorEmb,
+        subtotal: prod.preco * qtdVendida
+      });
+
+      renderCarrinho();
+    }
+
+    function removerItemCarrinho(index) {
+      carrinhoTemp.splice(index, 1);
+      renderCarrinho();
+    }
+
+    function renderCarrinho() {
+      const container = document.getElementById('itens-pedido-lista');
+      const totalSpan = document.getElementById('ped-total-valor');
+
+      if (carrinhoTemp.length === 0) {
+        container.innerHTML = `<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>`;
+        totalSpan.innerText = "0.00";
+        return;
+      }
+
+      let total = 0;
+      container.innerHTML = carrinhoTemp.map((item, index) => {
+        total += item.subtotal;
+        return `<div class="carrinho-item">
+          <div>
+            <strong>${item.nome}</strong><br>
+            <span style="font-size:0.75rem; color:#64748b;">${item.quantidade}x R$ ${item.precoUnitario.toFixed(2)} (${item.quantidade * item.ovosPorEmbalagem} ovos)</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <strong>R$ ${item.subtotal.toFixed(2)}</strong>
+            <button class="btn-danger" type="button" onclick="removerItemCarrinho(${index})">✕</button>
+          </div>
+        </div>`;
+      }).join('');
+
+      totalSpan.innerText = total.toFixed(2);
+    }
+
+    function finalizarPedido(e) {
+      e.preventDefault();
+      if (carrinhoTemp.length === 0) return alert('Adicione pelo menos um produto ao pedido.');
+
+      const cliId = document.getElementById('ped-cliente').value;
+      const cliente = state.clientes.find(c => c.id === cliId);
+      if (!cliente) return alert('Selecione um cliente válido.');
+
+      const formaPag = document.getElementById('ped-forma-pagamento').value;
+      const dadosPag = document.getElementById('ped-dados-pagamento').value.trim();
+      const statusPag = document.getElementById('ped-status').value;
+      const obs = document.getElementById('ped-obs').value.trim();
+
+      let totalValor = 0;
+      carrinhoTemp.forEach(i => totalValor += i.subtotal);
+
+      const novoPedido = {
+        clienteId: cliente.id,
+        clienteNome: cliente.nome,
+        clienteTel: cliente.tel || '',
+        clienteEnd: cliente.end || '',
+        itens: carrinhoTemp,
+        total: totalValor,
+        formaPagamento: formaPag,
+        dadosPagamento: dadosPag,
+        status: statusPag,
+        obs: obs,
+        dataCriacao: firebase.firestore.Timestamp.fromDate(new Date()),
+        empresaId: state.currentUser.empresaId
+      };
+
+      // Baixa no estoque produto a produto
+      const batch = db.batch();
+
+      carrinhoTemp.forEach(item => {
+        const prodRef = db.collection("produtos").doc(item.produtoId);
+        const prodAtual = state.produtos.find(p => p.id === item.produtoId);
+        if (prodAtual) {
+          const abatimentoOvos = item.quantidade * item.ovosPorEmbalagem;
+          const novoSaldo = Math.max(0, (prodAtual.qtd || 0) - abatimentoOvos);
+          batch.update(prodRef, { qtd: novoSaldo });
+        }
+      });
+
+      const pedidoRef = db.collection("pedidos").doc();
+      batch.set(pedidoRef, novoPedido);
+
+      batch.commit().then(() => {
+        alert('Pedido finalizado com sucesso e estoque atualizado!');
+        carrinhoTemp = [];
+        renderCarrinho();
+        document.getElementById('ped-obs').value = '';
+        document.getElementById('ped-dados-pagamento').value = '';
+        
+        // Exibe comprovante
+        abrirComprovante({ id: pedidoRef.id, ...novoPedido, dataCriacao: new Date() });
+      }).catch(err => alert('Erro ao finalizar pedido: ' + err.message));
     }
 
     // --- RENDERIZAÇÃO GERAL ---
@@ -656,305 +925,118 @@
     }
 
     function renderClientes() {
+      const tbody = document.getElementById('lista-clientes');
       const tbodyDash = document.getElementById('lista-clientes-dash');
-      const tbodyFull = document.getElementById('lista-clientes');
-      if (tbodyDash) tbodyDash.innerHTML = '';
-      if (tbodyFull) tbodyFull.innerHTML = '';
+      
+      if (tbody) {
+        tbody.innerHTML = state.clientes.map(c => `<tr>
+          <td><strong>${c.nome}</strong><br><span style="font-size:0.75rem; color:#64748b;">${c.doc || 'Sem Doc'}</span></td>
+          <td>${c.tel}</td>
+          <td><button class="btn-danger" type="button" onclick="deletarCliente('${c.id}')">Excluir</button></td>
+        </tr>`).join('');
+      }
 
-      state.clientes.forEach(c => {
-        if (tbodyDash) {
-          tbodyDash.innerHTML += `<tr><td><strong>${c.nome}</strong><br><small>${c.doc || ''}</small></td><td>${c.tel}</td></tr>`;
-        }
-        if (tbodyFull) {
-          tbodyFull.innerHTML += `<tr><td><strong>${c.nome}</strong><br><small>${c.doc || ''}</small></td><td>${c.tel}</td><td><button class="btn-danger" onclick="deletarCliente('${c.id}')">Excluir</button></td></tr>`;
-        }
-      });
+      if (tbodyDash) {
+        tbodyDash.innerHTML = state.clientes.map(c => `<tr>
+          <td><strong>${c.nome}</strong><br><span style="font-size:0.75rem; color:#64748b;">${c.doc || 'Sem Doc'}</span></td>
+          <td>${c.tel}</td>
+        </tr>`).join('');
+      }
     }
 
     function filtrarClientesDashboard() {
-      const term = document.getElementById('dash-busca-cliente').value.toLowerCase();
-      const rows = document.querySelectorAll('#lista-clientes-dash tr');
-      rows.forEach(r => {
-        r.style.display = r.innerText.toLowerCase().includes(term) ? '' : 'none';
+      const termo = document.getElementById('dash-busca-cliente').value.toLowerCase();
+      const tbodyDash = document.getElementById('lista-clientes-dash');
+      const filtrados = state.clientes.filter(c => 
+        c.nome.toLowerCase().includes(termo) || 
+        (c.doc && c.doc.toLowerCase().includes(termo)) || 
+        (c.tel && c.tel.includes(termo))
+      );
+
+      tbodyDash.innerHTML = filtrados.map(c => `<tr>
+        <td><strong>${c.nome}</strong><br><span style="font-size:0.75rem; color:#64748b;">${c.doc || 'Sem Doc'}</span></td>
+        <td>${c.tel}</td>
+      </tr>`).join('');
+    }
+
+    function cadastrarCliente(e) {
+      e.preventDefault();
+      const nome = document.getElementById('cli-nome').value.trim();
+      const doc = document.getElementById('cli-doc').value.trim();
+      const tel = document.getElementById('cli-tel').value.trim();
+      const end = document.getElementById('cli-end').value.trim();
+
+      db.collection("clientes").add({
+        nome, doc, tel, end,
+        empresaId: state.currentUser.empresaId
+      }).then(() => {
+        alert('Cliente cadastrado com sucesso!');
+        e.target.reset();
       });
+    }
+
+    function deletarCliente(id) {
+      if (confirm('Remover este cliente?')) {
+        db.collection("clientes").doc(id).delete();
+      }
     }
 
     function renderProdutos() {
       const tbody = document.getElementById('lista-produtos');
       if (!tbody) return;
-      tbody.innerHTML = '';
-      state.produtos.forEach(p => {
-        tbody.innerHTML += `<tr>
-          <td><strong>${p.nome}</strong></td>
-          <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
-          <td>${p.qtd}</td>
-          <td>
-            <button class="btn-warning" onclick="editarProduto('${p.id}')">Editar</button>
-            <button class="btn-danger" onclick="deletarProduto('${p.id}')">Excluir</button>
-          </td>
-        </tr>`;
-      });
-    }
 
-    function renderUsuarios() {
-      const tbody = document.getElementById('lista-usuarios');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      state.usuarios.forEach(u => {
-        tbody.innerHTML += `<tr>
-          <td><strong>${u.login}</strong></td>
-          <td>${u.role}</td>
-          <td>
-            <button class="btn-warning" onclick="alterarSenhaUsuario('${u.id}', '${u.login}')">Senha</button>
-            ${u.login !== 'admin' ? `<button class="btn-danger" onclick="deletarUsuario('${u.id}')">Excluir</button>` : ''}
-          </td>
-        </tr>`;
-      });
+      tbody.innerHTML = state.produtos.map(p => `<tr>
+        <td><strong>${p.nome}</strong></td>
+        <td>R$ ${p.preco.toFixed(2)}</td>
+        <td><span class="badge ${p.qtd > 50 ? 'badge-pago' : 'badge-pendente'}">${p.qtd} ovos</span></td>
+        <td>
+          <button class="btn-warning" type="button" onclick="editarProduto('${p.id}')">✏️</button>
+          <button class="btn-danger" type="button" onclick="deletarProduto('${p.id}')">✕</button>
+        </td>
+      </tr>`).join('');
     }
 
     function renderDropdowns() {
       const selCli = document.getElementById('ped-cliente');
-      const selProd = document.getElementById('ped-produto');
-      const selEnt = document.getElementById('prod-ent-item');
-
       if (selCli) {
-        selCli.innerHTML = state.clientes.map(c => `<option value="${c.id}">${c.nome} - ${c.tel}</option>`).join('');
+        selCli.innerHTML = state.clientes.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
       }
+
+      const selProd = document.getElementById('ped-produto');
       if (selProd) {
-        selProd.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} (R$ ${parseFloat(p.preco).toFixed(2)}) - Estq: ${p.qtd}</option>`).join('');
-      }
-      if (selEnt) {
-        selEnt.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+        selProd.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${p.preco.toFixed(2)} (Estoque: ${p.qtd} ovos)</option>`).join('');
       }
     }
 
     function filtrarClientesDropdown() {
-      const term = document.getElementById('ped-busca-cliente').value.toLowerCase();
+      const termo = document.getElementById('ped-busca-cliente').value.toLowerCase();
       const selCli = document.getElementById('ped-cliente');
-      const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(term) || (c.doc && c.doc.includes(term)) || c.tel.includes(term));
-      selCli.innerHTML = filtrados.map(c => `<option value="${c.id}">${c.nome} - ${c.tel}</option>`).join('');
-    }
+      const filtrados = state.clientes.filter(c => 
+        c.nome.toLowerCase().includes(termo) || 
+        (c.doc && c.doc.toLowerCase().includes(termo)) || 
+        (c.tel && c.tel.includes(termo))
+      );
 
-    // --- OPERAÇÕES CLIENTES ---
-    function cadastrarCliente(e) {
-      e.preventDefault();
-      const novo = {
-        empresaId: state.currentUser.empresaId,
-        nome: document.getElementById('cli-nome').value.trim(),
-        doc: document.getElementById('cli-doc').value.trim(),
-        tel: document.getElementById('cli-tel').value.trim(),
-        end: document.getElementById('cli-end').value.trim()
-      };
-      db.collection("clientes").add(novo).then(() => {
-        alert('Cliente cadastrado com sucesso!');
-        e.target.reset();
-      }).catch(err => alert('Erro: ' + err.message));
-    }
-
-    function deletarCliente(id) {
-      if (confirm('Tem certeza que deseja excluir este cliente?')) {
-        db.collection("clientes").doc(id).delete();
-      }
-    }
-
-    // --- OPERAÇÕES PRODUTOS ---
-    function salvarProduto(e) {
-      e.preventDefault();
-      const id = document.getElementById('prod-id-edit').value;
-      const dados = {
-        empresaId: state.currentUser.empresaId,
-        nome: document.getElementById('prod-nome').value.trim(),
-        preco: parseFloat(document.getElementById('prod-preco').value),
-        qtd: parseInt(document.getElementById('prod-qtd').value)
-      };
-
-      if (id) {
-        db.collection("produtos").doc(id).update(dados).then(() => {
-          alert('Produto atualizado!');
-          limparFormProduto();
-        });
-      } else {
-        db.collection("produtos").add(dados).then(() => {
-          alert('Produto cadastrado!');
-          limparFormProduto();
-        });
-      }
-    }
-
-    function editarProduto(id) {
-      const p = state.produtos.find(item => item.id === id);
-      if (!p) return;
-      document.getElementById('prod-id-edit').value = p.id;
-      document.getElementById('prod-nome').value = p.nome;
-      document.getElementById('prod-preco').value = p.preco;
-      document.getElementById('prod-qtd').value = p.qtd;
-      document.getElementById('form-prod-title').innerText = "Editar Produto";
-      document.getElementById('btn-salvar-prod').innerText = "Atualizar Produto";
-      document.getElementById('btn-cancelar-edit').style.display = "block";
-    }
-
-    function limparFormProduto() {
-      document.getElementById('form-produto').reset();
-      document.getElementById('prod-id-edit').value = "";
-      document.getElementById('form-prod-title').innerText = "Cadastrar Novo Produto";
-      document.getElementById('btn-salvar-prod').innerText = "Salvar Produto na Nuvem";
-      document.getElementById('btn-cancelar-edit').style.display = "none";
-    }
-
-    function deletarProduto(id) {
-      if (confirm('Excluir este produto do estoque?')) {
-        db.collection("produtos").doc(id).delete();
-      }
-    }
-
-    function registrarEntradaProducao(e) {
-      e.preventDefault();
-      const prodId = document.getElementById('prod-ent-item').value;
-      const qtd = parseInt(document.getElementById('prod-ent-qtd').value);
-      const prod = state.produtos.find(p => p.id === prodId);
-
-      if (!prod) return alert('Selecione um produto válido');
-
-      db.collection("produtos").doc(prodId).update({ qtd: prod.qtd + qtd });
-      db.collection("producao").add({
-        empresaId: state.currentUser.empresaId,
-        prodId: prodId,
-        nomeItem: prod.nome,
-        qtd: qtd,
-        dataHora: new Date().toISOString()
-      }).then(() => {
-        alert('Produção lançada no estoque!');
-        document.getElementById('prod-ent-qtd').value = '';
-      });
-    }
-
-    function renderProducaoHoje() {
-      const tbody = document.getElementById('lista-producao-hoje');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      const hoje = new Date().toDateString();
-      const deHoje = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje);
-
-      deHoje.forEach(p => {
-        const hora = new Date(p.dataHora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        tbody.innerHTML += `<tr><td>${hora}</td><td>${p.nomeItem}</td><td>+${p.qtd}</td></tr>`;
-      });
-    }
-
-    // --- OPERAÇÕES PEDIDOS ---
-    function adicionarItemAoPedido() {
-      const prodId = document.getElementById('ped-produto').value;
-      const qtd = parseInt(document.getElementById('ped-qtd').value);
-      const prod = state.produtos.find(p => p.id === prodId);
-
-      if (!prod) return alert('Selecione um produto.');
-      if (qtd > prod.qtd) return alert(`Estoque insuficiente! Disponível: ${prod.qtd}`);
-
-      const existente = carrinhoTemp.find(i => i.id === prodId);
-      if (existente) {
-        existente.qtd += qtd;
-        existente.subtotal = existente.qtd * existente.preco;
-      } else {
-        carrinhoTemp.push({
-          id: prodId,
-          nome: prod.nome,
-          preco: prod.preco,
-          qtd: qtd,
-          subtotal: prod.preco * qtd
-        });
-      }
-
-      renderCarrinho();
-    }
-
-    function renderCarrinho() {
-      const container = document.getElementById('itens-pedido-lista');
-      const totalEl = document.getElementById('ped-total-valor');
-      if (carrinhoTemp.length === 0) {
-        container.innerHTML = '<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>';
-        totalEl.innerText = '0.00';
-        return;
-      }
-
-      let total = 0;
-      container.innerHTML = carrinhoTemp.map((item, index) => {
-        total += item.subtotal;
-        return `<div class="carrinho-item">
-          <div><strong>${item.nome}</strong><br><small>${item.qtd}x R$ ${item.preco.toFixed(2)}</small></div>
-          <div>
-            <span>R$ ${item.subtotal.toFixed(2)}</span>
-            <button class="btn-danger" style="margin-left:8px;" onclick="removerItemCarrinho(${index})">X</button>
-          </div>
-        </div>`;
-      }).join('');
-
-      totalEl.innerText = total.toFixed(2);
-    }
-
-    function removerItemCarrinho(index) {
-      carrinhoTemp.splice(index, 1);
-      renderCarrinho();
-    }
-
-    function finalizarPedido(e) {
-      e.preventDefault();
-      if (carrinhoTemp.length === 0) return alert('Adicione pelo menos um produto ao pedido!');
-
-      const cliId = document.getElementById('ped-cliente').value;
-      const cliente = state.clientes.find(c => c.id === cliId);
-      if (!cliente) return alert('Selecione um cliente.');
-
-      const total = carrinhoTemp.reduce((sum, item) => sum + item.subtotal, 0);
-
-      const novoPedido = {
-        empresaId: state.currentUser.empresaId,
-        cliente: cliente,
-        itens: carrinhoTemp,
-        total: total,
-        formaPagamento: document.getElementById('ped-forma-pagamento').value,
-        dadosPagamento: document.getElementById('ped-dados-pagamento').value.trim(),
-        status: document.getElementById('ped-status').value,
-        obs: document.getElementById('ped-obs').value.trim(),
-        dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
-      db.collection("pedidos").add(novoPedido).then(docRef => {
-        // Baixa no estoque
-        carrinhoTemp.forEach(item => {
-          const prodObj = state.produtos.find(p => p.id === item.id);
-          if (prodObj) {
-            const novaQtd = prodObj.qtd - item.qtd;
-            db.collection("produtos").doc(item.id).update({ qtd: novaQtd < 0 ? 0 : novaQtd });
-          }
-        });
-
-        alert('Pedido realizado com sucesso!');
-        carrinhoTemp = [];
-        renderCarrinho();
-        e.target.reset();
-        
-        // Exibe comprovante
-        exibirNota({ id: docRef.id, ...novoPedido, dataCriacao: new Date() });
-      }).catch(err => alert('Erro ao finalizar pedido: ' + err.message));
+      selCli.innerHTML = filtrados.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
     }
 
     function renderPedidos() {
       const tbody = document.getElementById('lista-pedidos');
       if (!tbody) return;
-      tbody.innerHTML = '';
 
-      state.pedidos.forEach((p, index) => {
-        const badgeClass = p.status === 'Pago' ? 'badge-pago' : 'badge-pendente';
-        tbody.innerHTML += `<tr>
-          <td>#${p.id.substring(0, 4)}</td>
-          <td>${p.cliente ? p.cliente.nome : 'Cliente Desconhecido'}</td>
-          <td>R$ ${parseFloat(p.total).toFixed(2)}</td>
-          <td><span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">${p.status}</span></td>
-          <td>
-            <button class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="abrirNotaPeloId('${p.id}')">Nota</button>
-          </td>
-        </tr>`;
-      });
+      tbody.innerHTML = state.pedidos.map((p, idx) => `<tr>
+        <td>#${state.pedidos.length - idx}</td>
+        <td><strong>${p.clienteNome}</strong></td>
+        <td>R$ ${p.total.toFixed(2)}</td>
+        <td>
+          <span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">
+            ${p.status}
+          </span>
+        </td>
+        <td>
+          <button class="btn" type="button" style="padding:3px 6px; font-size:0.75rem; width:auto;" onclick="verComprovantePedido('${p.id}')">📄 Nota</button>
+        </td>
+      </tr>`).join('');
     }
 
     function alternarStatusPedido(id, statusAtual) {
@@ -962,55 +1044,47 @@
       db.collection("pedidos").doc(id).update({ status: novoStatus });
     }
 
-    function abrirNotaPeloId(id) {
+    function verComprovantePedido(id) {
       const p = state.pedidos.find(item => item.id === id);
-      if (p) exibirNota(p);
+      if (p) abrirComprovante(p);
     }
 
-    function exibirNota(pedido) {
+    function abrirComprovante(pedido) {
       state.pedidoAtual = pedido;
       const box = document.getElementById('printable-receipt');
       const emp = state.empresa;
 
-      let dataStr = pedido.dataCriacao ? new Date(pedido.dataCriacao).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR');
+      const dataStr = pedido.dataCriacao ? new Date(pedido.dataCriacao).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR');
 
-      let html = `<div style="text-align:center; font-weight:bold; margin-bottom:10px;">
-        *** ${emp.nome.toUpperCase() || 'HAPPY EGGS'} ***<br>
-        ${emp.cnpj ? 'CNPJ: ' + emp.cnpj + '<br>' : ''}
-        ${emp.end ? emp.end + '<br>' : ''}
-        ${emp.tel ? 'TEL: ' + emp.tel : ''}
-      </div>
-      --------------------------------<br>
-      <strong>COMPROVANTE DE PEDIDO #${pedido.id.substring(0,6)}</strong><br>
-      DATA: ${dataStr}<br>
-      --------------------------------<br>
-      <strong>CLIENTE:</strong> ${pedido.cliente.nome}<br>
-      <strong>DOC:</strong> ${pedido.cliente.doc || 'N/A'}<br>
-      <strong>END:</strong> ${pedido.cliente.end || 'N/A'}<br>
-      --------------------------------<br>
-      <strong>ITENS:</strong><br>`;
+      let itensStr = pedido.itens.map(i => `${i.quantidade}x ${i.nome}\n   R$ ${i.precoUnitario.toFixed(2)} UN -> R$ ${i.subtotal.toFixed(2)}`).join('\n');
 
-      pedido.itens.forEach(i => {
-        html += `${i.qtd}x ${i.nome} - R$ ${i.subtotal.toFixed(2)}<br>`;
-      });
+      box.innerHTML = `
+========================================
+       ${emp.nome.toUpperCase()}
+========================================
+CNPJ/CPF: ${emp.cnpj || 'N/A'}
+TEL: ${emp.tel || 'N/A'}
+END: ${emp.end || 'N/A'}
+----------------------------------------
+COMPROVANTE DE PEDIDO
+DATA: ${dataStr}
+----------------------------------------
+CLIENTE: ${pedido.clienteNome}
+TEL: ${pedido.clienteTel || 'N/A'}
+----------------------------------------
+ITENS DO PEDIDO:
+${itensStr}
+----------------------------------------
+TOTAL DO PEDIDO: R$ ${pedido.total.toFixed(2)}
+FORMA DE PAGAMENTO: ${pedido.formaPagamento}
+STATUS: ${pedido.status.toUpperCase()}
+${pedido.dadosPagamento ? `CHAVE/DADOS: ${pedido.dadosPagamento}\n` : ''}
+${pedido.obs ? `OBS: ${pedido.obs}\n` : ''}----------------------------------------
+CHAVE PIX OFICIAL: ${emp.pix || 'N/A'}
+${emp.social ? `${emp.social}\n` : ''}========================================
+       Obrigado pela preferência!
+      `;
 
-      html += `--------------------------------<br>
-      <strong>TOTAL: R$ ${parseFloat(pedido.total).toFixed(2)}</strong><br>
-      PAGAMENTO: ${pedido.formaPagamento} (${pedido.status})<br>`;
-
-      if (pedido.dadosPagamento) html += `DADOS PAGTO: ${pedido.dadosPagamento}<br>`;
-      if (pedido.obs) html += `OBS: ${pedido.obs}<br>`;
-
-      if (emp.pix) {
-        html += `--------------------------------<br>
-        <strong>CHAVE PIX PARA PAGAMENTO:</strong><br>
-        ${emp.pix}<br>`;
-      }
-
-      html += `--------------------------------<br>
-      <div style="text-align:center; margin-top:8px;">Obrigado pela preferência!</div>`;
-
-      box.innerHTML = html;
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
@@ -1021,97 +1095,108 @@
     function enviarWhats() {
       if (!state.pedidoAtual) return;
       const p = state.pedidoAtual;
-      const tel = p.cliente.tel.replace(/\D/g, '');
+      const tel = p.clienteTel.replace(/\D/g, '');
       if (!tel) return alert('Cliente não possui telefone cadastrado.');
 
-      let text = `Olá ${p.cliente.nome}, segue o seu pedido na *${state.empresa.nome}*:\n\n`;
-      p.itens.forEach(i => text += `• ${i.qtd}x ${i.nome} = R$ ${i.subtotal.toFixed(2)}\n`);
-      text += `\n*Total: R$ ${parseFloat(p.total).toFixed(2)}*\nForma de Pagamento: ${p.formaPagamento} (${p.status})`;
-      if (state.empresa.pix) text += `\nChave Pix: ${state.empresa.pix}`;
+      let msg = `*COMPROVANTE DE PEDIDO - ${state.empresa.nome}*\n\n`;
+      msg += `*Cliente:* ${p.clienteNome}\n`;
+      msg += `*Total:* R$ ${p.total.toFixed(2)}\n`;
+      msg += `*Pagamento:* ${p.formaPagamento} (${p.status})\n\n`;
+      msg += `*Itens:*\n`;
+      p.itens.forEach(i => {
+        msg += `- ${i.quantidade}x ${i.nome} = R$ ${i.subtotal.toFixed(2)}\n`;
+      });
+      if (state.empresa.pix) msg += `\n*Chave Pix:* ${state.empresa.pix}`;
 
-      window.open(`https://api.whatsapp.com/send?phone=55${tel}&text=${encodeURIComponent(text)}`, '_blank');
+      const url = `https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
     }
 
-    // --- RELATÓRIOS DO DIA ---
     function abrirResumoVendasDia() {
-      const hoje = new Date().toDateString();
-      const pedidosHoje = state.pedidos.filter(p => new Date(p.dataCriacao).toDateString() === hoje);
+      const hojeStr = new Date().toDateString();
+      const pedidosHoje = state.pedidos.filter(p => {
+        if (!p.dataCriacao) return false;
+        const d = new Date(p.dataCriacao);
+        return d.toDateString() === hojeStr;
+      });
 
       let totalVendido = 0;
       let formas = {};
 
       pedidosHoje.forEach(p => {
-        totalVendido += parseFloat(p.total);
-        formas[p.formaPagamento] = (formas[p.formaPagamento] || 0) + parseFloat(p.total);
+        totalVendido += p.total;
+        formas[p.formaPagamento] = (formas[p.formaPagamento] || 0) + p.total;
       });
 
       const qtd = pedidosHoje.length;
-      const ticketMedio = qtd > 0 ? (totalVendido / qtd) : 0;
+      const ticket = qtd > 0 ? totalVendido / qtd : 0;
 
-      document.getElementById('resumo-data-hoje').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('resumo-data-hoje').innerText = `Data: ${new Date().toLocaleDateString('pt-BR')}`;
       document.getElementById('resumo-total-hoje').innerText = `R$ ${totalVendido.toFixed(2)}`;
       document.getElementById('resumo-qtd-pedidos').innerText = qtd;
-      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
+      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticket.toFixed(2)}`;
 
-      let detalheHtml = '';
+      let detalheFormas = '';
       for (let f in formas) {
-        detalheHtml += `<div>• ${f}: <strong>R$ ${formas[f].toFixed(2)}</strong></div>`;
+        detalheFormas += `<div><strong>${f}:</strong> R$ ${formas[f].toFixed(2)}</div>`;
       }
-      document.getElementById('resumo-detalhe-formas').innerHTML = detalheHtml || 'Nenhuma venda hoje.';
+      document.getElementById('resumo-detalhe-formas').innerHTML = detalheFormas || 'Nenhuma venda hoje.';
 
       const tbody = document.getElementById('resumo-tabela-hoje');
-      tbody.innerHTML = '';
-      pedidosHoje.forEach(p => {
-        tbody.innerHTML += `<tr>
-          <td>#${p.id.substring(0,4)}</td>
-          <td>${p.cliente ? p.cliente.nome : ''}</td>
-          <td>R$ ${parseFloat(p.total).toFixed(2)}</td>
-          <td>${p.status}</td>
-        </tr>`;
-      });
+      tbody.innerHTML = pedidosHoje.map((p, i) => `<tr>
+        <td>#${pedidosHoje.length - i}</td>
+        <td>${p.clienteNome}</td>
+        <td>R$ ${p.total.toFixed(2)}</td>
+        <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
+      </tr>`).join('');
 
       document.getElementById('modal-resumo').style.display = 'flex';
     }
 
-    // --- EMPRESA E USUÁRIOS (ADMIN) ---
-    function cadastrarUsuario(e) {
-      e.preventDefault();
-      const novo = {
-        empresaId: state.currentUser.empresaId,
-        login: document.getElementById('usr-login').value.trim().toLowerCase(),
-        pass: document.getElementById('usr-pass').value.trim(),
-        role: document.getElementById('usr-role').value
-      };
+    function renderUsuarios() {
+      const tbody = document.getElementById('lista-usuarios');
+      if (!tbody) return;
 
-      db.collection("usuarios").add(novo).then(() => {
-        alert('Usuário criado!');
-        e.target.reset();
-      }).catch(err => alert('Erro: ' + err.message));
+      tbody.innerHTML = state.usuarios.map(u => `<tr>
+        <td><strong>${u.login}</strong></td>
+        <td>${u.role}</td>
+        <td>
+          <button class="btn-warning" type="button" onclick="alterarSenhaUsuario('${u.id}', '${u.login}')">Senha</button>
+        </td>
+      </tr>`).join('');
     }
 
-    function deletarUsuario(id) {
-      if (confirm('Excluir este usuário?')) {
-        db.collection("usuarios").doc(id).delete();
-      }
+    function cadastrarUsuario(e) {
+      e.preventDefault();
+      const login = document.getElementById('usr-login').value.trim().toLowerCase();
+      const pass = document.getElementById('usr-pass').value.trim();
+      const role = document.getElementById('usr-role').value;
+
+      db.collection("usuarios").add({
+        login, pass, role,
+        empresaId: state.currentUser.empresaId
+      }).then(() => {
+        alert('Usuário criado!');
+        e.target.reset();
+      });
     }
 
     function salvarEmpresa(e) {
       e.preventDefault();
-      const dados = {
+      const empData = {
         nome: document.getElementById('emp-nome').value.trim(),
         cnpj: document.getElementById('emp-cnpj').value.trim(),
         tel: document.getElementById('emp-tel').value.trim(),
         end: document.getElementById('emp-end').value.trim(),
         social: document.getElementById('emp-social').value.trim(),
-        pix: document.getElementById('emp-pix').value.trim()
+        pix: document.getElementById('emp-pix').value.trim(),
       };
 
-      db.collection("config").doc(state.currentUser.empresaId).set(dados).then(() => {
-        alert('Dados da empresa atualizados na nuvem!');
-      }).catch(err => alert('Erro ao salvar empresa: ' + err.message));
+      db.collection("config").doc(state.currentUser.empresaId).set(empData)
+      .then(() => alert('Dados da empresa salvos!'))
+      .catch(err => alert('Erro: ' + err.message));
     }
 
-    // Inicializar no carregamento da página
     window.onload = initApp;
   </script>
 </body>
