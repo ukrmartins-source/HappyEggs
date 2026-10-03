@@ -242,7 +242,7 @@
           </div>
 
           <div class="carrinho-box">
-            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛍️️ ITENS SELECIONADOS:</div>
+            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛍 ITENS SELECIONADOS:</div>
             <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
             <div style="font-size: 1rem; font-weight: bold; text-align: right; margin-top: 10px; color: var(--accent);">Total: R$ <span id="ped-total-valor">0.00</span></div>
           </div>
@@ -840,6 +840,7 @@
       const totalPedido = carrinhoTemp.reduce((sum, item) => sum + item.subtotal, 0);
       const pedidoNum = Math.floor(1000 + Math.random() * 9000);
 
+      // Abate o estoque
       carrinhoTemp.forEach(item => {
         const prod = state.produtos.find(p => p.id === item.prodId);
         if (prod) {
@@ -862,15 +863,25 @@
         dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
       };
 
+      // Grava no Firestore
       db.collection("pedidos").add(p).then(docRef => {
+        p.id = docRef.id;
+        
         carrinhoTemp = [];
         renderCarrinho();
         document.getElementById('ped-busca-cliente').value = '';
         document.getElementById('ped-obs').value = '';
         document.getElementById('ped-dados-pagamento').value = '';
         
-        notificarTelegram({ ...p, id: pedidoNum });
+        // Abre o comprovante na tela imediatamente
         verNota(docRef.id);
+
+        // Notificação opcional via Telegram (executada em isolamento seguro)
+        try {
+          notificarTelegram(p);
+        } catch (errTelegram) {
+          console.warn("Aviso ao enviar notificação do Telegram:", errTelegram);
+        }
       }).catch(err => alert('Erro ao finalizar pedido: ' + err.message));
     }
 
@@ -948,10 +959,19 @@
     }
 
     function notificarTelegram(p) {
-      if (state.empresa.botToken && state.empresa.chatId) {
-        let resumoItens = p.itens.map(i => `• ${i.qtd}x ${i.nome}`).join('%0A');
-        const texto = `🚨 *NOVO PEDIDO #${p.id}*%0A%0A👤 *Cliente:* ${p.cliente}%0A📄 *Doc:* ${p.doc || 'Não informado'}%0A%0A📦 *Itens:*%0A${resumoItens}%0A%0A💰 *Total:* R$ ${p.total.toFixed(2)}%0A💳 *Pagamento:* ${p.formaPagamento}%0A📌 *Status:* ${p.status}`;
-        fetch(`https://api.telegram.org/bot${state.empresa.botToken}/sendMessage?chat_id=${state.empresa.chatId}&text=${texto}&parse_mode=Markdown`).catch(() => {});
+      if (state.empresa && state.empresa.botToken && state.empresa.chatId) {
+        let resumoItens = p.itens ? p.itens.map(i => `• ${i.qtd}x ${i.nome}`).join('\n') : '';
+        const texto = `🚨 *NOVO PEDIDO #${p.numPedido || p.id}*\n\n👤 *Cliente:* ${p.cliente}\n📄 *Doc:* ${p.doc || 'Não informado'}\n\n📦 *Itens:*\n${resumoItens}\n\n💰 *Total:* R$ ${p.total.toFixed(2)}\n💳 *Pagamento:* ${p.formaPagamento}\n📌 *Status:* ${p.status}`;
+        
+        fetch(`https://api.telegram.org/bot${state.empresa.botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: state.empresa.chatId,
+            text: texto,
+            parse_mode: 'Markdown'
+          })
+        }).catch(err => console.warn("Erro ao notificar Telegram:", err));
       }
     }
 
