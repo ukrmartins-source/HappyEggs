@@ -386,10 +386,6 @@
           <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
           <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @happyeggs | www.happyeggs.com"></div>
           <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
-          
-          <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border);">
-          <div class="form-group"><label>Token Bot Telegram (Notificações)</label><input type="text" id="emp-bot-token" placeholder="Opcional"></div>
-          <div class="form-group"><label>Chat ID Telegram</label><input type="text" id="emp-chat-id" placeholder="Opcional"></div>
           <button type="submit" class="btn" style="background:var(--success);">Salvar Dados da Empresa</button>
         </form>
       </div>
@@ -465,7 +461,7 @@
 
     let state = {
       usuarios: [],
-      empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "", botToken: "", chatId: "" },
+      empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "" },
       produtos: [],
       clientes: [],
       pedidos: [],
@@ -482,7 +478,6 @@
       db.collection("usuarios").onSnapshot(snapshot => {
         state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         if (state.usuarios.length === 0) {
-          // Usuário padrão inicial caso a base esteja limpa
           db.collection("usuarios").doc("admin").set({ 
             login: "admin", 
             pass: "1234", 
@@ -500,7 +495,6 @@
 
     // --- ESCUTADORES EM TEMPO REAL ISOLADOS POR EMPRESA ---
     function initListeners() {
-      // Limpa os escutadores anteriores se existirem
       state.listenersUnsubscribe.forEach(unsub => unsub());
       state.listenersUnsubscribe = [];
 
@@ -545,8 +539,6 @@
       document.getElementById('emp-end').value = state.empresa.end || '';
       document.getElementById('emp-social').value = state.empresa.social || '';
       document.getElementById('emp-pix').value = state.empresa.pix || '';
-      document.getElementById('emp-bot-token').value = state.empresa.botToken || '';
-      document.getElementById('emp-chat-id').value = state.empresa.chatId || '';
     }
 
     // --- AUTENTICAÇÃO COM VERIFICAÇÃO DE LICENÇA ---
@@ -559,7 +551,6 @@
       if (found) {
         const empresaId = found.empresaId || "empresa_demo";
         
-        // Validação da assinatura/licença da empresa
         const empDoc = await db.collection("empresas").doc(empresaId).get();
         if (empDoc.exists) {
           const empData = empDoc.data();
@@ -722,7 +713,7 @@
           nomeItem: prod.nome,
           qtd: qtd,
           empresaId: state.currentUser.empresaId,
-          dataHora: firebase.firestore.FieldValue.serverTimestamp()
+          dataHora: new Date()
         });
       }).then(() => {
         alert(`Entrada de ${qtd} un para "${prod.nome}" registrada com sucesso!`);
@@ -840,7 +831,7 @@
       const totalPedido = carrinhoTemp.reduce((sum, item) => sum + item.subtotal, 0);
       const pedidoNum = Math.floor(1000 + Math.random() * 9000);
 
-      // Abate o estoque
+      // Abate o estoque no Firestore
       carrinhoTemp.forEach(item => {
         const prod = state.produtos.find(p => p.id === item.prodId);
         if (prod) {
@@ -852,7 +843,10 @@
 
       const p = {
         numPedido: pedidoNum,
-        cliente: cli.nome, doc: cli.doc || '', tel: cli.tel, end: cli.end,
+        cliente: cli.nome, 
+        doc: cli.doc || '', 
+        tel: cli.tel, 
+        end: cli.end,
         itens: [...carrinhoTemp],
         total: totalPedido,
         formaPagamento: formaPag,
@@ -860,7 +854,7 @@
         status: status,
         obs: obs,
         empresaId: state.currentUser.empresaId,
-        dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
+        dataCriacao: new Date()
       };
 
       // Grava no Firestore
@@ -873,16 +867,57 @@
         document.getElementById('ped-obs').value = '';
         document.getElementById('ped-dados-pagamento').value = '';
         
-        // Abre o comprovante na tela imediatamente
-        verNota(docRef.id);
-
-        // Notificação opcional via Telegram (executada em isolamento seguro)
-        try {
-          notificarTelegram(p);
-        } catch (errTelegram) {
-          console.warn("Aviso ao enviar notificação do Telegram:", errTelegram);
-        }
+        // Exibe o comprovante diretamente usando os dados que já temos
+        exibirComprovanteDireto(p);
       }).catch(err => alert('Erro ao finalizar pedido: ' + err.message));
+    }
+
+    function exibirComprovanteDireto(p) {
+      state.pedidoAtual = p;
+
+      let statusTag = '[🔴 PAGAMENTO PENDENTE]';
+      if (p.status === 'Pago') statusTag = '[🟢 PAGAMENTO CONFIRMADO]';
+      if (p.status === 'Cancelado') statusTag = '[⚪ PEDIDO CANCELADO]';
+
+      let listaItensTxt = p.itens ? p.itens.map(i => `
+        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+          <span>${i.qtd}x ${i.nome}</span>
+          <span>R$ ${Number(i.subtotal).toFixed(2)}</span>
+        </div>
+      `).join('') : '';
+
+      let obsHtml = p.obs ? `<b>OBSERVAÇÕES:</b><br>${p.obs}<br>--------------------------------------------------<br>` : '';
+
+      document.getElementById('printable-receipt').innerHTML = `
+        <div style="text-align:center; margin-bottom:8px;">
+          <b style="font-size:1.1rem;">${(state.empresa.nome || 'HAPPY EGGS').toUpperCase()}</b><br>
+          CNPJ/CPF: ${state.empresa.cnpj || '-'}<br>
+          Tel/Whats: ${state.empresa.tel || ''}
+        </div>
+        --------------------------------------------------<br>
+        <b>COMPROVANTE DE PEDIDO #${p.numPedido || ''}</b><br>
+        <b>Cliente:</b> ${p.cliente}<br>
+        <b>Documento:</b> ${p.doc || 'Não Informado'}<br>
+        <b>Endereço:</b> ${p.end}<br>
+        --------------------------------------------------<br>
+        <b>ITENS DO PEDIDO:</b><br>
+        ${listaItensTxt}
+        --------------------------------------------------<br>
+        <div style="display:flex; justify-content:space-between; font-size:1rem;"><b>VALOR TOTAL:</b><b>R$ ${Number(p.total).toFixed(2)}</b></div>
+        <b>FORMA DE PGTO:</b> ${p.formaPagamento || 'Pix'}<br>
+        <b>DADOS PGTO:</b> ${p.dadosPagamento || state.empresa.pix || ''}<br>
+        <b>SITUAÇÃO:</b> ${statusTag}<br>
+        --------------------------------------------------<br>
+        ${obsHtml}
+        <div style="text-align:center; font-size: 0.75rem; margin-top: 10px;">
+          <b>${state.empresa.nome || 'HAPPY EGGS'}</b><br>
+          📍 ${state.empresa.end || ''}<br>
+          🌐 ${state.empresa.social || ''}<br>
+          Obrigado pela preferência!
+        </div>
+      `;
+      
+      document.getElementById('modal-nota').style.display = 'flex';
     }
 
     function cancelarPedido(id) {
@@ -920,9 +955,7 @@
         tel: document.getElementById('emp-tel').value.trim(),
         end: document.getElementById('emp-end').value.trim(),
         social: document.getElementById('emp-social').value.trim(),
-        pix: document.getElementById('emp-pix').value.trim(),
-        botToken: document.getElementById('emp-bot-token').value.trim(),
-        chatId: document.getElementById('emp-chat-id').value.trim()
+        pix: document.getElementById('emp-pix').value.trim()
       };
       db.collection("config").doc(state.currentUser.empresaId).set(empresaData)
         .then(() => alert('Dados da Empresa salvos na Nuvem!'))
@@ -955,23 +988,6 @@
             }
           })
           .catch(err => alert('Erro ao excluir: ' + err.message));
-      }
-    }
-
-    function notificarTelegram(p) {
-      if (state.empresa && state.empresa.botToken && state.empresa.chatId) {
-        let resumoItens = p.itens ? p.itens.map(i => `• ${i.qtd}x ${i.nome}`).join('\n') : '';
-        const texto = `🚨 *NOVO PEDIDO #${p.numPedido || p.id}*\n\n👤 *Cliente:* ${p.cliente}\n📄 *Doc:* ${p.doc || 'Não informado'}\n\n📦 *Itens:*\n${resumoItens}\n\n💰 *Total:* R$ ${p.total.toFixed(2)}\n💳 *Pagamento:* ${p.formaPagamento}\n📌 *Status:* ${p.status}`;
-        
-        fetch(`https://api.telegram.org/bot${state.empresa.botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: state.empresa.chatId,
-            text: texto,
-            parse_mode: 'Markdown'
-          })
-        }).catch(err => console.warn("Erro ao notificar Telegram:", err));
       }
     }
 
@@ -1090,50 +1106,7 @@
     function verNota(id) {
       const p = state.pedidos.find(i => i.id === id);
       if(!p) return;
-      state.pedidoAtual = p;
-
-      let statusTag = '[🔴 PAGAMENTO PENDENTE]';
-      if (p.status === 'Pago') statusTag = '[🟢 PAGAMENTO CONFIRMADO]';
-      if (p.status === 'Cancelado') statusTag = '[⚪ PEDIDO CANCELADO]';
-
-      let listaItensTxt = p.itens ? p.itens.map(i => `
-        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
-          <span>${i.qtd}x ${i.nome}</span>
-          <span>R$ ${Number(i.subtotal).toFixed(2)}</span>
-        </div>
-      `).join('') : '';
-
-      let obsHtml = p.obs ? `<b>OBSERVAÇÕES:</b><br>${p.obs}<br>--------------------------------------------------<br>` : '';
-
-      document.getElementById('printable-receipt').innerHTML = `
-        <div style="text-align:center; margin-bottom:8px;">
-          <b style="font-size:1.1rem;">${(state.empresa.nome || 'HAPPY EGGS').toUpperCase()}</b><br>
-          CNPJ/CPF: ${state.empresa.cnpj || '-'}<br>
-          Tel/Whats: ${state.empresa.tel || ''}
-        </div>
-        --------------------------------------------------<br>
-        <b>COMPROVANTE DE PEDIDO #${p.numPedido || ''}</b><br>
-        <b>Cliente:</b> ${p.cliente}<br>
-        <b>Documento:</b> ${p.doc || 'Não Informado'}<br>
-        <b>Endereço:</b> ${p.end}<br>
-        --------------------------------------------------<br>
-        <b>ITENS DO PEDIDO:</b><br>
-        ${listaItensTxt}
-        --------------------------------------------------<br>
-        <div style="display:flex; justify-content:space-between; font-size:1rem;"><b>VALOR TOTAL:</b><b>R$ ${Number(p.total).toFixed(2)}</b></div>
-        <b>FORMA DE PGTO:</b> ${p.formaPagamento || 'Pix'}<br>
-        <b>DADOS PGTO:</b> ${p.dadosPagamento || state.empresa.pix}<br>
-        <b>SITUAÇÃO:</b> ${statusTag}<br>
-        --------------------------------------------------<br>
-        ${obsHtml}
-        <div style="text-align:center; font-size: 0.75rem; margin-top: 10px;">
-          <b>${state.empresa.nome}</b><br>
-          📍 ${state.empresa.end}<br>
-          🌐 ${state.empresa.social}<br>
-          Obrigado pela preferência!
-        </div>
-      `;
-      document.getElementById('modal-nota').style.display = 'flex';
+      exibirComprovanteDireto(p);
     }
 
     function enviarWhats() {
