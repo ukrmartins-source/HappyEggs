@@ -1,120 +1,705 @@
-db.collection("usuarios").doc(docId).update({ pass: novaSenha.trim() })
-        .then(() => alert(`Senha do usuário ${login} atualizada com sucesso!`))
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <title>HappyEggs - </title>
+  
+  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="icon" href="logo.png">
+
+  <!-- SDKs DO FIREBASE -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --primary: #1e293b;
+      --primary-dark: #0f172a;
+      --accent: #2563eb;
+      --accent-light: #3b82f6;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 30px; }
+
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 14px 18px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.25);
+      border-bottom: 2px solid var(--accent);
+    }
+    .brand h1 { font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+    .user-info { font-size: 0.8rem; display: flex; align-items: center; gap: 10px; }
+    .btn-logout { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: 0.2s; }
+    .btn-logout:hover { background: var(--danger); border-color: var(--danger); }
+
+    main { max-width: 580px; margin: 20px auto; padding: 0 12px; }
+
+    .login-card {
+      background: white; padding: 30px 25px; border-radius: 14px; box-shadow: 0 10px 25px rgba(15,23,42,0.12);
+      max-width: 380px; margin: 50px auto; text-align: center; border: 1px solid var(--border);
+    }
+    .login-card h2 { color: var(--primary-dark); margin-bottom: 6px; font-size: 1.5rem; font-weight: 800; }
+
+    .grid-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
+    .grid-btn {
+      background: linear-gradient(145deg, #1e293b, #0f172a); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+      padding: 20px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(15,23,42,0.15); transition: all 0.2s ease;
+    }
+    .grid-btn:active { transform: scale(0.97); background: var(--primary-dark); }
+    .grid-btn .icon { font-size: 2rem; }
+    .grid-btn .label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+    .grid-btn.full-width { grid-column: span 2; background: linear-gradient(145deg, #2563eb, #1d4ed8); border-color: var(--accent-light); }
+
+    .card { background: white; border-radius: 12px; padding: 18px; border: 1px solid var(--border); margin-bottom: 15px; box-shadow: 0 2px 8px rgba(15,23,42,0.05); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+    .card-title { font-size: 1rem; font-weight: 700; color: var(--primary-dark); display: flex; align-items: center; gap: 6px; }
+    
+    .form-group { margin-bottom: 12px; text-align: left; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #f8fafc; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); outline: none; background: #fff; }
+
+    .btn { background: var(--accent); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.9rem; text-align: center; text-decoration: none; display: inline-block; transition: 0.2s; }
+    .btn:hover { background: var(--accent-light); }
+    .btn-back { background: #475569; padding: 6px 12px; width: auto; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px; }
+    .btn-danger { background: var(--danger); width: auto; padding: 5px 10px; font-size: 0.75rem; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .btn-warning { background: var(--warning); width: auto; padding: 5px 10px; font-size: 0.75rem; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+    .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; cursor: pointer; display: inline-block; }
+    .badge-pago { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .badge-pendente { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .badge-cancelado { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
+    th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
+
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.7); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
+    .modal-content { background: white; width: 92%; max-width: 480px; border-radius: 12px; padding: 22px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+    
+    .receipt-box { 
+      border: 1px dashed #000; 
+      padding: 16px; 
+      font-family: 'Courier New', monospace; 
+      font-size: 0.85rem; 
+      background: #fff; 
+      margin-bottom: 12px; 
+      color: #000;
+      text-align: left;
+      width: 100%;
+      word-wrap: break-word;
+    }
+
+    .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
+    .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
+
+    .stat-card { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
+    .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
+    .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
+
+    @media print {
+      body * { visibility: hidden; }
+      #modal-nota, #modal-nota * { visibility: visible; }
+      #printable-receipt, #printable-receipt * { visibility: visible; }
+      #printable-receipt { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100% !important; 
+        border: none; 
+        padding: 0;
+        margin: 0;
+        text-align: left !important;
+        font-size: 11pt;
+      }
+      .modal-content { box-shadow: none; padding: 0; width: 100%; max-width: 100%; }
+      .modal { position: absolute; left: 0; top: 0; background: none; }
+      .modal button { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header id="app-header" style="display:none;">
+    <div class="brand"><span id="header-title">🥚 HAPPY EGGS</span></div>
+    <div class="user-info">
+      <span id="user-display">👤 Admin</span>
+      <button class="btn-logout" type="button" onclick="logout()">Sair</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- TELA DE LOGIN -->
+    <div id="view-login" class="login-card">
+      <h2>HAPPY EGGS</h2>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
+      <form onsubmit="autenticar(event)">
+        <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
+        <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password"></div>
+        <button type="submit" class="btn" style="margin-top:10px;">Entrar no Sistema</button>
+      </form>
+    </div>
+
+    <!-- MENU PRINCIPAL (DASHBOARD) -->
+    <div id="view-dashboard" style="display:none;">
+      <div class="grid-menu">
+        <button class="grid-btn full-width" type="button" onclick="navTo('pedidos')">
+          <span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span>
+        </button>
+        <button class="grid-btn" type="button" onclick="navTo('clientes')"><span class="icon">👥</span><span class="label">CLIENTES</span></button>
+        <button class="grid-btn" type="button" onclick="navTo('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
+        <button class="grid-btn admin-only" type="button" onclick="navTo('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
+        <button class="grid-btn admin-only" type="button" onclick="navTo('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendasDia()">
+          <span class="icon">📊</span><span class="label">RESUMO DE VENDAS DO DIA</span>
+        </button>
+      </div>
+
+      <div class="card" style="margin-top: 15px;">
+        <div class="card-header">
+          <div class="card-title">📋 Busca Rápida de Clientes</div>
+          <button class="btn btn-back" type="button" onclick="navTo('clientes')">➕ Cadastrar</button>
+        </div>
+        <div class="form-group" style="margin-bottom: 10px;">
+          <input type="text" id="dash-busca-cliente" placeholder="🔎 Digite para buscar cliente..." oninput="filtrarClientesDashboard()">
+        </div>
+        <table>
+          <thead><tr><th>Nome / Doc</th><th>Contato</th></tr></thead>
+          <tbody id="lista-clientes-dash"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA: CLIENTES -->
+    <div id="view-clientes" class="view-content" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Cadastrar Cliente</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        <form onsubmit="cadastrarCliente(event)">
+          <div class="form-group"><label>Nome / Razão Social</label><input type="text" id="cli-nome" required></div>
+          <div class="form-group"><label>Documento (CPF / RG / CNPJ)</label><input type="text" id="cli-doc" placeholder="Ex: 000.000.000-00"></div>
+          <div class="form-group"><label>WhatsApp / Telefone</label><input type="tel" id="cli-tel" placeholder="Ex: 5511999998888" required></div>
+          <div class="form-group"><label>Endereço Completo</label><input type="text" id="cli-end" placeholder="Rua, Nº, Bairro, Cidade" required></div>
+          <button type="submit" class="btn">Salvar Cliente na Nuvem</button>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-title">Clientes Cadastrados</div>
+        <table>
+          <thead><tr><th>Nome / Doc</th><th>Contato</th><th>Ação</th></tr></thead>
+          <tbody id="lista-clientes"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA: PEDIDOS -->
+    <div id="view-pedidos" class="view-content" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Novo Pedido</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        
+        <form onsubmit="finalizarPedido(event)">
+          <div class="form-group">
+            <label>🔎 Buscar Cliente</label>
+            <input type="text" id="ped-busca-cliente" placeholder="Filtrar por nome, doc ou fone..." oninput="filtrarClientesDropdown()">
+          </div>
+          <div class="form-group">
+            <label>Selecione o Cliente</label>
+            <select id="ped-cliente" required></select>
+          </div>
+
+          <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+
+          <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border:1px solid #e2e8f0;">
+            <div class="form-group">
+              <label>Selecione o Produto</label>
+              <select id="ped-produto"></select>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: flex-end;">
+              <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>Quantidade</label>
+                <input type="number" id="ped-qtd" min="1" value="1">
+              </div>
+              <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">➕ Adicionar</button>
+            </div>
+          </div>
+
+          <div class="carrinho-box">
+            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛍 ITENS SELECIONADOS:</div>
+            <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
+            <div style="font-size: 1rem; font-weight: bold; text-align: right; margin-top: 10px; color: var(--accent);">Total: R$ <span id="ped-total-valor">0.00</span></div>
+          </div>
+
+          <div class="form-group">
+            <label>Forma de Pagamento</label>
+            <select id="ped-forma-pagamento" required>
+              <option value="Pix">📱 Pix</option>
+              <option value="Cartão de Crédito/Débito">💳 Cartão de Crédito / Débito</option>
+              <option value="Transferência Bancária">🏦 Transferência Bancária</option>
+              <option value="Dinheiro">💵 Dinheiro</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Dados do Pagamento (Opcional)</label>
+            <input type="text" id="ped-dados-pagamento" placeholder="Ex: Chave Pix ou Banco">
+          </div>
+
+          <div class="form-group">
+            <label>Status do Pagamento</label>
+            <select id="ped-status" required>
+              <option value="Pago">🟢 Pago</option>
+              <option value="Pendente">🔴 Pendente (A Pagar)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Observações do Pedido (Sairá na Nota)</label>
+            <textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Deixar com a portaria"></textarea>
+          </div>
+
+          <button type="submit" class="btn" style="background:var(--success);">Finalizar Pedido</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Histórico de Pedidos</div>
+        <table>
+          <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="lista-pedidos"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA: PRODUTOS / ESTOQUE & ENTRADA DE PRODUÇÃO -->
+    <div id="view-produtos" class="view-content" style="display:none;">
+      <div class="card" style="border-left: 4px solid var(--accent);">
+        <div class="card-header">
+          <div class="card-title">🥚 Registrar Entrada de Produção (Diário)</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        <form onsubmit="registrarEntradaProducao(event)">
+          <div class="form-group">
+            <label>Selecione o Produto para Entrada</label>
+            <select id="prod-ent-item" required></select>
+          </div>
+          <div class="form-group">
+            <label>Quantidade Coletada/Produzida</label>
+            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 50 ou 100" required>
+          </div>
+          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Coleta de Produção</button>
+        </form>
+
+        <div style="margin-top: 15px;">
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Produção de Hoje</div>
+          <table>
+            <thead><tr><th>Hora</th><th>Item</th><th>Qtd</th></tr></thead>
+            <tbody id="lista-producao-hoje"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title" id="form-prod-title">Cadastrar Novo Produto</div>
+        </div>
+        <form id="form-produto" onsubmit="salvarProduto(event)">
+          <input type="hidden" id="prod-id-edit" value="">
+          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: Ovos Dúzia / Cartela 30" required></div>
+          <div class="form-group"><label>Preço Unitário (R$)</label><input type="number" step="0.01" id="prod-preco" required></div>
+          <div class="form-group"><label>Estoque Inicial/Atual</label><input type="number" id="prod-qtd" required></div>
+          <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
+          <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Estoque Atual</div>
+        <table>
+          <thead><tr><th>Produto</th><th>Preço</th><th>Qtd</th><th>Ações</th></tr></thead>
+          <tbody id="lista-produtos"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA: GESTÃO DE USUÁRIOS -->
+    <div id="view-usuarios" class="view-content" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Adicionar Usuário</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        <form onsubmit="cadastrarUsuario(event)">
+          <div class="form-group"><label>Login / Nome</label><input type="text" id="usr-login" required autocomplete="username"></div>
+          <div class="form-group"><label>Senha de Acesso</label><input type="password" id="usr-pass" required autocomplete="new-password"></div>
+          <div class="form-group">
+            <label>Nível de Permissão</label>
+            <select id="usr-role">
+              <option value="vendedor">Vendedor (Apenas Vendas/Clientes)</option>
+              <option value="admin">Administrador (Acesso Total)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn">Cadastrar Usuário</button>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-title">Usuários do Sistema</div>
+        <table>
+          <thead><tr><th>Usuário</th><th>Permissão</th><th>Ação</th></tr></thead>
+          <tbody id="lista-usuarios"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA: EMPRESA & MINHA SENHA -->
+    <div id="view-empresa" class="view-content" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔒 Alterar Minha Senha</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+        </div>
+        <form onsubmit="alterarMinhaSenha(event)">
+          <div class="form-group"><label>Nova Senha</label><input type="password" id="minha-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
+          <button type="submit" class="btn" style="background:var(--warning);">Atualizar Minha Senha</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Dados da Empresa (Rodapé da Nota)</div>
+        <form onsubmit="salvarEmpresa(event)">
+          <div class="form-group"><label>Nome Fantasia</label><input type="text" id="emp-nome" required></div>
+          <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="emp-cnpj" required></div>
+          <div class="form-group"><label>Telefone / WhatsApp Comercial</label><input type="text" id="emp-tel" placeholder="Ex: (11) 99999-8888" required></div>
+          <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
+          <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @happyeggs | www.happyeggs.com"></div>
+          <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
+          <button type="submit" class="btn" style="background:var(--success);">Salvar Dados da Empresa</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
+  <div class="modal" id="modal-nota">
+    <div class="modal-content">
+      <div class="card-title" style="margin-bottom:10px;">Comprovante do Pedido</div>
+      <div class="receipt-box" id="printable-receipt"></div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarImpressaoOuPDF()">📄 Imprimir / PDF</button>
+        <button class="btn" type="button" style="background:#10b981;" onclick="enviarWhats()">💬 WhatsApp</button>
+      </div>
+      <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:8px;">Fechar Nota</button>
+    </div>
+  </div>
+
+  <!-- MODAL: RESUMO DE VENDAS DO DIA -->
+  <div class="modal" id="modal-resumo">
+    <div class="modal-content">
+      <div class="card-title" style="margin-bottom:12px;">📊 Resumo de Vendas Hoje</div>
+      <div id="resumo-data-hoje" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; font-weight:bold;"></div>
+
+      <div class="stat-card">
+        <div class="stat-title">Total Vendido Hoje</div>
+        <div class="stat-value" id="resumo-total-hoje">R$ 0,00</div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+        <div class="stat-card" style="margin:0;">
+          <div class="stat-title">Nº de Pedidos</div>
+          <div class="stat-value" id="resumo-qtd-pedidos">0</div>
+        </div>
+        <div class="stat-card" style="margin:0;">
+          <div class="stat-title">Ticket Médio</div>
+          <div class="stat-value" id="resumo-ticket-medio">R$ 0,00</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-title" style="margin-bottom:6px;">Recebimento por Forma de Pagamento</div>
+        <div id="resumo-detalhe-formas" style="font-size:0.85rem; line-height:1.4;"></div>
+      </div>
+
+      <div style="margin-top:15px;">
+        <div class="stat-title" style="margin-bottom:6px;">Vendas Realizadas Hoje</div>
+        <table>
+          <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="resumo-tabela-hoje"></tbody>
+        </table>
+      </div>
+
+      <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b; margin-top:15px;">Fechar Resumo</button>
+    </div>
+  </div>
+
+  <script>
+    // --- CONFIGURAÇÃO DO NOVO FIREBASE HAPPY EGGS ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAYmxniwbHyi4HmTH-aVlHo2zp-7pXY_lg",
+      authDomain: "happyeggs-534f2.firebaseapp.com",
+      projectId: "happyeggs-534f2",
+      storageBucket: "happyeggs-534f2.firebasestorage.app",
+      messagingSenderId: "682226137910",
+      appId: "1:682226137910:web:2aaca1393954e3be875197",
+      measurementId: "G-CEBF9P0K94"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let state = {
+      usuarios: [],
+      empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "" },
+      produtos: [],
+      clientes: [],
+      pedidos: [],
+      producao: [],
+      currentUser: null,
+      pedidoAtual: null,
+      listenersUnsubscribe: []
+    };
+
+    let carrinhoTemp = [];
+
+    function initApp() {
+      db.collection("usuarios").get().then(snapshot => {
+        state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (state.usuarios.length === 0) {
+          db.collection("usuarios").doc("admin").set({ 
+            login: "admin", 
+            pass: "1234", 
+            role: "admin",
+            empresaId: "empresa_demo"
+          });
+          db.collection("empresas").doc("empresa_demo").set({
+            nome: "Granja Demonstração",
+            status: "Ativo"
+          });
+        }
+      }).catch(err => console.error("Erro na inicialização:", err));
+    }
+
+    // --- ESCUTADORES EM TEMPO REAL ISOLADOS POR EMPRESA ---
+    function initListeners() {
+      state.listenersUnsubscribe.forEach(unsub => unsub());
+      state.listenersUnsubscribe = [];
+
+      if (!state.currentUser || !state.currentUser.empresaId) return;
+
+      const empresaId = state.currentUser.empresaId;
+
+      const unsubClientes = db.collection("clientes").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.clientes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        render();
+      }, err => console.error("Erro clientes:", err));
+
+      const unsubProdutos = db.collection("produtos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        render();
+      }, err => console.error("Erro produtos:", err));
+
+      const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.pedidos = snapshot.docs.map(doc => {
+          const dataDoc = doc.data();
+          let dataCriacaoParsed = new Date();
+          if (dataDoc.dataCriacao && dataDoc.dataCriacao.toDate) {
+            dataCriacaoParsed = dataDoc.dataCriacao.toDate();
+          } else if (dataDoc.dataCriacao) {
+            dataCriacaoParsed = new Date(dataDoc.dataCriacao);
+          }
+          return { id: doc.id, ...dataDoc, dataCriacao: dataCriacaoParsed };
+        }).sort((a, b) => b.dataCriacao - a.dataCriacao);
+
+        render();
+      }, err => console.error("Erro pedidos:", err));
+
+      const unsubProducao = db.collection("producao").where("empresaId", "==", empresaId).orderBy("dataHora", "desc").limit(50).onSnapshot(snapshot => {
+        state.producao = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderProducaoHoje();
+      }, err => console.error("Erro producao:", err));
+
+      const unsubEmpresa = db.collection("config").doc(empresaId).onSnapshot(doc => {
+        if (doc.exists) {
+          state.empresa = doc.data();
+          carregarEmpresaCampos();
+        }
+      });
+
+      const unsubUsuarios = db.collection("usuarios").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        render();
+      });
+
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios);
+    }
+
+    function carregarEmpresaCampos() {
+      if (!document.getElementById('emp-nome')) return;
+      document.getElementById('emp-nome').value = state.empresa.nome || '';
+      document.getElementById('emp-cnpj').value = state.empresa.cnpj || '';
+      document.getElementById('emp-tel').value = state.empresa.tel || '';
+      document.getElementById('emp-end').value = state.empresa.end || '';
+      document.getElementById('emp-social').value = state.empresa.social || '';
+      document.getElementById('emp-pix').value = state.empresa.pix || '';
+    }
+
+    // --- AUTENTICAÇÃO COM VERIFICAÇÃO DE LICENÇA ---
+    async function autenticar(e) {
+      e.preventDefault();
+      const u = document.getElementById('login-user').value.trim().toLowerCase();
+      const p = document.getElementById('login-pass').value.trim();
+      
+      try {
+        const snapshot = await db.collection("usuarios").where("login", "==", u).get();
+        if (snapshot.empty) {
+          alert('Usuário ou senha incorretos!');
+          return;
+        }
+
+        const userDoc = snapshot.docs[0];
+        const found = { id: userDoc.id, ...userDoc.data() };
+
+        if (found.pass !== p) {
+          alert('Usuário ou senha incorretos!');
+          return;
+        }
+
+        const empresaId = found.empresaId || "empresa_demo";
+        const empDoc = await db.collection("empresas").doc(empresaId).get();
+        if (empDoc.exists) {
+          const empData = empDoc.data();
+          if (empData.status !== "Ativo") {
+            alert("A conta da sua empresa está inativa ou pendente de pagamento. Entre em contato com o suporte.");
+            return;
+          }
+        }
+
+        state.currentUser = found;
+        document.getElementById('view-login').style.display = 'none';
+        document.getElementById('app-header').style.display = 'flex';
+        document.getElementById('user-display').innerText = `👤 ${found.login.toUpperCase()}`;
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
+        
+        initListeners();
+        navTo('dashboard');
+      } catch (err) {
+        alert('Erro ao realizar login: ' + err.message);
+      }
+    }
+
+    function logout() {
+      state.listenersUnsubscribe.forEach(unsub => unsub());
+      state.listenersUnsubscribe = [];
+      state.currentUser = null;
+      document.getElementById('app-header').style.display = 'none';
+      document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
+      document.getElementById('view-dashboard').style.display = 'none';
+      document.getElementById('view-login').style.display = 'block';
+      document.getElementById('login-pass').value = '';
+    }
+
+    function navTo(screen) {
+      document.getElementById('view-dashboard').style.display = 'none';
+      document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
+      if (screen === 'dashboard') document.getElementById('view-dashboard').style.display = 'block';
+      else document.getElementById(`view-${screen}`).style.display = 'block';
+    }
+
+    function alterarMinhaSenha(e) {
+      e.preventDefault();
+      const novaSenha = document.getElementById('minha-nova-senha').value.trim();
+      if (!novaSenha) return alert('Por favor, introduza uma nova senha.');
+
+      if (state.currentUser) {
+        const docId = state.currentUser.id || state.currentUser.login;
+        db.collection("usuarios").doc(docId).update({ pass: novaSenha })
+        .then(() => {
+          state.currentUser.pass = novaSenha;
+          alert('Sua senha foi alterada com sucesso!');
+          document.getElementById('minha-nova-senha').value = '';
+        }).catch(err => alert('Erro ao mudar a senha: ' + err.message));
+      }
+    }
+
+    function alterarSenhaUsuario(docId, login) {
+      const novaSenha = prompt(`Digite a nova senha para o usuário ${login.toUpperCase()}:`);
+      if (novaSenha && novaSenha.trim() !== "") {
+        db.collection("usuarios").doc(docId).update({ pass: novaSenha.trim() })
+        .then(() => alert(`Senha do usuário ${login} alterada com sucesso!`))
         .catch(err => alert('Erro ao alterar senha: ' + err.message));
       }
     }
 
-    function excluirUsuario(docId, login) {
-      if (login === state.currentUser.login) return alert("Você não pode excluir seu próprio usuário em uso!");
-      if (confirm(`Deseja realmente excluir o usuário "${login}"?`)) {
-        db.collection("usuarios").doc(docId).delete()
-        .then(() => alert("Usuário excluído com sucesso!"))
-        .catch(err => alert("Erro ao excluir usuário: " + err.message));
-      }
-    }
-
-    function cadastrarUsuario(e) {
-      e.preventDefault();
-      const login = document.getElementById('usr-login').value.trim().toLowerCase();
-      const pass = document.getElementById('usr-pass').value.trim();
-      const role = document.getElementById('usr-role').value;
-      const empresaId = state.currentUser.empresaId;
-
-      if (state.usuarios.some(u => u.login === login)) {
-        return alert('Este login já existe na sua empresa.');
-      }
-
-      db.collection("usuarios").add({ login, pass, role, empresaId })
-      .then(() => {
-        alert('Usuário cadastrado com sucesso!');
-        document.getElementById('usr-login').value = '';
-        document.getElementById('usr-pass').value = '';
-      }).catch(err => alert('Erro ao cadastrar usuário: ' + err.message));
-    }
-
-    // --- GESTÃO DE CLIENTES ---
     function cadastrarCliente(e) {
       e.preventDefault();
       const nome = document.getElementById('cli-nome').value.trim();
       const doc = document.getElementById('cli-doc').value.trim();
       const tel = document.getElementById('cli-tel').value.trim();
       const end = document.getElementById('cli-end').value.trim();
-      const empresaId = state.currentUser.empresaId;
 
-      db.collection("clientes").add({ nome, doc, tel, end, empresaId })
-      .then(() => {
-        alert('Cliente cadastrado com sucesso!');
-        document.getElementById('cli-nome').value = '';
-        document.getElementById('cli-doc').value = '';
-        document.getElementById('cli-tel').value = '';
-        document.getElementById('cli-end').value = '';
-      }).catch(err => alert('Erro ao cadastrar cliente: ' + err.message));
+      db.collection("clientes").add({
+        nome, doc, tel, end,
+        empresaId: state.currentUser.empresaId
+      }).then(() => {
+        alert("Cliente cadastrado com sucesso!");
+        e.target.reset();
+      }).catch(err => alert("Erro ao cadastrar cliente: " + err.message));
     }
 
-    function excluirCliente(docId, nome) {
-      if (confirm(`Deseja remover o cliente "${nome}"?`)) {
-        db.collection("clientes").doc(docId).delete();
+    function excluirCliente(id) {
+      if (confirm("Deseja realmente excluir este cliente?")) {
+        db.collection("clientes").doc(id).delete();
       }
     }
 
-    function filtrarClientesDashboard() {
-      const busca = document.getElementById('dash-busca-cliente').value.toLowerCase();
-      const tbody = document.getElementById('lista-clientes-dash');
-      const filtrados = state.clientes.filter(c => 
-        (c.nome && c.nome.toLowerCase().includes(busca)) || 
-        (c.doc && c.doc.toLowerCase().includes(busca)) ||
-        (c.tel && c.tel.includes(busca))
-      );
-
-      tbody.innerHTML = filtrados.slice(0, 5).map(c => `
-        <tr>
-          <td><b>${c.nome}</b><br><small style="color:var(--text-muted);">${c.doc || 'Sem Doc'}</small></td>
-          <td>${c.tel}<br><small style="color:var(--text-muted);">${c.end || ''}</small></td>
-        </tr>
-      `).join('') || '<tr><td colspan="2" style="text-align:center; color:#64748b;">Nenhum cliente encontrado.</td></tr>';
-    }
-
-    function filtrarClientesDropdown() {
-      const busca = document.getElementById('ped-busca-cliente').value.toLowerCase();
-      const select = document.getElementById('ped-cliente');
-      const filtrados = state.clientes.filter(c => 
-        (c.nome && c.nome.toLowerCase().includes(busca)) || 
-        (c.doc && c.doc.toLowerCase().includes(busca)) ||
-        (c.tel && c.tel.includes(busca))
-      );
-
-      select.innerHTML = filtrados.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
-    }
-
-    // --- GESTÃO DE PRODUTOS & ESTOQUE ---
     function salvarProduto(e) {
       e.preventDefault();
-      const idEdit = document.getElementById('prod-id-edit').value;
+      const id = document.getElementById('prod-id-edit').value;
       const nome = document.getElementById('prod-nome').value.trim();
       const preco = parseFloat(document.getElementById('prod-preco').value) || 0;
       const qtd = parseInt(document.getElementById('prod-qtd').value) || 0;
-      const empresaId = state.currentUser.empresaId;
 
-      if (idEdit) {
-        db.collection("produtos").doc(idEdit).update({ nome, preco, qtd })
-        .then(() => {
+      const payload = {
+        nome, preco, qtd,
+        empresaId: state.currentUser.empresaId
+      };
+
+      if (id) {
+        db.collection("produtos").doc(id).update(payload).then(() => {
           alert("Produto atualizado!");
           limparFormProduto();
         });
       } else {
-        db.collection("produtos").add({ nome, preco, qtd, empresaId })
-        .then(() => {
+        db.collection("produtos").add(payload).then(() => {
           alert("Produto cadastrado!");
           limparFormProduto();
         });
       }
     }
 
-    function editarProduto(p) {
-      document.getElementById('prod-id-edit').value = p.id;
-      document.getElementById('prod-nome').value = p.nome;
-      document.getElementById('prod-preco').value = p.preco;
-      document.getElementById('prod-qtd').value = p.qtd;
+    function editarProduto(id) {
+      const prod = state.produtos.find(p => p.id === id);
+      if (!prod) return;
+      document.getElementById('prod-id-edit').value = prod.id;
+      document.getElementById('prod-nome').value = prod.nome;
+      document.getElementById('prod-preco').value = prod.preco;
+      document.getElementById('prod-qtd').value = prod.qtd;
       document.getElementById('form-prod-title').innerText = "Editar Produto";
       document.getElementById('btn-salvar-prod').innerText = "Atualizar Produto";
       document.getElementById('btn-cancelar-edit').style.display = "block";
@@ -128,83 +713,60 @@ db.collection("usuarios").doc(docId).update({ pass: novaSenha.trim() })
       document.getElementById('btn-cancelar-edit').style.display = "none";
     }
 
-    function excluirProduto(docId, nome) {
-      if (confirm(`Deseja remover o produto "${nome}"?`)) {
-        db.collection("produtos").doc(docId).delete();
+    function excluirProduto(id) {
+      if (confirm("Deseja remover este produto?")) {
+        db.collection("produtos").doc(id).delete();
       }
     }
 
-    // --- REGISTRO DE PRODUÇÃO DIÁRIA ---
     function registrarEntradaProducao(e) {
       e.preventDefault();
       const prodId = document.getElementById('prod-ent-item').value;
-      const qtdEntrada = parseInt(document.getElementById('prod-ent-qtd').value) || 0;
-      const empresaId = state.currentUser.empresaId;
+      const qtd = parseInt(document.getElementById('prod-ent-qtd').value) || 0;
+      const prod = state.produtos.find(p => p.id === prodId);
 
-      if (!prodId || qtdEntrada <= 0) return alert("Selecione um produto e uma quantidade válida.");
+      if (!prod || qtd <= 0) return;
 
-      const produto = state.produtos.find(p => p.id === prodId);
-      if (!produto) return alert("Produto não encontrado.");
-
-      const novaQtd = (produto.qtd || 0) + qtdEntrada;
+      const novaQtd = (prod.qtd || 0) + qtd;
 
       db.collection("produtos").doc(prodId).update({ qtd: novaQtd }).then(() => {
         db.collection("producao").add({
           produtoId: prodId,
-          produtoNome: produto.nome,
-          qtd: qtdEntrada,
-          empresaId: empresaId,
-          dataHora: firebase.firestore.FieldValue.serverTimestamp()
+          produtoNome: prod.nome,
+          qtd,
+          dataHora: firebase.firestore.FieldValue.serverTimestamp(),
+          empresaId: state.currentUser.empresaId
         });
-        alert(`Lançamento efetuado! ${qtdEntrada} unidades adicionadas ao estoque.`);
-        document.getElementById('prod-ent-qtd').value = '';
-      }).catch(err => alert("Erro ao lançar produção: " + err.message));
+        alert("Entrada de produção registrada!");
+        document.getElementById('prod-ent-qtd').value = "";
+      });
     }
 
     function renderProducaoHoje() {
       const tbody = document.getElementById('lista-producao-hoje');
       if (!tbody) return;
-
-      const hojeStr = new Date().toDateString();
-      const producoesHoje = state.producao.filter(item => {
-        if (!item.dataHora) return false;
-        const d = item.dataHora.toDate ? item.dataHora.toDate() : new Date(item.dataHora);
-        return d.toDateString() === hojeStr;
-      });
-
-      tbody.innerHTML = producoesHoje.map(p => {
-        const d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date();
-        const horaStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        return `<tr><td>${horaStr}</td><td>${p.produtoNome}</td><td><b>+${p.qtd}</b></td></tr>`;
-      }).join('') || '<tr><td colspan="3" style="text-align:center; color:#64748b;">Nenhuma produção lançada hoje.</td></tr>';
+      tbody.innerHTML = state.producao.map(p => `
+        <tr>
+          <td>${p.dataHora && p.dataHora.toDate ? p.dataHora.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-'}</td>
+          <td>${p.produtoNome}</td>
+          <td><strong>+${p.qtd}</strong></td>
+        </tr>
+      `).join('');
     }
 
-    // --- CARRINHO E PEDIDOS ---
     function adicionarItemAoPedido() {
-      const prodSelect = document.getElementById('ped-produto');
-      const prodId = prodSelect.value;
+      const prodId = document.getElementById('ped-produto').value;
       const qtd = parseInt(document.getElementById('ped-qtd').value) || 1;
+      const prod = state.produtos.find(p => p.id === prodId);
 
-      if (!prodId) return alert("Selecione um produto.");
-      const produto = state.produtos.find(p => p.id === prodId);
-      if (!produto) return;
+      if (!prod) return alert("Selecione um produto.");
+      if (qtd > prod.qtd) return alert(`Estoque insuficiente! Disponível: ${prod.qtd}`);
 
-      if (qtd > produto.qtd) {
-        if (!confirm(`Estoque insuficiente (${produto.qtd} disponíveis). Deseja adicionar assim mesmo?`)) return;
-      }
-
-      const itemExistente = carrinhoTemp.find(i => i.id === prodId);
-      if (itemExistente) {
-        itemExistente.qtd += qtd;
-        itemExistente.subtotal = itemExistente.qtd * itemExistente.preco;
+      const existente = carrinhoTemp.find(i => i.id === prodId);
+      if (existente) {
+        existente.qtd += qtd;
       } else {
-        carrinhoTemp.push({
-          id: produto.id,
-          nome: produto.nome,
-          preco: produto.preco,
-          qtd: qtd,
-          subtotal: qtd * produto.preco
-        });
+        carrinhoTemp.push({ id: prod.id, nome: prod.nome, preco: prod.preco, qtd });
       }
 
       renderCarrinho();
@@ -216,142 +778,116 @@ db.collection("usuarios").doc(docId).update({ pass: novaSenha.trim() })
     }
 
     function renderCarrinho() {
-      const listaEl = document.getElementById('itens-pedido-lista');
-      const totalEl = document.getElementById('ped-total-valor');
-
+      const el = document.getElementById('itens-pedido-lista');
       if (carrinhoTemp.length === 0) {
-        listaEl.innerHTML = '<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>';
-        totalEl.innerText = "0.00";
+        el.innerHTML = '<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>';
+        document.getElementById('ped-total-valor').innerText = "0.00";
         return;
       }
 
       let total = 0;
-      listaEl.innerHTML = carrinhoTemp.map((item, idx) => {
-        total += item.subtotal;
+      el.innerHTML = carrinhoTemp.map((item, idx) => {
+        const sub = item.preco * item.qtd;
+        total += sub;
         return `
           <div class="carrinho-item">
+            <div><strong>${item.nome}</strong><br><small>${item.qtd}x R$ ${item.preco.toFixed(2)}</small></div>
             <div>
-              <b>${item.nome}</b><br>
-              <small>${item.qtd}x R$ ${item.preco.toFixed(2)} = R$ ${item.subtotal.toFixed(2)}</small>
+              <span style="font-weight:bold; margin-right:8px;">R$ ${sub.toFixed(2)}</span>
+              <button class="btn-danger" type="button" onclick="removerItemCarrinho(${idx})">✕</button>
             </div>
-            <button type="button" class="btn-danger" onclick="removerItemCarrinho(${idx})">✖</button>
           </div>
         `;
       }).join('');
 
-      totalEl.innerText = total.toFixed(2);
+      document.getElementById('ped-total-valor').innerText = total.toFixed(2);
     }
 
-    async function finalizarPedido(e) {
+    function finalizarPedido(e) {
       e.preventDefault();
-      if (carrinhoTemp.length === 0) return alert("Adicione pelo menos um produto ao pedido.");
+      const cliId = document.getElementById('ped-cliente').value;
+      const cliente = state.clientes.find(c => c.id === cliId);
 
-      const clienteId = document.getElementById('ped-cliente').value;
-      const cliente = state.clientes.find(c => c.id === clienteId);
-      if (!cliente) return alert("Selecione um cliente válido.");
+      if (!cliente) return alert("Selecione um cliente!");
+      if (carrinhoTemp.length === 0) return alert("Adicione pelo menos um item ao pedido!");
 
       const formaPagamento = document.getElementById('ped-forma-pagamento').value;
       const dadosPagamento = document.getElementById('ped-dados-pagamento').value.trim();
       const status = document.getElementById('ped-status').value;
       const obs = document.getElementById('ped-obs').value.trim();
-      const total = carrinhoTemp.reduce((acc, item) => acc + item.subtotal, 0);
-      const empresaId = state.currentUser.empresaId;
+      const total = carrinhoTemp.reduce((acc, i) => acc + (i.preco * i.qtd), 0);
 
       const novoPedido = {
         clienteId: cliente.id,
         clienteNome: cliente.nome,
         clienteTel: cliente.tel,
         clienteEnd: cliente.end,
-        itens: carrinhoTemp,
-        total: total,
-        formaPagamento: formaPagamento,
-        dadosPagamento: dadosPagamento,
-        status: status,
-        obs: obs,
-        empresaId: empresaId,
-        vendedor: state.currentUser.login,
-        dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
+        itens: [...carrinhoTemp],
+        total,
+        formaPagamento,
+        dadosPagamento,
+        status,
+        obs,
+        dataCriacao: firebase.firestore.FieldValue.serverTimestamp(),
+        empresaId: state.currentUser.empresaId
       };
 
-      try {
-        const docRef = await db.collection("pedidos").add(novoPedido);
-        
-        // Dar baixa no estoque
-        for (const item of carrinhoTemp) {
-          const prodRef = db.collection("produtos").doc(item.id);
-          const prodSnap = await prodRef.get();
-          if (prodSnap.exists) {
-            const qtdAtual = prodSnap.data().qtd || 0;
-            await prodRef.update({ qtd: Math.max(0, qtdAtual - item.qtd) });
+      db.collection("pedidos").add(novoPedido).then(docRef => {
+        // Atualizar Estoque
+        carrinhoTemp.forEach(item => {
+          const prod = state.produtos.find(p => p.id === item.id);
+          if (prod) {
+            db.collection("produtos").doc(item.id).update({
+              qtd: Math.max(0, prod.qtd - item.qtd)
+            });
           }
-        }
+        });
 
-        alert("Pedido efetuado com sucesso!");
+        alert("Pedido gerado com sucesso!");
         carrinhoTemp = [];
         renderCarrinho();
-        document.getElementById('ped-obs').value = '';
-        document.getElementById('ped-dados-pagamento').value = '';
-
-        // Abrir nota fiscal/comprovante
-        abrirComprovante({ id: docRef.id, ...novoPedido, dataCriacao: new Date() });
-      } catch (err) {
-        alert("Erro ao finalizar pedido: " + err.message);
-      }
+        e.target.reset();
+        exibirComprovante({ id: docRef.id, ...novoPedido, dataCriacao: new Date() });
+      }).catch(err => alert("Erro ao salvar pedido: " + err.message));
     }
 
-    function alternarStatusPedido(pedidoId, statusAtual) {
-      const novoStatus = statusAtual === 'Pago' ? 'Pendente' : 'Pago';
-      db.collection("pedidos").doc(pedidoId).update({ status: novoStatus });
-    }
-
-    function cancelarPedido(pedidoId) {
-      if (confirm("Deseja alterar o status deste pedido para CANCELADO?")) {
-        db.collection("pedidos").doc(pedidoId).update({ status: 'Cancelado' });
-      }
-    }
-
-    // --- COMPROVANTE & IMPRESSÃO ---
-    function abrirComprovante(pedido) {
+    function exibirComprovante(pedido) {
       state.pedidoAtual = pedido;
-      const dataFormatada = pedido.dataCriacao instanceof Date ? pedido.dataCriacao.toLocaleString() : new Date().toLocaleString();
       const emp = state.empresa;
+      const dataStr = pedido.dataCriacao ? new Date(pedido.dataCriacao).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR');
 
-      let itensHtml = (pedido.itens || []).map(i => 
-        `${i.qtd}x ${i.nome.padEnd(22, '.').slice(0, 22)} R$ ${i.subtotal.toFixed(2)}`
-      ).join('<br>');
-
-      const reciboText = `
-========================================
-           ${emp.nome || 'HAPPY EGGS'}
-========================================
-CNPJ/CPF: ${emp.cnpj || 'Não informado'}
-TEL: ${emp.tel || ''}
-${emp.end || ''}
-${emp.social || ''}
-----------------------------------------
-COMPROVANTE DE PEDIDO #${pedido.id ? pedido.id.slice(-6).toUpperCase() : 'NOVO'}
-DATA: ${dataFormatada}
-VENDEDOR: ${pedido.vendedor || 'Sistema'}
-----------------------------------------
-CLIENTE: ${pedido.clienteNome}
-FONE: ${pedido.clienteTel || '-'}
-END: ${pedido.clienteEnd || '-'}
-----------------------------------------
-ITENS DO PEDIDO:
-${itensHtml}
-----------------------------------------
-TOTAL: R$ ${(pedido.total || 0).toFixed(2)}
-FORMA DE PAGTO: ${pedido.formaPagamento}
-STATUS: ${pedido.status.toUpperCase()}
-${pedido.dadosPagamento ? 'DADOS PAGTO: ' + pedido.dadosPagamento : ''}
-${emp.pix ? 'CHAVE PIX: ' + emp.pix : ''}
-----------------------------------------
-${pedido.obs ? 'OBS: ' + pedido.obs + '\n----------------------------------------' : ''}
-    Agradecemos a sua preferência!
-========================================
+      let html = `
+        <div style="text-align:center; font-weight:bold; margin-bottom:8px;">
+          ${emp.nome || 'HAPPY EGGS'}<br>
+          <small>${emp.cnpj ? 'CNPJ: ' + emp.cnpj : ''}</small><br>
+          <small>${emp.end || ''}</small><br>
+          <small>${emp.tel ? 'Tel: ' + emp.tel : ''}</small>
+        </div>
+        ----------------------------------------<br>
+        <strong>COMPROVANTE DE PEDIDO #${pedido.id.substring(0, 6).toUpperCase()}</strong><br>
+        Data: ${dataStr}<br>
+        ----------------------------------------<br>
+        <strong>CLIENTE:</strong> ${pedido.clienteNome}<br>
+        <strong>END:</strong> ${pedido.clienteEnd || 'Não informado'}<br>
+        ----------------------------------------<br>
+        <strong>ITENS:</strong><br>
       `;
 
-      document.getElementById('printable-receipt').innerHTML = `<pre style="font-family: monospace; white-space: pre-wrap; margin:0;">${reciboText}</pre>`;
+      pedido.itens.forEach(i => {
+        html += `${i.qtd}x ${i.nome} - R$ ${(i.preco * i.qtd).toFixed(2)}<br>`;
+      });
+
+      html += `
+        ----------------------------------------<br>
+        <strong>TOTAL: R$ ${pedido.total.toFixed(2)}</strong><br>
+        <strong>PAGAMENTO:</strong> ${pedido.formaPagamento} (${pedido.status})<br>
+        ${pedido.obs ? '<strong>OBS:</strong> ' + pedido.obs + '<br>' : ''}
+        ----------------------------------------<br>
+        ${emp.pix ? '<small>PIX: ' + emp.pix + '</small><br>' : ''}
+        <div style="text-align:center; margin-top:10px;"><small>Obrigado pela preferência!</small></div>
+      `;
+
+      document.getElementById('printable-receipt').innerHTML = html;
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
@@ -362,73 +898,45 @@ ${pedido.obs ? 'OBS: ' + pedido.obs + '\n---------------------------------------
     function enviarWhats() {
       if (!state.pedidoAtual) return;
       const p = state.pedidoAtual;
-      const fone = p.clienteTel ? p.clienteTel.replace(/\D/g, '') : '';
-      const emp = state.empresa;
-
-      let texto = `*--- ${emp.nome || 'HAPPY EGGS'} ---*\n`;
-      texto += `Olá *${p.clienteNome}*, segue o resumo do seu pedido:\n\n`;
+      let msg = `*COMPROVANTE DE PEDIDO - ${state.empresa.nome || 'HAPPY EGGS'}*\n\n`;
+      msg += `*Cliente:* ${p.clienteNome}\n`;
+      msg += `*Total:* R$ ${p.total.toFixed(2)}\n`;
+      msg += `*Pagamento:* ${p.formaPagamento} (${p.status})\n\n`;
+      msg += `*Itens:*\n`;
       p.itens.forEach(i => {
-        texto += `• ${i.qtd}x ${i.nome} - R$ ${i.subtotal.toFixed(2)}\n`;
+        msg += `- ${i.qtd}x ${i.nome} (R$ ${(i.preco * i.qtd).toFixed(2)})\n`;
       });
-      texto += `\n*Total: R$ ${p.total.toFixed(2)}*`;
-      texto += `\nForma de Pagamento: ${p.formaPagamento}`;
-      texto += `\nStatus: ${p.status}`;
-      if (emp.pix) texto += `\n\n*Chave Pix:* ${emp.pix}`;
-      texto += `\n\nObrigado pela preferência! 🥚`;
+      if (p.obs) msg += `\n*Obs:* ${p.obs}`;
 
-      const url = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(texto)}`;
+      const telLimpo = (p.clienteTel || '').replace(/\D/g, '');
+      const url = `https://api.whatsapp.com/send?phone=${telLimpo}&text=${encodeURIComponent(msg)}`;
       window.open(url, '_blank');
     }
 
-    // --- RESUMO DE VENDAS DO DIA ---
-    function abrirResumoVendasDia() {
-      const hoje = new Date();
-      const hojeStr = hoje.toDateString();
-      document.getElementById('resumo-data-hoje').innerText = `Data: ${hoje.toLocaleDateString()}`;
+    function cadastrarUsuario(e) {
+      e.preventDefault();
+      const login = document.getElementById('usr-login').value.trim().toLowerCase();
+      const pass = document.getElementById('usr-pass').value.trim();
+      const role = document.getElementById('usr-role').value;
 
-      const pedidosHoje = state.pedidos.filter(p => {
-        const d = p.dataCriacao instanceof Date ? p.dataCriacao : new Date(p.dataCriacao);
-        return d.toDateString() === hojeStr && p.status !== 'Cancelado';
-      });
-
-      const totalVendido = pedidosHoje.reduce((acc, p) => acc + (p.total || 0), 0);
-      const qtdPedidos = pedidosHoje.length;
-      const ticketMedio = qtdPedidos > 0 ? totalVendido / qtdPedidos : 0;
-
-      const formasMap = {};
-      pedidosHoje.forEach(p => {
-        const forma = p.formaPagamento || 'Outros';
-        formasMap[forma] = (formasMap[forma] || 0) + p.total;
-      });
-
-      document.getElementById('resumo-total-hoje').innerText = `R$ ${totalVendido.toFixed(2)}`;
-      document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
-      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
-
-      let detalheFormas = '';
-      for (const [forma, valor] of Object.entries(formasMap)) {
-        detalheFormas += `<div>• <b>${forma}:</b> R$ ${valor.toFixed(2)}</div>`;
-      }
-      document.getElementById('resumo-detalhe-formas').innerHTML = detalheFormas || '<div style="color:#64748b;">Nenhuma venda hoje.</div>';
-
-      const tbody = document.getElementById('resumo-tabela-hoje');
-      tbody.innerHTML = pedidosHoje.map(p => `
-        <tr>
-          <td>#${p.id.slice(-4).toUpperCase()}</td>
-          <td>${p.clienteNome}</td>
-          <td>R$ ${(p.total || 0).toFixed(2)}</td>
-          <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
-        </tr>
-      `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhuma venda realizada hoje.</td></tr>';
-
-      document.getElementById('modal-resumo').style.display = 'flex';
+      db.collection("usuarios").add({
+        login, pass, role,
+        empresaId: state.currentUser.empresaId
+      }).then(() => {
+        alert("Usuário adicionado!");
+        e.target.reset();
+      }).catch(err => alert("Erro ao criar usuário: " + err.message));
     }
 
-    // --- CONFIGURAÇÕES DA EMPRESA ---
+    function excluirUsuario(id) {
+      if (confirm("Deseja remover este usuário?")) {
+        db.collection("usuarios").doc(id).delete();
+      }
+    }
+
     function salvarEmpresa(e) {
       e.preventDefault();
-      const empresaId = state.currentUser.empresaId;
-      const configData = {
+      const empData = {
         nome: document.getElementById('emp-nome').value.trim(),
         cnpj: document.getElementById('emp-cnpj').value.trim(),
         tel: document.getElementById('emp-tel').value.trim(),
@@ -437,98 +945,137 @@ ${pedido.obs ? 'OBS: ' + pedido.obs + '\n---------------------------------------
         pix: document.getElementById('emp-pix').value.trim()
       };
 
-      db.collection("config").doc(empresaId).set(configData)
-      .then(() => alert("Dados da empresa salvos com sucesso!"))
-      .catch(err => alert("Erro ao salvar dados: " + err.message));
+      db.collection("config").doc(state.currentUser.empresaId).set(empData).then(() => {
+        alert("Dados da empresa salvos com sucesso!");
+      }).catch(err => alert("Erro ao salvar dados da empresa: " + err.message));
     }
 
-    // --- RENDERIZAÇÃO GERAL DA INTERFACE ---
+    function abrirResumoVendasDia() {
+      const hojeStr = new Date().toDateString();
+      const pedidosHoje = state.pedidos.filter(p => new Date(p.dataCriacao).toDateString() === hojeStr);
+
+      const totalVendido = pedidosHoje.reduce((acc, p) => acc + p.total, 0);
+      const qtdPedidos = pedidosHoje.length;
+      const ticketMedio = qtdPedidos > 0 ? (totalVendido / qtdPedidos) : 0;
+
+      document.getElementById('resumo-data-hoje').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('resumo-total-hoje').innerText = `R$ ${totalVendido.toFixed(2)}`;
+      document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
+      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
+
+      const formas = {};
+      pedidosHoje.forEach(p => {
+        formas[p.formaPagamento] = (formas[p.formaPagamento] || 0) + p.total;
+      });
+
+      let detalheHtml = '';
+      for (const [forma, valor] of Object.entries(formas)) {
+        detalheHtml += `<div><strong>${forma}:</strong> R$ ${valor.toFixed(2)}</div>`;
+      }
+      document.getElementById('resumo-detalhe-formas').innerHTML = detalheHtml || 'Nenhuma venda hoje.';
+
+      document.getElementById('resumo-tabela-hoje').innerHTML = pedidosHoje.map(p => `
+        <tr>
+          <td>#${p.id.substring(0,4)}</td>
+          <td>${p.clienteNome}</td>
+          <td>R$ ${p.total.toFixed(2)}</td>
+          <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
+        </tr>
+      `).join('');
+
+      document.getElementById('modal-resumo').style.display = 'flex';
+    }
+
+    function filtrarClientesDashboard() {
+      const term = document.getElementById('dash-busca-cliente').value.toLowerCase();
+      const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(term) || (c.doc && c.doc.includes(term)));
+      renderClientesList(filtrados, 'lista-clientes-dash');
+    }
+
+    function filtrarClientesDropdown() {
+      const term = document.getElementById('ped-busca-cliente').value.toLowerCase();
+      const select = document.getElementById('ped-cliente');
+      const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(term) || (c.doc && c.doc.includes(term)) || (c.tel && c.tel.includes(term)));
+
+      select.innerHTML = filtrados.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
+    }
+
+    function renderClientesList(lista, targetId) {
+      const tbody = document.getElementById(targetId);
+      if (!tbody) return;
+      tbody.innerHTML = lista.map(c => `
+        <tr>
+          <td><strong>${c.nome}</strong><br><small>${c.doc || 'Sem Doc'}</small></td>
+          <td>${c.tel}<br><small>${c.end}</small></td>
+          ${targetId === 'lista-clientes' ? `<td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">Excluir</button></td>` : ''}
+        </tr>
+      `).join('');
+    }
+
     function render() {
       // Render Clientes
-      filtrarClientesDashboard();
+      renderClientesList(state.clientes, 'lista-clientes');
+      renderClientesList(state.clientes, 'lista-clientes-dash');
+
+      // Dropdown Clientes Pedidos
       filtrarClientesDropdown();
 
-      const listClientes = document.getElementById('lista-clientes');
-      if (listClientes) {
-        listClientes.innerHTML = state.clientes.map(c => `
-          <tr>
-            <td><b>${c.nome}</b><br><small style="color:var(--text-muted);">${c.doc || 'Sem Doc'}</small></td>
-            <td>${c.tel}<br><small style="color:var(--text-muted);">${c.end || ''}</small></td>
-            <td><button type="button" class="btn-danger" onclick="excluirCliente('${c.id}', '${c.nome}')">🗑</button></td>
-          </tr>
-        `).join('') || '<tr><td colspan="3" style="text-align:center; color:#64748b;">Nenhum cliente cadastrado.</td></tr>';
-      }
-
       // Render Produtos
-      const pedProdSelect = document.getElementById('ped-produto');
-      const prodEntSelect = document.getElementById('prod-ent-item');
-      if (pedProdSelect) {
-        pedProdSelect.innerHTML = state.produtos.map(p => 
-          `<option value="${p.id}">${p.nome} - R$ ${p.preco.toFixed(2)} (Estoque: ${p.qtd})</option>`
-        ).join('');
-      }
-      if (prodEntSelect) {
-        prodEntSelect.innerHTML = state.produtos.map(p => 
-          `<option value="${p.id}">${p.nome} (Atual: ${p.qtd})</option>`
-        ).join('');
-      }
+      const prodSelects = ['ped-produto', 'prod-ent-item'];
+      prodSelects.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${p.preco.toFixed(2)} (Estoque: ${p.qtd})</option>`).join('');
+      });
 
-      const listProds = document.getElementById('lista-produtos');
-      if (listProds) {
-        listProds.innerHTML = state.produtos.map(p => `
+      const tbodyProd = document.getElementById('lista-produtos');
+      if (tbodyProd) {
+        tbodyProd.innerHTML = state.produtos.map(p => `
           <tr>
-            <td><b>${p.nome}</b></td>
+            <td><strong>${p.nome}</strong></td>
             <td>R$ ${p.preco.toFixed(2)}</td>
-            <td><b>${p.qtd}</b></td>
+            <td>${p.qtd}</td>
             <td>
-              <button type="button" class="btn-warning" onclick='editarProduto(${JSON.stringify(p)})'>✏️</button>
-              <button type="button" class="btn-danger" onclick="excluirProduto('${p.id}', '${p.nome}')">🗑</button>
+              <button class="btn-warning" type="button" onclick="editarProduto('${p.id}')">Editar</button>
+              <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">Excluir</button>
             </td>
           </tr>
-        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum produto em estoque.</td></tr>';
+        `).join('');
       }
 
       // Render Pedidos
-      const listPedidos = document.getElementById('lista-pedidos');
-      if (listPedidos) {
-        listPedidos.innerHTML = state.pedidos.map(p => {
-          const isCancelado = p.status === 'Cancelado';
-          const badgeClass = isCancelado ? 'badge-cancelado' : (p.status === 'Pago' ? 'badge-pago' : 'badge-pendente');
-          return `
-            <tr>
-              <td>#${p.id.slice(-4).toUpperCase()}</td>
-              <td><b>${p.clienteNome}</b></td>
-              <td>R$ ${(p.total || 0).toFixed(2)}</td>
-              <td>
-                <span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">${p.status}</span>
-              </td>
-              <td>
-                <button type="button" class="btn" style="padding:4px 8px; width:auto; font-size:0.75rem;" onclick='abrirComprovante(${JSON.stringify(p)})'>📄</button>
-                ${!isCancelado ? `<button type="button" class="btn-danger" style="margin-top:2px;" onclick="cancelarPedido('${p.id}')">🚫</button>` : ''}
-              </td>
-            </tr>
-          `;
-        }).join('') || '<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhum pedido cadastrado.</td></tr>';
+      const tbodyPed = document.getElementById('lista-pedidos');
+      if (tbodyPed) {
+        tbodyPed.innerHTML = state.pedidos.map(p => `
+          <tr>
+            <td>#${p.id.substring(0, 4)}</td>
+            <td>${p.clienteNome}</td>
+            <td>R$ ${p.total.toFixed(2)}</td>
+            <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
+            <td>
+              <button class="btn" style="padding: 4px 8px; font-size:0.75rem; width:auto;" type="button" onclick='exibirComprovante(${JSON.stringify(p)})'>Nota</button>
+            </td>
+          </tr>
+        `).join('');
       }
 
-      // Render Usuarios
-      const listUsrs = document.getElementById('lista-usuarios');
-      if (listUsrs) {
-        listUsrs.innerHTML = state.usuarios.map(u => `
+      // Render Usuários
+      const tbodyUsr = document.getElementById('lista-usuarios');
+      if (tbodyUsr) {
+        tbodyUsr.innerHTML = state.usuarios.map(u => `
           <tr>
-            <td><b>${u.login}</b></td>
-            <td>${u.role === 'admin' ? 'Administrador' : 'Vendedor'}</td>
+            <td><strong>${u.login}</strong></td>
+            <td>${u.role}</td>
             <td>
-              <button type="button" class="btn-warning" onclick="alterarSenhaUsuario('${u.id}', '${u.login}')">🔑</button>
-              <button type="button" class="btn-danger" onclick="excluirUsuario('${u.id}', '${u.login}')">🗑</button>
+              <button class="btn-warning" type="button" onclick="alterarSenhaUsuario('${u.id}', '${u.login}')">Senha</button>
+              ${u.login !== 'admin' ? `<button class="btn-danger" type="button" onclick="excluirUsuario('${u.id}')">Excluir</button>` : ''}
             </td>
           </tr>
         `).join('');
       }
     }
 
-    // Inicializa app ao carregar
-    window.onload = initApp;
+    // Inicialização da aplicação
+    initApp();
   </script>
 </body>
 </html>
