@@ -120,37 +120,46 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
-    /* CORREÇÃO PARA A IMPRESSÃO */
+    /* CORREÇÃO DEFINITIVA DE IMPRESSÃO - IMPRIME APENAS O RECIBO PERFEITO */
     @media print {
-      body * { visibility: hidden; }
-      #printable-receipt, #printable-receipt * { visibility: visible; }
-      #printable-receipt { 
-        position: absolute; 
-        left: 0; 
-        top: 0; 
-        width: 80mm !important; 
-        border: none !important; 
+      body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      header, main, .no-print, .modal-content > *:not(#printable-receipt) {
+        display: none !important;
+      }
+      .modal {
+        position: static !important;
+        display: block !important;
+        background: none !important;
+      }
+      .modal-content {
+        box-shadow: none !important;
+        border: none !important;
         padding: 0 !important;
         margin: 0 !important;
-        font-size: 10pt;
-      }
-      .modal, .modal-content { 
-        position: absolute; 
-        left: 0; 
-        top: 0; 
-        background: none !important; 
-        box-shadow: none !important;
-        padding: 0 !important;
         width: 100% !important;
+        max-width: 100% !important;
       }
-      .no-print { display: none !important; }
+      #printable-receipt {
+        display: block !important;
+        visibility: visible !important;
+        position: relative !important;
+        width: 100% !important;
+        max-width: 380px !important;
+        margin: 0 auto !important;
+        border: 1.5px dashed #000000 !important;
+        page-break-inside: avoid;
+      }
     }
   </style>
 </head>
 <body>
 
   <!-- CABEÇALHO -->
-  <header id="app-header" style="display:none;">
+  <header id="app-header" style="display:none;" class="no-print">
     <div class="brand"><span id="header-title">🥚 HAPPY EGGS</span></div>
     <div class="user-info">
       <span id="user-display">👤 Admin</span>
@@ -158,7 +167,7 @@
     </div>
   </header>
 
-  <main>
+  <main class="no-print">
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
@@ -738,7 +747,7 @@
           <td>${p.ovosUnid} ovos</td>
           <td>
             <button class="btn-warning" onclick="editarProduto('${p.id}')">✏️</button>
-            <button class="btn-danger" onclick="excluirProduto('${p.id}')">🗑️️</button>
+            <button class="btn-danger" onclick="excluirProduto('${p.id}')">🗑</button>
           </td>
         </tr>
       `).join('');
@@ -963,7 +972,6 @@
         return;
       }
 
-      // Calcula a numeração sequencial sem reordenar histórico anterior
       const maiorNum = state.pedidos.reduce((max, p) => Math.max(max, p.numeroPedido || 0), 0);
       const proximoNumero = maiorNum + 1;
 
@@ -991,7 +999,6 @@
       try {
         const docRef = await db.collection("pedidos").add(novoPedido);
 
-        // Atualização do Estoque Geral no Firestore
         const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
         await db.runTransaction(async (transaction) => {
           const sfDoc = await transaction.get(refEstoque);
@@ -1002,7 +1009,6 @@
 
         alert(`Pedido #${proximoNumero} gerado com sucesso!`);
         
-        // Atribui o id recém gerado e abre nota imediatamente
         novoPedido.id = docRef.id;
 
         carrinhoTemp = [];
@@ -1021,7 +1027,6 @@
       await db.collection("pedidos").doc(id).update({ status: novoStatus });
     }
 
-    // EXCLUSÃO DE PEDIDO PRESERVANDO NUMERAÇÃO
     async function excluirPedido(id, numero) {
       if (!confirm(`Tem certeza que deseja excluir o Pedido #${numero || ''}?\nEsta ação não alterará a numeração dos outros pedidos.`)) {
         return;
@@ -1149,7 +1154,6 @@
       const isPago = ped.status === 'Pago';
       const statusSymbol = isPago ? '🟢' : '🔴';
 
-      // Tratamento e validação de todos os dados do comprovante
       const numPedido = ped.numeroPedido || '---';
       const clienteNome = ped.clienteNome || 'Cliente não informado';
       const clienteDoc = ped.clienteDoc || 'N/I';
@@ -1212,24 +1216,39 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
+    // IMPRESSÃO CORRIGIDA DEDICADA
     function imprimirNota() {
       window.print();
     }
 
+    // GERAÇÃO DE PDF FORMATADA EM A4
     function salvarNotaPDF() {
-      const el = document.getElementById('printable-receipt');
+      const receiptElement = document.getElementById('printable-receipt');
       const ped = state.pedidoAtual || {};
       const num = ped.numeroPedido || 'comprovante';
+
+      // Cria container temporário para formatar a página A4 perfeitamente sem afetar a modal
+      const tempWrapper = document.createElement('div');
+      tempWrapper.style.padding = '20px';
+      tempWrapper.style.fontFamily = 'Arial, sans-serif';
       
+      const clone = receiptElement.cloneNode(true);
+      clone.style.border = '1px dashed #000';
+      clone.style.padding = '20px';
+      clone.style.maxWidth = '450px';
+      clone.style.margin = '0 auto';
+      
+      tempWrapper.appendChild(clone);
+
       const opt = {
-        margin:       [5, 5, 5, 5],
+        margin:       10,
         filename:     `Pedido_${num}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'mm', format: [80, 200], orientation: 'portrait' }
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      html2pdf().set(opt).from(el).save();
+      html2pdf().set(opt).from(tempWrapper).save();
     }
 
     function enviarWhats() {
@@ -1284,7 +1303,7 @@
       document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
 
       const htmlFormas = Object.keys(porForma).map(f => `
-        <div style="display:flex; justify-space-between; margin-bottom:2px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
           <span>${f}:</span>
           <strong>R$ ${porForma[f].toFixed(2)}</strong>
         </div>
