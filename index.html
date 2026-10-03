@@ -280,9 +280,9 @@
       </div>
 
       <div class="card">
-        <div class="card-title">Histórico de Pedidos</div>
+        <div class="card-title">Histórico de Pedidos Sequencial</div>
         <table>
-          <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th></tr></thead>
+          <thead><tr><th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody id="lista-pedidos"></tbody>
         </table>
       </div>
@@ -296,7 +296,6 @@
           <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
         </div>
         <form onsubmit="registrarEntradaProducao(event)">
-          <!-- REMOVIDO: Opção de selecionar produto -->
           <div class="form-group">
             <label>Quantidade Coletada/Produzida (Unidades de Ovos)</label>
             <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 1000 ovos/dia" required>
@@ -436,7 +435,7 @@
       <div style="margin-top:15px;">
         <div class="stat-title" style="margin-bottom:6px;">Vendas Realizadas Hoje</div>
         <table>
-          <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
+          <thead><tr><th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
           <tbody id="resumo-tabela-hoje"></tbody>
         </table>
       </div>
@@ -474,7 +473,6 @@
 
     let carrinhoTemp = [];
 
-    // Função utilitária para obter a quantidade de ovos por embalagem
     function calcularOvosPorEmbalagem(nomeProduto) {
       if (!nomeProduto) return 1;
       const str = nomeProduto.toLowerCase();
@@ -483,13 +481,12 @@
       if (str.includes("cartela 30") || str.includes("cartela de 30") || str.includes("30 ovos")) return 30;
       if (str.includes("dúzia") || str.includes("duzia") || str.includes("12 ovos")) return 12;
       
-      // Procura por números no texto da embalagem (ex: Cartela 20 -> 20)
       const match = str.match(/\d+/);
       if (match) {
         const val = parseInt(match[0], 10);
         if (val > 0) return val;
       }
-      return 1; // Padrão individual
+      return 1;
     }
 
     function initApp() {
@@ -539,7 +536,7 @@
             dataCriacaoParsed = new Date(dataDoc.dataCriacao);
           }
           return { id: doc.id, ...dataDoc, dataCriacao: dataCriacaoParsed };
-        }).sort((a, b) => b.dataCriacao - a.dataCriacao);
+        }).sort((a, b) => (a.numeroPedido || 0) - (b.numeroPedido || 0));
 
         render();
       }, err => console.error("Erro pedidos:", err));
@@ -574,7 +571,6 @@
       document.getElementById('emp-pix').value = state.empresa.pix || '';
     }
 
-    // --- AUTENTICAÇÃO COM VERIFICAÇÃO DE LICENÇA ---
     async function autenticar(e) {
       e.preventDefault();
       const u = document.getElementById('login-user').value.trim().toLowerCase();
@@ -669,7 +665,6 @@
 
       if (!quantidade || quantidade <= 0) return alert('Informe uma quantidade válida!');
 
-      // Se não houver produtos cadastrados, cria o produto padrão de estoque
       if (state.produtos.length === 0) {
         const novoProd = {
           nome: "Ovos (Unidade / Estoque Geral)",
@@ -685,8 +680,6 @@
         return;
       }
 
-      // Adiciona a quantidade de ovos coletados ao estoque
-      // Creditamos ao primeiro produto cadastrado ou a todos que forem tipo base
       const prodTarget = state.produtos[0];
       const novaQtd = (prodTarget.qtd || 0) + quantidade;
 
@@ -734,7 +727,7 @@
       }).join('');
     }
 
-    // --- CADASTRO E EDIÇÃO DE PRODUTOS/EMBALAGENS ---
+    // --- CADASTRO E EDIÇÃO DE PRODUTOS ---
     function salvarProduto(e) {
       e.preventDefault();
       const id = document.getElementById('prod-id-edit').value;
@@ -791,7 +784,7 @@
       }
     }
 
-    // --- CARRINHO DE PEDIDO E BAIXA DE ESTOQUE PROPORCIONAL ---
+    // --- CARRINHO E CRIAÇÃO SEQUENCIAL DE PEDIDOS ---
     function adicionarItemAoPedido() {
       const sel = document.getElementById('ped-produto');
       const prodId = sel.value;
@@ -805,7 +798,6 @@
       const ovosPorEmb = calcularOvosPorEmbalagem(prod.nome);
       const totalOvosNecessarios = qtdVendida * ovosPorEmb;
 
-      // Verifica se há estoque em unidades de ovos
       if ((prod.qtd || 0) < totalOvosNecessarios) {
         alert(`Estoque insuficiente! Saldo atual: ${prod.qtd || 0} ovos. Necessário para este pedido: ${totalOvosNecessarios} ovos.`);
         return;
@@ -872,7 +864,13 @@
       let totalValor = 0;
       carrinhoTemp.forEach(i => totalValor += i.subtotal);
 
+      // Calcula o próximo número sequencial de pedido para esta empresa
+      const proximoNumero = state.pedidos.length > 0 
+        ? Math.max(...state.pedidos.map(p => p.numeroPedido || 0)) + 1 
+        : 1;
+
       const novoPedido = {
+        numeroPedido: proximoNumero,
         clienteId: cliente.id,
         clienteNome: cliente.nome,
         clienteTel: cliente.tel || '',
@@ -887,7 +885,6 @@
         empresaId: state.currentUser.empresaId
       };
 
-      // Baixa no estoque produto a produto
       const batch = db.batch();
 
       carrinhoTemp.forEach(item => {
@@ -904,15 +901,54 @@
       batch.set(pedidoRef, novoPedido);
 
       batch.commit().then(() => {
-        alert('Pedido finalizado com sucesso e estoque atualizado!');
+        alert(`Pedido Nº ${proximoNumero} finalizado com sucesso!`);
         carrinhoTemp = [];
         renderCarrinho();
         document.getElementById('ped-obs').value = '';
         document.getElementById('ped-dados-pagamento').value = '';
         
-        // Exibe comprovante
         abrirComprovante({ id: pedidoRef.id, ...novoPedido, dataCriacao: new Date() });
       }).catch(err => alert('Erro ao finalizar pedido: ' + err.message));
+    }
+
+    // --- REORGANIZAÇÃO SEQUENCIAL AO EXCLUIR / CANCELAR PEDIDO ---
+    async function cancelarEExcluirPedido(pedidoId, numeroPedidoExcluido) {
+      if (!confirm(`Tem certeza que deseja CANCELAR/EXCLUIR o Pedido Nº ${numeroPedidoExcluido}?\n\nIsto irá estornar o estoque e reordenar a sequência de todos os pedidos subsequentes.`)) {
+        return;
+      }
+
+      try {
+        const pedido = state.pedidos.find(p => p.id === pedidoId);
+        const batch = db.batch();
+
+        // 1. Devolve a quantidade de ovos vendida de volta ao Estoque (Estorno)
+        if (pedido && pedido.itens) {
+          pedido.itens.forEach(item => {
+            const prodRef = db.collection("produtos").doc(item.produtoId);
+            const prodAtual = state.produtos.find(p => p.id === item.produtoId);
+            if (prodAtual) {
+              const devolucaoOvos = item.quantidade * item.ovosPorEmbalagem;
+              batch.update(prodRef, { qtd: (prodAtual.qtd || 0) + devolucaoOvos });
+            }
+          });
+        }
+
+        // 2. Apaga o pedido selecionado do banco
+        const pedRef = db.collection("pedidos").doc(pedidoId);
+        batch.delete(pedRef);
+
+        // 3. Reorganiza todos os pedidos subsequentes (Reduz 1 no número dos pedidos posteriores)
+        const pedidosAjustar = state.pedidos.filter(p => (p.numeroPedido || 0) > numeroPedidoExcluido);
+        pedidosAjustar.forEach(p => {
+          const pRef = db.collection("pedidos").doc(p.id);
+          batch.update(pRef, { numeroPedido: p.numeroPedido - 1 });
+        });
+
+        await batch.commit();
+        alert(`Pedido Nº ${numeroPedidoExcluido} foi cancelado e a sequência de pedidos foi reajustada com sucesso!`);
+      } catch (err) {
+        alert("Erro ao excluir e reordenar pedidos: " + err.message);
+      }
     }
 
     // --- RENDERIZAÇÃO GERAL ---
@@ -1024,8 +1060,8 @@
       const tbody = document.getElementById('lista-pedidos');
       if (!tbody) return;
 
-      tbody.innerHTML = state.pedidos.map((p, idx) => `<tr>
-        <td>#${state.pedidos.length - idx}</td>
+      tbody.innerHTML = state.pedidos.map(p => `<tr>
+        <td><strong>Pedido #${p.numeroPedido || 'N/A'}</strong></td>
         <td><strong>${p.clienteNome}</strong></td>
         <td>R$ ${p.total.toFixed(2)}</td>
         <td>
@@ -1034,7 +1070,10 @@
           </span>
         </td>
         <td>
-          <button class="btn" type="button" style="padding:3px 6px; font-size:0.75rem; width:auto;" onclick="verComprovantePedido('${p.id}')">📄 Nota</button>
+          <div style="display:flex; gap:4px;">
+            <button class="btn" type="button" style="padding:4px 6px; font-size:0.75rem; width:auto;" onclick="verComprovantePedido('${p.id}')">📄 Nota</button>
+            <button class="btn-danger" type="button" onclick="cancelarEExcluirPedido('${p.id}', ${p.numeroPedido || 0})">✕ Cancelar</button>
+          </div>
         </td>
       </tr>`).join('');
     }
@@ -1066,7 +1105,7 @@ CNPJ/CPF: ${emp.cnpj || 'N/A'}
 TEL: ${emp.tel || 'N/A'}
 END: ${emp.end || 'N/A'}
 ----------------------------------------
-COMPROVANTE DE PEDIDO
+COMPROVANTE DE PEDIDO Nº ${pedido.numeroPedido || ''}
 DATA: ${dataStr}
 ----------------------------------------
 CLIENTE: ${pedido.clienteNome}
@@ -1098,7 +1137,7 @@ ${emp.social ? `${emp.social}\n` : ''}========================================
       const tel = p.clienteTel.replace(/\D/g, '');
       if (!tel) return alert('Cliente não possui telefone cadastrado.');
 
-      let msg = `*COMPROVANTE DE PEDIDO - ${state.empresa.nome}*\n\n`;
+      let msg = `*COMPROVANTE DE PEDIDO Nº ${p.numeroPedido || ''} - ${state.empresa.nome}*\n\n`;
       msg += `*Cliente:* ${p.clienteNome}\n`;
       msg += `*Total:* R$ ${p.total.toFixed(2)}\n`;
       msg += `*Pagamento:* ${p.formaPagamento} (${p.status})\n\n`;
@@ -1143,8 +1182,8 @@ ${emp.social ? `${emp.social}\n` : ''}========================================
       document.getElementById('resumo-detalhe-formas').innerHTML = detalheFormas || 'Nenhuma venda hoje.';
 
       const tbody = document.getElementById('resumo-tabela-hoje');
-      tbody.innerHTML = pedidosHoje.map((p, i) => `<tr>
-        <td>#${pedidosHoje.length - i}</td>
+      tbody.innerHTML = pedidosHoje.map(p => `<tr>
+        <td><strong>Pedido #${p.numeroPedido || ''}</strong></td>
         <td>${p.clienteNome}</td>
         <td>R$ ${p.total.toFixed(2)}</td>
         <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
