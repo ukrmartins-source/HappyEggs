@@ -219,24 +219,48 @@
       const p = document.getElementById('login-pass').value.trim();
       
       try {
+        // Tenta buscar o usuário no Firestore
         const snapshot = await db.collection("usuarios").where("login", "==", u).get();
-        if (snapshot.empty) return alert('Usuário ou senha incorretos!');
+
+        // Se a coleção de usuários estiver vazia e a pessoa tentar entrar com admin/1234, cria automaticamente
+        if (snapshot.empty) {
+          if (u === 'admin' && p === '1234') {
+            const newAdmin = { login: 'admin', pass: '1234', role: 'admin' };
+            const docRef = await db.collection("usuarios").add(newAdmin);
+            state.currentUser = { id: docRef.id, ...newAdmin };
+            entrarNoSistema(state.currentUser);
+            return;
+          } else {
+            return alert('Usuário ou senha incorretos! (Para criar o 1º acesso, use usuário: admin e senha: 1234)');
+          }
+        }
 
         const userDoc = snapshot.docs[0];
         const found = { id: userDoc.id, ...userDoc.data() };
 
-        if (found.pass !== p) return alert('Usuário ou senha incorretos!');
+        if (found.pass !== p) {
+          return alert('Usuário ou senha incorretos!');
+        }
 
         state.currentUser = found;
-        document.getElementById('view-login').style.display = 'none';
-        document.getElementById('app-header').style.display = 'flex';
-        document.getElementById('user-display').innerText = `👤 ${found.login.toUpperCase()}`;
-        
-        initListeners();
-        navTo('dashboard');
+        entrarNoSistema(found);
+
       } catch (err) {
-        alert('Erro ao realizar login: ' + err.message);
+        if (err.code === 'permission-denied') {
+          alert('Erro de Permissão no Firebase: Acesse o Firebase Console > Firestore Database > Regras (Rules) e libere a leitura/escrita.');
+        } else {
+          alert('Erro ao realizar login: ' + err.message);
+        }
       }
+    }
+
+    function entrarNoSistema(user) {
+      document.getElementById('view-login').style.display = 'none';
+      document.getElementById('app-header').style.display = 'flex';
+      document.getElementById('user-display').innerText = `👤 ${user.login.toUpperCase()}`;
+      
+      initListeners();
+      navTo('dashboard');
     }
 
     function logout() {
@@ -253,7 +277,11 @@
       document.getElementById('view-dashboard').style.display = 'none';
       document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
       if (screen === 'dashboard') document.getElementById('view-dashboard').style.display = 'block';
-      else document.getElementById(`view-${screen}`).style.display = 'block';
+      else {
+        const targetView = document.getElementById(`view-${screen}`);
+        if (targetView) targetView.style.display = 'block';
+        else alert('Tela em desenvolvimento.');
+      }
     }
 
     function cadastrarCliente(e) {
