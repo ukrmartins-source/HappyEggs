@@ -13,6 +13,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+  <!-- HTML2PDF PARA GERAR PDF DIRETO NO NAVEGADOR -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <style>
     :root {
       --primary: #1e293b;
@@ -71,7 +74,7 @@
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #f8fafc; }
     .form-group input:focus, .form-group select:focus { border-color: var(--accent); outline: none; background: #fff; }
 
-    .btn { background: var(--accent); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.9rem; text-align: center; text-decoration: none; display: inline-block; transition: 0.2s; }
+    .btn { background: var(--accent); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.9rem; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
     .btn:hover { background: var(--accent-light); }
     .btn-back { background: #475569; padding: 6px 12px; width: auto; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px; }
     .btn-danger { background: var(--danger); width: auto; padding: 5px 10px; font-size: 0.75rem; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
@@ -80,26 +83,34 @@
     .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; cursor: pointer; display: inline-block; }
     .badge-pago { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
     .badge-pendente { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-    .badge-cancelado { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
     th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
 
+    /* ESTILOS DO MODAL DE NOTA E CUPOM */
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.7); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
-    .modal-content { background: white; width: 92%; max-width: 480px; border-radius: 12px; padding: 22px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+    .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
     .receipt-box { 
-      border: 1px dashed #000; 
-      padding: 16px; 
-      font-family: 'Courier New', monospace; 
-      font-size: 0.85rem; 
-      background: #fff; 
-      margin-bottom: 12px; 
-      color: #000;
+      border: 1.5px dashed #4b5563; 
+      border-radius: 8px;
+      padding: 18px; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 0.9rem; 
+      background: #ffffff; 
+      margin-bottom: 16px; 
+      color: #1f2937;
       text-align: left;
       width: 100%;
       word-wrap: break-word;
+      line-height: 1.4;
+    }
+
+    .dashed-divider {
+      border: none;
+      border-top: 1.5px dashed #9ca3af;
+      margin: 10px 0;
     }
 
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
@@ -109,31 +120,46 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
+    /* CORREÇÃO DE IMPRESSÃO */
     @media print {
-      body * { visibility: hidden; }
-      #modal-nota, #modal-nota * { visibility: visible; }
-      #printable-receipt, #printable-receipt * { visibility: visible; }
-      #printable-receipt { 
-        position: absolute; 
-        left: 0; 
-        top: 0; 
-        width: 100% !important; 
-        border: none; 
-        padding: 0;
-        margin: 0;
-        text-align: left !important;
-        font-size: 11pt;
+      body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
-      .modal-content { box-shadow: none; padding: 0; width: 100%; max-width: 100%; }
-      .modal { position: absolute; left: 0; top: 0; background: none; }
-      .modal button { display: none !important; }
+      header, main, .no-print, .modal-content > *:not(#printable-receipt) {
+        display: none !important;
+      }
+      .modal {
+        position: static !important;
+        display: block !important;
+        background: none !important;
+      }
+      .modal-content {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      #printable-receipt {
+        display: block !important;
+        visibility: visible !important;
+        position: relative !important;
+        width: 100% !important;
+        max-width: 380px !important;
+        margin: 0 auto !important;
+        border: 1.5px dashed #000000 !important;
+        page-break-inside: avoid;
+      }
     }
   </style>
 </head>
 <body>
 
   <!-- CABEÇALHO -->
-  <header id="app-header" style="display:none;">
+  <header id="app-header" style="display:none;" class="no-print">
     <div class="brand"><span id="header-title">🥚 HAPPY EGGS</span></div>
     <div class="user-info">
       <span id="user-display">👤 Admin</span>
@@ -141,7 +167,7 @@
     </div>
   </header>
 
-  <main>
+  <main class="no-print">
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
@@ -163,8 +189,8 @@
         <button class="grid-btn" type="button" onclick="navTo('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navTo('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navTo('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendasDia()">
-          <span class="icon">📊</span><span class="label">RESUMO DE VENDAS DO DIA</span>
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()">
+          <span class="icon">📊</span><span class="label">RELATÓRIO DE VENDAS (DIAS / MÊS)</span>
         </button>
       </div>
 
@@ -229,12 +255,12 @@
 
           <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border:1px solid #e2e8f0;">
             <div class="form-group">
-              <label>Selecione o Produto</label>
+              <label>Selecione a Embalagem / Produto</label>
               <select id="ped-produto"></select>
             </div>
             <div style="display: flex; gap: 8px; align-items: flex-end;">
               <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label>Quantidade</label>
+                <label>Quantidade de Embalagens</label>
                 <input type="number" id="ped-qtd" min="1" value="1">
               </div>
               <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">➕ Adicionar</button>
@@ -280,37 +306,39 @@
       </div>
 
       <div class="card">
-        <div class="card-title">Histórico de Pedidos</div>
+        <div class="card-title">Histórico de Pedidos Sequencial</div>
         <table>
-          <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th></tr></thead>
+          <thead><tr><th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody id="lista-pedidos"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- TELA: PRODUTOS / ESTOQUE & ENTRADA DE PRODUÇÃO -->
+    <!-- TELA: ESTOQUE E EMBALAGENS -->
     <div id="view-produtos" class="view-content" style="display:none;">
       <div class="card" style="border-left: 4px solid var(--accent);">
         <div class="card-header">
-          <div class="card-title">🥚 Registrar Entrada de Produção (Diário)</div>
+          <div class="card-title">🥚 Registrar Entrada de Produção</div>
           <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
         </div>
+
+        <div class="stat-card" style="background: #eff6ff; border-color: #bfdbfe;">
+          <div class="stat-title">Saldo Geral de Ovos em Estoque</div>
+          <div class="stat-value" id="estoque-geral-ovos" style="font-size: 1.8rem;">0 Ovos</div>
+        </div>
+
         <form onsubmit="registrarEntradaProducao(event)">
           <div class="form-group">
-            <label>Selecione o Produto para Entrada</label>
-            <select id="prod-ent-item" required></select>
+            <label>Quantidade Coletada/Produzida (Ovos Individuais)</label>
+            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 5000" required>
           </div>
-          <div class="form-group">
-            <label>Quantidade Coletada/Produzida</label>
-            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 50 ou 100" required>
-          </div>
-          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Coleta de Produção</button>
+          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Direto para o Estoque Geral</button>
         </form>
 
         <div style="margin-top: 15px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Produção de Hoje</div>
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Coletas de Hoje</div>
           <table>
-            <thead><tr><th>Hora</th><th>Item</th><th>Qtd</th></tr></thead>
+            <thead><tr><th>Hora</th><th>Unidades</th></tr></thead>
             <tbody id="lista-producao-hoje"></tbody>
           </table>
         </div>
@@ -318,22 +346,32 @@
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title" id="form-prod-title">Cadastrar Novo Produto</div>
+          <div class="card-title" id="form-prod-title">Cadastrar Novo Produto / Embalagem</div>
         </div>
         <form id="form-produto" onsubmit="salvarProduto(event)">
           <input type="hidden" id="prod-id-edit" value="">
-          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: Ovos Dúzia / Cartela 30" required></div>
-          <div class="form-group"><label>Preço Unitário (R$)</label><input type="number" step="0.01" id="prod-preco" required></div>
-          <div class="form-group"><label>Estoque Inicial/Atual</label><input type="number" id="prod-qtd" required></div>
+          <div class="form-group">
+            <label>Descrição do Item</label>
+            <input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / CAIXA 360 OVOS" required>
+          </div>
+          <div class="form-group">
+            <label>Preço Unitário (R$)</label>
+            <input type="number" step="0.01" id="prod-preco" placeholder="Ex: 12.00" required>
+          </div>
+          <div class="form-group">
+            <label>Quantidade de Ovos nesta Embalagem</label>
+            <input type="number" id="prod-ovos-unid" min="1" placeholder="Ex: 12 (para cartela de 12), 30 (para cartela de 30)" required>
+            <span style="font-size: 0.75rem; color: #64748b; margin-top: 3px; display: block;">Serve apenas para calcular quantos ovos descontar do Estoque Geral no pedido.</span>
+          </div>
           <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
           <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
         </form>
       </div>
 
       <div class="card">
-        <div class="card-title">Estoque Atual</div>
+        <div class="card-title">Produtos / Apresentações Disponíveis</div>
         <table>
-          <thead><tr><th>Produto</th><th>Preço</th><th>Qtd</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Descrição</th><th>Preço</th><th>Ovos/Emb</th><th>Ações</th></tr></thead>
           <tbody id="lista-produtos"></tbody>
         </table>
       </div>
@@ -399,25 +437,64 @@
   <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
   <div class="modal" id="modal-nota">
     <div class="modal-content">
-      <div class="card-title" style="margin-bottom:10px;">Comprovante do Pedido</div>
+      <div class="card-title no-print" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
+      
+      <!-- RECIBO COM BORDA TRACEJADA -->
       <div class="receipt-box" id="printable-receipt"></div>
-      <div style="display:flex; gap:8px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarImpressaoOuPDF()">📄 Imprimir / PDF</button>
-        <button class="btn" type="button" style="background:#10b981;" onclick="enviarWhats()">💬 WhatsApp</button>
+      
+      <!-- PAINEL DE AÇÕES E BOTÕES -->
+      <div class="no-print" style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <button class="btn" type="button" style="background:#2563eb;" onclick="salvarNotaPDF()">
+            💾 Salvar PDF
+          </button>
+          <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirNota()">
+            🖨️ Imprimir
+          </button>
+        </div>
+        
+        <button class="btn" type="button" style="background:#10b981;" onclick="enviarWhats()">
+          💬 WhatsApp
+        </button>
+
+        <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:4px;">
+          Fechar Nota
+        </button>
       </div>
-      <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:8px;">Fechar Nota</button>
     </div>
   </div>
 
-  <!-- MODAL: RESUMO DE VENDAS DO DIA -->
+  <!-- MODAL: RELATÓRIO DE VENDAS FLEXÍVEL -->
   <div class="modal" id="modal-resumo">
-    <div class="modal-content">
-      <div class="card-title" style="margin-bottom:12px;">📊 Resumo de Vendas Hoje</div>
-      <div id="resumo-data-hoje" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; font-weight:bold;"></div>
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
+      
+      <div class="form-group">
+        <label>Filtrar Período</label>
+        <select id="filtro-periodo" onchange="atualizarFiltroRelatorio()">
+          <option value="hoje">Hoje</option>
+          <option value="semana">Últimos 7 Dias (Semana)</option>
+          <option value="mes">Este Mês Atual</option>
+          <option value="personalizado">Personalizado (Intervalo de Datas)</option>
+        </select>
+      </div>
+
+      <div id="container-datas-personalizadas" style="display:none; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Data Inicial</label>
+          <input type="date" id="data-inicio" onchange="renderizarDadosRelatorio()">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Data Final</label>
+          <input type="date" id="data-fim" onchange="renderizarDadosRelatorio()">
+        </div>
+      </div>
+
+      <div id="resumo-periodo-texto" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; font-weight:bold;"></div>
 
       <div class="stat-card">
-        <div class="stat-title">Total Vendido Hoje</div>
-        <div class="stat-value" id="resumo-total-hoje">R$ 0,00</div>
+        <div class="stat-title">Total Faturado no Período</div>
+        <div class="stat-value" id="resumo-total-periodo">R$ 0,00</div>
       </div>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
@@ -436,20 +513,23 @@
         <div id="resumo-detalhe-formas" style="font-size:0.85rem; line-height:1.4;"></div>
       </div>
 
-      <div style="margin-top:15px;">
-        <div class="stat-title" style="margin-bottom:6px;">Vendas Realizadas Hoje</div>
+      <div style="margin-top:15px; max-height: 180px; overflow-y: auto;">
+        <div class="stat-title" style="margin-bottom:6px;">Vendas Listadas no Período</div>
         <table>
-          <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
-          <tbody id="resumo-tabela-hoje"></tbody>
+          <thead><tr><th># Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="resumo-tabela-periodo"></tbody>
         </table>
       </div>
 
-      <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b; margin-top:15px;">Fechar Resumo</button>
+      <div style="display:flex; gap:10px; margin-top:15px;">
+        <button class="btn" type="button" style="background:#2563eb;" onclick="window.print()">🖨️️ Imprimir Relatório</button>
+        <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
+      </div>
     </div>
   </div>
 
   <script>
-    // --- CONFIGURAÇÃO DO NOVO FIREBASE HAPPY EGGS ---
+    // --- CONFIGURAÇÃO DO FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyAYmxniwbHyi4HmTH-aVlHo2zp-7pXY_lg",
       authDomain: "happyeggs-534f2.firebaseapp.com",
@@ -470,6 +550,7 @@
       clientes: [],
       pedidos: [],
       producao: [],
+      estoqueGeralOvos: 0,
       currentUser: null,
       pedidoAtual: null,
       listenersUnsubscribe: []
@@ -495,7 +576,7 @@
       }).catch(err => console.error("Erro na inicialização:", err));
     }
 
-    // --- ESCUTADORES EM TEMPO REAL ISOLADOS POR EMPRESA ---
+    // --- ESCUTADORES EM TEMPO REAL ---
     function initListeners() {
       state.listenersUnsubscribe.forEach(unsub => unsub());
       state.listenersUnsubscribe = [];
@@ -514,6 +595,15 @@
         render();
       }, err => console.error("Erro produtos:", err));
 
+      const unsubEstoque = db.collection("estoque_geral").doc(empresaId).onSnapshot(doc => {
+        if (doc.exists) {
+          state.estoqueGeralOvos = doc.data().qtdOvos || 0;
+        } else {
+          state.estoqueGeralOvos = 0;
+        }
+        renderEstoqueGeral();
+      });
+
       const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.pedidos = snapshot.docs.map(doc => {
           const dataDoc = doc.data();
@@ -524,7 +614,7 @@
             dataCriacaoParsed = new Date(dataDoc.dataCriacao);
           }
           return { id: doc.id, ...dataDoc, dataCriacao: dataCriacaoParsed };
-        }).sort((a, b) => b.dataCriacao - a.dataCriacao);
+        }).sort((a, b) => (b.numeroPedido || 0) - (a.numeroPedido || 0));
 
         render();
       }, err => console.error("Erro pedidos:", err));
@@ -546,7 +636,7 @@
         render();
       });
 
-      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios);
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios);
     }
 
     function carregarEmpresaCampos() {
@@ -559,7 +649,6 @@
       document.getElementById('emp-pix').value = state.empresa.pix || '';
     }
 
-    // --- AUTENTICAÇÃO COM VERIFICAÇÃO DE LICENÇA ---
     async function autenticar(e) {
       e.preventDefault();
       const u = document.getElementById('login-user').value.trim().toLowerCase();
@@ -585,7 +674,7 @@
         if (empDoc.exists) {
           const empData = empDoc.data();
           if (empData.status !== "Ativo") {
-            alert("A conta da sua empresa está inativa ou pendente de pagamento. Entre em contato com o suporte.");
+            alert("A conta da sua empresa está inativa. Entre em contato com o suporte.");
             return;
           }
         }
@@ -598,228 +687,263 @@
         
         initListeners();
         navTo('dashboard');
-      } catch (err) {
-        alert('Erro ao realizar login: ' + err.message);
+      } catch (error) {
+        console.error("Erro na autenticação:", error);
+        alert("Erro ao tentar entrar. Tente novamente.");
       }
     }
 
     function logout() {
+      state.currentUser = null;
       state.listenersUnsubscribe.forEach(unsub => unsub());
       state.listenersUnsubscribe = [];
-      state.currentUser = null;
       document.getElementById('app-header').style.display = 'none';
       document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
       document.getElementById('view-dashboard').style.display = 'none';
       document.getElementById('view-login').style.display = 'block';
-      document.getElementById('login-pass').value = '';
     }
 
-    function navTo(screen) {
-      document.getElementById('view-dashboard').style.display = 'none';
+    function navTo(view) {
       document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
-      if (screen === 'dashboard') document.getElementById('view-dashboard').style.display = 'block';
-      else document.getElementById(`view-${screen}`).style.display = 'block';
-    }
+      document.getElementById('view-dashboard').style.display = 'none';
 
-    function alterarMinhaSenha(e) {
-      e.preventDefault();
-      const novaSenha = document.getElementById('minha-nova-senha').value.trim();
-      if (!novaSenha) return alert('Por favor, introduza uma nova senha.');
-
-      if (state.currentUser) {
-        const docId = state.currentUser.id || state.currentUser.login;
-        db.collection("usuarios").doc(docId).update({ pass: novaSenha })
-        .then(() => {
-          state.currentUser.pass = novaSenha;
-          alert('Sua senha foi alterada com sucesso!');
-          document.getElementById('minha-nova-senha').value = '';
-        }).catch(err => alert('Erro ao mudar a senha: ' + err.message));
+      if (view === 'dashboard') {
+        document.getElementById('view-dashboard').style.display = 'block';
+        filtrarClientesDashboard();
+      } else {
+        const el = document.getElementById(`view-${view}`);
+        if (el) el.style.display = 'block';
       }
+      render();
     }
 
-    function alterarSenhaUsuario(docId, login) {
-      const novaSenha = prompt(`Digite a nova senha para o usuário ${login.toUpperCase()}:`);
-      if (novaSenha && novaSenha.trim() !== '') {
-        db.collection("usuarios").doc(docId).update({ pass: novaSenha.trim() })
-          .then(() => {
-            alert(`Senha do usuário ${login} alterada com sucesso!`);
-            if (state.currentUser && (state.currentUser.id === docId || state.currentUser.login === login)) {
-              state.currentUser.pass = novaSenha.trim();
-            }
-          })
-          .catch(err => alert('Erro ao alterar senha: ' + err.message));
-      }
+    // --- RENDERIZAÇÃO DA INTERFACE ---
+    function render() {
+      renderClientes();
+      renderProdutos();
+      renderPedidos();
+      renderUsuarios();
+      renderDropdowns();
     }
 
-    // --- CLIENTES ---
-    function cadastrarCliente(e) {
-      e.preventDefault();
-      const nome = document.getElementById('cli-nome').value.trim();
-      const doc = document.getElementById('cli-doc').value.trim();
-      const tel = document.getElementById('cli-tel').value.trim();
-      const end = document.getElementById('cli-end').value.trim();
-
-      db.collection("clientes").add({ 
-        nome, doc, tel, end,
-        empresaId: state.currentUser.empresaId 
-      })
-        .then(() => { alert('Cliente gravado na Nuvem!'); e.target.reset(); })
-        .catch(err => alert('Erro ao salvar cliente: ' + err.message));
+    function renderEstoqueGeral() {
+      const el = document.getElementById('estoque-geral-ovos');
+      if (el) el.innerText = `${(state.estoqueGeralOvos || 0).toLocaleString('pt-BR')} Ovos`;
     }
 
-    function excluirCliente(id) {
-      if (confirm('Deseja excluir este cliente?')) {
-        db.collection("clientes").doc(id).delete().catch(err => alert('Erro ao excluir: ' + err.message));
+    function renderClientes() {
+      const tbody = document.getElementById('lista-clientes');
+      if (!tbody) return;
+      tbody.innerHTML = state.clientes.map(c => `
+        <tr>
+          <td><strong>${c.nome}</strong><br><small style="color:#64748b;">${c.doc || 'Sem Doc'}</small></td>
+          <td>${c.tel}<br><small style="color:#64748b;">${c.end || ''}</small></td>
+          <td><button class="btn-danger" onclick="excluirCliente('${c.id}')">Excluir</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function filtrarClientesDashboard() {
+      const termo = (document.getElementById('dash-busca-cliente')?.value || '').toLowerCase();
+      const tbody = document.getElementById('lista-clientes-dash');
+      if (!tbody) return;
+
+      const filtrados = state.clientes.filter(c => 
+        c.nome.toLowerCase().includes(termo) || 
+        (c.doc && c.doc.toLowerCase().includes(termo)) ||
+        (c.tel && c.tel.toLowerCase().includes(termo))
+      );
+
+      tbody.innerHTML = filtrados.slice(0, 10).map(c => `
+        <tr>
+          <td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td>
+          <td>📞 ${c.tel}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderProdutos() {
+      const tbody = document.getElementById('lista-produtos');
+      if (!tbody) return;
+      tbody.innerHTML = state.produtos.map(p => `
+        <tr>
+          <td><strong>${p.nome}</strong></td>
+          <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
+          <td>${p.ovosUnid} ovos</td>
+          <td>
+            <button class="btn-warning" onclick="editarProduto('${p.id}')">✏️</button>
+            <button class="btn-danger" onclick="excluirProduto('${p.id}')">🗑</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderPedidos() {
+      const tbody = document.getElementById('lista-pedidos');
+      if (!tbody) return;
+
+      tbody.innerHTML = state.pedidos.map(p => {
+        const isPago = p.status === 'Pago';
+        const badgeClass = isPago ? 'badge-pago' : 'badge-pendente';
+        
+        return `
+          <tr>
+            <td><strong>#${p.numeroPedido || '---'}</strong></td>
+            <td>${p.clienteNome || 'Cliente'}<br><small style="color:#64748b;">${p.formaPgto || ''}</small></td>
+            <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
+            <td>
+              <span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">
+                ${isPago ? '🟢 Pago' : '🔴 Pendente'}
+              </span>
+            </td>
+            <td>
+              <button class="btn" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb; margin-bottom:2px;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
+              <button class="btn-danger" title="Excluir/Estornar Pedido" onclick="excluirOuCancelarPedido('${p.id}', ${p.numeroPedido}, ${p.totalOvos || 0})">🗑️</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderUsuarios() {
+      const tbody = document.getElementById('lista-usuarios');
+      if (!tbody) return;
+      tbody.innerHTML = state.usuarios.map(u => `
+        <tr>
+          <td><strong>${u.login}</strong></td>
+          <td><span class="badge" style="background:#e2e8f0; color:#334155;">${u.role}</span></td>
+          <td>${u.login !== 'admin' ? `<button class="btn-danger" onclick="excluirUsuario('${u.id}')">Excluir</button>` : '---'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderDropdowns() {
+      filtrarClientesDropdown();
+
+      const prodSelect = document.getElementById('ped-produto');
+      if (prodSelect) {
+        prodSelect.innerHTML = state.produtos.map(p => `
+          <option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)} (${p.ovosUnid} ovos)</option>
+        `).join('');
       }
     }
 
     function filtrarClientesDropdown() {
-      const termo = document.getElementById('ped-busca-cliente').value.toLowerCase();
-      const selectCli = document.getElementById('ped-cliente');
-      if (!selectCli) return;
-      const clientesFiltrados = state.clientes.filter(c => 
-        c.nome.toLowerCase().includes(termo) || 
-        (c.doc && c.doc.toLowerCase().includes(termo)) || 
-        (c.tel && c.tel.includes(termo))
-      );
-      if (clientesFiltrados.length === 0) selectCli.innerHTML = '<option value="">Nenhum cliente encontrado...</option>';
-      else selectCli.innerHTML = clientesFiltrados.map(c => `<option value="${c.id}">${c.nome} ${c.doc ? `(${c.doc})` : ''} - ${c.tel}</option>`).join('');
-    }
+      const termo = (document.getElementById('ped-busca-cliente')?.value || '').toLowerCase();
+      const cliSelect = document.getElementById('ped-cliente');
+      if (!cliSelect) return;
 
-    function filtrarClientesDashboard() { renderClientesDashboard(); }
-
-    function renderClientesDashboard() {
-      const termo = document.getElementById('dash-busca-cliente')?.value.toLowerCase() || '';
-      const tbody = document.getElementById('lista-clientes-dash');
-      if (!tbody) return;
       const filtrados = state.clientes.filter(c => 
         c.nome.toLowerCase().includes(termo) || 
-        (c.doc && c.doc.toLowerCase().includes(termo)) || 
-        (c.tel && c.tel.includes(termo))
+        (c.doc && c.doc.toLowerCase().includes(termo)) ||
+        (c.tel && c.tel.toLowerCase().includes(termo))
       );
-      if (filtrados.length === 0) tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#64748b;">Nenhum cliente encontrado</td></tr>';
-      else tbody.innerHTML = filtrados.map(c => `<tr><td><b>${c.nome}</b><br><small style="color:#64748b;">${c.doc || 'Sem doc'}</small></td><td>${c.tel}</td></tr>`).join('');
+
+      if (filtrados.length === 0) {
+        cliSelect.innerHTML = `<option value="">Nenhum cliente encontrado</option>`;
+      } else {
+        cliSelect.innerHTML = filtrados.map(c => `
+          <option value="${c.id}">${c.nome} (${c.tel})</option>
+        `).join('');
+      }
     }
 
-    // --- PRODUTOS & PRODUÇÃO DIÁRIA ---
-    function salvarProduto(e) {
+    // --- AÇÕES DE CADASTRO E SISTEMA ---
+    async function cadastrarCliente(e) {
+      e.preventDefault();
+      const novo = {
+        empresaId: state.currentUser.empresaId,
+        nome: document.getElementById('cli-nome').value.trim(),
+        doc: document.getElementById('cli-doc').value.trim(),
+        tel: document.getElementById('cli-tel').value.trim(),
+        end: document.getElementById('cli-end').value.trim()
+      };
+
+      await db.collection("clientes").add(novo);
+      e.target.reset();
+      alert('Cliente cadastrado com sucesso!');
+    }
+
+    async function excluirCliente(id) {
+      if (confirm('Deseja realmente excluir este cliente?')) {
+        await db.collection("clientes").doc(id).delete();
+      }
+    }
+
+    async function salvarProduto(e) {
       e.preventDefault();
       const idEdit = document.getElementById('prod-id-edit').value;
-      const nome = document.getElementById('prod-nome').value.trim();
-      const preco = parseFloat(document.getElementById('prod-preco').value) || 0;
-      const qtd = parseInt(document.getElementById('prod-qtd').value) || 0;
+      const dados = {
+        empresaId: state.currentUser.empresaId,
+        nome: document.getElementById('prod-nome').value.trim(),
+        preco: parseFloat(document.getElementById('prod-preco').value || 0),
+        ovosUnid: parseInt(document.getElementById('prod-ovos-unid').value || 0)
+      };
 
       if (idEdit) {
-        db.collection("produtos").doc(idEdit).update({ nome, preco, qtd })
-          .then(() => alert('Produto atualizado na Nuvem!'))
-          .catch(err => alert('Erro ao atualizar: ' + err.message));
+        await db.collection("produtos").doc(idEdit).update(dados);
+        alert('Produto atualizado!');
       } else {
-        db.collection("produtos").add({ 
-          nome, preco, qtd,
-          empresaId: state.currentUser.empresaId
-        })
-          .then(() => alert('Produto adicionado na Nuvem!'))
-          .catch(err => alert('Erro ao adicionar: ' + err.message));
+        await db.collection("produtos").add(dados);
+        alert('Produto cadastrado com sucesso!');
       }
+
       limparFormProduto();
     }
 
-    function registrarEntradaProducao(e) {
-      e.preventDefault();
-      const prodId = document.getElementById('prod-ent-item').value;
-      const qtd = parseInt(document.getElementById('prod-ent-qtd').value) || 0;
-
-      if (!prodId) return alert('Selecione um produto.');
-      if (qtd <= 0) return alert('Digite uma quantidade válida.');
-
-      const prod = state.produtos.find(p => p.id === prodId);
-      if (!prod) return alert('Produto não encontrado.');
-
-      db.collection("produtos").doc(prod.id).update({
-        qtd: firebase.firestore.FieldValue.increment(qtd)
-      }).then(() => {
-        return db.collection("producao").add({
-          prodId: prod.id,
-          nomeItem: prod.nome,
-          qtd: qtd,
-          empresaId: state.currentUser.empresaId,
-          dataHora: new Date()
-        });
-      }).then(() => {
-        alert(`Entrada de ${qtd} un para "${prod.nome}" registrada com sucesso!`);
-        document.getElementById('prod-ent-qtd').value = '';
-      }).catch(err => alert('Erro ao registrar entrada: ' + err.message));
-    }
-
-    function renderProducaoHoje() {
-      const tbody = document.getElementById('lista-producao-hoje');
-      if (!tbody) return;
-
-      const hoje = new Date();
-      const inicioHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-
-      const lancamentosHoje = state.producao.filter(item => {
-        if (!item.dataHora) return false;
-        const d = item.dataHora.toDate ? item.dataHora.toDate() : new Date(item.dataHora);
-        return d >= inicioHoje;
-      });
-
-      if (lancamentosHoje.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#64748b;">Nenhuma entrada registrada hoje.</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = lancamentosHoje.map(item => {
-        const d = item.dataHora.toDate ? item.dataHora.toDate() : new Date();
-        const horaStr = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        return `<tr>
-          <td><b>${horaStr}</b></td>
-          <td>${item.nomeItem || 'Ovos'}</td>
-          <td><b style="color:var(--success);">+${item.qtd}</b></td>
-        </tr>`;
-      }).join('');
-    }
-
-    function prepararEdicaoProduto(id) {
-      const prod = state.produtos.find(p => p.id === id);
-      if (!prod) return;
-      document.getElementById('prod-id-edit').value = prod.id;
-      document.getElementById('prod-nome').value = prod.nome;
-      document.getElementById('prod-preco').value = prod.preco;
-      document.getElementById('prod-qtd').value = prod.qtd;
-      document.getElementById('form-prod-title').innerText = 'Editar Produto';
-      document.getElementById('btn-salvar-prod').innerText = 'Atualizar Produto';
-      document.getElementById('btn-cancelar-edit').style.display = 'block';
+    function editarProduto(id) {
+      const p = state.produtos.find(prod => prod.id === id);
+      if (!p) return;
+      document.getElementById('prod-id-edit').value = p.id;
+      document.getElementById('prod-nome').value = p.nome;
+      document.getElementById('prod-preco').value = p.preco;
+      document.getElementById('prod-ovos-unid').value = p.ovosUnid;
+      document.getElementById('form-prod-title').innerText = "Editar Produto";
+      document.getElementById('btn-salvar-prod').innerText = "Atualizar Produto";
+      document.getElementById('btn-cancelar-edit').style.display = "block";
     }
 
     function limparFormProduto() {
-      document.getElementById('prod-id-edit').value = '';
       document.getElementById('form-produto').reset();
-      document.getElementById('form-prod-title').innerText = 'Cadastrar Novo Produto';
-      document.getElementById('btn-salvar-prod').innerText = 'Salvar Produto na Nuvem';
-      document.getElementById('btn-cancelar-edit').style.display = 'none';
+      document.getElementById('prod-id-edit').value = "";
+      document.getElementById('form-prod-title').innerText = "Cadastrar Novo Produto / Embalagem";
+      document.getElementById('btn-salvar-prod').innerText = "Salvar Produto na Nuvem";
+      document.getElementById('btn-cancelar-edit').style.display = "none";
     }
 
-    function excluirProduto(id) {
-      if (confirm('Excluir este produto da nuvem?')) {
-        db.collection("produtos").doc(id).delete().catch(err => alert('Erro ao excluir: ' + err.message));
+    async function excluirProduto(id) {
+      if (confirm('Deseja excluir este produto?')) {
+        await db.collection("produtos").doc(id).delete();
       }
     }
 
-    // --- CARRINHO & PEDIDOS ---
     function adicionarItemAoPedido() {
       const prodId = document.getElementById('ped-produto').value;
-      const qtd = parseInt(document.getElementById('ped-qtd').value);
-      if (!prodId || isNaN(qtd) || qtd <= 0) return alert('Selecione um produto e quantidade válida.');
-
+      const qtd = parseInt(document.getElementById('ped-qtd').value || 1);
       const prod = state.produtos.find(p => p.id === prodId);
-      if(!prod) return alert('Produto inválido.');
 
-      const qtdNoCarrinho = carrinhoTemp.filter(i => i.prodId === prodId).reduce((a, b) => a + b.qtd, 0);
-      if (prod.qtd < (qtdNoCarrinho + qtd)) return alert(`Estoque insuficiente! Disponível: ${prod.qtd}`);
+      if (!prod || qtd <= 0) {
+        alert('Selecione um produto e quantidade válida.');
+        return;
+      }
 
-      carrinhoTemp.push({ prodId: prod.id, nome: prod.nome, preco: prod.preco, qtd: qtd, subtotal: prod.preco * qtd });
-      document.getElementById('ped-qtd').value = 1;
+      const itemExistente = carrinhoTemp.find(i => i.produtoId === prodId);
+      if (itemExistente) {
+        itemExistente.qtd += qtd;
+        itemExistente.subtotal = itemExistente.qtd * prod.preco;
+        itemExistente.totalOvos = itemExistente.qtd * prod.ovosUnid;
+      } else {
+        carrinhoTemp.push({
+          produtoId: prod.id,
+          nome: prod.nome,
+          preco: prod.preco,
+          qtd: qtd,
+          ovosUnid: prod.ovosUnid,
+          totalOvos: qtd * prod.ovosUnid,
+          subtotal: qtd * prod.preco
+        });
+      }
+
       renderCarrinho();
     }
 
@@ -829,166 +953,209 @@
     }
 
     function renderCarrinho() {
-      const container = document.getElementById('itens-pedido-lista');
+      const lista = document.getElementById('itens-pedido-lista');
       const totalSpan = document.getElementById('ped-total-valor');
-      if (!container || !totalSpan) return;
 
       if (carrinhoTemp.length === 0) {
-        container.innerHTML = '<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>';
-        totalSpan.innerText = '0.00';
+        lista.innerHTML = `<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>`;
+        totalSpan.innerText = "0.00";
         return;
       }
-      let total = 0;
-      container.innerHTML = carrinhoTemp.map((item, index) => {
-        total += item.subtotal;
-        return `<div class="carrinho-item">
-            <div><b>${item.qtd}x</b> ${item.nome}<br><small style="color:#64748b;">R$ ${item.preco.toFixed(2)} un = R$ ${item.subtotal.toFixed(2)}</small></div>
-            <button type="button" class="btn-danger" onclick="removerItemCarrinho(${index})">🗑</button>
-          </div>`;
+
+      let totalGeral = 0;
+      lista.innerHTML = carrinhoTemp.map((item, idx) => {
+        totalGeral += item.subtotal;
+        return `
+          <div class="carrinho-item">
+            <div>
+              <strong>${item.qtd}x ${item.nome}</strong><br>
+              <small style="color:#64748b;">R$ ${item.preco.toFixed(2)} un | Total Ovos: ${item.totalOvos}</small>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <strong>R$ ${item.subtotal.toFixed(2)}</strong>
+              <button class="btn-danger" style="padding:2px 6px;" onclick="removerItemCarrinho(${idx})">✕</button>
+            </div>
+          </div>
+        `;
       }).join('');
-      totalSpan.innerText = total.toFixed(2);
+
+      totalSpan.innerText = totalGeral.toFixed(2);
     }
 
-    function finalizarPedido(e) {
+    async function finalizarPedido(e) {
       e.preventDefault();
+      if (carrinhoTemp.length === 0) {
+        alert('Adicione pelo menos um produto ao pedido!');
+        return;
+      }
+
       const cliId = document.getElementById('ped-cliente').value;
-      if (!cliId) return alert('Selecione um cliente.');
-      if (carrinhoTemp.length === 0) return alert('Adicione pelo menos um produto!');
+      const cliente = state.clientes.find(c => c.id === cliId);
 
-      const cli = state.clientes.find(c => c.id === cliId);
-      const formaPag = document.getElementById('ped-forma-pagamento').value;
-      const dadosPag = document.getElementById('ped-dados-pagamento').value.trim() || state.empresa.pix;
-      const status = document.getElementById('ped-status').value;
-      const obs = document.getElementById('ped-obs').value.trim();
-      const totalPedido = carrinhoTemp.reduce((sum, item) => sum + item.subtotal, 0);
-      const pedidoNum = Math.floor(1000 + Math.random() * 9000);
+      if (!cliente) {
+        alert('Selecione um cliente válido!');
+        return;
+      }
 
-      // Abate o estoque no Firestore
-      carrinhoTemp.forEach(item => {
-        const prod = state.produtos.find(p => p.id === item.prodId);
-        if (prod) {
-          db.collection("produtos").doc(prod.id).update({
-            qtd: firebase.firestore.FieldValue.increment(-item.qtd)
-          });
-        }
-      });
+      const maiorNum = state.pedidos.reduce((max, p) => Math.max(max, p.numeroPedido || 0), 0);
+      const proximoNumero = maiorNum + 1;
 
-      const p = {
-        numPedido: pedidoNum,
-        cliente: cli ? cli.nome : 'Cliente Desconhecido', 
-        doc: cli ? (cli.doc || '') : '', 
-        tel: cli ? cli.tel : '', 
-        end: cli ? cli.end : '',
-        itens: [...carrinhoTemp],
-        total: totalPedido,
-        formaPagamento: formaPag,
-        dadosPagamento: dadosPag,
-        status: status,
-        obs: obs,
+      const totalPedido = carrinhoTemp.reduce((acc, i) => acc + i.subtotal, 0);
+      const totalOvosPedido = carrinhoTemp.reduce((acc, i) => acc + i.totalOvos, 0);
+
+      const novoPedido = {
         empresaId: state.currentUser.empresaId,
-        dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
+        numeroPedido: proximoNumero,
+        clienteId: cliente.id,
+        clienteNome: cliente.nome,
+        clienteDoc: cliente.doc || 'N/I',
+        clienteEnd: cliente.end || 'Não informado',
+        clienteTel: cliente.tel || '',
+        itens: carrinhoTemp,
+        total: totalPedido,
+        totalOvos: totalOvosPedido,
+        formaPgto: document.getElementById('ped-forma-pagamento').value,
+        dadosPgto: document.getElementById('ped-dados-pagamento').value.trim(),
+        status: document.getElementById('ped-status').value,
+        obs: document.getElementById('ped-obs').value.trim(),
+        dataCriacao: new Date()
       };
 
-      // Grava no Firestore permanentemente para consulta
-      db.collection("pedidos").add(p).then(docRef => {
-        p.id = docRef.id;
-        p.dataCriacao = new Date(); 
+      try {
+        const docRef = await db.collection("pedidos").add(novoPedido);
+
+        const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+        await db.runTransaction(async (transaction) => {
+          const sfDoc = await transaction.get(refEstoque);
+          let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
+          let novoSaldo = atual - totalOvosPedido;
+          transaction.set(refEstoque, { qtdOvos: novoSaldo }, { merge: true });
+        });
+
+        alert(`Pedido #${proximoNumero} gerado com sucesso!`);
         
+        novoPedido.id = docRef.id;
+
         carrinhoTemp = [];
         renderCarrinho();
-        document.getElementById('ped-busca-cliente').value = '';
-        document.getElementById('ped-obs').value = '';
-        document.getElementById('ped-dados-pagamento').value = '';
-        
-        exibirComprovanteDireto(p);
-      }).catch(err => alert('Erro ao finalizar pedido: ' + err.message));
+        e.target.reset();
+
+        abrirModalNota(novoPedido);
+      } catch (err) {
+        console.error("Erro ao gerar pedido:", err);
+        alert("Erro ao salvar pedido na nuvem.");
+      }
     }
 
-    function exibirComprovanteDireto(p) {
-      state.pedidoAtual = p;
-
-      let statusTag = '[🔴 PAGAMENTO PENDENTE]';
-      if (p.status === 'Pago') statusTag = '[🟢 PAGAMENTO CONFIRMADO]';
-      if (p.status === 'Cancelado') statusTag = '[⚪ PEDIDO CANCELADO]';
-
-      let listaItensTxt = p.itens ? p.itens.map(i => `
-        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
-          <span>${i.qtd}x ${i.nome}</span>
-          <span>R$ ${Number(i.subtotal).toFixed(2)}</span>
-        </div>
-      `).join('') : '';
-
-      let obsHtml = p.obs ? `<b>OBSERVAÇÕES:</b><br>${p.obs}<br>--------------------------------------------------<br>` : '';
-
-      document.getElementById('printable-receipt').innerHTML = `
-        <div style="text-align:center; margin-bottom:8px;">
-          <b style="font-size:1.1rem;">${(state.empresa.nome || 'HAPPY EGGS').toUpperCase()}</b><br>
-          CNPJ/CPF: ${state.empresa.cnpj || '-'}<br>
-          Tel/Whats: ${state.empresa.tel || ''}
-        </div>
-        --------------------------------------------------<br>
-        <b>COMPROVANTE DE PEDIDO #${p.numPedido || ''}</b><br>
-        <b>Cliente:</b> ${p.cliente}<br>
-        <b>Documento:</b> ${p.doc || 'Não Informado'}<br>
-        <b>Endereço:</b> ${p.end}<br>
-        --------------------------------------------------<br>
-        <b>ITENS DO PEDIDO:</b><br>
-        ${listaItensTxt}
-        --------------------------------------------------<br>
-        <div style="display:flex; justify-content:space-between; font-size:1rem;"><b>VALOR TOTAL:</b><b>R$ ${Number(p.total).toFixed(2)}</b></div>
-        <b>FORMA DE PGTO:</b> ${p.formaPagamento || 'Pix'}<br>
-        <b>DADOS PGTO:</b> ${p.dadosPagamento || state.empresa.pix || ''}<br>
-        <b>SITUAÇÃO:</b> ${statusTag}<br>
-        --------------------------------------------------<br>
-        ${obsHtml}
-        <div style="text-align:center; font-size: 0.75rem; margin-top: 10px;">
-          <b>${state.empresa.nome || 'HAPPY EGGS'}</b><br>
-          📍 ${state.empresa.end || ''}<br>
-          🌐 ${state.empresa.social || ''}<br>
-          Obrigado pela preferência!
-        </div>
-      `;
-      
-      document.getElementById('modal-nota').style.display = 'flex';
+    async function alternarStatusPedido(id, statusAtual) {
+      const novoStatus = statusAtual === 'Pago' ? 'Pendente' : 'Pago';
+      await db.collection("pedidos").doc(id).update({ status: novoStatus });
     }
 
-    // --- IMPRESSÃO DIRETA NA MESMA PÁGINA (COMPATÍVEL COM CELULAR) ---
-    function gerarImpressaoOuPDF() {
-      // Dispara a impressão sem abrir novas abas. 
-      // O CSS @media print oculta o restante da tela e exibe apenas o comprovante.
-      window.print();
-    }
+    // EXCLUIR / CANCELAR PEDIDO COM ESTORNO AUTOMÁTICO DE OVOS
+    async function excluirOuCancelarPedido(id, numero, qtdOvosEstorno) {
+      if (!confirm(`Tem certeza que deseja excluir o Pedido #${numero || ''}?\nOs ${qtdOvosEstorno || 0} ovos deste pedido retornarão ao Estoque Geral.`)) {
+        return;
+      }
+      try {
+        await db.collection("pedidos").doc(id).delete();
 
-    function cancelarPedido(id) {
-      const p = state.pedidos.find(item => item.id === id);
-      if (!p) return;
-      if (p.status === 'Cancelado') return alert('Este pedido já foi cancelado.');
-
-      if (confirm(`Deseja cancelar o pedido #${p.numPedido}? Os produtos retornarão ao estoque.`)) {
-        if (p.itens && p.itens.length > 0) {
-          p.itens.forEach(item => {
-            db.collection("produtos").doc(item.prodId).update({
-              qtd: firebase.firestore.FieldValue.increment(item.qtd)
-            });
+        // Estorno dos ovos para o estoque geral
+        if (qtdOvosEstorno > 0) {
+          const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+          await db.runTransaction(async (transaction) => {
+            const sfDoc = await transaction.get(refEstoque);
+            let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
+            transaction.set(refEstoque, { qtdOvos: atual + qtdOvosEstorno }, { merge: true });
           });
         }
-        db.collection("pedidos").doc(id).update({ status: 'Cancelado' });
+
+        alert(`Pedido #${numero || ''} excluído e estoque estornado com sucesso!`);
+      } catch (err) {
+        console.error("Erro ao excluir pedido:", err);
+        alert("Erro ao excluir o pedido.");
       }
     }
 
-    function alternarStatus(id) {
-      const p = state.pedidos.find(item => item.id === id);
-      if (p) {
-        if (p.status === 'Cancelado') return alert('Pedidos cancelados não podem ter status alterado.');
-        const novoStatus = p.status === 'Pago' ? 'Pendente' : 'Pago';
-        db.collection("pedidos").doc(id).update({ status: novoStatus });
-      }
-    }
-
-    // --- EMPRESA E USUÁRIOS ---
-    function salvarEmpresa(e) {
+    async function registrarEntradaProducao(e) {
       e.preventDefault();
-      const empresaData = {
+      const qtd = parseInt(document.getElementById('prod-ent-qtd').value || 0);
+      if (qtd <= 0) return;
+
+      const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+      
+      await db.runTransaction(async (transaction) => {
+        const sfDoc = await transaction.get(refEstoque);
+        let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
+        transaction.set(refEstoque, { qtdOvos: atual + qtd }, { merge: true });
+      });
+
+      await db.collection("producao").add({
+        empresaId: state.currentUser.empresaId,
+        qtdOvos: qtd,
+        dataHora: new Date()
+      });
+
+      e.target.reset();
+      alert('Entrada de produção registrada!');
+    }
+
+    function renderProducaoHoje() {
+      const tbody = document.getElementById('lista-producao-hoje');
+      if (!tbody) return;
+
+      const hoje = new Date().toDateString();
+      const doDia = state.producao.filter(p => {
+        let d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
+        return d.toDateString() === hoje;
+      });
+
+      tbody.innerHTML = doDia.map(p => {
+        let d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
+        return `
+          <tr>
+            <td>${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+            <td><strong>+ ${p.qtdOvos.toLocaleString('pt-BR')} ovos</strong></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function cadastrarUsuario(e) {
+      e.preventDefault();
+      const login = document.getElementById('usr-login').value.trim().toLowerCase();
+      const pass = document.getElementById('usr-pass').value.trim();
+      const role = document.getElementById('usr-role').value;
+
+      await db.collection("usuarios").add({
+        empresaId: state.currentUser.empresaId,
+        login, pass, role
+      });
+
+      e.target.reset();
+      alert('Usuário cadastrado com sucesso!');
+    }
+
+    async function excluirUsuario(id) {
+      if (confirm('Deseja excluir este usuário?')) {
+        await db.collection("usuarios").doc(id).delete();
+      }
+    }
+
+    async function alterarMinhaSenha(e) {
+      e.preventDefault();
+      const nova = document.getElementById('minha-nova-senha').value.trim();
+      if (!nova) return;
+
+      await db.collection("usuarios").doc(state.currentUser.id).update({ pass: nova });
+      state.currentUser.pass = nova;
+      e.target.reset();
+      alert('Sua senha foi alterada com sucesso!');
+    }
+
+    async function salvarEmpresa(e) {
+      e.preventDefault();
+      const dados = {
         nome: document.getElementById('emp-nome').value.trim(),
         cnpj: document.getElementById('emp-cnpj').value.trim(),
         tel: document.getElementById('emp-tel').value.trim(),
@@ -996,187 +1163,268 @@
         social: document.getElementById('emp-social').value.trim(),
         pix: document.getElementById('emp-pix').value.trim()
       };
-      db.collection("config").doc(state.currentUser.empresaId).set(empresaData)
-        .then(() => alert('Dados da Empresa salvos na Nuvem!'))
-        .catch(err => alert('Erro ao salvar empresa: ' + err.message));
+
+      await db.collection("config").doc(state.currentUser.empresaId).set(dados, { merge: true });
+      state.empresa = dados;
+      alert('Dados da empresa salvos com sucesso!');
     }
 
-    function cadastrarUsuario(e) {
-      e.preventDefault();
-      const login = document.getElementById('usr-login').value.trim().toLowerCase();
-      const pass = document.getElementById('usr-pass').value.trim();
-      const role = document.getElementById('usr-role').value;
+    // --- MONTAGEM DO RECIBO / NOTA FISCAL ---
+    function abrirModalNota(pedidoOuId) {
+      let ped = null;
 
-      if (!login || !pass) return alert('Preencha login e senha.');
-
-      db.collection("usuarios").doc(login).set({ 
-        login, pass, role,
-        empresaId: state.currentUser.empresaId
-      })
-        .then(() => { alert('Utilizador adicionado!'); e.target.reset(); })
-        .catch(err => alert('Erro ao cadastrar usuário: ' + err.message));
-    }
-
-    function excluirUsuario(id) {
-      if (confirm(`Tem certeza de que deseja remover o utilizador "${id}"?`)) {
-        db.collection("usuarios").doc(id).delete()
-          .then(() => {
-            alert('Usuário excluído com sucesso!');
-            if (state.currentUser && (state.currentUser.id === id || state.currentUser.login === id)) {
-              logout();
-            }
-          })
-          .catch(err => alert('Erro ao excluir: ' + err.message));
-      }
-    }
-
-    // --- RESUMO DE VENDAS DO DIA ---
-    function abrirResumoVendasDia() {
-      const hoje = new Date();
-      const inicioHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-
-      const pedidosHoje = state.pedidos.filter(p => {
-        if (!p.dataCriacao) return false;
-        const dataPed = p.dataCriacao.toDate ? p.dataCriacao.toDate() : new Date(p.dataCriacao);
-        return dataPed >= inicioHoje && p.status !== 'Cancelado';
-      });
-
-      const totalVendido = pedidosHoje.reduce((sum, p) => sum + p.total, 0);
-      const qtdPedidos = pedidosHoje.length;
-      const ticketMedio = qtdPedidos > 0 ? (totalVendido / qtdPedidos) : 0;
-
-      const porForma = {};
-      pedidosHoje.forEach(p => {
-        const forma = p.formaPagamento || 'Outros';
-        porForma[forma] = (porForma[forma] || 0) + p.total;
-      });
-
-      document.getElementById('resumo-data-hoje').innerText = `Data: ${hoje.toLocaleDateString('pt-BR')}`;
-      document.getElementById('resumo-total-hoje').innerText = `R$ ${totalVendido.toFixed(2)}`;
-      document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
-      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
-
-      let formasHtml = Object.keys(porForma).length > 0 
-        ? Object.entries(porForma).map(([forma, val]) => `• <b>${forma}:</b> R$ ${val.toFixed(2)}`).join('<br>')
-        : '<span style="color:#64748b;">Nenhuma venda registrada hoje.</span>';
-      
-      document.getElementById('resumo-detalhe-formas').innerHTML = formasHtml;
-
-      const tbody = document.getElementById('resumo-tabela-hoje');
-      if (pedidosHoje.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhuma venda hoje</td></tr>';
+      if (typeof pedidoOuId === 'string') {
+        ped = state.pedidos.find(p => p.id === pedidoOuId);
       } else {
-        tbody.innerHTML = pedidosHoje.map(p => `
-          <tr>
-            <td>#${p.numPedido || '----'}</td>
-            <td>${p.cliente}</td>
-            <td>R$ ${p.total.toFixed(2)}</td>
-            <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
-          </tr>
-        `).join('');
+        ped = pedidoOuId;
       }
 
-      document.getElementById('modal-resumo').style.display = 'flex';
+      if (!ped) {
+        alert('Erro ao carregar os dados do pedido.');
+        return;
+      }
+
+      state.pedidoAtual = ped;
+      const receipt = document.getElementById('printable-receipt');
+      const emp = state.empresa || {};
+
+      const isPago = ped.status === 'Pago';
+      const statusSymbol = isPago ? '🟢' : '🔴';
+
+      const numPedido = ped.numeroPedido || '---';
+      const clienteNome = ped.clienteNome || 'Cliente não informado';
+      const clienteDoc = ped.clienteDoc || 'N/I';
+      const clienteEnd = ped.clienteEnd || 'Não informado';
+      const totalValor = parseFloat(ped.total || 0).toFixed(2);
+      const formaPgto = ped.formaPgto || 'Não especificada';
+      const dadosPgto = ped.dadosPgto || '';
+      const obs = ped.obs || '';
+      const itens = ped.itens || [];
+
+      receipt.innerHTML = `
+        <div style="text-align:center; margin-bottom:8px;">
+          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
+          <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
+          <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
+        </div>
+
+        <hr class="dashed-divider">
+
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
+          COMPROVANTE DE PEDIDO #${numPedido}
+        </div>
+        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${clienteNome}</div>
+        <div style="margin-bottom:2px;"><strong>Documento:</strong> ${clienteDoc}</div>
+        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${clienteEnd}</div>
+
+        <hr class="dashed-divider">
+
+        <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
+        ${itens.length > 0 ? itens.map(i => `
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>${i.qtd}x${i.nome}</span>
+            <span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span>
+          </div>
+        `).join('') : '<div style="font-size:0.8rem; color:#64748b;">Nenhum item registrado</div>'}
+
+        <hr class="dashed-divider">
+
+        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
+          <span>VALOR TOTAL:</span>
+          <span>R$ ${totalValor}</span>
+        </div>
+        <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${formaPgto}</div>
+        ${dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${dadosPgto}</div>` : ''}
+        <div style="margin-bottom:2px;">
+          <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
+        </div>
+        ${obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${obs}</div>` : ''}
+
+        <hr class="dashed-divider">
+
+        <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
+          <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
+          ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
+          ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
+          <p style="margin-top:4px;">Obrigado pela preferência!</p>
+        </div>
+      `;
+
+      document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    // --- RENDERIZAÇÃO GERAL ---
-    function render() {
-      if (!state.currentUser) return;
-
-      const elClientes = document.getElementById('lista-clientes');
-      if (elClientes) {
-        elClientes.innerHTML = state.clientes.map(c => `
-          <tr>
-            <td><b>${c.nome}</b><br><small style="color:#64748b;">Doc: ${c.doc || 'Não informado'}</small></td>
-            <td>${c.tel}</td>
-            <td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">🗑</button></td>
-          </tr>`).join('');
-      }
-
-      const elProdutos = document.getElementById('lista-produtos');
-      if (elProdutos) {
-        elProdutos.innerHTML = state.produtos.map(p => `
-          <tr>
-            <td>${p.nome}</td>
-            <td>R$ ${Number(p.preco).toFixed(2)}</td>
-            <td><b>${p.qtd}</b></td>
-            <td>
-              <button class="btn-warning" type="button" onclick="prepararEdicaoProduto('${p.id}')">✏️</button>
-              <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑</button>
-            </td>
-          </tr>`).join('');
-      }
-
-      const elPedidos = document.getElementById('lista-pedidos');
-      if (elPedidos) {
-        elPedidos.innerHTML = state.pedidos.map(p => {
-          let badgeClass = 'badge-pendente';
-          let badgeTxt = '🔴 PENDENTE';
-          if (p.status === 'Pago') { badgeClass = 'badge-pago'; badgeTxt = '🟢 PAGO'; }
-          if (p.status === 'Cancelado') { badgeClass = 'badge-cancelado'; badgeTxt = '⚪ CANCELADO'; }
-
-          return `
-          <tr>
-            <td>#${p.numPedido || '----'}</td>
-            <td>${p.cliente}</td>
-            <td>R$ ${Number(p.total).toFixed(2)}</td>
-            <td><span class="badge ${badgeClass}" onclick="alternarStatus('${p.id}')">${badgeTxt}</span></td>
-            <td>
-              <button class="btn" type="button" style="padding:3px 6px; font-size:0.75rem;" onclick="verNota('${p.id}')">📄 Nota</button>
-              ${p.status !== 'Cancelado' ? `<button class="btn-danger" type="button" style="padding:3px 6px; font-size:0.75rem;" onclick="cancelarPedido('${p.id}')">❌</button>` : ''}
-            </td>
-          </tr>`;
-        }).join('');
-      }
-
-      const elUsuarios = document.getElementById('lista-usuarios');
-      if (elUsuarios) {
-        elUsuarios.innerHTML = state.usuarios.map(u => {
-          const uId = u.id || u.login;
-          return `
-          <tr>
-            <td><b>${u.login}</b></td>
-            <td>${u.role}</td>
-            <td>
-              <button class="btn-warning" type="button" title="Alterar Senha" onclick="alterarSenhaUsuario('${uId}', '${u.login}')">🔑</button>
-              <button class="btn-danger" type="button" title="Excluir Usuário" onclick="excluirUsuario('${uId}')">🗑</button>
-            </td>
-          </tr>`;
-        }).join('');
-      }
-
-      filtrarClientesDropdown();
-      renderClientesDashboard();
-      
-      const prodOptions = state.produtos.map(p => 
-        `<option value="${p.id}" ${p.qtd <= 0 ? 'disabled' : ''}>${p.nome} - R$ ${Number(p.preco).toFixed(2)} (${p.qtd <= 0 ? 'SEM ESTOQUE' : 'Estoque: ' + p.qtd})</option>`
-      ).join('');
-
-      const elPedProd = document.getElementById('ped-produto');
-      if (elPedProd) elPedProd.innerHTML = prodOptions;
-
-      const elEntProd = document.getElementById('prod-ent-item');
-      if (elEntProd) elEntProd.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+    function imprimirNota() {
+      window.print();
     }
 
-    // --- COMPROVANTE DE PEDIDO ---
-    function verNota(id) {
-      const p = state.pedidos.find(i => i.id === id);
-      if(!p) return;
-      exibirComprovanteDireto(p);
+    function salvarNotaPDF() {
+      const receiptElement = document.getElementById('printable-receipt');
+      const ped = state.pedidoAtual || {};
+      const num = ped.numeroPedido || 'comprovante';
+
+      const pdfContainer = document.createElement('div');
+      pdfContainer.style.position = 'absolute';
+      pdfContainer.style.left = '-9999px';
+      pdfContainer.style.top = '0';
+      pdfContainer.style.width = '380px';
+      pdfContainer.style.backgroundColor = '#ffffff';
+      pdfContainer.style.padding = '15px';
+
+      pdfContainer.innerHTML = receiptElement.innerHTML;
+      pdfContainer.className = 'receipt-box';
+      pdfContainer.style.border = '1px dashed #000';
+
+      document.body.appendChild(pdfContainer);
+
+      const opt = {
+        margin:       [10, 10, 10, 10],
+        filename:     `Pedido_${num}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, logging: false, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(pdfContainer).save().then(() => {
+        document.body.removeChild(pdfContainer);
+      }).catch(err => {
+        console.error('Erro ao gerar PDF:', err);
+        if (pdfContainer.parentNode) {
+          document.body.removeChild(pdfContainer);
+        }
+      });
     }
 
     function enviarWhats() {
-      const p = state.pedidoAtual;
-      if (!p) return;
+      const ped = state.pedidoAtual;
+      if (!ped) return;
 
-      let itensWhats = p.itens ? p.itens.map(i => `• ${i.qtd}x ${i.nome} (R$ ${Number(i.subtotal).toFixed(2)})`).join('%0A') : '';
-      let obsWhats = p.obs ? `%0A*Obs:* ${p.obs}` : '';
+      let fone = (ped.clienteTel || '').replace(/\D/g, '');
+      if (!fone.startsWith('55') && fone.length >= 10) fone = '55' + fone;
 
-      const text = `Olá *${p.cliente}*, segue o comprovante do *Pedido #${p.numPedido}* do ${state.empresa.nome}:%0A%0A*Doc:* ${p.doc || 'Não informado'}%0A*Itens:*%0A${itensWhats}%0A%0A*Total:* R$ ${Number(p.total).toFixed(2)}%0A*Forma de Pagamento:* ${p.formaPagamento}%0A*Dados de Pago:* ${p.dadosPagamento}%0A*Status:* ${p.status}${obsWhats}%0A%0A📍 ${state.empresa.end}%0A🌐 ${state.empresa.social}`;
-      window.open(`https://wa.me/${p.tel.replace(/\D/g, '')}?text=${text}`, '_blank');
+      let msg = `*COMPROVANTE DE PEDIDO #${ped.numeroPedido || ''}*\n`;
+      msg += `*Empresa:* ${state.empresa.nome || 'HappyEggs'}\n`;
+      msg += `--------------------------------\n`;
+      msg += `*Cliente:* ${ped.clienteNome}\n`;
+      msg += `*Status:* ${ped.status === 'Pago' ? '🟢 PAGAMENTO CONFIRMADO' : '🔴 AGUARDANDO PAGAMENTO'}\n\n`;
+      msg += `*ITENS:*\n`;
+      (ped.itens || []).forEach(i => {
+        msg += `• ${i.qtd}x ${i.nome} - R$ ${parseFloat(i.subtotal).toFixed(2)}\n`;
+      });
+      msg += `\n*TOTAL: R$ ${parseFloat(ped.total).toFixed(2)}*\n`;
+      msg += `*Forma de Pgto:* ${ped.formaPgto}\n`;
+
+      if (state.empresa.pix) {
+        msg += `*Chave Pix:* ${state.empresa.pix}\n`;
+      }
+
+      msg += `\nAgradecemos a preferência! 🥚`;
+
+      const link = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(msg)}`;
+      window.open(link, '_blank');
     }
 
+    // --- FUNÇÕES DE RELATÓRIO E FILTRAGEM POR PERÍODO ---
+    function abrirResumoVendas() {
+      document.getElementById('filtro-periodo').value = 'hoje';
+      atualizarFiltroRelatorio();
+      document.getElementById('modal-resumo').style.display = 'flex';
+    }
+
+    function atualizarFiltroRelatorio() {
+      const tipo = document.getElementById('filtro-periodo').value;
+      const boxDatas = document.getElementById('container-datas-personalizadas');
+      
+      if (tipo === 'personalizado') {
+        boxDatas.style.display = 'grid';
+        if (!document.getElementById('data-inicio').value) {
+          const hojeIso = new Date().toISOString().split('T')[0];
+          document.getElementById('data-inicio').value = hojeIso;
+          document.getElementById('data-fim').value = hojeIso;
+        }
+      } else {
+        boxDatas.style.display = 'none';
+      }
+      renderizarDadosRelatorio();
+    }
+
+    function renderizarDadosRelatorio() {
+      const tipo = document.getElementById('filtro-periodo').value;
+      const agora = new Date();
+      let pedidosFiltrados = [];
+      let textoPeriodo = '';
+
+      if (tipo === 'hoje') {
+        const hojeStr = agora.toDateString();
+        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao.toDateString && p.dataCriacao.toDateString() === hojeStr);
+        textoPeriodo = `Período: Hoje (${agora.toLocaleDateString('pt-BR')})`;
+      } else if (tipo === 'semana') {
+        const seteDiasAtras = new Date();
+        seteDiasAtras.setDate(agora.getDate() - 7);
+        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao >= seteDiasAtras);
+        textoPeriodo = `Período: Últimos 7 dias (Até ${agora.toLocaleDateString('pt-BR')})`;
+      } else if (tipo === 'mes') {
+        const mesAtual = agora.getMonth();
+        const anoAtual = agora.getFullYear();
+        pedidosFiltrados = state.pedidos.filter(p => {
+          if (!p.dataCriacao) return false;
+          return p.dataCriacao.getMonth() === mesAtual && p.dataCriacao.getFullYear() === anoAtual;
+        });
+        textoPeriodo = `Período: Mês Atual (${agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })} )`;
+      } else if (tipo === 'personalizado') {
+        const dIniStr = document.getElementById('data-inicio').value;
+        const dFimStr = document.getElementById('data-fim').value;
+        
+        if (dIniStr && dFimStr) {
+          const dIni = new Date(dIniStr + 'T00:00:00');
+          const dFim = new Date(dFimStr + 'T23:59:59');
+          pedidosFiltrados = state.pedidos.filter(p => {
+            if (!p.dataCriacao) return false;
+            return p.dataCriacao >= dIni && p.dataCriacao <= dFim;
+          });
+          textoPeriodo = `Período de ${dIni.toLocaleDateString('pt-BR')} até ${dFim.toLocaleDateString('pt-BR')}`;
+        } else {
+          pedidosFiltrados = [];
+          textoPeriodo = 'Selecione as datas inicial e final';
+        }
+      }
+
+      document.getElementById('resumo-periodo-texto').innerText = textoPeriodo;
+
+      const totalPeriodo = pedidosFiltrados.reduce((acc, p) => acc + (p.total || 0), 0);
+      const qtdPedidos = pedidosFiltrados.length;
+      const ticketMedio = qtdPedidos > 0 ? (totalPeriodo / qtdPedidos) : 0;
+
+      const porForma = {};
+      pedidosFiltrados.forEach(p => {
+        const forma = p.formaPgto || 'Não especificada';
+        porForma[forma] = (porForma[forma] || 0) + (p.total || 0);
+      });
+
+      document.getElementById('resumo-total-periodo').innerText = `R$ ${totalPeriodo.toFixed(2)}`;
+      document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
+      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
+
+      const htmlFormas = Object.keys(porForma).map(f => `
+        <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+          <span>${f}:</span>
+          <strong>R$ ${porForma[f].toFixed(2)}</strong>
+        </div>
+      `).join('');
+      document.getElementById('resumo-detalhe-formas').innerHTML = htmlFormas || 'Nenhuma venda registrada no período.';
+
+      const tbody = document.getElementById('resumo-tabela-periodo');
+      tbody.innerHTML = pedidosFiltrados.map(p => `
+        <tr>
+          <td>#${p.numeroPedido || ''}</td>
+          <td>${p.dataCriacao ? p.dataCriacao.toLocaleDateString('pt-BR') : ''}</td>
+          <td>${p.clienteNome}</td>
+          <td>R$ ${parseFloat(p.total).toFixed(2)}</td>
+          <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    // Inicialização da Aplicação
     initApp();
   </script>
 </body>
