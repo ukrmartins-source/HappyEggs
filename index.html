@@ -114,12 +114,22 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
+    /* ESTILOS DE IMPRESSÃO ESPECÍFICOS PARA EVITAR CONFLITOS ENTRE RECIBO E RELATÓRIO */
     @media print {
       body { background: #ffffff !important; margin: 0 !important; padding: 0 !important; }
-      header, main, .no-print, .modal-content > *:not(#printable-receipt) { display: none !important; }
-      .modal { position: static !important; display: block !important; background: none !important; }
-      .modal-content { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
-      #printable-receipt { display: block !important; visibility: visible !important; position: relative !important; width: 100% !important; max-width: 380px !important; margin: 0 auto !important; border: 1.5px dashed #000000 !important; page-break-inside: avoid; }
+      header, main, .no-print { display: none !important; }
+      
+      /* Se o modal de nota estiver aberto */
+      body.printing-receipt #modal-nota { position: static !important; display: block !important; background: none !important; }
+      body.printing-receipt #modal-nota .modal-content > *:not(#printable-receipt) { display: none !important; }
+      body.printing-receipt #modal-nota .modal-content { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+      body.printing-receipt #printable-receipt { display: block !important; visibility: visible !important; position: relative !important; width: 100% !important; max-width: 380px !important; margin: 0 auto !important; border: 1.5px dashed #000000 !important; page-break-inside: avoid; }
+
+      /* Se o modal de relatório estiver aberto */
+      body.printing-report #modal-resumo { position: static !important; display: block !important; background: none !important; }
+      body.printing-report #modal-resumo .modal-content > *:not(#printable-report-content) { display: none !important; }
+      body.printing-report #modal-resumo .modal-content { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+      body.printing-report #printable-report-content { display: block !important; visibility: visible !important; position: relative !important; width: 100% !important; margin: 0 auto !important; }
     }
   </style>
 </head>
@@ -157,7 +167,6 @@
         <button class="grid-btn admin-only" type="button" onclick="navTo('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navTo('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
         
-        <!-- BOTÃO DE RELATÓRIO CORRIGIDO -->
         <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()">
           <span class="icon">📊</span><span class="label">RELATÓRIO DE VENDAS (DIAS / MÊS)</span>
         </button>
@@ -436,62 +445,66 @@
   <!-- MODAL: RELATÓRIO DE VENDAS FLEXÍVEL -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 500px;">
-      <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
       
-      <div class="form-group">
-        <label>Filtrar Período</label>
-        <select id="filtro-periodo" onchange="atualizarFiltroRelatorio()">
-          <option value="hoje">Hoje</option>
-          <option value="semana">Últimos 7 Dias (Semana)</option>
-          <option value="mes">Este Mês Atual</option>
-          <option value="personalizado">Personalizado (Intervalo de Datas)</option>
-        </select>
-      </div>
-
-      <div id="container-datas-personalizadas" style="display:none; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
-        <div class="form-group" style="margin-bottom:0;">
-          <label>Data Inicial</label>
-          <input type="date" id="data-inicio" onchange="renderizarDadosRelatorio()">
+      <!-- CONTÊINER ISOLADO PARA IMPRESSÃO CORRETA DO RELATÓRIO -->
+      <div id="printable-report-content">
+        <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
+        
+        <div class="form-group no-print">
+          <label>Filtrar Período</label>
+          <select id="filtro-periodo" onchange="atualizarFiltroRelatorio()">
+            <option value="hoje">Hoje</option>
+            <option value="semana">Últimos 7 Dias (Semana)</option>
+            <option value="mes">Este Mês Atual</option>
+            <option value="personalizado">Personalizado (Intervalo de Datas)</option>
+          </select>
         </div>
-        <div class="form-group" style="margin-bottom:0;">
-          <label>Data Final</label>
-          <input type="date" id="data-fim" onchange="renderizarDadosRelatorio()">
+
+        <div id="container-datas-personalizadas" class="no-print" style="display:none; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Data Inicial</label>
+            <input type="date" id="data-inicio" onchange="renderizarDadosRelatorio()">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Data Final</label>
+            <input type="date" id="data-fim" onchange="renderizarDadosRelatorio()">
+          </div>
+        </div>
+
+        <div id="resumo-periodo-texto" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; font-weight:bold;"></div>
+
+        <div class="stat-card">
+          <div class="stat-title">Total Faturado no Período</div>
+          <div class="stat-value" id="resumo-total-periodo">R$ 0,00</div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div class="stat-card" style="margin:0;">
+            <div class="stat-title">Nº de Pedidos</div>
+            <div class="stat-value" id="resumo-qtd-pedidos">0</div>
+          </div>
+          <div class="stat-card" style="margin:0;">
+            <div class="stat-title">Ticket Médio</div>
+            <div class="stat-value" id="resumo-ticket-medio">R$ 0,00</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-title" style="margin-bottom:6px;">Recebimento por Forma de Pagamento</div>
+          <div id="resumo-detalhe-formas" style="font-size:0.85rem; line-height:1.4;"></div>
+        </div>
+
+        <div style="margin-top:15px; max-height: 180px; overflow-y: auto;">
+          <div class="stat-title" style="margin-bottom:6px;">Vendas Listadas no Período</div>
+          <table>
+            <thead><tr><th># Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody id="resumo-tabela-periodo"></tbody>
+          </table>
         </div>
       </div>
 
-      <div id="resumo-periodo-texto" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; font-weight:bold;"></div>
-
-      <div class="stat-card">
-        <div class="stat-title">Total Faturado no Período</div>
-        <div class="stat-value" id="resumo-total-periodo">R$ 0,00</div>
-      </div>
-
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-        <div class="stat-card" style="margin:0;">
-          <div class="stat-title">Nº de Pedidos</div>
-          <div class="stat-value" id="resumo-qtd-pedidos">0</div>
-        </div>
-        <div class="stat-card" style="margin:0;">
-          <div class="stat-title">Ticket Médio</div>
-          <div class="stat-value" id="resumo-ticket-medio">R$ 0,00</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-title" style="margin-bottom:6px;">Recebimento por Forma de Pagamento</div>
-        <div id="resumo-detalhe-formas" style="font-size:0.85rem; line-height:1.4;"></div>
-      </div>
-
-      <div style="margin-top:15px; max-height: 180px; overflow-y: auto;">
-        <div class="stat-title" style="margin-bottom:6px;">Vendas Listadas no Período</div>
-        <table>
-          <thead><tr><th># Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
-          <tbody id="resumo-tabela-periodo"></tbody>
-        </table>
-      </div>
-
-      <div style="display:flex; gap:10px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="window.print()">🖨 Imprimir Relatório</button>
+      <div class="no-print" style="display:flex; gap:10px; margin-top:15px;">
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorio()">🖨 Imprimir Relatório</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
     </div>
@@ -1216,12 +1229,25 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
+    // CORREÇÃO DO BOTÃO IMPRIMIR RECIBO (DISPARA DIRETAMENTE SEM PRECISAR SALVAR PDF ANTES)
     function imprimirNota() {
+      document.body.classList.add('printing-receipt');
       setTimeout(() => {
         window.print();
-      }, 100);
+        document.body.classList.remove('printing-receipt');
+      }, 150);
     }
 
+    // CORREÇÃO DA IMPRESSÃO DO RELATÓRIO DE VENDAS
+    function imprimirRelatorio() {
+      document.body.classList.add('printing-report');
+      setTimeout(() => {
+        window.print();
+        document.body.classList.remove('printing-report');
+      }, 150);
+    }
+
+    // CORREÇÃO DO PDF DO PEDIDO (GARANTE A RENDERIZAÇÃO SEM TELA EM BRANCO)
     function salvarNotaPDF() {
       const receiptElement = document.getElementById('printable-receipt');
       const ped = state.pedidoAtual || {};
@@ -1255,7 +1281,9 @@
       };
 
       html2pdf().set(opt).from(pdfContainer).save().then(() => {
-        document.body.removeChild(pdfContainer);
+        if (pdfContainer.parentNode) {
+          document.body.removeChild(pdfContainer);
+        }
       }).catch(err => {
         console.error('Erro ao gerar PDF:', err);
         if (pdfContainer.parentNode) {
@@ -1289,8 +1317,6 @@
       }
 
       msg += `\nAgradecemos a preferência! 🥚`;
-
-      salvarNotaPDF();
 
       const link = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(msg)}`;
       window.open(link, '_blank');
