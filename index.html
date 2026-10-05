@@ -114,17 +114,20 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
-    /* REGRAS DE IMPRESSÃO LEVES E OTIMIZADAS (ELIMINAM TRAVAMENTOS E BLOQUEIOS) */
+    /* REGRAS DE IMPRESSÃO ROBUSTAS E SEGURAS (CORRIGE O BUG DE MÚLTIPLOS CLIQUES) */
     @media print {
       body * { visibility: hidden !important; }
-      header, main { display: none !important; }
-      .modal[style*="flex"] {
-        position: fixed !important; left: 0 !important; top: 0 !important; width: 100% !important; height: 100% !important;
-        background: white !important; display: flex !important; align-items: flex-start !important; justify-content: center !important; z-index: 99999 !important;
+      header, main, .no-print { display: none !important; }
+      .modal, .modal-content, #printable-receipt, #printable-receipt * {
+        visibility: visible !important;
       }
-      .modal[style*="flex"] * { visibility: visible !important; }
-      .modal[style*="flex"] .modal-content { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; background: #ffffff !important; }
-      .modal[style*="flex"] .no-print { display: none !important; }
+      .modal {
+        position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; height: auto !important;
+        background: transparent !important; display: block !important; z-index: 999999 !important;
+      }
+      .modal-content {
+        box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; background: #ffffff !important;
+      }
     }
   </style>
 </head>
@@ -412,14 +415,14 @@
     <div class="modal-content">
       <div class="card-title no-print" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       
-      <!-- RECIBO COM BORDA TRACEJADA (IGUAL À FOTO) -->
+      <!-- RECIBO COM BORDA TRACEJADA -->
       <div class="receipt-box" id="printable-receipt"></div>
       
       <!-- PAINEL DE AÇÕES E BOTÕES -->
       <div class="no-print" style="display:flex; flex-direction:column; gap:10px;">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <button class="btn" type="button" style="background:#2563eb;" onclick="baixarReciboImagem()">
-            💾 Baixar Imagem
+            💾 Baixar Arquivo/PDF
           </button>
           <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirNota()">
             🖨️ Imprimir
@@ -427,7 +430,7 @@
         </div>
         
         <button class="btn" type="button" style="background:#10b981;" onclick="enviarWhats()">
-          💬 Enviar WhatsApp (Texto + Imagem)
+          💬 Enviar WhatsApp (Comprovante Formatado)
         </button>
 
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:4px;">
@@ -1221,7 +1224,7 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    // IMPRESSÃO INSTANTÂNEA E DIRETA (SEM TRAVAMENTOS)
+    // IMPRESSÃO DIRETA BLINDADA (RESPONDE NO 1º CLIQUE)
     function imprimirNota() {
       window.print();
     }
@@ -1230,7 +1233,7 @@
       window.print();
     }
 
-    // GERA O RECIBO EXATO EM IMAGEM PARA BAIXAR E ANEXAR NO WHATSAPP
+    // GERA O COMPROVANTE EM PDF COM TIMING SEGURO (ELIMINA PÁGINAS EM BRANCO)
     function baixarReciboImagem() {
       const receiptElement = document.getElementById('printable-receipt');
       const ped = state.pedidoAtual || {};
@@ -1249,14 +1252,18 @@
         jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
       };
 
-      html2pdf().set(opt).from(receiptElement).save().then(() => {
-        alert('Comprovante baixado! Agora você pode enviá-lo pelo WhatsApp junto com o texto.');
-      }).catch(err => {
-        console.error('Erro ao gerar imagem:', err);
-        alert('Erro ao gerar arquivo.');
-      });
+      // Adicionado atraso de renderização para garantir que o DOM está pronto e evitar PDF em branco
+      setTimeout(() => {
+        html2pdf().set(opt).from(receiptElement).save().then(() => {
+          alert('Comprovante baixado com sucesso! Agora você pode enviá-lo pelo WhatsApp.');
+        }).catch(err => {
+          console.error('Erro ao gerar arquivo:', err);
+          alert('Erro ao gerar arquivo PDF.');
+        });
+      }, 300);
     }
 
+    // WHATSAPP REESTRUTURADO COM DADOS COMPLETOS E PROFISSIONAIS
     function enviarWhats() {
       const ped = state.pedidoAtual;
       if (!ped) return;
@@ -1264,23 +1271,26 @@
       let fone = (ped.clienteTel || '').replace(/\D/g, '');
       if (!fone.startsWith('55') && fone.length >= 10) fone = '55' + fone;
 
-      let msg = `*COMPROVANTE DE PEDIDO #${ped.numeroPedido || ''}*\n`;
+      let msg = `*COMPROVANTE DE PEDIDO #${ped.numeroPedido || ''}* 🥚\n`;
       msg += `*Empresa:* ${state.empresa.nome || 'HappyEggs'}\n`;
       msg += `--------------------------------\n`;
-      msg += `*Cliente:* ${ped.clienteNome}\n`;
-      msg += `*Status:* ${ped.status === 'Pago' ? '🟢 PAGAMENTO CONFIRMADO' : '🔴 AGUARDANDO PAGAMENTO'}\n\n`;
-      msg += `*ITENS:*\n`;
+      msg += `👤 *Cliente:* ${ped.clienteNome}\n`;
+      msg += `📌 *Status:* ${ped.status === 'Pago' ? '🟢 PAGAMENTO CONFIRMADO' : '🔴 AGUARDANDO PAGAMENTO'}\n\n`;
+      msg += `🛍 *ITENS DO PEDIDO:*\n`;
       (ped.itens || []).forEach(i => {
-        msg += `• ${i.qtd}x ${i.nome} - R$ ${parseFloat(i.subtotal).toFixed(2)}\n`;
+        msg += `• ${i.qtd}x ${i.nome} — R$ ${parseFloat(i.subtotal).toFixed(2)}\n`;
       });
-      msg += `\n*TOTAL: R$ ${parseFloat(ped.total).toFixed(2)}*\n`;
-      msg += `*Forma de Pgto:* ${ped.formaPgto}\n`;
+      msg += `\n💰 *TOTAL A PAGAR: R$ ${parseFloat(ped.total).toFixed(2)}*\n`;
+      msg += `💳 *Forma de Pgto:* ${ped.formaPgto}\n`;
 
       if (state.empresa.pix) {
-        msg += `*Chave Pix:* ${state.empresa.pix}\n`;
+        msg += `📱 *Chave Pix:* ${state.empresa.pix}\n`;
+      }
+      if (ped.obs) {
+        msg += `📝 *Obs:* ${ped.obs}\n`;
       }
 
-      msg += `\nAgradecemos a preferência! 🥚\n*(Baixe o arquivo PDF/Imagem no botão acima e envie junto)*`;
+      msg += `\nAgradecemos a preferência! Volte sempre. 🙏\n*(Dica: Baixe o arquivo PDF acima e envie junto na conversa)*`;
 
       const link = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(msg)}`;
       window.open(link, '_blank');
@@ -1389,4 +1399,4 @@
     initApp();
   </script>
 </body>
-</html>  
+</html>
