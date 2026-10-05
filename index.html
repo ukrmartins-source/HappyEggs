@@ -771,7 +771,7 @@
           <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
           <td>${p.ovosUnid} ovos</td>
           <td>
-            <button class="btn-warning" onclick="editarProduto('${p.id}')">✏️️</button>
+            <button class="btn-warning" onclick="editarProduto('${p.id}')">✏</button>
             <button class="btn-danger" onclick="excluirProduto('${p.id}')">🗑</button>
           </td>
         </tr>
@@ -1060,7 +1060,6 @@
       try {
         await db.collection("pedidos").doc(id).delete();
 
-        // Estorno dos ovos para o estoque geral
         if (qtdOvosEstorno > 0) {
           const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
           await db.runTransaction(async (transaction) => {
@@ -1253,8 +1252,13 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
+    // --- FUNÇÕES CORRIGIDAS DE IMPRESSÃO, PDF E WHATSAPP ---
+
     function imprimirNota() {
-      window.print();
+      // Pequeno timeout para garantir a estabilidade do DOM antes de chamar a impressão do navegador
+      setTimeout(() => {
+        window.print();
+      }, 100);
     }
 
     function salvarNotaPDF() {
@@ -1267,26 +1271,27 @@
         return;
       }
 
+      // Cria um container isolado estruturado para evitar páginas em branco
       const pdfContainer = document.createElement('div');
       pdfContainer.style.position = 'fixed';
       pdfContainer.style.left = '-9999px';
       pdfContainer.style.top = '0';
-      pdfContainer.style.width = '400px';
+      pdfContainer.style.width = '380px';
       pdfContainer.style.backgroundColor = '#ffffff';
-      pdfContainer.style.padding = '20px';
-      pdfContainer.style.fontFamily = 'monospace';
-      pdfContainer.style.fontSize = '13px';
-      pdfContainer.style.color = '#000000';
+      pdfContainer.style.padding = '15px';
+      pdfContainer.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      pdfContainer.style.fontSize = '12px';
+      pdfContainer.style.color = '#1f2937';
       pdfContainer.innerHTML = receiptElement.innerHTML;
 
       document.body.appendChild(pdfContainer);
 
       const opt = {
-        margin:       10,
+        margin:       5,
         filename:     `Pedido_${num}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false, windowWidth: 400 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        html2canvas:  { scale: 2, useCORS: true, logging: false, windowWidth: 380 },
+        jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
       };
 
       html2pdf().set(opt).from(pdfContainer).save().then(() => {
@@ -1325,6 +1330,10 @@
 
       msg += `\nAgradecemos a preferência! 🥚`;
 
+      // Dispara o PDF para salvamento automático para que o usuário possa anexá-lo facilmente no chat
+      salvarNotaPDF();
+
+      // Abre o WhatsApp com a mensagem formatada pronta para envio
       const link = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(msg)}`;
       window.open(link, '_blank');
     }
