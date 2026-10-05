@@ -88,7 +88,6 @@
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
     th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
 
-    /* ESTILOS DO MODAL DE NOTA E CUPOM */
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.7); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
@@ -107,12 +106,7 @@
       line-height: 1.4;
     }
 
-    .dashed-divider {
-      border: none;
-      border-top: 1.5px dashed #9ca3af;
-      margin: 10px 0;
-    }
-
+    .dashed-divider { border: none; border-top: 1.5px dashed #9ca3af; margin: 10px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -120,39 +114,12 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
-    /* CORREÇÃO DE IMPRESSÃO */
     @media print {
-      body {
-        background: #ffffff !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-      header, main, .no-print, .modal-content > *:not(#printable-receipt) {
-        display: none !important;
-      }
-      .modal {
-        position: static !important;
-        display: block !important;
-        background: none !important;
-      }
-      .modal-content {
-        box-shadow: none !important;
-        border: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      #printable-receipt {
-        display: block !important;
-        visibility: visible !important;
-        position: relative !important;
-        width: 100% !important;
-        max-width: 380px !important;
-        margin: 0 auto !important;
-        border: 1.5px dashed #000000 !important;
-        page-break-inside: avoid;
-      }
+      body { background: #ffffff !important; margin: 0 !important; padding: 0 !important; }
+      header, main, .no-print, .modal-content > *:not(#printable-receipt) { display: none !important; }
+      .modal { position: static !important; display: block !important; background: none !important; }
+      .modal-content { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+      #printable-receipt { display: block !important; visibility: visible !important; position: relative !important; width: 100% !important; max-width: 380px !important; margin: 0 auto !important; border: 1.5px dashed #000000 !important; page-break-inside: avoid; }
     }
   </style>
 </head>
@@ -189,7 +156,7 @@
         <button class="grid-btn" type="button" onclick="navTo('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navTo('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navTo('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()">
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrerResumoVendas()">
           <span class="icon">📊</span><span class="label">RELATÓRIO DE VENDAS (DIAS / MÊS)</span>
         </button>
       </div>
@@ -576,7 +543,6 @@
       }).catch(err => console.error("Erro na inicialização:", err));
     }
 
-    // --- ESCUTADORES EM TEMPO REAL ---
     function initListeners() {
       state.listenersUnsubscribe.forEach(unsub => unsub());
       state.listenersUnsubscribe = [];
@@ -717,7 +683,6 @@
       render();
     }
 
-    // --- RENDERIZAÇÃO DA INTERFACE ---
     function render() {
       renderClientes();
       renderProdutos();
@@ -738,7 +703,7 @@
         <tr>
           <td><strong>${c.nome}</strong><br><small style="color:#64748b;">${c.doc || 'Sem Doc'}</small></td>
           <td>${c.tel}<br><small style="color:#64748b;">${c.end || ''}</small></td>
-          <td><button class="btn-danger" onclick="excluirCliente('${c.id}')">Excluir</button></td>
+          <td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">Excluir</button></td>
         </tr>
       `).join('');
     }
@@ -771,8 +736,8 @@
           <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
           <td>${p.ovosUnid} ovos</td>
           <td>
-            <button class="btn-warning" onclick="editarProduto('${p.id}')">✏</button>
-            <button class="btn-danger" onclick="excluirProduto('${p.id}')">🗑</button>
+            <button class="btn-warning" type="button" onclick="editarProduto('${p.id}')">✏</button>
+            <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑</button>
           </td>
         </tr>
       `).join('');
@@ -797,8 +762,8 @@
               </span>
             </td>
             <td>
-              <button class="btn" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb; margin-bottom:2px;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
-              <button class="btn-danger" title="Excluir/Estornar Pedido" onclick="excluirOuCancelarPedido('${p.id}', ${p.numeroPedido}, ${p.totalOvos || 0})">🗑️</button>
+              <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb; margin-bottom:2px;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
+              <button class="btn-danger" type="button" title="Excluir/Estornar Pedido" onclick="excluirOuCancelarPedido('${p.id}', ${p.numeroPedido}, ${p.totalOvos || 0})">🗑️</button>
             </td>
           </tr>
         `;
@@ -812,7 +777,7 @@
         <tr>
           <td><strong>${u.login}</strong></td>
           <td><span class="badge" style="background:#e2e8f0; color:#334155;">${u.role}</span></td>
-          <td>${u.login !== 'admin' ? `<button class="btn-danger" onclick="excluirUsuario('${u.id}')">Excluir</button>` : '---'}</td>
+          <td>${u.login !== 'admin' ? `<button class="btn-danger" type="button" onclick="excluirUsuario('${u.id}')">Excluir</button>` : '---'}</td>
         </tr>
       `).join('');
     }
@@ -848,7 +813,6 @@
       }
     }
 
-    // --- AÇÕES DE CADASTRO E SISTEMA ---
     async function cadastrarCliente(e) {
       e.preventDefault();
       const novo = {
@@ -973,7 +937,7 @@
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
               <strong>R$ ${item.subtotal.toFixed(2)}</strong>
-              <button class="btn-danger" style="padding:2px 6px;" onclick="removerItemCarrinho(${idx})">✕</button>
+              <button class="btn-danger" type="button" style="padding:2px 6px;" onclick="removerItemCarrinho(${idx})">✕</button>
             </div>
           </div>
         `;
@@ -1052,7 +1016,6 @@
       await db.collection("pedidos").doc(id).update({ status: novoStatus });
     }
 
-    // EXCLUIR / CANCELAR PEDIDO COM ESTORNO AUTOMÁTICO DE OVOS
     async function excluirOuCancelarPedido(id, numero, qtdOvosEstorno) {
       if (!confirm(`Tem certeza que deseja excluir o Pedido #${numero || ''}?\nOs ${qtdOvosEstorno || 0} ovos deste pedido retornarão ao Estoque Geral.`)) {
         return;
@@ -1168,7 +1131,6 @@
       alert('Dados da empresa salvos com sucesso!');
     }
 
-    // --- MONTAGEM DO RECIBO / NOTA FISCAL ---
     function abrirModalNota(pedidoOuId) {
       let ped = null;
 
@@ -1252,10 +1214,7 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    // --- FUNÇÕES CORRIGIDAS DE IMPRESSÃO, PDF E WHATSAPP ---
-
     function imprimirNota() {
-      // Pequeno timeout para garantir a estabilidade do DOM antes de chamar a impressão do navegador
       setTimeout(() => {
         window.print();
       }, 100);
@@ -1271,7 +1230,6 @@
         return;
       }
 
-      // Cria um container isolado estruturado para evitar páginas em branco
       const pdfContainer = document.createElement('div');
       pdfContainer.style.position = 'fixed';
       pdfContainer.style.left = '-9999px';
@@ -1330,15 +1288,12 @@
 
       msg += `\nAgradecemos a preferência! 🥚`;
 
-      // Dispara o PDF para salvamento automático para que o usuário possa anexá-lo facilmente no chat
       salvarNotaPDF();
 
-      // Abre o WhatsApp com a mensagem formatada pronta para envio
       const link = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(msg)}`;
       window.open(link, '_blank');
     }
 
-    // --- FUNÇÕES DE RELATÓRIO E FILTRAGEM POR PERÍODO ---
     function abrirResumoVendas() {
       document.getElementById('filtro-periodo').value = 'hoje';
       atualizarFiltroRelatorio();
@@ -1439,7 +1394,6 @@
       `).join('');
     }
 
-    // Inicialização da Aplicação
     initApp();
   </script>
 </body>
