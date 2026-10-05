@@ -88,6 +88,7 @@
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
     th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
 
+    /* ESTILOS DO MODAL DE NOTA E CUPOM */
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.7); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
@@ -106,7 +107,12 @@
       line-height: 1.4;
     }
 
-    .dashed-divider { border: none; border-top: 1.5px dashed #9ca3af; margin: 10px 0; }
+    .dashed-divider {
+      border: none;
+      border-top: 1.5px dashed #9ca3af;
+      margin: 10px 0;
+    }
+
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -114,22 +120,49 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
+    /* CORREÃÃO DE IMPRESSÃO */
     @media print {
-      body { background: #ffffff !important; margin: 0 !important; padding: 0 !important; }
-      header, main, .no-print, .modal-content > *:not(#printable-receipt) { display: none !important; }
-      .modal { position: static !important; display: block !important; background: none !important; }
-      .modal-content { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
-      #printable-receipt { display: block !important; visibility: visible !important; position: relative !important; width: 100% !important; max-width: 380px !important; margin: 0 auto !important; border: 1.5px dashed #000000 !important; page-break-inside: avoid; }
+      body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      header, main, .no-print, .modal-content > *:not(#printable-receipt) {
+        display: none !important;
+      }
+      .modal {
+        position: static !important;
+        display: block !important;
+        background: none !important;
+      }
+      .modal-content {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      #printable-receipt {
+        display: block !important;
+        visibility: visible !important;
+        position: relative !important;
+        width: 100% !important;
+        max-width: 380px !important;
+        margin: 0 auto !important;
+        border: 1.5px dashed #000000 !important;
+        page-break-inside: avoid;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- CABEÇALHO -->
+  <!-- CABEÃALHO -->
   <header id="app-header" style="display:none;" class="no-print">
-    <div class="brand"><span id="header-title">🥚 HAPPY EGGS</span></div>
+    <div class="brand"><span id="header-title">ð¥ HAPPY EGGS</span></div>
     <div class="user-info">
-      <span id="user-display">👤 Admin</span>
+      <span id="user-display">ð¤ Admin</span>
       <button class="btn-logout" type="button" onclick="logout()">Sair</button>
     </div>
   </header>
@@ -138,9 +171,9 @@
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
-      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">GestÃ£o de Avicultura Multi-Empresas</p>
       <form onsubmit="autenticar(event)">
-        <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
+        <div class="form-group"><label>UsuÃ¡rio</label><input type="text" id="login-user" placeholder="Seu usuÃ¡rio" required autocomplete="username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password"></div>
         <button type="submit" class="btn" style="margin-top:10px;">Entrar no Sistema</button>
       </form>
@@ -150,24 +183,24 @@
     <div id="view-dashboard" style="display:none;">
       <div class="grid-menu">
         <button class="grid-btn full-width" type="button" onclick="navTo('pedidos')">
-          <span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span>
+          <span class="icon">ð</span><span class="label">NOVO PEDIDO / VENDAS</span>
         </button>
-        <button class="grid-btn" type="button" onclick="navTo('clientes')"><span class="icon">👥</span><span class="label">CLIENTES</span></button>
-        <button class="grid-btn" type="button" onclick="navTo('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
-        <button class="grid-btn admin-only" type="button" onclick="navTo('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
-        <button class="grid-btn admin-only" type="button" onclick="navTo('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrerResumoVendas()">
-          <span class="icon">📊</span><span class="label">RELATÓRIO DE VENDAS (DIAS / MÊS)</span>
+        <button class="grid-btn" type="button" onclick="navTo('clientes')"><span class="icon">ð¥</span><span class="label">CLIENTES</span></button>
+        <button class="grid-btn" type="button" onclick="navTo('produtos')"><span class="icon">ð¦</span><span class="label">ESTOQUE</span></button>
+        <button class="grid-btn admin-only" type="button" onclick="navTo('usuarios')"><span class="icon">ð</span><span class="label">USUÃRIOS</span></button>
+        <button class="grid-btn admin-only" type="button" onclick="navTo('empresa')"><span class="icon">âï¸</span><span class="label">EMPRESA</span></button>
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()">
+          <span class="icon">ð</span><span class="label">RELATÃRIO DE VENDAS (DIAS / MÃS)</span>
         </button>
       </div>
 
       <div class="card" style="margin-top: 15px;">
         <div class="card-header">
-          <div class="card-title">📋 Busca Rápida de Clientes</div>
-          <button class="btn btn-back" type="button" onclick="navTo('clientes')">➕ Cadastrar</button>
+          <div class="card-title">ð Busca RÃ¡pida de Clientes</div>
+          <button class="btn btn-back" type="button" onclick="navTo('clientes')">â Cadastrar</button>
         </div>
         <div class="form-group" style="margin-bottom: 10px;">
-          <input type="text" id="dash-busca-cliente" placeholder="🔎 Digite para buscar cliente..." oninput="filtrarClientesDashboard()">
+          <input type="text" id="dash-busca-cliente" placeholder="ð Digite para buscar cliente..." oninput="filtrarClientesDashboard()">
         </div>
         <table>
           <thead><tr><th>Nome / Doc</th><th>Contato</th></tr></thead>
@@ -181,20 +214,20 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title">Cadastrar Cliente</div>
-          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">ð  InÃ­cio</button>
         </div>
         <form onsubmit="cadastrarCliente(event)">
-          <div class="form-group"><label>Nome / Razão Social</label><input type="text" id="cli-nome" required></div>
+          <div class="form-group"><label>Nome / RazÃ£o Social</label><input type="text" id="cli-nome" required></div>
           <div class="form-group"><label>Documento (CPF / RG / CNPJ)</label><input type="text" id="cli-doc" placeholder="Ex: 000.000.000-00"></div>
           <div class="form-group"><label>WhatsApp / Telefone</label><input type="tel" id="cli-tel" placeholder="Ex: 5511999998888" required></div>
-          <div class="form-group"><label>Endereço Completo</label><input type="text" id="cli-end" placeholder="Rua, Nº, Bairro, Cidade" required></div>
+          <div class="form-group"><label>EndereÃ§o Completo</label><input type="text" id="cli-end" placeholder="Rua, NÂº, Bairro, Cidade" required></div>
           <button type="submit" class="btn">Salvar Cliente na Nuvem</button>
         </form>
       </div>
       <div class="card">
         <div class="card-title">Clientes Cadastrados</div>
         <table>
-          <thead><tr><th>Nome / Doc</th><th>Contato</th><th>Ação</th></tr></thead>
+          <thead><tr><th>Nome / Doc</th><th>Contato</th><th>AÃ§Ã£o</th></tr></thead>
           <tbody id="lista-clientes"></tbody>
         </table>
       </div>
@@ -205,12 +238,12 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title">Novo Pedido</div>
-          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">ð  InÃ­cio</button>
         </div>
         
         <form onsubmit="finalizarPedido(event)">
           <div class="form-group">
-            <label>🔎 Buscar Cliente</label>
+            <label>ð Buscar Cliente</label>
             <input type="text" id="ped-busca-cliente" placeholder="Filtrar por nome, doc ou fone..." oninput="filtrarClientesDropdown()">
           </div>
           <div class="form-group">
@@ -230,12 +263,12 @@
                 <label>Quantidade de Embalagens</label>
                 <input type="number" id="ped-qtd" min="1" value="1">
               </div>
-              <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">➕ Adicionar</button>
+              <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">â Adicionar</button>
             </div>
           </div>
 
           <div class="carrinho-box">
-            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛍 ITENS SELECIONADOS:</div>
+            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">ð ITENS SELECIONADOS:</div>
             <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
             <div style="font-size: 1rem; font-weight: bold; text-align: right; margin-top: 10px; color: var(--accent);">Total: R$ <span id="ped-total-valor">0.00</span></div>
           </div>
@@ -243,10 +276,10 @@
           <div class="form-group">
             <label>Forma de Pagamento</label>
             <select id="ped-forma-pagamento" required>
-              <option value="Pix">📱 Pix</option>
-              <option value="Cartão de Crédito/Débito">💳 Cartão de Crédito / Débito</option>
-              <option value="Transferência Bancária">🏦 Transferência Bancária</option>
-              <option value="Dinheiro">💵 Dinheiro</option>
+              <option value="Pix">ð± Pix</option>
+              <option value="CartÃ£o de CrÃ©dito/DÃ©bito">ð³ CartÃ£o de CrÃ©dito / DÃ©bito</option>
+              <option value="TransferÃªncia BancÃ¡ria">ð¦ TransferÃªncia BancÃ¡ria</option>
+              <option value="Dinheiro">ðµ Dinheiro</option>
             </select>
           </div>
 
@@ -258,14 +291,14 @@
           <div class="form-group">
             <label>Status do Pagamento</label>
             <select id="ped-status" required>
-              <option value="Pago">🟢 Pago</option>
-              <option value="Pendente">🔴 Pendente (A Pagar)</option>
+              <option value="Pago">ð¢ Pago</option>
+              <option value="Pendente">ð´ Pendente (A Pagar)</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label>Observações do Pedido (Sairá na Nota)</label>
-            <textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Deixar com a portaria"></textarea>
+            <label>ObservaÃ§Ãµes do Pedido (SairÃ¡ na Nota)</label>
+            <textarea id="ped-obs" rows="2" placeholder="Ex: Entregar atÃ© 14h / Deixar com a portaria"></textarea>
           </div>
 
           <button type="submit" class="btn" style="background:var(--success);">Finalizar Pedido</button>
@@ -273,9 +306,9 @@
       </div>
 
       <div class="card">
-        <div class="card-title">Histórico de Pedidos Sequencial</div>
+        <div class="card-title">HistÃ³rico de Pedidos Sequencial</div>
         <table>
-          <thead><tr><th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th></tr></thead>
+          <thead><tr><th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>AÃ§Ãµes</th></tr></thead>
           <tbody id="lista-pedidos"></tbody>
         </table>
       </div>
@@ -285,8 +318,8 @@
     <div id="view-produtos" class="view-content" style="display:none;">
       <div class="card" style="border-left: 4px solid var(--accent);">
         <div class="card-header">
-          <div class="card-title">🥚 Registrar Entrada de Produção</div>
-          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+          <div class="card-title">ð¥ Registrar Entrada de ProduÃ§Ã£o</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">ð  InÃ­cio</button>
         </div>
 
         <div class="stat-card" style="background: #eff6ff; border-color: #bfdbfe;">
@@ -299,11 +332,11 @@
             <label>Quantidade Coletada/Produzida (Ovos Individuais)</label>
             <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 5000" required>
           </div>
-          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Direto para o Estoque Geral</button>
+          <button type="submit" class="btn" style="background:var(--accent);">â LanÃ§ar Direto para o Estoque Geral</button>
         </form>
 
         <div style="margin-top: 15px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Coletas de Hoje</div>
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">HistÃ³rico de Coletas de Hoje</div>
           <table>
             <thead><tr><th>Hora</th><th>Unidades</th></tr></thead>
             <tbody id="lista-producao-hoje"></tbody>
@@ -318,11 +351,11 @@
         <form id="form-produto" onsubmit="salvarProduto(event)">
           <input type="hidden" id="prod-id-edit" value="">
           <div class="form-group">
-            <label>Descrição do Item</label>
+            <label>DescriÃ§Ã£o do Item</label>
             <input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / CAIXA 360 OVOS" required>
           </div>
           <div class="form-group">
-            <label>Preço Unitário (R$)</label>
+            <label>PreÃ§o UnitÃ¡rio (R$)</label>
             <input type="number" step="0.01" id="prod-preco" placeholder="Ex: 12.00" required>
           </div>
           <div class="form-group">
@@ -331,43 +364,43 @@
             <span style="font-size: 0.75rem; color: #64748b; margin-top: 3px; display: block;">Serve apenas para calcular quantos ovos descontar do Estoque Geral no pedido.</span>
           </div>
           <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
-          <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
+          <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar EdiÃ§Ã£o</button>
         </form>
       </div>
 
       <div class="card">
-        <div class="card-title">Produtos / Apresentações Disponíveis</div>
+        <div class="card-title">Produtos / ApresentaÃ§Ãµes DisponÃ­veis</div>
         <table>
-          <thead><tr><th>Descrição</th><th>Preço</th><th>Ovos/Emb</th><th>Ações</th></tr></thead>
+          <thead><tr><th>DescriÃ§Ã£o</th><th>PreÃ§o</th><th>Ovos/Emb</th><th>AÃ§Ãµes</th></tr></thead>
           <tbody id="lista-produtos"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- TELA: GESTÃO DE USUÁRIOS -->
+    <!-- TELA: GESTÃO DE USUÃRIOS -->
     <div id="view-usuarios" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">Adicionar Usuário</div>
-          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+          <div class="card-title">Adicionar UsuÃ¡rio</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">ð  InÃ­cio</button>
         </div>
         <form onsubmit="cadastrarUsuario(event)">
           <div class="form-group"><label>Login / Nome</label><input type="text" id="usr-login" required autocomplete="username"></div>
           <div class="form-group"><label>Senha de Acesso</label><input type="password" id="usr-pass" required autocomplete="new-password"></div>
           <div class="form-group">
-            <label>Nível de Permissão</label>
+            <label>NÃ­vel de PermissÃ£o</label>
             <select id="usr-role">
               <option value="vendedor">Vendedor (Apenas Vendas/Clientes)</option>
               <option value="admin">Administrador (Acesso Total)</option>
             </select>
           </div>
-          <button type="submit" class="btn">Cadastrar Usuário</button>
+          <button type="submit" class="btn">Cadastrar UsuÃ¡rio</button>
         </form>
       </div>
       <div class="card">
-        <div class="card-title">Usuários do Sistema</div>
+        <div class="card-title">UsuÃ¡rios do Sistema</div>
         <table>
-          <thead><tr><th>Usuário</th><th>Permissão</th><th>Ação</th></tr></thead>
+          <thead><tr><th>UsuÃ¡rio</th><th>PermissÃ£o</th><th>AÃ§Ã£o</th></tr></thead>
           <tbody id="lista-usuarios"></tbody>
         </table>
       </div>
@@ -377,8 +410,8 @@
     <div id="view-empresa" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">🔒 Alterar Minha Senha</div>
-          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
+          <div class="card-title">ð Alterar Minha Senha</div>
+          <button class="btn btn-back" type="button" onclick="navTo('dashboard')">ð  InÃ­cio</button>
         </div>
         <form onsubmit="alterarMinhaSenha(event)">
           <div class="form-group"><label>Nova Senha</label><input type="password" id="minha-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
@@ -387,14 +420,14 @@
       </div>
 
       <div class="card">
-        <div class="card-title">Dados da Empresa (Rodapé da Nota)</div>
+        <div class="card-title">Dados da Empresa (RodapÃ© da Nota)</div>
         <form onsubmit="salvarEmpresa(event)">
           <div class="form-group"><label>Nome Fantasia</label><input type="text" id="emp-nome" required></div>
           <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="emp-cnpj" required></div>
           <div class="form-group"><label>Telefone / WhatsApp Comercial</label><input type="text" id="emp-tel" placeholder="Ex: (11) 99999-8888" required></div>
-          <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
+          <div class="form-group"><label>EndereÃ§o Completo</label><input type="text" id="emp-end" placeholder="Rua, NÂº, Bairro, Cidade/UF" required></div>
           <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @happyeggs | www.happyeggs.com"></div>
-          <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
+          <div class="form-group"><label>Chave Pix Oficial PadrÃ£o</label><input type="text" id="emp-pix" required></div>
           <button type="submit" class="btn" style="background:var(--success);">Salvar Dados da Empresa</button>
         </form>
       </div>
@@ -409,19 +442,19 @@
       <!-- RECIBO COM BORDA TRACEJADA -->
       <div class="receipt-box" id="printable-receipt"></div>
       
-      <!-- PAINEL DE AÇÕES E BOTÕES -->
+      <!-- PAINEL DE AÃÃES E BOTÃES -->
       <div class="no-print" style="display:flex; flex-direction:column; gap:10px;">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <button class="btn" type="button" style="background:#2563eb;" onclick="salvarNotaPDF()">
-            💾 Salvar PDF
+            ð¾ Salvar PDF
           </button>
           <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirNota()">
-            🖨️ Imprimir
+            ð¨ï¸ Imprimir
           </button>
         </div>
         
         <button class="btn" type="button" style="background:#10b981;" onclick="enviarWhats()">
-          💬 WhatsApp
+          ð¬ WhatsApp
         </button>
 
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:4px;">
@@ -431,17 +464,17 @@
     </div>
   </div>
 
-  <!-- MODAL: RELATÓRIO DE VENDAS FLEXÍVEL -->
+  <!-- MODAL: RELATÃRIO DE VENDAS FLEXÃVEL -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 500px;">
-      <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
+      <div class="card-title" style="margin-bottom:12px;">ð RelatÃ³rio de Vendas e Faturamento</div>
       
       <div class="form-group">
-        <label>Filtrar Período</label>
+        <label>Filtrar PerÃ­odo</label>
         <select id="filtro-periodo" onchange="atualizarFiltroRelatorio()">
           <option value="hoje">Hoje</option>
-          <option value="semana">Últimos 7 Dias (Semana)</option>
-          <option value="mes">Este Mês Atual</option>
+          <option value="semana">Ãltimos 7 Dias (Semana)</option>
+          <option value="mes">Este MÃªs Atual</option>
           <option value="personalizado">Personalizado (Intervalo de Datas)</option>
         </select>
       </div>
@@ -460,17 +493,17 @@
       <div id="resumo-periodo-texto" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; font-weight:bold;"></div>
 
       <div class="stat-card">
-        <div class="stat-title">Total Faturado no Período</div>
+        <div class="stat-title">Total Faturado no PerÃ­odo</div>
         <div class="stat-value" id="resumo-total-periodo">R$ 0,00</div>
       </div>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
         <div class="stat-card" style="margin:0;">
-          <div class="stat-title">Nº de Pedidos</div>
+          <div class="stat-title">NÂº de Pedidos</div>
           <div class="stat-value" id="resumo-qtd-pedidos">0</div>
         </div>
         <div class="stat-card" style="margin:0;">
-          <div class="stat-title">Ticket Médio</div>
+          <div class="stat-title">Ticket MÃ©dio</div>
           <div class="stat-value" id="resumo-ticket-medio">R$ 0,00</div>
         </div>
       </div>
@@ -481,7 +514,7 @@
       </div>
 
       <div style="margin-top:15px; max-height: 180px; overflow-y: auto;">
-        <div class="stat-title" style="margin-bottom:6px;">Vendas Listadas no Período</div>
+        <div class="stat-title" style="margin-bottom:6px;">Vendas Listadas no PerÃ­odo</div>
         <table>
           <thead><tr><th># Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
           <tbody id="resumo-tabela-periodo"></tbody>
@@ -489,14 +522,14 @@
       </div>
 
       <div style="display:flex; gap:10px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="window.print()">🖨 Imprimir Relatório</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="window.print()">ð¨ï¸ï¸ Imprimir RelatÃ³rio</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
     </div>
   </div>
 
   <script>
-    // --- CONFIGURAÇÃO DO FIREBASE ---
+    // --- CONFIGURAÃÃO DO FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyAYmxniwbHyi4HmTH-aVlHo2zp-7pXY_lg",
       authDomain: "happyeggs-534f2.firebaseapp.com",
@@ -536,13 +569,14 @@
             empresaId: "empresa_demo"
           });
           db.collection("empresas").doc("empresa_demo").set({
-            nome: "Granja Demonstração",
+            nome: "Granja DemonstraÃ§Ã£o",
             status: "Ativo"
           });
         }
-      }).catch(err => console.error("Erro na inicialização:", err));
+      }).catch(err => console.error("Erro na inicializaÃ§Ã£o:", err));
     }
 
+    // --- ESCUTADORES EM TEMPO REAL ---
     function initListeners() {
       state.listenersUnsubscribe.forEach(unsub => unsub());
       state.listenersUnsubscribe = [];
@@ -623,7 +657,7 @@
       try {
         const snapshot = await db.collection("usuarios").where("login", "==", u).get();
         if (snapshot.empty) {
-          alert('Usuário ou senha incorretos!');
+          alert('UsuÃ¡rio ou senha incorretos!');
           return;
         }
 
@@ -631,7 +665,7 @@
         const found = { id: userDoc.id, ...userDoc.data() };
 
         if (found.pass !== p) {
-          alert('Usuário ou senha incorretos!');
+          alert('UsuÃ¡rio ou senha incorretos!');
           return;
         }
 
@@ -640,7 +674,7 @@
         if (empDoc.exists) {
           const empData = empDoc.data();
           if (empData.status !== "Ativo") {
-            alert("A conta da sua empresa está inativa. Entre em contato com o suporte.");
+            alert("A conta da sua empresa estÃ¡ inativa. Entre em contato com o suporte.");
             return;
           }
         }
@@ -648,13 +682,13 @@
         state.currentUser = found;
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('app-header').style.display = 'flex';
-        document.getElementById('user-display').innerText = `👤 ${found.login.toUpperCase()}`;
+        document.getElementById('user-display').innerText = `ð¤ ${found.login.toUpperCase()}`;
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
         
         initListeners();
         navTo('dashboard');
       } catch (error) {
-        console.error("Erro na autenticação:", error);
+        console.error("Erro na autenticaÃ§Ã£o:", error);
         alert("Erro ao tentar entrar. Tente novamente.");
       }
     }
@@ -683,6 +717,7 @@
       render();
     }
 
+    // --- RENDERIZAÃÃO DA INTERFACE ---
     function render() {
       renderClientes();
       renderProdutos();
@@ -703,7 +738,7 @@
         <tr>
           <td><strong>${c.nome}</strong><br><small style="color:#64748b;">${c.doc || 'Sem Doc'}</small></td>
           <td>${c.tel}<br><small style="color:#64748b;">${c.end || ''}</small></td>
-          <td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">Excluir</button></td>
+          <td><button class="btn-danger" onclick="excluirCliente('${c.id}')">Excluir</button></td>
         </tr>
       `).join('');
     }
@@ -722,7 +757,7 @@
       tbody.innerHTML = filtrados.slice(0, 10).map(c => `
         <tr>
           <td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td>
-          <td>📞 ${c.tel}</td>
+          <td>ð ${c.tel}</td>
         </tr>
       `).join('');
     }
@@ -736,8 +771,8 @@
           <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
           <td>${p.ovosUnid} ovos</td>
           <td>
-            <button class="btn-warning" type="button" onclick="editarProduto('${p.id}')">✏</button>
-            <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑</button>
+            <button class="btn-warning" onclick="editarProduto('${p.id}')">âï¸</button>
+            <button class="btn-danger" onclick="excluirProduto('${p.id}')">ð</button>
           </td>
         </tr>
       `).join('');
@@ -758,12 +793,12 @@
             <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
             <td>
               <span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">
-                ${isPago ? '🟢 Pago' : '🔴 Pendente'}
+                ${isPago ? 'ð¢ Pago' : 'ð´ Pendente'}
               </span>
             </td>
             <td>
-              <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb; margin-bottom:2px;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
-              <button class="btn-danger" type="button" title="Excluir/Estornar Pedido" onclick="excluirOuCancelarPedido('${p.id}', ${p.numeroPedido}, ${p.totalOvos || 0})">🗑️</button>
+              <button class="btn" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb; margin-bottom:2px;" onclick="abrirModalNota('${p.id}')">ð Recibo</button>
+              <button class="btn-danger" title="Excluir/Estornar Pedido" onclick="excluirOuCancelarPedido('${p.id}', ${p.numeroPedido}, ${p.totalOvos || 0})">ðï¸</button>
             </td>
           </tr>
         `;
@@ -777,7 +812,7 @@
         <tr>
           <td><strong>${u.login}</strong></td>
           <td><span class="badge" style="background:#e2e8f0; color:#334155;">${u.role}</span></td>
-          <td>${u.login !== 'admin' ? `<button class="btn-danger" type="button" onclick="excluirUsuario('${u.id}')">Excluir</button>` : '---'}</td>
+          <td>${u.login !== 'admin' ? `<button class="btn-danger" onclick="excluirUsuario('${u.id}')">Excluir</button>` : '---'}</td>
         </tr>
       `).join('');
     }
@@ -813,6 +848,7 @@
       }
     }
 
+    // --- AÃÃES DE CADASTRO E SISTEMA ---
     async function cadastrarCliente(e) {
       e.preventDefault();
       const novo = {
@@ -887,7 +923,7 @@
       const prod = state.produtos.find(p => p.id === prodId);
 
       if (!prod || qtd <= 0) {
-        alert('Selecione um produto e quantidade válida.');
+        alert('Selecione um produto e quantidade vÃ¡lida.');
         return;
       }
 
@@ -937,7 +973,7 @@
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
               <strong>R$ ${item.subtotal.toFixed(2)}</strong>
-              <button class="btn-danger" type="button" style="padding:2px 6px;" onclick="removerItemCarrinho(${idx})">✕</button>
+              <button class="btn-danger" style="padding:2px 6px;" onclick="removerItemCarrinho(${idx})">â</button>
             </div>
           </div>
         `;
@@ -957,7 +993,7 @@
       const cliente = state.clientes.find(c => c.id === cliId);
 
       if (!cliente) {
-        alert('Selecione um cliente válido!');
+        alert('Selecione um cliente vÃ¡lido!');
         return;
       }
 
@@ -973,7 +1009,7 @@
         clienteId: cliente.id,
         clienteNome: cliente.nome,
         clienteDoc: cliente.doc || 'N/I',
-        clienteEnd: cliente.end || 'Não informado',
+        clienteEnd: cliente.end || 'NÃ£o informado',
         clienteTel: cliente.tel || '',
         itens: carrinhoTemp,
         total: totalPedido,
@@ -1016,13 +1052,15 @@
       await db.collection("pedidos").doc(id).update({ status: novoStatus });
     }
 
+    // EXCLUIR / CANCELAR PEDIDO COM ESTORNO AUTOMÃTICO DE OVOS
     async function excluirOuCancelarPedido(id, numero, qtdOvosEstorno) {
-      if (!confirm(`Tem certeza que deseja excluir o Pedido #${numero || ''}?\nOs ${qtdOvosEstorno || 0} ovos deste pedido retornarão ao Estoque Geral.`)) {
+      if (!confirm(`Tem certeza que deseja excluir o Pedido #${numero || ''}?\nOs ${qtdOvosEstorno || 0} ovos deste pedido retornarÃ£o ao Estoque Geral.`)) {
         return;
       }
       try {
         await db.collection("pedidos").doc(id).delete();
 
+        // Estorno dos ovos para o estoque geral
         if (qtdOvosEstorno > 0) {
           const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
           await db.runTransaction(async (transaction) => {
@@ -1032,7 +1070,7 @@
           });
         }
 
-        alert(`Pedido #${numero || ''} excluído e estoque estornado com sucesso!`);
+        alert(`Pedido #${numero || ''} excluÃ­do e estoque estornado com sucesso!`);
       } catch (err) {
         console.error("Erro ao excluir pedido:", err);
         alert("Erro ao excluir o pedido.");
@@ -1059,7 +1097,7 @@
       });
 
       e.target.reset();
-      alert('Entrada de produção registrada!');
+      alert('Entrada de produÃ§Ã£o registrada!');
     }
 
     function renderProducaoHoje() {
@@ -1095,11 +1133,11 @@
       });
 
       e.target.reset();
-      alert('Usuário cadastrado com sucesso!');
+      alert('UsuÃ¡rio cadastrado com sucesso!');
     }
 
     async function excluirUsuario(id) {
-      if (confirm('Deseja excluir este usuário?')) {
+      if (confirm('Deseja excluir este usuÃ¡rio?')) {
         await db.collection("usuarios").doc(id).delete();
       }
     }
@@ -1131,6 +1169,7 @@
       alert('Dados da empresa salvos com sucesso!');
     }
 
+    // --- MONTAGEM DO RECIBO / NOTA FISCAL ---
     function abrirModalNota(pedidoOuId) {
       let ped = null;
 
@@ -1150,14 +1189,14 @@
       const emp = state.empresa || {};
 
       const isPago = ped.status === 'Pago';
-      const statusSymbol = isPago ? '🟢' : '🔴';
+      const statusSymbol = isPago ? 'ð¢' : 'ð´';
 
       const numPedido = ped.numeroPedido || '---';
-      const clienteNome = ped.clienteNome || 'Cliente não informado';
+      const clienteNome = ped.clienteNome || 'Cliente nÃ£o informado';
       const clienteDoc = ped.clienteDoc || 'N/I';
-      const clienteEnd = ped.clienteEnd || 'Não informado';
+      const clienteEnd = ped.clienteEnd || 'NÃ£o informado';
       const totalValor = parseFloat(ped.total || 0).toFixed(2);
-      const formaPgto = ped.formaPgto || 'Não especificada';
+      const formaPgto = ped.formaPgto || 'NÃ£o especificada';
       const dadosPgto = ped.dadosPgto || '';
       const obs = ped.obs || '';
       const itens = ped.itens || [];
@@ -1176,7 +1215,7 @@
         </div>
         <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${clienteNome}</div>
         <div style="margin-bottom:2px;"><strong>Documento:</strong> ${clienteDoc}</div>
-        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${clienteEnd}</div>
+        <div style="margin-bottom:2px;"><strong>EndereÃ§o:</strong> ${clienteEnd}</div>
 
         <hr class="dashed-divider">
 
@@ -1197,7 +1236,7 @@
         <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${formaPgto}</div>
         ${dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${dadosPgto}</div>` : ''}
         <div style="margin-bottom:2px;">
-          <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
+          <strong>SITUAÃÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
         </div>
         ${obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${obs}</div>` : ''}
 
@@ -1205,9 +1244,9 @@
 
         <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
           <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
-          ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
-          ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
-          <p style="margin-top:4px;">Obrigado pela preferência!</p>
+          ${emp.end ? `<div>ð ${emp.end}</div>` : ''}
+          ${emp.social ? `<div>ð ${emp.social}</div>` : ''}
+          <p style="margin-top:4px;">Obrigado pela preferÃªncia!</p>
         </div>
       `;
 
@@ -1215,9 +1254,7 @@
     }
 
     function imprimirNota() {
-      setTimeout(() => {
-        window.print();
-      }, 100);
+      window.print();
     }
 
     function salvarNotaPDF() {
@@ -1225,31 +1262,26 @@
       const ped = state.pedidoAtual || {};
       const num = ped.numeroPedido || 'comprovante';
 
-      if (!receiptElement || !receiptElement.innerHTML.trim()) {
-        alert('Nenhum comprovante disponível para gerar o PDF.');
-        return;
-      }
-
       const pdfContainer = document.createElement('div');
-      pdfContainer.style.position = 'fixed';
+      pdfContainer.style.position = 'absolute';
       pdfContainer.style.left = '-9999px';
       pdfContainer.style.top = '0';
       pdfContainer.style.width = '380px';
       pdfContainer.style.backgroundColor = '#ffffff';
       pdfContainer.style.padding = '15px';
-      pdfContainer.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      pdfContainer.style.fontSize = '12px';
-      pdfContainer.style.color = '#1f2937';
+
       pdfContainer.innerHTML = receiptElement.innerHTML;
+      pdfContainer.className = 'receipt-box';
+      pdfContainer.style.border = '1px dashed #000';
 
       document.body.appendChild(pdfContainer);
 
       const opt = {
-        margin:       5,
+        margin:       [10, 10, 10, 10],
         filename:     `Pedido_${num}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false, windowWidth: 380 },
-        jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+        html2canvas:  { scale: 2, logging: false, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
       html2pdf().set(opt).from(pdfContainer).save().then(() => {
@@ -1259,7 +1291,6 @@
         if (pdfContainer.parentNode) {
           document.body.removeChild(pdfContainer);
         }
-        alert('Erro ao gerar o arquivo PDF.');
       });
     }
 
@@ -1274,10 +1305,10 @@
       msg += `*Empresa:* ${state.empresa.nome || 'HappyEggs'}\n`;
       msg += `--------------------------------\n`;
       msg += `*Cliente:* ${ped.clienteNome}\n`;
-      msg += `*Status:* ${ped.status === 'Pago' ? '🟢 PAGAMENTO CONFIRMADO' : '🔴 AGUARDANDO PAGAMENTO'}\n\n`;
+      msg += `*Status:* ${ped.status === 'Pago' ? 'ð¢ PAGAMENTO CONFIRMADO' : 'ð´ AGUARDANDO PAGAMENTO'}\n\n`;
       msg += `*ITENS:*\n`;
       (ped.itens || []).forEach(i => {
-        msg += `• ${i.qtd}x ${i.nome} - R$ ${parseFloat(i.subtotal).toFixed(2)}\n`;
+        msg += `â¢ ${i.qtd}x ${i.nome} - R$ ${parseFloat(i.subtotal).toFixed(2)}\n`;
       });
       msg += `\n*TOTAL: R$ ${parseFloat(ped.total).toFixed(2)}*\n`;
       msg += `*Forma de Pgto:* ${ped.formaPgto}\n`;
@@ -1286,14 +1317,13 @@
         msg += `*Chave Pix:* ${state.empresa.pix}\n`;
       }
 
-      msg += `\nAgradecemos a preferência! 🥚`;
-
-      salvarNotaPDF();
+      msg += `\nAgradecemos a preferÃªncia! ð¥`;
 
       const link = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(msg)}`;
       window.open(link, '_blank');
     }
 
+    // --- FUNÃÃES DE RELATÃRIO E FILTRAGEM POR PERÃODO ---
     function abrirResumoVendas() {
       document.getElementById('filtro-periodo').value = 'hoje';
       atualizarFiltroRelatorio();
@@ -1326,12 +1356,12 @@
       if (tipo === 'hoje') {
         const hojeStr = agora.toDateString();
         pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao.toDateString && p.dataCriacao.toDateString() === hojeStr);
-        textoPeriodo = `Período: Hoje (${agora.toLocaleDateString('pt-BR')})`;
+        textoPeriodo = `PerÃ­odo: Hoje (${agora.toLocaleDateString('pt-BR')})`;
       } else if (tipo === 'semana') {
         const seteDiasAtras = new Date();
         seteDiasAtras.setDate(agora.getDate() - 7);
         pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao >= seteDiasAtras);
-        textoPeriodo = `Período: Últimos 7 dias (Até ${agora.toLocaleDateString('pt-BR')})`;
+        textoPeriodo = `PerÃ­odo: Ãltimos 7 dias (AtÃ© ${agora.toLocaleDateString('pt-BR')})`;
       } else if (tipo === 'mes') {
         const mesAtual = agora.getMonth();
         const anoAtual = agora.getFullYear();
@@ -1339,7 +1369,7 @@
           if (!p.dataCriacao) return false;
           return p.dataCriacao.getMonth() === mesAtual && p.dataCriacao.getFullYear() === anoAtual;
         });
-        textoPeriodo = `Período: Mês Atual (${agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })} )`;
+        textoPeriodo = `PerÃ­odo: MÃªs Atual (${agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })} )`;
       } else if (tipo === 'personalizado') {
         const dIniStr = document.getElementById('data-inicio').value;
         const dFimStr = document.getElementById('data-fim').value;
@@ -1351,7 +1381,7 @@
             if (!p.dataCriacao) return false;
             return p.dataCriacao >= dIni && p.dataCriacao <= dFim;
           });
-          textoPeriodo = `Período de ${dIni.toLocaleDateString('pt-BR')} até ${dFim.toLocaleDateString('pt-BR')}`;
+          textoPeriodo = `PerÃ­odo de ${dIni.toLocaleDateString('pt-BR')} atÃ© ${dFim.toLocaleDateString('pt-BR')}`;
         } else {
           pedidosFiltrados = [];
           textoPeriodo = 'Selecione as datas inicial e final';
@@ -1366,7 +1396,7 @@
 
       const porForma = {};
       pedidosFiltrados.forEach(p => {
-        const forma = p.formaPgto || 'Não especificada';
+        const forma = p.formaPgto || 'NÃ£o especificada';
         porForma[forma] = (porForma[forma] || 0) + (p.total || 0);
       });
 
@@ -1380,7 +1410,7 @@
           <strong>R$ ${porForma[f].toFixed(2)}</strong>
         </div>
       `).join('');
-      document.getElementById('resumo-detalhe-formas').innerHTML = htmlFormas || 'Nenhuma venda registrada no período.';
+      document.getElementById('resumo-detalhe-formas').innerHTML = htmlFormas || 'Nenhuma venda registrada no perÃ­odo.';
 
       const tbody = document.getElementById('resumo-tabela-periodo');
       tbody.innerHTML = pedidosFiltrados.map(p => `
@@ -1394,6 +1424,7 @@
       `).join('');
     }
 
+    // InicializaÃ§Ã£o da AplicaÃ§Ã£o
     initApp();
   </script>
 </body>
