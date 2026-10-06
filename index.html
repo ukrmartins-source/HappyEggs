@@ -88,7 +88,8 @@
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
     th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
 
-    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.7); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
+    /* OTIMIZADO PARA SAFARI: Removido o backdrop-filter pesado e usado fundo sólido */
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
     .receipt-box { 
@@ -1282,10 +1283,13 @@
       }, 300);
     }
 
-    // WHATSAPP REESTRUTURADO COM DADOS COMPLETOS E PROFISSIONAIS
+    // WHATSAPP REESTRUTURADO: Baixa o PDF automaticamente e abre a conversa
     function enviarWhats() {
       const ped = state.pedidoAtual;
       if (!ped) return;
+
+      // 1. Dispara o download automático do PDF para o usuário anexar no WhatsApp
+      baixarReciboImagem();
 
       let fone = (ped.clienteTel || '').replace(/\D/g, '');
       if (!fone.startsWith('55') && fone.length >= 10) fone = '55' + fone;
@@ -1309,7 +1313,7 @@
         msg += `📝 *Obs:* ${ped.obs}\n`;
       }
 
-      msg += `\nAgradecemos a preferência! Volte sempre. 🙏\n*(Dica: Baixe o arquivo PDF acima e envie junto na conversa)*`;
+      msg += `\nAgradecemos a preferência! Volte sempre. 🙏\n*(O PDF do recibo foi baixado no seu dispositivo. Basta anexá-lo aqui)*`;
 
       const link = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(msg)}`;
       window.open(link, '_blank');
