@@ -114,24 +114,27 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
-    /* REGRAS DE IMPRESSÃO ROBUSTAS E SEGURAS (CORRIGE O BUG DE MÚLTIPLOS CLIQUES) */
+        /* REGRAS DE IMPRESSÃO ROBUSTAS E SEGURAS PARA RECIBOS E RELATÓRIOS */
     @media print {
       body * { visibility: hidden !important; }
       header, main, .no-print { display: none !important; }
-      .modal, .modal-content, #printable-receipt, #printable-receipt * {
+      
+      /* Libera tanto o recibo quanto o modal de relatório e seus conteúdos internos */
+      .modal, .modal-content, 
+      #printable-receipt, #printable-receipt *, 
+      #modal-resumo, #modal-resumo * {
         visibility: visible !important;
       }
+      
       .modal {
         position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; height: auto !important;
         background: transparent !important; display: block !important; z-index: 999999 !important;
       }
+      
       .modal-content {
         box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; background: #ffffff !important;
       }
     }
-  </style>
-</head>
-<body>
 
   <!-- CABEÇALHO -->
   <header id="app-header" style="display:none;" class="no-print">
