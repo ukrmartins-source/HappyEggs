@@ -435,7 +435,7 @@
       <!-- RECIBO COM BORDA TRACEJADA -->
       <div class="receipt-box" id="printable-receipt"></div>
       
-      <!-- PAINEL DE AÇÕES E BOTÕES -->
+      <!-- PAINEL DE AÇÕES E BOTÕES (WHATSAPP REMOVIDO) -->
       <div class="no-print" style="display:flex; flex-direction:column; gap:10px;">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <button class="btn" type="button" style="background:#2563eb;" onclick="baixarReciboImagem()">
@@ -445,10 +445,6 @@
             🖨️ Imprimir
           </button>
         </div>
-        
-        <button class="btn" type="button" style="background:#10b981;" onclick="enviarWhats()">
-          💬 Enviar WhatsApp (Comprovante Formatado)
-        </button>
 
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:4px;">
           Fechar Nota
@@ -1249,6 +1245,7 @@
       window.print();
     }
 
+    // Função otimizada para Safari Mobile para evitar engasgos e menus indesejados
     function baixarReciboImagem() {
       const receiptElement = document.getElementById('printable-receipt');
       const ped = state.pedidoAtual || {};
@@ -1262,55 +1259,28 @@
       const opt = {
         margin:       5,
         filename:     `Recibo_Pedido_${num}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        image:        { type: 'jpeg', quality: 0.95 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false, letterRendering: true },
         jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
       };
 
+      // Disparo otimizado e assíncrono para liberar a thread do Safari no iOS
       setTimeout(() => {
-        html2pdf().set(opt).from(receiptElement).save().then(() => {
-          alert('Comprovante baixado com sucesso!');
+        html2pdf().set(opt).from(receiptElement).outputPdf('blob').then((pdfBlob) => {
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = `Recibo_Pedido_${num}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
         }).catch(err => {
           console.error('Erro ao gerar arquivo:', err);
-          alert('Erro ao gerar arquivo PDF.');
+          // Fallback nativo simples caso o html2pdf encontre restrições de bloqueio no Safari
+          html2pdf().set(opt).from(receiptElement).save();
         });
-      }, 300);
-    }
-
-    // WHATSAPP INTEGRADO: Dispara o download do PDF e abre a conversa imediatamente
-    function enviarWhats() {
-      const ped = state.pedidoAtual;
-      if (!ped) return;
-
-      // Executa o download automático do recibo em PDF
-      baixarReciboImagem();
-
-      let fone = (ped.clienteTel || '').replace(/\D/g, '');
-      if (!fone.startsWith('55') && fone.length >= 10) fone = '55' + fone;
-
-      let msg = `*COMPROVANTE DE PEDIDO #${ped.numeroPedido || ''}* 🥚\n`;
-      msg += `*Empresa:* ${state.empresa.nome || 'HappyEggs'}\n`;
-      msg += `--------------------------------\n`;
-      msg += `👤 *Cliente:* ${ped.clienteNome}\n`;
-      msg += `📌 *Status:* ${ped.status === 'Pago' ? '🟢 PAGAMENTO CONFIRMADO' : '🔴 AGUARDANDO PAGAMENTO'}\n\n`;
-      msg += `🛍 *ITENS DO PEDIDO:*\n`;
-      (ped.itens || []).forEach(i => {
-        msg += `• ${i.qtd}x ${i.nome} — R$ ${parseFloat(i.subtotal).toFixed(2)}\n`;
-      });
-      msg += `\n💰 *TOTAL A PAGAR: R$ ${parseFloat(ped.total).toFixed(2)}*\n`;
-      msg += `💳 *Forma de Pgto:* ${ped.formaPgto}\n`;
-
-      if (state.empresa.pix) {
-        msg += `📱 *Chave Pix:* ${state.empresa.pix}\n`;
-      }
-      if (ped.obs) {
-        msg += `📝 *Obs:* ${ped.obs}\n`;
-      }
-
-      msg += `\nAgradecemos a preferência! Volte sempre. 🙏\n*(O PDF do recibo foi baixado no seu dispositivo. Basta anexá-lo aqui)*`;
-
-      const link = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(msg)}`;
-      window.open(link, '_blank');
+      }, 150);
     }
 
     function abrirResumoVendas() {
