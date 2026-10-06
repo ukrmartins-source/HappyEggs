@@ -114,7 +114,7 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
    
-         /* REGRAS DE IMPRESSÃO ROBUSTAS E SEGURAS PARA RECIBOS E RELATÓRIOS */
+    /* REGRAS DE IMPRESSÃO ROBUSTAS E SEGURAS PARA RECIBOS E RELATÓRIOS */
     @media print {
       body * { visibility: hidden !important; }
       header, main, .no-print { display: none !important; }
@@ -135,7 +135,9 @@
         box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; background: #ffffff !important;
       }
     }
-
+  </style>
+</head>
+<body>
 
   <!-- CABEÇALHO -->
   <header id="app-header" style="display:none;" class="no-print">
@@ -1256,7 +1258,6 @@
         jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
       };
 
-      // Adicionado atraso de renderização para garantir que o DOM está pronto e evitar PDF em branco
       setTimeout(() => {
         html2pdf().set(opt).from(receiptElement).save().then(() => {
           alert('Comprovante baixado com sucesso! Agora você pode enviá-lo pelo WhatsApp.');
