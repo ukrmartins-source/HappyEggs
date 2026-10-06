@@ -88,7 +88,6 @@
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
     th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
 
-    /* OTIMIZADO PARA SAFARI: Removido o backdrop-filter pesado e usado fundo sólido */
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
@@ -115,12 +114,10 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
    
-    /* REGRAS DE IMPRESSÃO CORRIGIDAS E BLINDADAS PARA SAFARI E CHROME */
     @media print {
       body * { visibility: hidden !important; }
       header, main, .no-print { display: none !important; }
       
-      /* Se o modal de recibo estiver aberto, imprime exclusivamente ele */
       #modal-nota:not([style*="display: none"]) {
         visibility: visible !important;
         position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; height: auto !important;
@@ -135,7 +132,6 @@
         visibility: visible !important;
       }
 
-      /* Se o modal de relatório estiver aberto, imprime exclusivamente ele */
       #modal-resumo:not([style*="display: none"]) {
         visibility: visible !important;
         position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; height: auto !important;
@@ -1245,7 +1241,6 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    // IMPRESSÃO DIRETA BLINDADA (RESPONDE NO 1º CLIQUE)
     function imprimirNota() {
       window.print();
     }
@@ -1254,7 +1249,6 @@
       window.print();
     }
 
-    // GERA O COMPROVANTE EM PDF COM TIMING SEGURO (ELIMINA PÁGINAS EM BRANCO)
     function baixarReciboImagem() {
       const receiptElement = document.getElementById('printable-receipt');
       const ped = state.pedidoAtual || {};
@@ -1275,7 +1269,7 @@
 
       setTimeout(() => {
         html2pdf().set(opt).from(receiptElement).save().then(() => {
-          alert('Comprovante baixado com sucesso! Agora você pode enviá-lo pelo WhatsApp.');
+          alert('Comprovante baixado com sucesso!');
         }).catch(err => {
           console.error('Erro ao gerar arquivo:', err);
           alert('Erro ao gerar arquivo PDF.');
@@ -1283,12 +1277,12 @@
       }, 300);
     }
 
-    // WHATSAPP REESTRUTURADO: Baixa o PDF automaticamente e abre a conversa
+    // WHATSAPP INTEGRADO: Dispara o download do PDF e abre a conversa imediatamente
     function enviarWhats() {
       const ped = state.pedidoAtual;
       if (!ped) return;
 
-      // 1. Dispara o download automático do PDF para o usuário anexar no WhatsApp
+      // Executa o download automático do recibo em PDF
       baixarReciboImagem();
 
       let fone = (ped.clienteTel || '').replace(/\D/g, '');
