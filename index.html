@@ -113,92 +113,12 @@
     .stat-card { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
-   
-    /* REGRAS DE IMPRESSÃO OTIMIZADAS PARA MÁXIMO 2 PEDIDOS POR PÁGINA */
-    @media print {
-      @page {
-        size: A4 portrait;
-        margin: 8mm;
-      }
-
-      body * { visibility: hidden !important; }
-      header, main, .no-print { display: none !important; }
-      
-      #modal-nota:not([style*="display: none"]) {
-        visibility: visible !important;
-        position: absolute !important; 
-        left: 0 !important; 
-        top: 0 !important; 
-        width: 100% !important; 
-        height: auto !important;
-        background: #ffffff !important; 
-        display: block !important; 
-        z-index: 999999 !important;
-      }
-      
-      #modal-nota:not([style*="display: none"]) .modal-content {
-        visibility: visible !important;
-        box-shadow: none !important; 
-        border: none !important; 
-        width: 100% !important; 
-        max-width: 100% !important; 
-        padding: 0 !important; 
-        margin: 0 !important; 
-        background: #ffffff !important;
-      }
-
-      #modal-nota:not([style*="display: none"]) #printable-receipt,
-      #modal-nota:not([style*="display: none"]) #printable-receipt * {
-        visibility: visible !important;
-      }
-
-      /* Container de lista para múltiplos pedidos */
-      .recibo-container {
-        display: block !important;
-        width: 100% !important;
-      }
-
-      /* Cada pedido individual */
-      .recibo-item {
-        box-sizing: border-box !important;
-        width: 100% !important;
-        max-height: 47vh !important; /* Limita a altura para no máximo metade da folha */
-        margin-bottom: 12px !important;
-        padding: 12px !important;
-        border: 1px dashed #4b5563 !important;
-        border-radius: 6px !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        overflow: hidden !important;
-      }
-
-      /* Quebra de página exata a cada 2 pedidos */
-      .recibo-item:nth-child(2n) {
-        page-break-after: always !important;
-        break-after: page !important;
-        margin-bottom: 0 !important;
-      }
-
-      #modal-resumo:not([style*="display: none"]) {
-        visibility: visible !important;
-        position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; height: auto !important;
-        background: transparent !important; display: block !important; z-index: 999999 !important;
-      }
-      #modal-resumo:not([style*="display: none"]) .modal-content {
-        visibility: visible !important;
-        box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; background: #ffffff !important;
-      }
-      #modal-resumo:not([style*="display: none"]) *,
-      #modal-resumo:not([style*="display: none"]) table {
-        visibility: visible !important;
-      }
-    }
   </style>
 </head>
 <body>
 
   <!-- CABEÇALHO -->
-  <header id="app-header" style="display:none;" class="no-print">
+  <header id="app-header" style="display:none;">
     <div class="brand"><span id="header-title">🥚 HAPPY EGGS</span></div>
     <div class="user-info">
       <span id="user-display">👤 Admin</span>
@@ -206,7 +126,7 @@
     </div>
   </header>
 
-  <main class="no-print">
+  <main>
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
@@ -381,7 +301,6 @@
             <div class="stat-title">Saldo Geral de Ovos em Estoque</div>
             <div class="stat-value" id="estoque-geral-ovos" style="font-size: 1.8rem;">0 Ovos</div>
           </div>
-          <!-- BOTÃO DE BALANÇO DE ESTOQUE (ADMIN APENAS) -->
           <button class="btn admin-only" type="button" style="width: auto; background: var(--warning); padding: 8px 12px; font-size: 0.8rem;" onclick="abrirModalBalanco()">
             ⚖️ Atualizar Estoque
           </button>
@@ -497,13 +416,11 @@
   <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
   <div class="modal" id="modal-nota">
     <div class="modal-content">
-      <div class="card-title no-print" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
+      <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       
-      <!-- RECIBO COM BORDA TRACEJADA -->
       <div class="receipt-box" id="printable-receipt"></div>
       
-      <!-- PAINEL DE AÇÕES E BOTÕES -->
-      <div class="no-print" style="display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
         <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirNota()">
           🖨️ Imprimir
         </button>
@@ -521,7 +438,7 @@
       
       <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
       
-      <div class="form-group no-print">
+      <div class="form-group">
         <label>Filtrar Período</label>
         <select id="filtro-periodo" onchange="atualizarFiltroRelatorio()">
           <option value="hoje">Hoje</option>
@@ -531,7 +448,7 @@
         </select>
       </div>
 
-      <div id="container-datas-personalizadas" class="no-print" style="display:none; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+      <div id="container-datas-personalizadas" style="display:none; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
         <div class="form-group" style="margin-bottom:0;">
           <label>Data Inicial</label>
           <input type="date" id="data-inicio" onchange="renderizarDadosRelatorio()">
@@ -544,36 +461,39 @@
 
       <div id="resumo-periodo-texto" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; font-weight:bold;"></div>
 
-      <div class="stat-card">
-        <div class="stat-title">Total Faturado no Período</div>
-        <div class="stat-value" id="resumo-total-periodo">R$ 0,00</div>
-      </div>
-
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-        <div class="stat-card" style="margin:0;">
-          <div class="stat-title">Nº de Pedidos</div>
-          <div class="stat-value" id="resumo-qtd-pedidos">0</div>
+      <!-- CONTAINER PARA IMPRESSÃO ISOLADA DO RELATÓRIO -->
+      <div id="area-relatorio-impressao">
+        <div class="stat-card">
+          <div class="stat-title">Total Faturado no Período</div>
+          <div class="stat-value" id="resumo-total-periodo">R$ 0,00</div>
         </div>
-        <div class="stat-card" style="margin:0;">
-          <div class="stat-title">Ticket Médio</div>
-          <div class="stat-value" id="resumo-ticket-medio">R$ 0,00</div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div class="stat-card" style="margin:0;">
+            <div class="stat-title">Nº de Pedidos</div>
+            <div class="stat-value" id="resumo-qtd-pedidos">0</div>
+          </div>
+          <div class="stat-card" style="margin:0;">
+            <div class="stat-title">Ticket Médio</div>
+            <div class="stat-value" id="resumo-ticket-medio">R$ 0,00</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-title" style="margin-bottom:6px;">Recebimento por Forma de Pagamento</div>
+          <div id="resumo-detalhe-formas" style="font-size:0.85rem; line-height:1.4;"></div>
+        </div>
+
+        <div style="margin-top:15px; max-height: 180px; overflow-y: auto;">
+          <div class="stat-title" style="margin-bottom:6px;">Vendas Listadas no Período</div>
+          <table>
+            <thead><tr><th># Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody id="resumo-tabela-periodo"></tbody>
+          </table>
         </div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-title" style="margin-bottom:6px;">Recebimento por Forma de Pagamento</div>
-        <div id="resumo-detalhe-formas" style="font-size:0.85rem; line-height:1.4;"></div>
-      </div>
-
-      <div style="margin-top:15px; max-height: 180px; overflow-y: auto;">
-        <div class="stat-title" style="margin-bottom:6px;">Vendas Listadas no Período</div>
-        <table>
-          <thead><tr><th># Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
-          <tbody id="resumo-tabela-periodo"></tbody>
-        </table>
-      </div>
-
-      <div class="no-print" style="display:flex; gap:10px; margin-top:15px;">
+      <div style="display:flex; gap:10px; margin-top:15px;">
         <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorio()">🖨 Imprimir Relatório</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
@@ -873,7 +793,7 @@
             </td>
             <td>
               <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb; margin-bottom:2px;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
-              <button class="btn-danger" type="button" title="Excluir/Estornar Pedido" onclick="excluirOuCancelarPedido('${p.id}', ${p.numeroPedido}, ${p.totalOvos || 0})">🗑️</button>
+              <button class="btn-danger" type="button" title="Excluir/Estornar Pedido" onclick="excluirOuCancelarPedido('${p.id}', ${p.numeroPedido}, ${p.totalOvos || 0})">🗑️️</button>
             </td>
           </tr>
         `;
@@ -897,9 +817,7 @@
       receiptBox.innerHTML = '';
       const emp = state.empresa || {};
 
-      let htmlGeral = '<div class="recibo-container">';
-
-      selecionados.forEach((id) => {
+      selecionados.forEach((id, idx) => {
         const ped = state.pedidos.find(p => p.id === id);
         if (!ped) return;
 
@@ -907,8 +825,8 @@
         const statusSymbol = isPago ? '🟢' : '🔴';
         const itens = ped.itens || [];
 
-        htmlGeral += `
-          <div class="recibo-item">
+        const reciboHTML = `
+          <div class="recibo-item" style="${idx > 0 ? 'page-break-before: always; margin-top:20px; border-top: 1px dashed #cbd5e1; padding-top: 20px;' : ''}">
             <div style="text-align:center; margin-bottom:8px;">
               <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
               <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
@@ -957,10 +875,9 @@
             </div>
           </div>
         `;
-      });
 
-      htmlGeral += '</div>';
-      receiptBox.innerHTML = htmlGeral;
+        receiptBox.innerHTML += reciboHTML;
+      });
 
       document.getElementById('modal-nota').style.display = 'flex';
     }
@@ -1400,67 +1317,118 @@
       const itens = ped.itens || [];
 
       receipt.innerHTML = `
-        <div class="recibo-container">
-          <div class="recibo-item">
-            <div style="text-align:center; margin-bottom:8px;">
-              <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
-              <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
-              <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
-            </div>
+        <div style="text-align:center; margin-bottom:8px;">
+          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
+          <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
+          <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
+        </div>
 
-            <hr class="dashed-divider">
+        <hr class="dashed-divider">
 
-            <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
-              COMPROVANTE DE PEDIDO #${numPedido}
-            </div>
-            <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${clienteNome}</div>
-            <div style="margin-bottom:2px;"><strong>Documento:</strong> ${clienteDoc}</div>
-            <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${clienteEnd}</div>
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
+          COMPROVANTE DE PEDIDO #${numPedido}
+        </div>
+        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${clienteNome}</div>
+        <div style="margin-bottom:2px;"><strong>Documento:</strong> ${clienteDoc}</div>
+        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${clienteEnd}</div>
 
-            <hr class="dashed-divider">
+        <hr class="dashed-divider">
 
-            <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
-            ${itens.length > 0 ? itens.map(i => `
-              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                <span>${i.qtd}x${i.nome}</span>
-                <span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span>
-              </div>
-            `).join('') : '<div style="font-size:0.8rem; color:#64748b;">Nenhum item registrado</div>'}
-
-            <hr class="dashed-divider">
-
-            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
-              <span>VALOR TOTAL:</span>
-              <span>R$ ${totalValor}</span>
-            </div>
-            <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${formaPgto}</div>
-            ${dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${dadosPgto}</div>` : ''}
-            <div style="margin-bottom:2px;">
-              <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
-            </div>
-            ${obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${obs}</div>` : ''}
-
-            <hr class="dashed-divider">
-
-            <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
-              <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
-              ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
-              ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
-              <p style="margin-top:4px;">Obrigado pela preferência!</p>
-            </div>
+        <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
+        ${itens.length > 0 ? itens.map(i => `
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>${i.qtd}x${i.nome}</span>
+            <span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span>
           </div>
+        `).join('') : '<div style="font-size:0.8rem; color:#64748b;">Nenhum item registrado</div>'}
+
+        <hr class="dashed-divider">
+
+        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
+          <span>VALOR TOTAL:</span>
+          <span>R$ ${totalValor}</span>
+        </div>
+        <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${formaPgto}</div>
+        ${dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${dadosPgto}</div>` : ''}
+        <div style="margin-bottom:2px;">
+          <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
+        </div>
+        ${obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${obs}</div>` : ''}
+
+        <hr class="dashed-divider">
+
+        <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
+          <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
+          ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
+          ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
+          <p style="margin-top:4px;">Obrigado pela preferência!</p>
         </div>
       `;
 
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
+    // --- MÉTODOS DE IMPRESSÃO ISOLADA EM JANELA POP-UP ---
+    function abrirJanelaEImprimir(conteudoHtml, titulo) {
+      const janela = window.open('', '_blank', 'width=800,height=600');
+      if (!janela) {
+        alert('Por favor, permita pop-ups no navegador para realizar a impressão.');
+        return;
+      }
+
+      janela.document.write(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>${titulo}</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+            body { padding: 20px; color: #000; background: #fff; font-size: 12px; }
+            .receipt-box { border: 1px dashed #000; padding: 15px; border-radius: 6px; max-width: 400px; margin: 0 auto; }
+            .dashed-divider { border: none; border-top: 1px dashed #000; margin: 10px 0; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #ccc; font-size: 11px; }
+            th { background: #f0f0f0; }
+            .stat-card { border: 1px solid #ccc; padding: 8px; border-radius: 4px; margin-bottom: 8px; }
+            .stat-title { font-size: 10px; text-transform: uppercase; color: #555; }
+            .stat-value { font-size: 14px; font-weight: bold; }
+            .badge { font-weight: bold; font-size: 10px; }
+            @media print {
+              body { padding: 0; }
+              @page { margin: 0.5cm; }
+            }
+          </style>
+        </head>
+        <body>
+          ${conteudoHtml}
+        </body>
+        </html>
+      `);
+
+      janela.document.close();
+      janela.focus();
+
+      setTimeout(() => {
+        janela.print();
+        janela.close();
+      }, 300);
+    }
+
     function imprimirNota() {
-      window.print();
+      const htmlRecibo = document.getElementById('printable-receipt').outerHTML;
+      abrirJanelaEImprimir(htmlRecibo, 'Comprovante do Pedido');
     }
 
     function imprimirRelatorio() {
-      window.print();
+      const htmlRelatorio = document.getElementById('area-relatorio-impressao').innerHTML;
+      const tituloPeriodo = document.getElementById('resumo-periodo-texto').innerText;
+      const conteudoCompleto = `
+        <h2 style="text-align:center; margin-bottom: 5px;">Relatório de Vendas</h2>
+        <p style="text-align:center; font-weight:bold; margin-bottom: 15px;">${tituloPeriodo}</p>
+        ${htmlRelatorio}
+      `;
+      abrirJanelaEImprimir(conteudoCompleto, 'Relatorio de Vendas');
     }
 
     function abrirResumoVendas() {
