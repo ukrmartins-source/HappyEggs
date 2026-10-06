@@ -793,7 +793,7 @@
             </td>
             <td>
               <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb; margin-bottom:2px;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
-              <button class="btn-danger" type="button" title="Excluir/Estornar Pedido" onclick="excluirOuCancelarPedido('${p.id}', ${p.numeroPedido}, ${p.totalOvos || 0})">🗑️️</button>
+              <button class="btn-danger" type="button" title="Excluir/Estornar Pedido" onclick="excluirOuCancelarPedido('${p.id}', ${p.numeroPedido}, ${p.totalOvos || 0})">🗑</button>
             </td>
           </tr>
         `;
@@ -826,7 +826,7 @@
         const itens = ped.itens || [];
 
         const reciboHTML = `
-          <div class="recibo-item" style="${idx > 0 ? 'page-break-before: always; margin-top:20px; border-top: 1px dashed #cbd5e1; padding-top: 20px;' : ''}">
+          <div class="recibo-item" style="${idx > 0 ? 'margin-top:20px; border-top: 1px dashed #cbd5e1; padding-top: 20px;' : ''}">
             <div style="text-align:center; margin-bottom:8px;">
               <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
               <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
@@ -1368,15 +1368,27 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    // --- MÉTODOS DE IMPRESSÃO ISOLADA EM JANELA POP-UP ---
-    function abrirJanelaEImprimir(conteudoHtml, titulo) {
-      const janela = window.open('', '_blank', 'width=800,height=600');
-      if (!janela) {
-        alert('Por favor, permita pop-ups no navegador para realizar a impressão.');
-        return;
+    // --- MÉTODOS DE IMPRESSÃO VIA IFRAME OCULTO (SEM POP-UP / MULTI-PEDIDOS POR PÁGINA) ---
+    function executarImpressaoSilenciosa(conteudoHtml, titulo) {
+      let iframe = document.getElementById('iframe-impressao-oculto');
+      if (iframe) {
+        iframe.remove();
       }
 
-      janela.document.write(`
+      iframe = document.createElement('iframe');
+      iframe.id = 'iframe-impressao-oculto';
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(`
         <!DOCTYPE html>
         <html lang="pt-BR">
         <head>
@@ -1384,19 +1396,37 @@
           <title>${titulo}</title>
           <style>
             * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-            body { padding: 20px; color: #000; background: #fff; font-size: 12px; }
-            .receipt-box { border: 1px dashed #000; padding: 15px; border-radius: 6px; max-width: 400px; margin: 0 auto; }
+            body { padding: 15px; color: #000; background: #fff; font-size: 12px; }
+            
+            .receipt-box { 
+              border: 1px dashed #000; 
+              padding: 15px; 
+              border-radius: 6px; 
+              max-width: 400px; 
+              margin: 0 auto 15px auto; 
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
+
+            .recibo-item {
+              page-break-inside: avoid;
+              break-inside: avoid;
+              margin-bottom: 15px;
+            }
+
             .dashed-divider { border: none; border-top: 1px dashed #000; margin: 10px 0; }
-            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; page-break-inside: auto; }
+            tr { page-break-inside: avoid; break-inside: avoid; }
             th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #ccc; font-size: 11px; }
             th { background: #f0f0f0; }
-            .stat-card { border: 1px solid #ccc; padding: 8px; border-radius: 4px; margin-bottom: 8px; }
+            .stat-card { border: 1px solid #ccc; padding: 8px; border-radius: 4px; margin-bottom: 8px; page-break-inside: avoid; break-inside: avoid; }
             .stat-title { font-size: 10px; text-transform: uppercase; color: #555; }
             .stat-value { font-size: 14px; font-weight: bold; }
             .badge { font-weight: bold; font-size: 10px; }
+
             @media print {
+              @page { size: auto; margin: 10mm; }
               body { padding: 0; }
-              @page { margin: 0.5cm; }
             }
           </style>
         </head>
@@ -1406,18 +1436,17 @@
         </html>
       `);
 
-      janela.document.close();
-      janela.focus();
+      doc.close();
+      iframe.contentWindow.focus();
 
       setTimeout(() => {
-        janela.print();
-        janela.close();
-      }, 300);
+        iframe.contentWindow.print();
+      }, 250);
     }
 
     function imprimirNota() {
       const htmlRecibo = document.getElementById('printable-receipt').outerHTML;
-      abrirJanelaEImprimir(htmlRecibo, 'Comprovante do Pedido');
+      executarImpressaoSilenciosa(htmlRecibo, 'Comprovante do Pedido');
     }
 
     function imprimirRelatorio() {
@@ -1428,7 +1457,7 @@
         <p style="text-align:center; font-weight:bold; margin-bottom: 15px;">${tituloPeriodo}</p>
         ${htmlRelatorio}
       `;
-      abrirJanelaEImprimir(conteudoCompleto, 'Relatorio de Vendas');
+      executarImpressaoSilenciosa(conteudoCompleto, 'Relatório de Vendas');
     }
 
     function abrirResumoVendas() {
