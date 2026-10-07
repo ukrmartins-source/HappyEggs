@@ -133,7 +133,7 @@
     </div>
   </header>
 
-  <!-- ABAS DE NAVEGAÇÃO ENTRE MÓDULOS (EXIBIDO APÓS LOGIN) -->
+  <!-- ABAS DE NAVEGAÇÃO ENTRE MÓDULOS -->
   <div id="module-selector-bar" class="module-tabs" style="display:none;">
     <button class="mod-tab-btn active-comercial" id="tab-btn-comercial" type="button" onclick="alternarModuloPrincipal('comercial')">
       🛒 Módulo Comercial & Vendas
@@ -147,7 +147,7 @@
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
-      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas[cite: 2]</p>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
       <form onsubmit="autenticar(event)">
         <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password"></div>
@@ -220,7 +220,7 @@
       </div>
     </div>
 
-    <!-- MÓDULO COMERCIAL & VENDAS (DASHBOARD COMERCIAL) -->
+    <!-- MÓDULO COMERCIAL & VENDAS -->
     <div id="view-dashboard" class="view-content" style="display:none;">
       <div class="grid-menu">
         <button class="grid-btn full-width" type="button" onclick="navTo('pedidos')"><span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span></button>
@@ -248,7 +248,7 @@
       </div>
     </div>
 
-    <!-- MÓDULO ZOOTÉCNICO & PRODUÇÃO DE AVES (NOVA ABA PRINCIPAL) -->
+    <!-- MÓDULO ZOOTÉCNICO & PRODUÇÃO DE AVES -->
     <div id="view-zootech" class="view-content" style="display:none;">
       <div class="card" style="border-left: 4px solid var(--zootech);">
         <div class="card-header">
@@ -272,12 +272,9 @@
         <div class="card-header">
           <div class="card-title">🥚 Lotes Ativos & Indicadores Zootécnicos</div>
         </div>
-        <div id="lista-lotes-container">
-          <!-- Renderizado dinamicamente -->
-        </div>
+        <div id="lista-lotes-container"></div>
       </div>
 
-      <!-- LANÇAMENTO DIÁRIO DE POSTURA -->
       <div class="card" style="border-left: 4px solid var(--warning);">
         <div class="card-header">
           <div class="card-title">📊 Lançamento Diário de Postura & Mortalidade</div>
@@ -296,7 +293,6 @@
         </form>
       </div>
 
-      <!-- HISTÓRICO RECENTE DE APONTAMENTOS -->
       <div class="card">
         <div class="card-title" style="margin-bottom:8px;">Histórico de Apontamentos Recentes</div>
         <table>
@@ -680,7 +676,6 @@
         renderProducaoHoje();
       });
 
-      // LISTENERS DO MÓDULO ZOOTÉCNICO
       const unsubLotes = db.collection("lotes_aves").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.lotes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderLotesZootech();
@@ -774,7 +769,6 @@
       document.getElementById('view-login').style.display = 'block';
     }
 
-    // ALTERNAR ENTRE ABAS PRINCIPAIS DO SISTEMA
     function alternarModuloPrincipal(modulo) {
       const btnComercial = document.getElementById('tab-btn-comercial');
       const btnZootech = document.getElementById('tab-btn-zootech');
@@ -872,7 +866,7 @@
       await db.collection("empresas").doc(id).update({ status: statusAtual === 'Ativo' ? 'Bloqueado' : 'Ativo' });
     }
 
-    // --- FUNÇÕES DO MÓDULO ZOOTÉCNICO ---
+    // --- FUNÇÕES ZOOTÉCNICAS ---
     async function cadastrarLoteAves(e) {
       e.preventDefault();
       const nome = document.getElementById('lote-nome').value.trim();
@@ -972,7 +966,7 @@
           <td><strong>${a.loteNome || 'Lote'}</strong></td>
           <td>${a.ovosColetados} ovos</td>
           <td><strong style="color:var(--zootech);">${a.taxaPostura}%</strong></td>
-          <td>${a.mortalidade > '0' ? `<span style="color:var(--danger)">-${a.mortalidade}</span>` : '0'}</td>
+          <td>${a.mortalidade > 0 ? `<span style="color:var(--danger)">-${a.mortalidade}</span>` : '0'}</td>
         </tr>
       `).join('');
     }
@@ -983,7 +977,7 @@
       }
     }
 
-    // --- FUNÇÕES COMERCIAIS & CLIENTES (MANTIDAS INTACTAS) ---
+    // --- FUNÇÕES COMERCIAIS & CLIENTES ---
     function renderClientes() {
       const tbody = document.getElementById('lista-clientes');
       if (!tbody) return;
@@ -1039,14 +1033,42 @@
     function imprimirPedidosSelecionados() {
       const selecionados = Array.from(document.querySelectorAll('.check-pedido:checked')).map(cb => cb.value);
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
+      
       const receiptBox = document.getElementById('printable-receipt');
       receiptBox.innerHTML = '';
       const emp = state.empresa || {};
+
       selecionados.forEach((id, idx) => {
         const ped = state.pedidos.find(p => p.id === id);
         if (!ped) return;
-        receiptBox.innerHTML += `<div><strong>Pedido #${ped.numeroPedido}</strong> - ${ped.clienteNome} - R$ ${ped.total.toFixed(2)}</div>`;
+        const isPago = ped.status === 'Pago';
+        const statusSymbol = isPago ? '🟢' : '🔴';
+        const itens = ped.itens || [];
+
+        receiptBox.innerHTML += `
+          <div style="${idx > 0 ? 'margin-top:20px; border-top: 1.5px dashed #4b5563; padding-top: 20px;' : ''}">
+            <div style="text-align:center; margin-bottom:8px;">
+              <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
+              <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
+              <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
+            </div>
+            <hr class="dashed-divider">
+            <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}</div>
+            <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente não informado'}</div>
+            <div style="margin-bottom:2px;"><strong>Documento:</strong> ${ped.clienteDoc || 'N/I'}</div>
+            <hr class="dashed-divider">
+            <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS:</div>
+            ${itens.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
+            <hr class="dashed-divider">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
+              <span>TOTAL:</span><span>R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+            </div>
+            <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${ped.formaPgto || 'Não especificada'}</div>
+            <div style="margin-bottom:2px;"><strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]</div>
+          </div>
+        `;
       });
+
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
@@ -1059,7 +1081,7 @@
     function renderDropdowns() {
       filtrarClientesDropdown();
       const prodSelect = document.getElementById('ped-produto');
-      if (prodSelect) prodSelect.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)}</option>`).join('');
+      if (prodSelect) prodSelect.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)} (${p.ovosUnid} ovos)</option>`).join('');
     }
 
     function filtrarClientesDropdown() {
@@ -1105,7 +1127,7 @@
       const qtd = parseInt(document.getElementById('ped-qtd').value || 1);
       const prod = state.produtos.find(p => p.id === prodId);
       if (!prod) return;
-      carrinhoTemp.push({ produtoId: prod.id, nome: prod.nome, preco: prod.preco, qtd, totalOvos: qtd * prod.ovosUnid, subtotal: qtd * prod.preco });
+      carrinhoTemp.push({ produtoId: prod.id, nome: prod.nome, preco: prod.preco, qtd, ovosUnid: prod.ovosUnid, totalOvos: qtd * prod.ovosUnid, subtotal: qtd * prod.preco });
       renderCarrinho();
     }
 
@@ -1138,6 +1160,8 @@
         numeroPedido: proximoNumero,
         clienteId: cliente.id,
         clienteNome: cliente.nome,
+        clienteDoc: cliente.doc || 'N/I',
+        clienteEnd: cliente.end || 'Não informado',
         itens: carrinhoTemp,
         total: totalPedido,
         totalOvos,
@@ -1146,11 +1170,14 @@
         dataCriacao: new Date()
       };
 
-      await db.collection("pedidos").add(novo);
+      const docRef = await db.collection("pedidos").add(novo);
+      novo.id = docRef.id;
+
       carrinhoTemp = [];
       renderCarrinho();
       e.target.reset();
-      alert(`Pedido #${proximoNumero} gerado!`);
+
+      abrirModalNota(novo);
     }
 
     async function alternarStatusPedido(id, status) {
@@ -1207,39 +1234,123 @@
       e.preventDefault();
       const dados = { nome: document.getElementById('emp-nome').value, cnpj: document.getElementById('emp-cnpj').value, tel: document.getElementById('emp-tel').value, end: document.getElementById('emp-end').value, social: document.getElementById('emp-social').value, pix: document.getElementById('emp-pix').value };
       await db.collection("config").doc(state.currentUser.empresaId).set(dados, { merge: true });
+      state.empresa = dados;
       alert('Dados salvos!');
     }
 
-    function abrirModalNota(id) {
-      const ped = state.pedidos.find(p => p.id === id);
+    function abrirModalNota(pedidoOuId) {
+      let ped = null;
+      if (typeof pedidoOuId === 'string') {
+        ped = state.pedidos.find(p => p.id === pedidoOuId);
+      } else {
+        ped = pedidoOuId;
+      }
       if (!ped) return;
-      document.getElementById('printable-receipt').innerHTML = `<strong>Pedido #${ped.numeroPedido}</strong><br>Cliente: ${ped.clienteNome}<br>Total: R$ ${ped.total.toFixed(2)}`;
+
+      state.pedidoAtual = ped;
+      const receipt = document.getElementById('printable-receipt');
+      const emp = state.empresa || {};
+      const isPago = ped.status === 'Pago';
+      const statusSymbol = isPago ? '🟢' : '🔴';
+      const itens = ped.itens || [];
+
+      receipt.innerHTML = `
+        <div style="text-align:center; margin-bottom:8px;">
+          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
+          <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
+          <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
+        </div>
+        <hr class="dashed-divider">
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}</div>
+        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente não informado'}</div>
+        <div style="margin-bottom:2px;"><strong>Documento:</strong> ${ped.clienteDoc || 'N/I'}</div>
+        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+        <hr class="dashed-divider">
+        <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
+        ${itens.length > 0 ? itens.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('') : '<div style="font-size:0.8rem; color:#64748b;">Nenhum item</div>'}
+        <hr class="dashed-divider">
+        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
+          <span>VALOR TOTAL:</span><span>R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+        </div>
+        <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${ped.formaPgto || 'Não especificada'}</div>
+        <div style="margin-bottom:2px;"><strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]</div>
+        ${ped.obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${ped.obs}</div>` : ''}
+        <hr class="dashed-divider">
+        <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
+          <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
+          ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
+          ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
+          <p style="margin-top:4px;">Obrigado pela preferência!</p>
+        </div>
+      `;
+
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    function executarImpressaoSilenciosa(html, titulo) {
-      let iframe = document.getElementById('iframe-impressao');
+    function executarImpressaoSilenciosa(conteudoHtml, titulo) {
+      let iframe = document.getElementById('iframe-impressao-oculto');
       if (iframe) iframe.remove();
+
       iframe = document.createElement('iframe');
-      iframe.id = 'iframe-impressao';
-      iframe.style.display = 'none';
+      iframe.id = 'iframe-impressao-oculto';
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+
       document.body.appendChild(iframe);
-      iframe.contentWindow.document.write(`<html><head><title>${titulo}</title></head><body>${html}</body></html>`);
-      iframe.contentWindow.document.close();
-      setTimeout(() => iframe.contentWindow.print(), 200);
+
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>${titulo}</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+            body { padding: 15px; color: #000; background: #fff; font-size: 12px; }
+            .receipt-box { border: 1px dashed #000; padding: 15px; border-radius: 6px; max-width: 400px; margin: 0 auto 15px auto; }
+            .dashed-divider { border: none; border-top: 1px dashed #000; margin: 10px 0; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #ccc; font-size: 11px; }
+            th { background: #f0f0f0; }
+          </style>
+        </head>
+        <body>${conteudoHtml}</body>
+        </html>
+      `);
+      doc.close();
+      iframe.contentWindow.focus();
+      setTimeout(() => { iframe.contentWindow.print(); }, 250);
     }
 
-    function imprimirNota() { executarImpressaoSilenciosa(document.getElementById('printable-receipt').innerHTML, 'Recibo'); }
-    function imprimirRelatorio() { executarImpressaoSilenciosa(document.getElementById('area-relatorio-impressao').innerHTML, 'Relatório'); }
+    function imprimirNota() {
+      const htmlRecibo = document.getElementById('printable-receipt').outerHTML;
+      executarImpressaoSilenciosa(htmlRecibo, 'Comprovante do Pedido');
+    }
+
+    function imprimirRelatorio() {
+      const htmlRelatorio = document.getElementById('area-relatorio-impressao').outerHTML;
+      executarImpressaoSilenciosa(htmlRelatorio, 'Relatório de Vendas');
+    }
 
     function exportarRelatorioExcel() {
-      let csv = "Pedido;Cliente;Total;Status\n";
-      state.pedidos.forEach(p => { csv += `#${p.numeroPedido};"${p.clienteNome}";R$ ${p.total.toFixed(2)};${p.status}\n`; });
+      let csv = "Pedido;Data;Cliente;Total;Status\n";
+      state.pedidos.forEach(p => {
+        const dataStr = p.dataCriacao ? p.dataCriacao.toLocaleDateString('pt-BR') : '';
+        const totalStr = (p.total || 0).toFixed(2).replace('.', ',');
+        csv += `#${p.numeroPedido || ''};${dataStr};"${p.clienteNome || ''}";R$ ${totalStr};${p.status || ''}\n`;
+      });
       const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = 'relatorio_vendas.csv';
+      a.href = url; a.download = `relatorio_vendas_${new Date().toISOString().slice(0,10)}.csv`;
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     function abrirResumoVendas() {
@@ -1249,12 +1360,23 @@
     }
 
     function atualizarFiltroRelatorio() { renderizarDadosRelatorio(); }
+    
     function renderizarDadosRelatorio() {
-      const total = state.pedidos.reduce((acc, p) => acc + p.total, 0);
+      const total = state.pedidos.reduce((acc, p) => acc + (p.total || 0), 0);
+      const qtd = state.pedidos.length;
       document.getElementById('resumo-total-periodo').innerText = `R$ ${total.toFixed(2)}`;
-      document.getElementById('resumo-qtd-pedidos').innerText = state.pedidos.length;
-      document.getElementById('resumo-ticket-medio').innerText = state.pedidos.length > 0 ? `R$ ${(total/state.pedidos.length).toFixed(2)}` : 'R$ 0,00';
-      document.getElementById('resumo-tabela-periodo').innerHTML = state.pedidos.map(p => `<tr><td>#${p.numeroPedido}</td><td>${p.clienteNome}</td><td>R$ ${p.total.toFixed(2)}</td><td>${p.status}</td></tr>`).join('');
+      document.getElementById('resumo-qtd-pedidos').innerText = qtd;
+      document.getElementById('resumo-ticket-medio').innerText = qtd > 0 ? `R$ ${(total/qtd).toFixed(2)}` : 'R$ 0,00';
+      document.getElementById('resumo-periodo-texto').innerText = "Período Geral de Vendas";
+      document.getElementById('resumo-tabela-periodo').innerHTML = state.pedidos.map(p => `
+        <tr>
+          <td>#${p.numeroPedido || ''}</td>
+          <td>${p.dataCriacao ? p.dataCriacao.toLocaleDateString('pt-BR') : ''}</td>
+          <td>${p.clienteNome}</td>
+          <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
+          <td>${p.status}</td>
+        </tr>
+      `).join('');
     }
 
     initApp();
