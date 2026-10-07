@@ -13,7 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- HTML2PDF PARA GERAR O COMPROVANTE EXATO EM IMAGEM/PDF -->
+  <!-- HTML2PDF PARA GERAR O COMPROVANTE E EXPORTAÇÕES EXATAS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -79,6 +79,7 @@
     .btn-back { background: #475569; padding: 6px 12px; width: auto; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px; }
     .btn-danger { background: var(--danger); width: auto; padding: 5px 10px; font-size: 0.75rem; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .btn-warning { background: var(--warning); width: auto; padding: 5px 10px; font-size: 0.75rem; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .btn-success { background: var(--success); }
 
     .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; cursor: pointer; display: inline-block; }
     .badge-pago { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
@@ -140,14 +141,33 @@
       </form>
     </div>
 
-    <!-- PAINEL SUPER ADMIN (SaaS) -->
+    <!-- PAINEL SUPER ADMIN (SaaS) COM DASHBOARD GLOBAL -->
     <div id="view-superadmin" class="view-content" style="display:none;">
-      <div class="card" style="border-left: 4px solid var(--warning);">
-        <div class="card-header">
-          <div class="card-title">👑 Painel Super Admin (SaaS)</div>
+      
+      <!-- DASHBOARD GLOBAL DO SUPER ADMIN -->
+      <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border: none;">
+        <div class="card-header" style="border-color: rgba(255,255,255,0.1);">
+          <div class="card-title" style="color: white;">👑 Dashboard Global SaaS</div>
           <button class="btn btn-back" type="button" onclick="logout()">Sair</button>
         </div>
-        <p style="font-size:0.85rem; color:#64748b; margin-bottom: 12px;">Cadastre novas granjas clientes com dados completos de contacto e credenciais.</p>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px;">
+          <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Granjas Ativas</div>
+            <div id="global-granjas-ativas" style="font-size: 1.2rem; font-weight: bold; color: #38bdf8;">0</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Faturamento Global</div>
+            <div id="global-faturamento" style="font-size: 1.1rem; font-weight: bold; color: #34d399;">R$ 0</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Ovos no Sistema</div>
+            <div id="global-ovos" style="font-size: 1.1rem; font-weight: bold; color: #facc15;">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-left: 4px solid var(--warning);">
+        <div class="card-title" style="margin-bottom: 12px;">Cadastrar Nova Granja / Empresa Cliente</div>
         
         <form onsubmit="cadastrarEmpresaCliente(event)">
           <div class="form-group"><label>Nome da Granja / Empresa</label><input type="text" id="saas-nome" placeholder="Ex: Avicultura São José" required></div>
@@ -156,17 +176,32 @@
           <div class="form-group"><label>E-mail de Contato</label><input type="email" id="saas-email" placeholder="contato@saojose.com"></div>
           <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="saas-tel" placeholder="Ex: (11) 99999-8888"></div>
           <div class="form-group"><label>Endereço Completo</label><input type="text" id="saas-end" placeholder="Rua, Nº, Bairro, Cidade/UF"></div>
+          
+          <div class="form-group">
+            <label>Plano de Assinatura</label>
+            <select id="saas-plano" onchange="atualizarComportamentoPlano()" required>
+              <option value="mensal">Mensal (30 Dias)</option>
+              <option value="anual">Anual (365 Dias)</option>
+              <option value="vitalicio">Vitalício (Sem Expiração)</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="grupo-vencimento">
+            <label>Data de Vencimento da Assinatura</label>
+            <input type="date" id="saas-vencimento">
+          </div>
+
           <div class="form-group"><label>Usuário Administrador da Granja</label><input type="text" id="saas-admin-user" placeholder="admin_saojose" required></div>
           <div class="form-group"><label>Senha Inicial</label><input type="password" id="saas-admin-pass" placeholder="Senha de acesso" required></div>
-          <div class="form-group"><label>Data de Vencimento da Assinatura</label><input type="date" id="saas-vencimento" required></div>
-          <button type="submit" class="btn" style="background:var(--success);">➕ Cadastrar Nova Empresa Cliente</button>
+          
+          <button type="submit" class="btn btn-success">➕ Cadastrar Empresa Cliente</button>
         </form>
       </div>
 
       <div class="card">
-        <div class="card-title">Empresas, Dados e Credenciais</div>
+        <div class="card-title">Empresas, Planos e Credenciais</div>
         <table>
-          <thead><tr><th>Dados da Empresa</th><th>Usuários e Senhas</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Dados e Plano</th><th>Usuários e Senhas</th><th>Ações</th></tr></thead>
           <tbody id="lista-empresas-saas"></tbody>
         </table>
       </div>
@@ -295,7 +330,7 @@
             <textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Deixar com a portaria"></textarea>
           </div>
 
-          <button type="submit" class="btn" style="background:var(--success);">Finalizar Pedido</button>
+          <button type="submit" class="btn btn-success">Finalizar Pedido</button>
         </form>
       </div>
 
@@ -441,7 +476,7 @@
           <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
           <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @happyeggs | www.happyeggs.com"></div>
           <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
-          <button type="submit" class="btn" style="background:var(--success);">Salvar Dados da Empresa</button>
+          <button type="submit" class="btn btn-success">Salvar Dados da Empresa</button>
         </form>
       </div>
     </div>
@@ -466,7 +501,7 @@
     </div>
   </div>
 
-  <!-- MODAL: RELATÓRIO DE VENDAS FLEXÍVEL -->
+  <!-- MODAL: RELATÓRIO DE VENDAS FLEXÍVEL COM EXPORTAÇÃO PDF/EXCEL -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 500px;">
       
@@ -495,7 +530,7 @@
 
       <div id="resumo-periodo-texto" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; font-weight:bold;"></div>
 
-      <!-- CONTAINER PARA IMPRESSÃO ISOLADA DO RELATÓRIO -->
+      <!-- CONTAINER PARA IMPRESSÃO E EXPORTAÇÃO DO RELATÓRIO -->
       <div id="area-relatorio-impressao">
         <div class="stat-card">
           <div class="stat-title">Total Faturado no Período</div>
@@ -527,9 +562,13 @@
         </div>
       </div>
 
-      <div style="display:flex; gap:10px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorio()">🖨 Imprimir Relatório</button>
-        <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorio()">🖨 Imprimir</button>
+        <button class="btn" type="button" style="background:#059669;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
+      </div>
+      <div style="margin-top: 8px;">
+        <button class="btn" type="button" style="background:#dc2626;" onclick="exportarRelatorioPDF()">📄 Baixar PDF</button>
+        <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b; margin-top:6px;">Fechar</button>
       </div>
     </div>
   </div>
@@ -577,6 +616,9 @@
       usuarios: [],
       empresasSaaS: [],
       todosUsuariosSaaS: [],
+      todasEmpresasGlobal: [],
+      todosPedidosGlobal: [],
+      todoEstoqueGlobal: [],
       empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "" },
       produtos: [],
       clientes: [],
@@ -602,23 +644,46 @@
           });
           db.collection("empresas").doc("empresa_demo").set({
             nome: "Granja Demonstração",
-            status: "Ativo"
+            status: "Ativo",
+            plano: "vitalicio",
+            vencimento: "2099-12-31"
           });
         }
       }).catch(err => console.error("Erro na inicialização:", err));
     }
 
-    // --- CARREGAR DADOS DO SUPER ADMIN (EMPRESAS E UTILIZADORES) ---
+    // --- CARREGAR DADOS DO SUPER ADMIN (DASHBOARD GLOBAL E EMPRESAS) ---
     function initSuperAdminListener() {
       db.collection("empresas").onSnapshot(snapshot => {
         state.empresasSaaS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderEmpresasSaaS();
+        calcularDashboardGlobal();
       });
 
       db.collection("usuarios").onSnapshot(snapshot => {
         state.todosUsuariosSaaS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderEmpresasSaaS();
       });
+
+      db.collection("pedidos").onSnapshot(snapshot => {
+        state.todosPedidosGlobal = snapshot.docs.map(doc => doc.data());
+        calcularDashboardGlobal();
+      });
+
+      db.collection("estoque_geral").onSnapshot(snapshot => {
+        state.todoEstoqueGlobal = snapshot.docs.map(doc => doc.data());
+        calcularDashboardGlobal();
+      });
+    }
+
+    function calcularDashboardGlobal() {
+      const granjasAtivas = state.empresasSaaS.filter(e => e.status === 'Ativo').length;
+      const faturamentoGlobal = state.todosPedidosGlobal.reduce((acc, p) => acc + (p.total || 0), 0);
+      const totalOvosGlobal = state.todoEstoqueGlobal.reduce((acc, e) => acc + (e.qtdOvos || 0), 0);
+
+      document.getElementById('global-granjas-ativas').innerText = granjasAtivas;
+      document.getElementById('global-faturamento').innerText = `R$ ${faturamentoGlobal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+      document.getElementById('global-ovos').innerText = `${totalOvosGlobal.toLocaleString('pt-BR')} Ovos`;
     }
 
     function initListeners() {
@@ -730,8 +795,20 @@
         if (empDoc.exists) {
           const empData = empDoc.data();
           if (empData.status !== "Ativo") {
-            alert("A conta da sua empresa está inativa. Entre em contato com o suporte.");
+            alert("A conta da sua empresa está bloqueada. Entre em contato com o suporte.");
             return;
+          }
+
+          // VERIFICAÇÃO DE VENCIMENTO DE PLANO (EXCETO VITALÍCIO)
+          if (empData.plano !== "vitalicio" && empData.vencimento) {
+            const hoje = new Date();
+            hoje.setHours(0,0,0,0);
+            const vencimentoDate = new Date(empData.vencimento + 'T00:00:00');
+
+            if (hoje > vencimentoDate) {
+              alert(`Aviso: A assinatura da sua granja expirou em ${vencimentoDate.toLocaleDateString('pt-BR')}. O acesso está temporariamente bloqueado. Por favor, regularize com o suporte.`);
+              return;
+            }
           }
         }
 
@@ -786,7 +863,30 @@
       if (el) el.innerText = `${(state.estoqueGeralOvos || 0).toLocaleString('pt-BR')} Ovos`;
     }
 
-    // --- SUPER ADMIN: GESTÃO DE EMPRESAS CLIENTES E CREDENCIAIS (SaaS) ---
+    // --- CONTROLO DE PLANOS E VENCIMENTO NO SUPER ADMIN ---
+    function atualizarComportamentoPlano() {
+      const plano = document.getElementById('saas-plano').value;
+      const grupoVenc = document.getElementById('grupo-vencimento');
+      const inputVenc = document.getElementById('saas-vencimento');
+
+      const hoje = new Date();
+      if (plano === 'mensal') {
+        hoje.setDate(hoje.getDate() + 30);
+        grupoVenc.style.display = 'block';
+        inputVenc.value = hoje.toISOString().split('T')[0];
+        inputVenc.required = true;
+      } else if (plano === 'anual') {
+        hoje.setFullYear(hoje.getFullYear() + 1);
+        grupoVenc.style.display = 'block';
+        inputVenc.value = hoje.toISOString().split('T')[0];
+        inputVenc.required = true;
+      } else if (plano === 'vitalicio') {
+        grupoVenc.style.display = 'none';
+        inputVenc.value = '2099-12-31';
+        inputVenc.required = false;
+      }
+    }
+
     async function cadastrarEmpresaCliente(e) {
       e.preventDefault();
       const nome = document.getElementById('saas-nome').value.trim();
@@ -795,24 +895,24 @@
       const email = document.getElementById('saas-email').value.trim();
       const tel = document.getElementById('saas-tel').value.trim();
       const end = document.getElementById('saas-end').value.trim();
+      const plano = document.getElementById('saas-plano').value;
+      const vencimento = document.getElementById('saas-vencimento').value || '2099-12-31';
       const adminUser = document.getElementById('saas-admin-user').value.trim().toLowerCase();
       const adminPass = document.getElementById('saas-admin-pass').value.trim();
-      const vencimento = document.getElementById('saas-vencimento').value;
 
       try {
-        // Salva dados cadastrais da empresa
         await db.collection("empresas").doc(idEmpresa).set({
           nome,
           cnpj,
           email,
           tel,
           end,
+          plano,
           vencimento,
           status: "Ativo",
           criadoEm: new Date()
         });
 
-        // Configura automaticamente os dados padrão do rodapé da nota para esta nova empresa
         await db.collection("config").doc(idEmpresa).set({
           nome,
           cnpj,
@@ -822,7 +922,6 @@
           pix: ""
         });
 
-        // Cadastra o usuário administrador da granja
         await db.collection("usuarios").add({
           empresaId: idEmpresa,
           login: adminUser,
@@ -832,6 +931,7 @@
 
         alert(`Empresa cliente ${nome} cadastrada com sucesso!`);
         e.target.reset();
+        atualizarComportamentoPlano();
       } catch (err) {
         alert("Erro ao cadastrar empresa: " + err.message);
       }
@@ -859,12 +959,9 @@
           <tr>
             <td>
               <strong>${emp.nome}</strong><br>
-              <small style="color:#64748b;">ID: ${emp.id}</small><br>
-              <small style="color:#64748b;">CNPJ: ${emp.cnpj || 'N/I'}</small><br>
-              <small style="color:#64748b;">E-mail: ${emp.email || 'N/I'}</small><br>
-              <small style="color:#64748b;">Tel: ${emp.tel || 'N/I'}</small><br>
-              <small style="color:#64748b;">End: ${emp.end || 'N/I'}</small><br>
-              <small style="color:#d97706; font-weight:bold;">Venc: ${emp.vencimento || 'N/I'}</small><br>
+              <small style="color:#64748b;">ID: ${emp.id} | CNPJ: ${emp.cnpj || 'N/I'}</small><br>
+              <small style="color:#2563eb; font-weight:bold; text-transform:uppercase;">Plano: ${emp.plano || 'mensal'}</small><br>
+              <small style="color:#d97706;">Venc: ${emp.vencimento || 'N/I'}</small><br>
               <span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}" style="margin-top:4px;">${emp.status || 'Ativo'}</span>
             </td>
             <td>${listaUsuariosHtml}</td>
@@ -1552,7 +1649,7 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    // --- MÉTODOS DE IMPRESSÃO VIA IFRAME OCULTO (SEM POP-UP / MULTI-PEDIDOS POR PÁGINA) ---
+    // --- MÉTODOS DE IMPRESSÃO E EXPORTAÇÃO (PDF / EXCEL) ---
     function executarImpressaoSilenciosa(conteudoHtml, titulo) {
       let iframe = document.getElementById('iframe-impressao-oculto');
       if (iframe) {
@@ -1642,6 +1739,62 @@
         ${htmlRelatorio}
       `;
       executarImpressaoSilenciosa(conteudoCompleto, 'Relatório de Vendas');
+    }
+
+    function exportarRelatorioPDF() {
+      const elemento = document.getElementById('area-relatorio-impressao');
+      const tituloPeriodo = document.getElementById('resumo-periodo-texto').innerText;
+      
+      const containerExport = document.createElement('div');
+      containerExport.style.padding = '20px';
+      containerExport.style.background = '#ffffff';
+      containerExport.innerHTML = `
+        <h2 style="text-align:center; color:#0f172a; margin-bottom:5px;">HappyEggs - Relatório de Vendas</h2>
+        <p style="text-align:center; font-size:12px; color:#64748b; margin-bottom:15px; font-weight:bold;">${tituloPeriodo}</p>
+        ${elemento.innerHTML}
+      `;
+
+      const opt = {
+        margin:       10,
+        filename:     `relatorio_vendas_${new Date().toISOString().split('T')[0]}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().from(containerExport).set(opt).save();
+    }
+
+    function exportarRelatorioExcel() {
+      const tituloPeriodo = document.getElementById('resumo-periodo-texto').innerText;
+      const totalFaturado = document.getElementById('resumo-total-periodo').innerText;
+      const qtdPedidos = document.getElementById('resumo-qtd-pedidos').innerText;
+      const ticketMedio = document.getElementById('resumo-ticket-medio').innerText;
+
+      let csv = `\uFEFFHappyEggs - Relatorio de Vendas\n`;
+      csv += `${tituloPeriodo}\n\n`;
+      csv += `Total Faturado;${totalFaturado}\n`;
+      csv += `Quantidade de Pedidos;${qtdPedidos}\n`;
+      csv += `Ticket Médio;${ticketMedio}\n\n`;
+      csv += `Numero Pedido;Data;Cliente;Total;Status\n`;
+
+      // Recolher linhas da tabela do relatório
+      const linhas = document.querySelectorAll('#resumo-tabela-periodo tr');
+      linhas.forEach(tr => {
+        const cols = tr.querySelectorAll('td');
+        if (cols.length >= 5) {
+          csv += `${cols[0].innerText};${cols[1].innerText};${cols[2].innerText};${cols[3].innerText};${cols[4].innerText}\n`;
+        }
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `relatorio_vendas_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
 
     function abrirResumoVendas() {
@@ -1745,6 +1898,7 @@
     }
 
     initApp();
+    atualizarComportamentoPlano();
   </script>
 </body>
 </html>
