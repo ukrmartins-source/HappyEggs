@@ -147,11 +147,15 @@
           <div class="card-title">👑 Painel Super Admin (SaaS)</div>
           <button class="btn btn-back" type="button" onclick="logout()">Sair</button>
         </div>
-        <p style="font-size:0.85rem; color:#64748b; margin-bottom: 12px;">Gerencie aqui as granjas/empresas clientes e seus acessos ao sistema.</p>
+        <p style="font-size:0.85rem; color:#64748b; margin-bottom: 12px;">Cadastre novas granjas clientes com dados completos de contacto e credenciais.</p>
         
         <form onsubmit="cadastrarEmpresaCliente(event)">
-          <div class="form-group"><label>Nome da Granja / Empresa Cliente</label><input type="text" id="saas-nome" placeholder="Ex: Avicultura São José" required></div>
+          <div class="form-group"><label>Nome da Granja / Empresa</label><input type="text" id="saas-nome" placeholder="Ex: Avicultura São José" required></div>
           <div class="form-group"><label>ID Único (Sem espaços, ex: sao_jose)</label><input type="text" id="saas-id" placeholder="sao_jose" required></div>
+          <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="saas-cnpj" placeholder="Ex: 00.000.000/0001-00"></div>
+          <div class="form-group"><label>E-mail de Contato</label><input type="email" id="saas-email" placeholder="contato@saojose.com"></div>
+          <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="saas-tel" placeholder="Ex: (11) 99999-8888"></div>
+          <div class="form-group"><label>Endereço Completo</label><input type="text" id="saas-end" placeholder="Rua, Nº, Bairro, Cidade/UF"></div>
           <div class="form-group"><label>Usuário Administrador da Granja</label><input type="text" id="saas-admin-user" placeholder="admin_saojose" required></div>
           <div class="form-group"><label>Senha Inicial</label><input type="password" id="saas-admin-pass" placeholder="Senha de acesso" required></div>
           <div class="form-group"><label>Data de Vencimento da Assinatura</label><input type="date" id="saas-vencimento" required></div>
@@ -160,9 +164,9 @@
       </div>
 
       <div class="card">
-        <div class="card-title">Empresas / Clientes Assinantes</div>
+        <div class="card-title">Empresas, Dados e Credenciais</div>
         <table>
-          <thead><tr><th>Granja</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Dados da Empresa</th><th>Usuários e Senhas</th><th>Ações</th></tr></thead>
           <tbody id="lista-empresas-saas"></tbody>
         </table>
       </div>
@@ -572,6 +576,7 @@
     let state = {
       usuarios: [],
       empresasSaaS: [],
+      todosUsuariosSaaS: [],
       empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "" },
       produtos: [],
       clientes: [],
@@ -603,10 +608,15 @@
       }).catch(err => console.error("Erro na inicialização:", err));
     }
 
-    // --- CARREGAR DADOS DO SUPER ADMIN ---
+    // --- CARREGAR DADOS DO SUPER ADMIN (EMPRESAS E UTILIZADORES) ---
     function initSuperAdminListener() {
       db.collection("empresas").onSnapshot(snapshot => {
         state.empresasSaaS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderEmpresasSaaS();
+      });
+
+      db.collection("usuarios").onSnapshot(snapshot => {
+        state.todosUsuariosSaaS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderEmpresasSaaS();
       });
     }
@@ -776,23 +786,43 @@
       if (el) el.innerText = `${(state.estoqueGeralOvos || 0).toLocaleString('pt-BR')} Ovos`;
     }
 
-    // --- SUPER ADMIN: GESTÃO DE EMPRESAS CLIENTES (SaaS) ---
+    // --- SUPER ADMIN: GESTÃO DE EMPRESAS CLIENTES E CREDENCIAIS (SaaS) ---
     async function cadastrarEmpresaCliente(e) {
       e.preventDefault();
       const nome = document.getElementById('saas-nome').value.trim();
       const idEmpresa = document.getElementById('saas-id').value.trim().toLowerCase().replace(/\s+/g, '_');
+      const cnpj = document.getElementById('saas-cnpj').value.trim();
+      const email = document.getElementById('saas-email').value.trim();
+      const tel = document.getElementById('saas-tel').value.trim();
+      const end = document.getElementById('saas-end').value.trim();
       const adminUser = document.getElementById('saas-admin-user').value.trim().toLowerCase();
       const adminPass = document.getElementById('saas-admin-pass').value.trim();
       const vencimento = document.getElementById('saas-vencimento').value;
 
       try {
+        // Salva dados cadastrais da empresa
         await db.collection("empresas").doc(idEmpresa).set({
           nome,
+          cnpj,
+          email,
+          tel,
+          end,
           vencimento,
           status: "Ativo",
           criadoEm: new Date()
         });
 
+        // Configura automaticamente os dados padrão do rodapé da nota para esta nova empresa
+        await db.collection("config").doc(idEmpresa).set({
+          nome,
+          cnpj,
+          tel,
+          end,
+          social: "",
+          pix: ""
+        });
+
+        // Cadastra o usuário administrador da granja
         await db.collection("usuarios").add({
           empresaId: idEmpresa,
           login: adminUser,
@@ -813,16 +843,36 @@
 
       tbody.innerHTML = state.empresasSaaS.map(emp => {
         const isAtivo = emp.status === 'Ativo';
+        const usuariosDaEmpresa = state.todosUsuariosSaaS.filter(u => u.empresaId === emp.id);
+
+        const listaUsuariosHtml = usuariosDaEmpresa.map(u => `
+          <div style="background:#f8fafc; padding:6px 8px; border-radius:6px; margin-bottom:4px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong>👤 ${u.login}</strong> <span style="font-size:0.7rem; color:#64748b;">(${u.role})</span><br>
+              <span style="font-size:0.8rem; color:#2563eb;">Senha: <strong>${u.pass}</strong></span>
+            </div>
+            <button class="btn-warning" type="button" style="font-size:0.65rem; padding:3px 6px;" onclick="redefinirSenhaCliente('${u.id}', '${u.login}')">Alterar</button>
+          </div>
+        `).join('') || '<span style="color:#64748b; font-size:0.8rem;">Nenhum usuário.</span>';
+
         return `
           <tr>
-            <td><strong>${emp.nome}</strong><br><small style="color:#64748b;">ID: ${emp.id}</small></td>
-            <td>${emp.vencimento || 'N/I'}</td>
-            <td><span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}">${emp.status || 'Ativo'}</span></td>
             <td>
-              <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 8px;" onclick="alternarStatusEmpresa('${emp.id}', '${emp.status || 'Ativo'}')">
+              <strong>${emp.nome}</strong><br>
+              <small style="color:#64748b;">ID: ${emp.id}</small><br>
+              <small style="color:#64748b;">CNPJ: ${emp.cnpj || 'N/I'}</small><br>
+              <small style="color:#64748b;">E-mail: ${emp.email || 'N/I'}</small><br>
+              <small style="color:#64748b;">Tel: ${emp.tel || 'N/I'}</small><br>
+              <small style="color:#64748b;">End: ${emp.end || 'N/I'}</small><br>
+              <small style="color:#d97706; font-weight:bold;">Venc: ${emp.vencimento || 'N/I'}</small><br>
+              <span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}" style="margin-top:4px;">${emp.status || 'Ativo'}</span>
+            </td>
+            <td>${listaUsuariosHtml}</td>
+            <td>
+              <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%; margin-bottom:4px;" onclick="alternarStatusEmpresa('${emp.id}', '${emp.status || 'Ativo'}')">
                 ${isAtivo ? 'Bloquear' : 'Ativar'}
               </button>
-              <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 8px; margin-left:4px;" onclick="excluirEmpresaSaaS('${emp.id}')">
+              <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%;" onclick="excluirEmpresaSaaS('${emp.id}')">
                 🗑️ Apagar
               </button>
             </td>
@@ -831,13 +881,25 @@
       }).join('');
     }
 
+    async function redefinirSenhaCliente(usuarioId, loginUser) {
+      const novaSenha = prompt(`Digite a nova senha para o usuário "${loginUser}":`);
+      if (!novaSenha || novaSenha.trim() === "") return;
+
+      try {
+        await db.collection("usuarios").doc(usuarioId).update({ pass: novaSenha.trim() });
+        alert(`Senha do usuário "${loginUser}" atualizada com sucesso!`);
+      } catch (err) {
+        alert("Erro ao atualizar senha: " + err.message);
+      }
+    }
+
     async function alternarStatusEmpresa(id, statusAtual) {
       const novoStatus = statusAtual === 'Ativo' ? 'Bloqueado' : 'Ativo';
       await db.collection("empresas").doc(id).update({ status: novoStatus });
     }
 
     async function excluirEmpresaSaaS(id) {
-      if (confirm(`Tem certeza que deseja excluir a empresa ${id}? Esta ação não pode ser desfeita.`)) {
+      if (confirm(`Tem certeza que deseja excluir a empresa ${id} e seus dados? Esta ação não pode ser desfeita.`)) {
         try {
           await db.collection("empresas").doc(id).delete();
           alert('Empresa excluída com sucesso!');
@@ -1009,7 +1071,7 @@
       if (!tbody) return;
       tbody.innerHTML = state.usuarios.map(u => `
         <tr>
-          <td><strong>${u.login}</strong></td>
+          <td><strong>${u.login}</strong><br><small style="color:#2563eb;">Senha: ${u.pass}</small></td>
           <td><span class="badge" style="background:#e2e8f0; color:#334155;">${u.role}</span></td>
           <td>${u.login !== 'admin' ? `<button class="btn-danger" type="button" onclick="excluirUsuario('${u.id}')">Excluir</button>` : '---'}</td>
         </tr>
