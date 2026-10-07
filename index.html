@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0f172a">
-  <title>Rancho UK - ERP Tech Avicultura</title>
+  <title>HappyEggs - ERP Avicultura</title>
   
-  <!-- Ícone do Aplicativo no iPhone (Apple Touch Icon) -->
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="icon" href="logo.png">
 
@@ -14,7 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- HTML2PDF PARA GERAR PDF DIRETO NO NAVEGADOR -->
+  <!-- HTML2PDF PARA GERAR O COMPROVANTE EXATO EM IMAGEM/PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -55,7 +54,6 @@
     }
     .login-card h2 { color: var(--primary-dark); margin-bottom: 6px; font-size: 1.5rem; font-weight: 800; }
 
-    /* GRID MENU REORGANIZADO */
     .grid-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
     .grid-btn {
       background: linear-gradient(145deg, #1e293b, #0f172a); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
@@ -92,7 +90,7 @@
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
     th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
 
-    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.7); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
     .receipt-box { 
@@ -110,79 +108,39 @@
       line-height: 1.4;
     }
 
-    .dashed-divider {
-      border: none;
-      border-top: 1.5px dashed #9ca3af;
-      margin: 10px 0;
-    }
-
+    .dashed-divider { border: none; border-top: 1.5px dashed #9ca3af; margin: 10px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
     .stat-card { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
-
-    /* CORREÇÃO DE IMPRESSÃO */
-    @media print {
-      body {
-        background: #ffffff !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-      header, main, .no-print, .modal-content > *:not(#printable-receipt) {
-        display: none !important;
-      }
-      .modal {
-        position: static !important;
-        display: block !important;
-        background: none !important;
-      }
-      .modal-content {
-        box-shadow: none !important;
-        border: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      #printable-receipt {
-        display: block !important;
-        visibility: visible !important;
-        position: relative !important;
-        width: 100% !important;
-        max-width: 380px !important;
-        margin: 0 auto !important;
-        border: 1.5px dashed #000000 !important;
-        page-break-inside: avoid;
-      }
-    }
   </style>
 </head>
 <body>
 
   <!-- CABEÇALHO -->
-  <header id="app-header" style="display:none;" class="no-print">
-    <div class="brand"><span id="header-title">⚡ RANCHO UK</span></div>
+  <header id="app-header" style="display:none;">
+    <div class="brand"><span id="header-title">🥚 HAPPY EGGS</span></div>
     <div class="user-info">
       <span id="user-display">👤 Admin</span>
       <button class="btn-logout" type="button" onclick="logout()">Sair</button>
     </div>
   </header>
 
-  <main class="no-print">
+  <main>
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
-      <h2>RANCHO UK</h2>
-      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Sistema Inteligente de Avicultura</p>
+      <h2>HAPPY EGGS</h2>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
       <form onsubmit="autenticar(event)">
-        <div class="form-group"><label>Usuário / Login Mestre</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
+        <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password"></div>
         <button type="submit" class="btn" style="margin-top:10px;">Entrar no Sistema</button>
       </form>
     </div>
 
-    <!-- PAINEL SUPER ADMIN (EXCLUSIVO PARA VOCÊ GERENCIAR SEUS CLIENTES/SaaS) -->
+    <!-- PAINEL SUPER ADMIN (SaaS) -->
     <div id="view-superadmin" class="view-content" style="display:none;">
       <div class="card" style="border-left: 4px solid var(--warning);">
         <div class="card-header">
@@ -219,9 +177,10 @@
         <button class="grid-btn" type="button" onclick="navTo('clientes')"><span class="icon">👥</span><span class="label">CLIENTES</span></button>
         <button class="grid-btn" type="button" onclick="navTo('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navTo('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
-        <button class="grid-btn admin-only" type="button" onclick="navTo('empresa')"><span class="icon">⚙</span><span class="label">EMPRESA</span></button>
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendasDia()">
-          <span class="icon">📊</span><span class="label">RESUMO DE VENDAS DO DIA</span>
+        <button class="grid-btn admin-only" type="button" onclick="navTo('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
+        
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()">
+          <span class="icon">📊</span><span class="label">RELATÓRIO DE VENDAS (DIAS / MÊS)</span>
         </button>
       </div>
 
@@ -299,7 +258,7 @@
           </div>
 
           <div class="carrinho-box">
-            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛍️ ITENS SELECIONADOS:</div>
+            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛍 ITENS SELECIONADOS:</div>
             <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
             <div style="font-size: 1rem; font-weight: bold; text-align: right; margin-top: 10px; color: var(--accent);">Total: R$ <span id="ped-total-valor">0.00</span></div>
           </div>
@@ -337,38 +296,56 @@
       </div>
 
       <div class="card">
-        <div class="card-title">Histórico de Pedidos Sequencial</div>
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="card-title">Histórico de Pedidos Sequencial</div>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="imprimirPedidosSelecionados()">
+            🖨️ Imprimir Selecionados
+          </button>
+        </div>
         <table>
-          <thead><tr><th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th></tr></thead>
+          <thead>
+            <tr>
+              <th style="width: 30px;"><input type="checkbox" id="check-todos-pedidos" onclick="alternarTodosPedidos(this)"></th>
+              <th># Pedido</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
           <tbody id="lista-pedidos"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- TELA: PRODUTOS / ESTOQUE & ENTRADA DE PRODUÇÃO -->
+    <!-- TELA: ESTOQUE E EMBALAGENS -->
     <div id="view-produtos" class="view-content" style="display:none;">
-      <!-- SEÇÃO ENTRADA DE PRODUÇÃO DIÁRIA -->
       <div class="card" style="border-left: 4px solid var(--accent);">
         <div class="card-header">
-          <div class="card-title">🥚 Registrar Entrada de Produção (Diário)</div>
+          <div class="card-title">🥚 Registrar Entrada de Produção</div>
           <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
         </div>
 
-        <div class="stat-card" style="background: #eff6ff; border-color: #bfdbfe;">
-          <div class="stat-title">Saldo Geral de Ovos em Estoque</div>
-          <div class="stat-value" id="estoque-geral-ovos" style="font-size: 1.8rem;">0 Ovos</div>
+        <div class="stat-card" style="background: #eff6ff; border-color: #bfdbfe; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div class="stat-title">Saldo Geral de Ovos em Estoque</div>
+            <div class="stat-value" id="estoque-geral-ovos" style="font-size: 1.8rem;">0 Ovos</div>
+          </div>
+          <button class="btn admin-only" type="button" style="width: auto; background: var(--warning); padding: 8px 12px; font-size: 0.8rem;" onclick="abrirModalBalanco()">
+            ⚖️ Atualizar Estoque
+          </button>
         </div>
 
         <form onsubmit="registrarEntradaProducao(event)">
           <div class="form-group">
             <label>Quantidade Coletada/Produzida (Ovos Individuais)</label>
-            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 50 ou 100" required>
+            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 5000" required>
           </div>
           <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Direto para o Estoque Geral</button>
         </form>
 
         <div style="margin-top: 15px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Produção de Hoje</div>
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Coletas de Hoje</div>
           <table>
             <thead><tr><th>Hora</th><th>Unidades</th></tr></thead>
             <tbody id="lista-producao-hoje"></tbody>
@@ -376,7 +353,6 @@
         </div>
       </div>
 
-      <!-- CADASTRAR / EDITAR PRODUTO / EMBALAGEM -->
       <div class="card">
         <div class="card-header">
           <div class="card-title" id="form-prod-title">Cadastrar Novo Produto / Embalagem</div>
@@ -385,7 +361,7 @@
           <input type="hidden" id="prod-id-edit" value="">
           <div class="form-group">
             <label>Descrição do Item</label>
-            <input type="text" id="prod-nome" placeholder="Ex: Ovos Dúzia / Cartela 30 / Caixa 360" required>
+            <input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / CAIXA 360 OVOS" required>
           </div>
           <div class="form-group">
             <label>Preço Unitário (R$)</label>
@@ -394,6 +370,7 @@
           <div class="form-group">
             <label>Quantidade de Ovos nesta Embalagem</label>
             <input type="number" id="prod-ovos-unid" min="1" placeholder="Ex: 12 (para cartela de 12), 30 (para cartela de 30)" required>
+            <span style="font-size: 0.75rem; color: #64748b; margin-top: 3px; display: block;">Serve apenas para calcular quantos ovos descontar do Estoque Geral no pedido.</span>
           </div>
           <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
           <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
@@ -458,12 +435,8 @@
           <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="emp-cnpj" required></div>
           <div class="form-group"><label>Telefone / WhatsApp Comercial</label><input type="text" id="emp-tel" placeholder="Ex: (11) 99999-8888" required></div>
           <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
-          <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @ranchouk | www.ranchouk.com"></div>
+          <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @happyeggs | www.happyeggs.com"></div>
           <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
-          
-          <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border);">
-          <div class="form-group"><label>Token Bot Telegram (Notificações)</label><input type="text" id="emp-bot-token" placeholder="Opcional"></div>
-          <div class="form-group"><label>Chat ID Telegram</label><input type="text" id="emp-chat-id" placeholder="Opcional"></div>
           <button type="submit" class="btn" style="background:var(--success);">Salvar Dados da Empresa</button>
         </form>
       </div>
@@ -473,24 +446,13 @@
   <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
   <div class="modal" id="modal-nota">
     <div class="modal-content">
-      <div class="card-title no-print" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
+      <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       
-      <!-- RECIBO COM BORDA TRACEJADA -->
       <div class="receipt-box" id="printable-receipt"></div>
       
-      <!-- PAINEL DE AÇÕES E BOTÕES -->
-      <div class="no-print" style="display:flex; flex-direction:column; gap:10px;">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <button class="btn" type="button" style="background:#2563eb;" onclick="salvarNotaPDF()">
-            💾 Salvar PDF
-          </button>
-          <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirNota()">
-            🖨️ Imprimir
-          </button>
-        </div>
-        
-        <button class="btn" type="button" style="background:#10b981;" onclick="enviarWhats()">
-          💬 WhatsApp
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirNota()">
+          🖨️ Imprimir
         </button>
 
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:4px;">
@@ -500,55 +462,108 @@
     </div>
   </div>
 
-  <!-- MODAL: RESUMO DE VENDAS DO DIA -->
+  <!-- MODAL: RELATÓRIO DE VENDAS FLEXÍVEL -->
   <div class="modal" id="modal-resumo">
-    <div class="modal-content">
-      <div class="card-title" style="margin-bottom:12px;">📊 Resumo de Vendas Hoje</div>
-      <div id="resumo-data-hoje" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px; font-weight:bold;"></div>
-
-      <div class="stat-card">
-        <div class="stat-title">Total Vendido Hoje</div>
-        <div class="stat-value" id="resumo-total-hoje">R$ 0,00</div>
+    <div class="modal-content" style="max-width: 500px;">
+      
+      <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
+      
+      <div class="form-group">
+        <label>Filtrar Período</label>
+        <select id="filtro-periodo" onchange="atualizarFiltroRelatorio()">
+          <option value="hoje">Hoje</option>
+          <option value="semana">Últimos 7 Dias (Semana)</option>
+          <option value="mes">Este Mês Atual</option>
+          <option value="personalizado">Personalizado (Intervalo de Datas)</option>
+        </select>
       </div>
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-        <div class="stat-card" style="margin:0;">
-          <div class="stat-title">Nº de Pedidos</div>
-          <div class="stat-value" id="resumo-qtd-pedidos">0</div>
+      <div id="container-datas-personalizadas" style="display:none; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Data Inicial</label>
+          <input type="date" id="data-inicio" onchange="renderizarDadosRelatorio()">
         </div>
-        <div class="stat-card" style="margin:0;">
-          <div class="stat-title">Ticket Médio</div>
-          <div class="stat-value" id="resumo-ticket-medio">R$ 0,00</div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Data Final</label>
+          <input type="date" id="data-fim" onchange="renderizarDadosRelatorio()">
         </div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-title" style="margin-bottom:6px;">Recebimento por Forma de Pagamento</div>
-        <div id="resumo-detalhe-formas" style="font-size:0.85rem; line-height:1.4;"></div>
+      <div id="resumo-periodo-texto" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px; font-weight:bold;"></div>
+
+      <!-- CONTAINER PARA IMPRESSÃO ISOLADA DO RELATÓRIO -->
+      <div id="area-relatorio-impressao">
+        <div class="stat-card">
+          <div class="stat-title">Total Faturado no Período</div>
+          <div class="stat-value" id="resumo-total-periodo">R$ 0,00</div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <div class="stat-card" style="margin:0;">
+            <div class="stat-title">Nº de Pedidos</div>
+            <div class="stat-value" id="resumo-qtd-pedidos">0</div>
+          </div>
+          <div class="stat-card" style="margin:0;">
+            <div class="stat-title">Ticket Médio</div>
+            <div class="stat-value" id="resumo-ticket-medio">R$ 0,00</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-title" style="margin-bottom:6px;">Recebimento por Forma de Pagamento</div>
+          <div id="resumo-detalhe-formas" style="font-size:0.85rem; line-height:1.4;"></div>
+        </div>
+
+        <div style="margin-top:15px; max-height: 180px; overflow-y: auto;">
+          <div class="stat-title" style="margin-bottom:6px;">Vendas Listadas no Período</div>
+          <table>
+            <thead><tr><th># Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody id="resumo-tabela-periodo"></tbody>
+          </table>
+        </div>
       </div>
 
-      <div style="margin-top:15px;">
-        <div class="stat-title" style="margin-bottom:6px;">Vendas Realizadas Hoje</div>
-        <table>
-          <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
-          <tbody id="resumo-tabela-hoje"></tbody>
-        </table>
+      <div style="display:flex; gap:10px; margin-top:15px;">
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorio()">🖨 Imprimir Relatório</button>
+        <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
+    </div>
+  </div>
 
-      <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b; margin-top:15px;">Fechar Resumo</button>
+  <!-- MODAL: ATUALIZAR ESTOQUE / BALANÇO MANUAL (ADMIN) -->
+  <div class="modal" id="modal-balanco">
+    <div class="modal-content" style="max-width: 380px;">
+      <div class="card-title" style="margin-bottom: 12px;">⚖️ Balanço Manual de Estoque</div>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">
+        Insira a contagem física real de ovos. Isso substituirá o saldo atual no sistema.
+      </p>
+      <form onsubmit="salvarBalancoEstoque(event)">
+        <div class="form-group">
+          <label>Novo Saldo Real de Ovos</label>
+          <input type="number" id="balanco-nova-qtd" min="0" placeholder="Ex: 12500" required>
+        </div>
+        <div class="form-group">
+          <label>Motivo / Observação do Ajuste</label>
+          <input type="text" id="balanco-motivo" placeholder="Ex: Contagem física do galpão" required>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button type="submit" class="btn" style="background: var(--warning);">Salvar Balanço</button>
+          <button type="button" class="btn" style="background: #64748b;" onclick="fecharModalBalanco()">Cancelar</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <script>
     // --- CONFIGURAÇÃO DO FIREBASE ---
     const firebaseConfig = {
-      apiKey: "AIzaSyA5ISZ_4AT5e2M8mmXtkptYy8SyxhHm58I",
-      authDomain: "rancho-uk.firebaseapp.com",
-      projectId: "rancho-uk",
-      storageBucket: "rancho-uk.firebasestorage.app",
-      messagingSenderId: "991359302971",
-      appId: "1:991359302971:web:b934b7eadabfa086c00b1e",
-      measurementId: "G-712PTRH1JZ"
+      apiKey: "AIzaSyAYmxniwbHyi4HmTH-aVlHo2zp-7pXY_lg",
+      authDomain: "happyeggs-534f2.firebaseapp.com",
+      projectId: "happyeggs-534f2",
+      storageBucket: "happyeggs-534f2.firebasestorage.app",
+      messagingSenderId: "682226137910",
+      appId: "1:682226137910:web:2aaca1393954e3be875197",
+      measurementId: "G-CEBF9P0K94"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -557,62 +572,73 @@
     let state = {
       usuarios: [],
       empresasSaaS: [],
-      empresa: { nome: "Rancho UK", cnpj: "", tel: "", end: "", social: "", pix: "", botToken: "", chatId: "" },
+      empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "" },
       produtos: [],
       clientes: [],
       pedidos: [],
       producao: [],
       estoqueGeralOvos: 0,
       currentUser: null,
-      currentEmpresaId: "rancho_uk", // Padrão
-      pedidoAtual: null
+      pedidoAtual: null,
+      listenersUnsubscribe: []
     };
 
     let carrinhoTemp = [];
-    let unsubscribers = [];
 
-    // --- CARREGAR DADOS DO SAAS (EMPRESAS CLIENTES) ---
+    function initApp() {
+      db.collection("usuarios").get().then(snapshot => {
+        state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (state.usuarios.length === 0) {
+          db.collection("usuarios").doc("admin").set({ 
+            login: "admin", 
+            pass: "1234", 
+            role: "admin",
+            empresaId: "empresa_demo"
+          });
+          db.collection("empresas").doc("empresa_demo").set({
+            nome: "Granja Demonstração",
+            status: "Ativo"
+          });
+        }
+      }).catch(err => console.error("Erro na inicialização:", err));
+    }
+
+    // --- CARREGAR DADOS DO SUPER ADMIN ---
     function initSuperAdminListener() {
-      db.collection("empresas_saas").onSnapshot(snapshot => {
+      db.collection("empresas").onSnapshot(snapshot => {
         state.empresasSaaS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderEmpresasSaaS();
       });
     }
 
-    // --- ESCUTADORES EM TEMPO REAL ISOLADOS POR EMPRESA (MULTI-TENANT) ---
-    function mudarEscopoEmpresa(empId) {
-      state.currentEmpresaId = empId;
-      
-      // Cancela escutadores anteriores se houver
-      unsubscribers.forEach(unsub => unsub());
-      unsubscribers = [];
+    function initListeners() {
+      state.listenersUnsubscribe.forEach(unsub => unsub());
+      state.listenersUnsubscribe = [];
 
-      const empIdFiltro = empId;
+      if (!state.currentUser || !state.currentUser.empresaId) return;
 
-      // 1. Clientes
-      unsubscribers.push(db.collection("clientes").where("empresaId", "==", empIdFiltro).onSnapshot(snapshot => {
+      const empresaId = state.currentUser.empresaId;
+
+      const unsubClientes = db.collection("clientes").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.clientes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         render();
-      }));
+      }, err => console.error("Erro clientes:", err));
 
-      // 2. Produtos
-      unsubscribers.push(db.collection("produtos").where("empresaId", "==", empIdFiltro).onSnapshot(snapshot => {
+      const unsubProdutos = db.collection("produtos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         render();
-      }));
+      }, err => console.error("Erro produtos:", err));
 
-      // 3. Estoque Geral
-      unsubscribers.push(db.collection("estoque_geral").doc(empIdFiltro).onSnapshot(doc => {
+      const unsubEstoque = db.collection("estoque_geral").doc(empresaId).onSnapshot(doc => {
         if (doc.exists) {
           state.estoqueGeralOvos = doc.data().qtdOvos || 0;
         } else {
           state.estoqueGeralOvos = 0;
         }
         renderEstoqueGeral();
-      }));
+      });
 
-      // 4. Pedidos
-      unsubscribers.push(db.collection("pedidos").where("empresaId", "==", empIdFiltro).orderBy("dataCriacao", "desc").onSnapshot(snapshot => {
+      const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.pedidos = snapshot.docs.map(doc => {
           const dataDoc = doc.data();
           let dataCriacaoParsed = new Date();
@@ -622,32 +648,29 @@
             dataCriacaoParsed = new Date(dataDoc.dataCriacao);
           }
           return { id: doc.id, ...dataDoc, dataCriacao: dataCriacaoParsed };
-        });
-        render();
-      }, err => console.error("Erro pedidos:", err)));
+        }).sort((a, b) => (b.numeroPedido || 0) - (a.numeroPedido || 0));
 
-      // 5. Usuários da Empresa
-      unsubscribers.push(db.collection("usuarios").where("empresaId", "==", empIdFiltro).onSnapshot(snapshot => {
-        state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         render();
-      }));
+      }, err => console.error("Erro pedidos:", err));
 
-      // 6. Produção
-      unsubscribers.push(db.collection("producao").where("empresaId", "==", empIdFiltro).orderBy("dataHora", "desc").limit(50).onSnapshot(snapshot => {
+      const unsubProducao = db.collection("producao").where("empresaId", "==", empresaId).orderBy("dataHora", "desc").limit(50).onSnapshot(snapshot => {
         state.producao = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderProducaoHoje();
-      }));
+      }, err => console.error("Erro producao:", err));
 
-      // 7. Configurações da Empresa
-      unsubscribers.push(db.collection("config").doc(empIdFiltro).onSnapshot(doc => {
+      const unsubEmpresa = db.collection("config").doc(empresaId).onSnapshot(doc => {
         if (doc.exists) {
           state.empresa = doc.data();
           carregarEmpresaCampos();
-        } else {
-          state.empresa = { nome: empId, cnpj: "", tel: "", end: "", social: "", pix: "" };
-          carregarEmpresaCampos();
         }
-      }));
+      });
+
+      const unsubUsuarios = db.collection("usuarios").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        render();
+      });
+
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios);
     }
 
     function carregarEmpresaCampos() {
@@ -658,17 +681,14 @@
       document.getElementById('emp-end').value = state.empresa.end || '';
       document.getElementById('emp-social').value = state.empresa.social || '';
       document.getElementById('emp-pix').value = state.empresa.pix || '';
-      document.getElementById('emp-bot-token').value = state.empresa.botToken || '';
-      document.getElementById('emp-chat-id').value = state.empresa.chatId || '';
     }
 
-    // --- AUTENTICAÇÃO ---
     async function autenticar(e) {
       e.preventDefault();
       const u = document.getElementById('login-user').value.trim().toLowerCase();
       const p = document.getElementById('login-pass').value.trim();
       
-      // 1. Verificar se é o Super Admin Mestre (Você)
+      // LOGIN MESTRE SUPER ADMIN
       if (u === "superadmin" && p === "rancho123*") {
         state.currentUser = { login: "superadmin", role: "superadmin" };
         document.getElementById('view-login').style.display = 'none';
@@ -680,59 +700,65 @@
         return;
       }
 
-      // 2. Procurar nas coleções de usuários das empresas clientes
-      const snapshot = await db.collection("usuarios").where("login", "==", u).get();
-      if (snapshot.empty) {
-        return alert('Usuário ou senha incorretos!');
-      }
-
-      let userFound = null;
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.pass === p) {
-          userFound = { id: doc.id, ...data };
-        }
-      });
-
-      if (userFound) {
-        // Verificar se a empresa está bloqueada por inadimplência
-        const empresaDoc = await db.collection("empresas_saas").doc(userFound.empresaId).get();
-        if (empresaDoc.exists && empresaDoc.data().status === 'bloqueado') {
-          return alert('Acesso bloqueado! Entre em contato com o suporte para regularizar a assinatura.');
+      try {
+        const snapshot = await db.collection("usuarios").where("login", "==", u).get();
+        if (snapshot.empty) {
+          alert('Usuário ou senha incorretos!');
+          return;
         }
 
-        state.currentUser = userFound;
-        mudarEscopoEmpresa(userFound.empresaId);
+        const userDoc = snapshot.docs[0];
+        const found = { id: userDoc.id, ...userDoc.data() };
 
+        if (found.pass !== p) {
+          alert('Usuário ou senha incorretos!');
+          return;
+        }
+
+        const empresaId = found.empresaId || "empresa_demo";
+        const empDoc = await db.collection("empresas").doc(empresaId).get();
+        if (empDoc.exists) {
+          const empData = empDoc.data();
+          if (empData.status !== "Ativo") {
+            alert("A conta da sua empresa está inativa. Entre em contato com o suporte.");
+            return;
+          }
+        }
+
+        state.currentUser = found;
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('app-header').style.display = 'flex';
-        document.getElementById('user-display').innerText = `👤 ${userFound.login.toUpperCase()}`;
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = userFound.role === 'admin' ? 'flex' : 'none');
+        document.getElementById('user-display').innerText = `👤 ${found.login.toUpperCase()}`;
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
+        
+        initListeners();
         navTo('dashboard');
-      } else {
-        alert('Senha incorreta!');
+      } catch (error) {
+        console.error("Erro na autenticação:", error);
+        alert("Erro ao tentar entrar. Tente novamente.");
       }
     }
 
     function logout() {
       state.currentUser = null;
-      unsubscribers.forEach(unsub => unsub());
-      unsubscribers = [];
+      state.listenersUnsubscribe.forEach(unsub => unsub());
+      state.listenersUnsubscribe = [];
       document.getElementById('app-header').style.display = 'none';
       document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
       document.getElementById('view-dashboard').style.display = 'none';
       document.getElementById('view-login').style.display = 'block';
-      document.getElementById('login-pass').value = '';
     }
 
-    function navTo(screen) {
-      document.getElementById('view-dashboard').style.display = 'none';
+    function navTo(view) {
       document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
-      if (screen === 'dashboard') {
+      document.getElementById('view-dashboard').style.display = 'none';
+
+      if (view === 'dashboard') {
         document.getElementById('view-dashboard').style.display = 'block';
         filtrarClientesDashboard();
       } else {
-        document.getElementById(`view-${screen}`).style.display = 'block';
+        const el = document.getElementById(`view-${view}`);
+        if (el) el.style.display = 'block';
       }
       render();
     }
@@ -760,15 +786,13 @@
       const vencimento = document.getElementById('saas-vencimento').value;
 
       try {
-        // Criar registro da empresa
-        await db.collection("empresas_saas").doc(idEmpresa).set({
+        await db.collection("empresas").doc(idEmpresa).set({
           nome,
           vencimento,
-          status: "ativo",
+          status: "Ativo",
           criadoEm: new Date()
         });
 
-        // Criar usuário administrador padrão para essa granja
         await db.collection("usuarios").add({
           empresaId: idEmpresa,
           login: adminUser,
@@ -788,17 +812,17 @@
       if (!tbody) return;
 
       tbody.innerHTML = state.empresasSaaS.map(emp => {
-        const isAtivo = emp.status === 'ativo';
+        const isAtivo = emp.status === 'Ativo';
         return `
           <tr>
             <td><strong>${emp.nome}</strong><br><small style="color:#64748b;">ID: ${emp.id}</small></td>
             <td>${emp.vencimento || 'N/I'}</td>
-            <td><span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}">${emp.status}</span></td>
+            <td><span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}">${emp.status || 'Ativo'}</span></td>
             <td>
-              <button class="btn-warning" style="font-size:0.7rem; padding:4px 8px;" onclick="alternarStatusEmpresa('${emp.id}', '${emp.status}')">
+              <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 8px;" onclick="alternarStatusEmpresa('${emp.id}', '${emp.status || 'Ativo'}')">
                 ${isAtivo ? 'Bloquear' : 'Ativar'}
               </button>
-              <button class="btn-danger" style="font-size:0.7rem; padding:4px 8px; margin-left:4px;" onclick="excluirEmpresaSaaS('${emp.id}')">
+              <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 8px; margin-left:4px;" onclick="excluirEmpresaSaaS('${emp.id}')">
                 🗑️ Apagar
               </button>
             </td>
@@ -808,67 +832,18 @@
     }
 
     async function alternarStatusEmpresa(id, statusAtual) {
-      const novoStatus = statusAtual === 'ativo' ? 'bloqueado' : 'ativo';
-      await db.collection("empresas_saas").doc(id).update({ status: novoStatus });
+      const novoStatus = statusAtual === 'Ativo' ? 'Bloqueado' : 'Ativo';
+      await db.collection("empresas").doc(id).update({ status: novoStatus });
     }
 
     async function excluirEmpresaSaaS(id) {
       if (confirm(`Tem certeza que deseja excluir a empresa ${id}? Esta ação não pode ser desfeita.`)) {
         try {
-          await db.collection("empresas_saas").doc(id).delete();
+          await db.collection("empresas").doc(id).delete();
           alert('Empresa excluída com sucesso!');
         } catch (err) {
           alert('Erro ao excluir empresa: ' + err.message);
         }
-      }
-    }
-
-    function alterarMinhaSenha(e) {
-      e.preventDefault();
-      const novaSenha = document.getElementById('minha-nova-senha').value.trim();
-      if (!novaSenha) return alert('Por favor, introduza uma nova senha.');
-
-      if (state.currentUser) {
-        const docId = state.currentUser.id;
-        db.collection("usuarios").doc(docId).update({ pass: novaSenha })
-        .then(() => {
-          state.currentUser.pass = novaSenha;
-          alert('Sua senha foi alterada com sucesso!');
-          document.getElementById('minha-nova-senha').value = '';
-        }).catch(err => alert('Erro ao mudar a senha: ' + err.message));
-      }
-    }
-
-    function alterarSenhaUsuario(docId, login) {
-      const novaSenha = prompt(`Digite a nova senha para o usuário ${login.toUpperCase()}:`);
-      if (novaSenha && novaSenha.trim() !== '') {
-        db.collection("usuarios").doc(docId).update({ pass: novaSenha.trim() })
-          .then(() => {
-            alert(`Senha do usuário ${login} alterada com sucesso!`);
-          })
-          .catch(err => alert('Erro ao alterar senha: ' + err.message));
-      }
-    }
-
-    // --- CLIENTES ---
-    function cadastrarCliente(e) {
-      e.preventDefault();
-      const nome = document.getElementById('cli-nome').value.trim();
-      const doc = document.getElementById('cli-doc').value.trim();
-      const tel = document.getElementById('cli-tel').value.trim();
-      const end = document.getElementById('cli-end').value.trim();
-
-      db.collection("clientes").add({ 
-        empresaId: state.currentEmpresaId, 
-        nome, doc, tel, end 
-      })
-        .then(() => { alert('Cliente gravado na Nuvem!'); e.target.reset(); })
-        .catch(err => alert('Erro ao salvar cliente: ' + err.message));
-    }
-
-    function excluirCliente(id) {
-      if (confirm('Deseja excluir este cliente?')) {
-        db.collection("clientes").doc(id).delete().catch(err => alert('Erro ao excluir: ' + err.message));
       }
     }
 
@@ -879,7 +854,7 @@
         <tr>
           <td><strong>${c.nome}</strong><br><small style="color:#64748b;">${c.doc || 'Sem Doc'}</small></td>
           <td>${c.tel}<br><small style="color:#64748b;">${c.end || ''}</small></td>
-          <td><button class="btn-danger" onclick="excluirCliente('${c.id}')">Excluir</button></td>
+          <td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">Excluir</button></td>
         </tr>
       `).join('');
     }
@@ -903,43 +878,215 @@
       `).join('');
     }
 
-    function filtrarClientesDropdown() {
-      const termo = (document.getElementById('ped-busca-cliente')?.value || '').toLowerCase();
-      const selectCli = document.getElementById('ped-cliente');
-      if (!selectCli) return;
+    function renderProdutos() {
+      const tbody = document.getElementById('lista-produtos');
+      if (!tbody) return;
+      tbody.innerHTML = state.produtos.map(p => `
+        <tr>
+          <td><strong>${p.nome}</strong></td>
+          <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
+          <td>${p.ovosUnid} ovos</td>
+          <td>
+            <button class="btn-warning" type="button" onclick="editarProduto('${p.id}')">✏</button>
+            <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑</button>
+          </td>
+        </tr>
+      `).join('');
+    }
 
-      const clientesFiltrados = state.clientes.filter(c => 
-        c.nome.toLowerCase().includes(termo) || 
-        (c.doc && c.doc.toLowerCase().includes(termo)) || 
-        (c.tel && c.tel.includes(termo))
-      );
+    function renderPedidos() {
+      const tbody = document.getElementById('lista-pedidos');
+      if (!tbody) return;
 
-      if (clientesFiltrados.length === 0) {
-        selectCli.innerHTML = '<option value="">Nenhum cliente encontrado...</option>';
-      } else {
-        selectCli.innerHTML = clientesFiltrados.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('');
+      tbody.innerHTML = state.pedidos.map(p => {
+        const isPago = p.status === 'Pago';
+        const badgeClass = isPago ? 'badge-pago' : 'badge-pendente';
+        
+        return `
+          <tr>
+            <td><input type="checkbox" class="check-pedido" value="${p.id}"></td>
+            <td><strong>#${p.numeroPedido || '---'}</strong></td>
+            <td>${p.clienteNome || 'Cliente'}<br><small style="color:#64748b;">${p.formaPgto || ''}</small></td>
+            <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
+            <td>
+              <span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">
+                ${isPago ? '🟢 Pago' : '🔴 Pendente'}
+              </span>
+            </td>
+            <td>
+              <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb; margin-bottom:2px;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
+              <button class="btn-danger" type="button" title="Excluir/Estornar Pedido" onclick="excluirOuCancelarPedido('${p.id}', ${p.numeroPedido}, ${p.totalOvos || 0})">🗑</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function alternarTodosPedidos(master) {
+      const checkboxes = document.querySelectorAll('.check-pedido');
+      checkboxes.forEach(cb => cb.checked = master.checked);
+    }
+
+    function imprimirPedidosSelecionados() {
+      const selecionados = Array.from(document.querySelectorAll('.check-pedido:checked')).map(cb => cb.value);
+
+      if (selecionados.length === 0) {
+        alert('Selecione pelo menos um pedido da lista para imprimir!');
+        return;
+      }
+
+      const receiptBox = document.getElementById('printable-receipt');
+      receiptBox.innerHTML = '';
+      const emp = state.empresa || {};
+
+      selecionados.forEach((id, idx) => {
+        const ped = state.pedidos.find(p => p.id === id);
+        if (!ped) return;
+
+        const isPago = ped.status === 'Pago';
+        const statusSymbol = isPago ? '🟢' : '🔴';
+        const itens = ped.itens || [];
+
+        const reciboHTML = `
+          <div class="recibo-item" style="${idx > 0 ? 'margin-top:20px; border-top: 1px dashed #cbd5e1; padding-top: 20px;' : ''}">
+            <div style="text-align:center; margin-bottom:8px;">
+              <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
+              <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
+              <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
+            </div>
+
+            <hr class="dashed-divider">
+
+            <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
+              COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}
+            </div>
+            <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente não informado'}</div>
+            <div style="margin-bottom:2px;"><strong>Documento:</strong> ${ped.clienteDoc || 'N/I'}</div>
+            <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+
+            <hr class="dashed-divider">
+
+            <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
+            ${itens.length > 0 ? itens.map(i => `
+              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                <span>${i.qtd}x${i.nome}</span>
+                <span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span>
+              </div>
+            `).join('') : '<div style="font-size:0.8rem; color:#64748b;">Nenhum item registrado</div>'}
+
+            <hr class="dashed-divider">
+
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
+              <span>VALOR TOTAL:</span>
+              <span>R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+            </div>
+            <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${ped.formaPgto || 'Não especificada'}</div>
+            ${ped.dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${ped.dadosPgto}</div>` : ''}
+            <div style="margin-bottom:2px;">
+              <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
+            </div>
+            ${ped.obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${ped.obs}</div>` : ''}
+
+            <hr class="dashed-divider">
+
+            <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
+              <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
+              ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
+              ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
+              <p style="margin-top:4px;">Obrigado pela preferência!</p>
+            </div>
+          </div>
+        `;
+
+        receiptBox.innerHTML += reciboHTML;
+      });
+
+      document.getElementById('modal-nota').style.display = 'flex';
+    }
+
+    function renderUsuarios() {
+      const tbody = document.getElementById('lista-usuarios');
+      if (!tbody) return;
+      tbody.innerHTML = state.usuarios.map(u => `
+        <tr>
+          <td><strong>${u.login}</strong></td>
+          <td><span class="badge" style="background:#e2e8f0; color:#334155;">${u.role}</span></td>
+          <td>${u.login !== 'admin' ? `<button class="btn-danger" type="button" onclick="excluirUsuario('${u.id}')">Excluir</button>` : '---'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderDropdowns() {
+      filtrarClientesDropdown();
+
+      const prodSelect = document.getElementById('ped-produto');
+      if (prodSelect) {
+        prodSelect.innerHTML = state.produtos.map(p => `
+          <option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)} (${p.ovosUnid} ovos)</option>
+        `).join('');
       }
     }
 
-    // --- PRODUTOS & ESTOQUE ---
-    function salvarProduto(e) {
+    function filtrarClientesDropdown() {
+      const termo = (document.getElementById('ped-busca-cliente')?.value || '').toLowerCase();
+      const cliSelect = document.getElementById('ped-cliente');
+      if (!cliSelect) return;
+
+      const filtrados = state.clientes.filter(c => 
+        c.nome.toLowerCase().includes(termo) || 
+        (c.doc && c.doc.toLowerCase().includes(termo)) ||
+        (c.tel && c.tel.toLowerCase().includes(termo))
+      );
+
+      if (filtrados.length === 0) {
+        cliSelect.innerHTML = `<option value="">Nenhum cliente encontrado</option>`;
+      } else {
+        cliSelect.innerHTML = filtrados.map(c => `
+          <option value="${c.id}">${c.nome} (${c.tel})</option>
+        `).join('');
+      }
+    }
+
+    async function cadastrarCliente(e) {
+      e.preventDefault();
+      const novo = {
+        empresaId: state.currentUser.empresaId,
+        nome: document.getElementById('cli-nome').value.trim(),
+        doc: document.getElementById('cli-doc').value.trim(),
+        tel: document.getElementById('cli-tel').value.trim(),
+        end: document.getElementById('cli-end').value.trim()
+      };
+
+      await db.collection("clientes").add(novo);
+      e.target.reset();
+      alert('Cliente cadastrado com sucesso!');
+    }
+
+    async function excluirCliente(id) {
+      if (confirm('Deseja realmente excluir este cliente?')) {
+        await db.collection("clientes").doc(id).delete();
+      }
+    }
+
+    async function salvarProduto(e) {
       e.preventDefault();
       const idEdit = document.getElementById('prod-id-edit').value;
-      const nome = document.getElementById('prod-nome').value.trim();
-      const preco = parseFloat(document.getElementById('prod-preco').value || 0);
-      const ovosUnid = parseInt(document.getElementById('prod-ovos-unid').value || 1);
-
-      const dados = { empresaId: state.currentEmpresaId, nome, preco, ovosUnid };
+      const dados = {
+        empresaId: state.currentUser.empresaId,
+        nome: document.getElementById('prod-nome').value.trim(),
+        preco: parseFloat(document.getElementById('prod-preco').value || 0),
+        ovosUnid: parseInt(document.getElementById('prod-ovos-unid').value || 0)
+      };
 
       if (idEdit) {
-        db.collection("produtos").doc(idEdit).update(dados)
-          .then(() => { alert('Produto atualizado!'); limparFormProduto(); })
-          .catch(err => alert('Erro ao atualizar: ' + err.message));
+        await db.collection("produtos").doc(idEdit).update(dados);
+        alert('Produto atualizado!');
       } else {
-        db.collection("produtos").add(dados)
-          .then(() => { alert('Produto cadastrado com sucesso!'); limparFormProduto(); })
-          .catch(err => alert('Erro ao cadastrar: ' + err.message));
+        await db.collection("produtos").add(dados);
+        alert('Produto cadastrado com sucesso!');
       }
+
+      limparFormProduto();
     }
 
     function editarProduto(id) {
@@ -948,7 +1095,7 @@
       document.getElementById('prod-id-edit').value = p.id;
       document.getElementById('prod-nome').value = p.nome;
       document.getElementById('prod-preco').value = p.preco;
-      document.getElementById('prod-ovos-unid').value = p.ovosUnid || 1;
+      document.getElementById('prod-ovos-unid').value = p.ovosUnid;
       document.getElementById('form-prod-title').innerText = "Editar Produto";
       document.getElementById('btn-salvar-prod').innerText = "Atualizar Produto";
       document.getElementById('btn-cancelar-edit').style.display = "block";
@@ -962,81 +1109,9 @@
       document.getElementById('btn-cancelar-edit').style.display = "none";
     }
 
-    function excluirProduto(id) {
+    async function excluirProduto(id) {
       if (confirm('Deseja excluir este produto?')) {
-        db.collection("produtos").doc(id).delete().catch(err => alert('Erro ao excluir: ' + err.message));
-      }
-    }
-
-    function renderProdutos() {
-      const tbody = document.getElementById('lista-produtos');
-      if (!tbody) return;
-      tbody.innerHTML = state.produtos.map(p => `
-        <tr>
-          <td><strong>${p.nome}</strong></td>
-          <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
-          <td>${p.ovosUnid || 1} ovos</td>
-          <td>
-            <button class="btn-warning" onclick="editarProduto('${p.id}')">✏️</button>
-            <button class="btn-danger" onclick="excluirProduto('${p.id}')">🗑</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    async function registrarEntradaProducao(e) {
-      e.preventDefault();
-      const qtd = parseInt(document.getElementById('prod-ent-qtd').value || 0);
-      if (qtd <= 0) return;
-
-      const refEstoque = db.collection("estoque_geral").doc(state.currentEmpresaId);
-
-      await db.runTransaction(async (transaction) => {
-        const doc = await transaction.get(refEstoque);
-        let atual = doc.exists ? (doc.data().qtdOvos || 0) : 0;
-        transaction.set(refEstoque, { qtdOvos: atual + qtd }, { merge: true });
-      });
-
-      await db.collection("producao").add({
-        empresaId: state.currentEmpresaId,
-        qtdOvos: qtd,
-        dataHora: new Date()
-      });
-
-      e.target.reset();
-      alert('Entrada de produção registrada com sucesso!');
-    }
-
-    function renderProducaoHoje() {
-      const tbody = document.getElementById('lista-producao-hoje');
-      if (!tbody) return;
-
-      const hoje = new Date().toDateString();
-      const doDia = state.producao.filter(p => {
-        let d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
-        return d.toDateString() === hoje;
-      });
-
-      tbody.innerHTML = doDia.map(p => {
-        let d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
-        return `
-          <tr>
-            <td>${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
-            <td><strong>+ ${p.qtdOvos.toLocaleString('pt-BR')} ovos</strong></td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    // --- PEDIDOS / CARRINHO ---
-    function renderDropdowns() {
-      filtrarClientesDropdown();
-
-      const prodSelect = document.getElementById('ped-produto');
-      if (prodSelect) {
-        prodSelect.innerHTML = state.produtos.map(p => `
-          <option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)} (${p.ovosUnid || 1} ovos)</option>
-        `).join('');
+        await db.collection("produtos").doc(id).delete();
       }
     }
 
@@ -1050,21 +1125,19 @@
         return;
       }
 
-      const ovosUnid = prod.ovosUnid || 1;
       const itemExistente = carrinhoTemp.find(i => i.produtoId === prodId);
-
       if (itemExistente) {
         itemExistente.qtd += qtd;
         itemExistente.subtotal = itemExistente.qtd * prod.preco;
-        itemExistente.totalOvos = itemExistente.qtd * ovosUnid;
+        itemExistente.totalOvos = itemExistente.qtd * prod.ovosUnid;
       } else {
         carrinhoTemp.push({
           produtoId: prod.id,
           nome: prod.nome,
           preco: prod.preco,
           qtd: qtd,
-          ovosUnid: ovosUnid,
-          totalOvos: qtd * ovosUnid,
+          ovosUnid: prod.ovosUnid,
+          totalOvos: qtd * prod.ovosUnid,
           subtotal: qtd * prod.preco
         });
       }
@@ -1098,7 +1171,7 @@
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
               <strong>R$ ${item.subtotal.toFixed(2)}</strong>
-              <button class="btn-danger" style="padding:2px 6px;" onclick="removerItemCarrinho(${idx})">✕</button>
+              <button class="btn-danger" type="button" style="padding:2px 6px;" onclick="removerItemCarrinho(${idx})">✕</button>
             </div>
           </div>
         `;
@@ -1109,12 +1182,18 @@
 
     async function finalizarPedido(e) {
       e.preventDefault();
-      if (carrinhoTemp.length === 0) return alert('Adicione pelo menos um produto ao pedido!');
+      if (carrinhoTemp.length === 0) {
+        alert('Adicione pelo menos um produto ao pedido!');
+        return;
+      }
 
       const cliId = document.getElementById('ped-cliente').value;
       const cliente = state.clientes.find(c => c.id === cliId);
 
-      if (!cliente) return alert('Selecione um cliente válido!');
+      if (!cliente) {
+        alert('Selecione um cliente válido!');
+        return;
+      }
 
       const maiorNum = state.pedidos.reduce((max, p) => Math.max(max, p.numeroPedido || 0), 0);
       const proximoNumero = maiorNum + 1;
@@ -1123,7 +1202,7 @@
       const totalOvosPedido = carrinhoTemp.reduce((acc, i) => acc + i.totalOvos, 0);
 
       const novoPedido = {
-        empresaId: state.currentEmpresaId,
+        empresaId: state.currentUser.empresaId,
         numeroPedido: proximoNumero,
         clienteId: cliente.id,
         clienteNome: cliente.nome,
@@ -1143,11 +1222,12 @@
       try {
         const docRef = await db.collection("pedidos").add(novoPedido);
 
-        const refEstoque = db.collection("estoque_geral").doc(state.currentEmpresaId);
+        const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
         await db.runTransaction(async (transaction) => {
-          const doc = await transaction.get(refEstoque);
-          let atual = doc.exists ? (doc.data().qtdOvos || 0) : 0;
-          transaction.set(refEstoque, { qtdOvos: atual - totalOvosPedido }, { merge: true });
+          const sfDoc = await transaction.get(refEstoque);
+          let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
+          let novoSaldo = atual - totalOvosPedido;
+          transaction.set(refEstoque, { qtdOvos: novoSaldo }, { merge: true });
         });
 
         alert(`Pedido #${proximoNumero} gerado com sucesso!`);
@@ -1165,90 +1245,153 @@
       }
     }
 
-    function renderPedidos() {
-      const tbody = document.getElementById('lista-pedidos');
-      if (!tbody) return;
-
-      tbody.innerHTML = state.pedidos.map(p => {
-        const isPago = p.status === 'Pago';
-        const badgeClass = isPago ? 'badge-pago' : 'badge-pendente';
-
-        return `
-          <tr>
-            <td><strong>#${p.numeroPedido || '---'}</strong></td>
-            <td>${p.clienteNome || 'Cliente'}<br><small style="color:#64748b;">${p.formaPgto || ''}</small></td>
-            <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
-            <td>
-              <span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">
-                ${isPago ? '🟢 Pago' : '🔴 Pendente'}
-              </span>
-            </td>
-            <td>
-              <button class="btn" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb; margin-bottom:2px;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
-              <button class="btn-danger" title="Excluir Pedido" onclick="excluirPedido('${p.id}', ${p.numeroPedido || 0}, ${p.totalOvos || 0})">🗑️</button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
     async function alternarStatusPedido(id, statusAtual) {
       const novoStatus = statusAtual === 'Pago' ? 'Pendente' : 'Pago';
       await db.collection("pedidos").doc(id).update({ status: novoStatus });
     }
 
-    async function excluirPedido(id, numero, totalOvosDoPedido) {
-      if (!confirm(`Tem certeza que deseja excluir o Pedido #${numero || ''}? Os ovos deste pedido retornarão ao estoque.`)) return;
+    async function excluirOuCancelarPedido(id, numero, qtdOvosEstorno) {
+      if (!confirm(`Tem certeza que deseja excluir o Pedido #${numero || ''}?\nOs ${qtdOvosEstorno || 0} ovos deste pedido retornarão ao Estoque Geral.`)) {
+        return;
+      }
       try {
-        const refEstoque = db.collection("estoque_geral").doc(state.currentEmpresaId);
-        await db.runTransaction(async (transaction) => {
-          const doc = await transaction.get(refEstoque);
-          let atual = doc.exists ? (doc.data().qtdOvos || 0) : 0;
-          let devolucao = totalOvosDoPedido || 0;
-          transaction.set(refEstoque, { qtdOvos: atual + devolucao }, { merge: true });
-        });
-
         await db.collection("pedidos").doc(id).delete();
-        alert(`Pedido #${numero || ''} excluído e ${totalOvosDoPedido || 0} ovos repostos ao estoque com sucesso!`);
+
+        if (qtdOvosEstorno > 0) {
+          const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+          await db.runTransaction(async (transaction) => {
+            const sfDoc = await transaction.get(refEstoque);
+            let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
+            transaction.set(refEstoque, { qtdOvos: atual + qtdOvosEstorno }, { merge: true });
+          });
+        }
+
+        alert(`Pedido #${numero || ''} excluído e estoque estornado com sucesso!`);
       } catch (err) {
-        alert("Erro ao excluir o pedido: " + err.message);
+        console.error("Erro ao excluir pedido:", err);
+        alert("Erro ao excluir o pedido.");
       }
     }
 
-    // --- USUÁRIOS E EMPRESA ---
-    function cadastrarUsuario(e) {
+    async function registrarEntradaProducao(e) {
+      e.preventDefault();
+      const qtd = parseInt(document.getElementById('prod-ent-qtd').value || 0);
+      if (qtd <= 0) return;
+
+      const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+      
+      await db.runTransaction(async (transaction) => {
+        const sfDoc = await transaction.get(refEstoque);
+        let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
+        transaction.set(refEstoque, { qtdOvos: atual + qtd }, { merge: true });
+      });
+
+      await db.collection("producao").add({
+        empresaId: state.currentUser.empresaId,
+        qtdOvos: qtd,
+        dataHora: new Date()
+      });
+
+      e.target.reset();
+      alert('Entrada de produção registrada!');
+    }
+
+    function renderProducaoHoje() {
+      const tbody = document.getElementById('lista-producao-hoje');
+      if (!tbody) return;
+
+      const hoje = new Date().toDateString();
+      const doDia = state.producao.filter(p => {
+        let d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
+        return d.toDateString() === hoje;
+      });
+
+      tbody.innerHTML = doDia.map(p => {
+        let d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
+        return `
+          <tr>
+            <td>${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+            <td><strong>+ ${p.qtdOvos.toLocaleString('pt-BR')} ovos</strong></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // --- FUNÇÕES DO BALANÇO MANUAL DE ESTOQUE ---
+    function abrirModalBalanco() {
+      if (!state.currentUser || state.currentUser.role !== 'admin') {
+        alert('Acesso restrito a administradores.');
+        return;
+      }
+      document.getElementById('balanco-nova-qtd').value = state.estoqueGeralOvos || 0;
+      document.getElementById('balanco-motivo').value = '';
+      document.getElementById('modal-balanco').style.display = 'flex';
+    }
+
+    function fecharModalBalanco() {
+      document.getElementById('modal-balanco').style.display = 'none';
+    }
+
+    async function salvarBalancoEstoque(e) {
+      e.preventDefault();
+      const novaQtd = parseInt(document.getElementById('balanco-nova-qtd').value);
+      const motivo = document.getElementById('balanco-motivo').value.trim();
+
+      if (isNaN(novaQtd) || novaQtd < 0) {
+        alert('Insira uma quantidade válida.');
+        return;
+      }
+
+      try {
+        const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+        await refEstoque.set({ 
+          qtdOvos: novaQtd,
+          ultimoAjusteEm: new Date(),
+          ajustadoPor: state.currentUser.login,
+          motivoAjuste: motivo
+        }, { merge: true });
+
+        alert('Estoque geral atualizado com sucesso!');
+        fecharModalBalanco();
+      } catch (err) {
+        console.error("Erro ao atualizar balanço:", err);
+        alert('Erro ao salvar o balanço no banco de dados.');
+      }
+    }
+
+    async function cadastrarUsuario(e) {
       e.preventDefault();
       const login = document.getElementById('usr-login').value.trim().toLowerCase();
       const pass = document.getElementById('usr-pass').value.trim();
       const role = document.getElementById('usr-role').value;
 
-      db.collection("usuarios").add({ 
-        empresaId: state.currentEmpresaId, 
-        login, pass, role 
-      })
-        .then(() => { alert('Usuário cadastrado com sucesso!'); e.target.reset(); })
-        .catch(err => alert('Erro ao cadastrar usuário: ' + err.message));
+      await db.collection("usuarios").add({
+        empresaId: state.currentUser.empresaId,
+        login, pass, role
+      });
+
+      e.target.reset();
+      alert('Usuário cadastrado com sucesso!');
     }
 
-    function excluirUsuario(id) {
+    async function excluirUsuario(id) {
       if (confirm('Deseja excluir este usuário?')) {
-        db.collection("usuarios").doc(id).delete().catch(err => alert('Erro ao excluir: ' + err.message));
+        await db.collection("usuarios").doc(id).delete();
       }
     }
 
-    function renderUsuarios() {
-      const tbody = document.getElementById('lista-usuarios');
-      if (!tbody) return;
-      tbody.innerHTML = state.usuarios.map(u => `
-        <tr>
-          <td><strong>${u.login}</strong></td>
-          <td><span class="badge" style="background:#e2e8f0; color:#334155;">${u.role}</span></td>
-          <td>${u.role !== 'admin' ? `<button class="btn-danger" onclick="excluirUsuario('${u.id}')">Excluir</button>` : '---'}</td>
-        </tr>
-      `).join('');
+    async function alterarMinhaSenha(e) {
+      e.preventDefault();
+      const nova = document.getElementById('minha-nova-senha').value.trim();
+      if (!nova) return;
+
+      await db.collection("usuarios").doc(state.currentUser.id).update({ pass: nova });
+      state.currentUser.pass = nova;
+      e.target.reset();
+      alert('Sua senha foi alterada com sucesso!');
     }
 
-    function salvarEmpresa(e) {
+    async function salvarEmpresa(e) {
       e.preventDefault();
       const dados = {
         nome: document.getElementById('emp-nome').value.trim(),
@@ -1256,17 +1399,14 @@
         tel: document.getElementById('emp-tel').value.trim(),
         end: document.getElementById('emp-end').value.trim(),
         social: document.getElementById('emp-social').value.trim(),
-        pix: document.getElementById('emp-pix').value.trim(),
-        botToken: document.getElementById('emp-bot-token').value.trim(),
-        chatId: document.getElementById('emp-chat-id').value.trim()
+        pix: document.getElementById('emp-pix').value.trim()
       };
 
-      db.collection("config").doc(state.currentEmpresaId).set(dados, { merge: true })
-        .then(() => { alert('Dados da empresa salvos com sucesso!'); state.empresa = dados; })
-        .catch(err => alert('Erro ao salvar dados da empresa: ' + err.message));
+      await db.collection("config").doc(state.currentUser.empresaId).set(dados, { merge: true });
+      state.empresa = dados;
+      alert('Dados da empresa salvos com sucesso!');
     }
 
-    // --- MONTAGEM DO COMPROVANTE & RECIBO ---
     function abrirModalNota(pedidoOuId) {
       let ped = null;
 
@@ -1276,7 +1416,10 @@
         ped = pedidoOuId;
       }
 
-      if (!ped) return alert('Erro ao carregar os dados do pedido.');
+      if (!ped) {
+        alert('Erro ao carregar os dados do pedido.');
+        return;
+      }
 
       state.pedidoAtual = ped;
       const receipt = document.getElementById('printable-receipt');
@@ -1297,7 +1440,7 @@
 
       receipt.innerHTML = `
         <div style="text-align:center; margin-bottom:8px;">
-          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'RANCHO UK'}</h2>
+          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
           <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
           <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
         </div>
@@ -1337,7 +1480,7 @@
         <hr class="dashed-divider">
 
         <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
-          <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Rancho UK'}</div>
+          <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
           ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
           ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
           <p style="margin-top:4px;">Obrigado pela preferência!</p>
@@ -1347,95 +1490,175 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    function imprimirNota() {
-      window.print();
-    }
-
-    function salvarNotaPDF() {
-      const receiptElement = document.getElementById('printable-receipt');
-      const ped = state.pedidoAtual || {};
-      const num = ped.numeroPedido || 'comprovante';
-
-      const pdfContainer = document.createElement('div');
-      pdfContainer.style.position = 'absolute';
-      pdfContainer.style.left = '-9999px';
-      pdfContainer.style.top = '0';
-      pdfContainer.style.width = '380px';
-      pdfContainer.style.backgroundColor = '#ffffff';
-      pdfContainer.style.padding = '15px';
-
-      pdfContainer.innerHTML = receiptElement.innerHTML;
-      pdfContainer.className = 'receipt-box';
-      pdfContainer.style.border = '1px dashed #000';
-
-      document.body.appendChild(pdfContainer);
-
-      const opt = {
-        margin:       [10, 10, 10, 10],
-        filename:     `Pedido_${num}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, logging: false, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      html2pdf().set(opt).from(pdfContainer).save().then(() => {
-        document.body.removeChild(pdfContainer);
-      }).catch(err => {
-        console.error('Erro ao gerar PDF:', err);
-        if (pdfContainer.parentNode) {
-          document.body.removeChild(pdfContainer);
-        }
-      });
-    }
-
-    function enviarWhats() {
-      const ped = state.pedidoAtual;
-      if (!ped) return;
-
-      let fone = (ped.clienteTel || '').replace(/\D/g, '');
-      if (!fone.startsWith('55') && fone.length >= 10) fone = '55' + fone;
-
-      let msg = `*COMPROVANTE DE PEDIDO #${ped.numeroPedido || ''}*\n`;
-      msg += `*Empresa:* ${state.empresa.nome || 'Rancho UK'}\n`;
-      msg += `--------------------------------\n`;
-      msg += `*Cliente:* ${ped.clienteNome}\n`;
-      msg += `*Status:* ${ped.status === 'Pago' ? '🟢 PAGAMENTO CONFIRMADO' : '🔴 AGUARDANDO PAGAMENTO'}\n\n`;
-      msg += `*ITENS:*\n`;
-      (ped.itens || []).forEach(i => {
-        msg += `• ${i.qtd}x ${i.nome} - R$ ${parseFloat(i.subtotal).toFixed(2)}\n`;
-      });
-      msg += `\n*TOTAL: R$ ${parseFloat(ped.total).toFixed(2)}*\n`;
-      msg += `*Forma de Pgto:* ${ped.formaPgto}\n`;
-
-      if (state.empresa.pix) {
-        msg += `*Chave Pix:* ${state.empresa.pix}\n`;
+    // --- MÉTODOS DE IMPRESSÃO VIA IFRAME OCULTO (SEM POP-UP / MULTI-PEDIDOS POR PÁGINA) ---
+    function executarImpressaoSilenciosa(conteudoHtml, titulo) {
+      let iframe = document.getElementById('iframe-impressao-oculto');
+      if (iframe) {
+        iframe.remove();
       }
 
-      msg += `\nAgradecemos a preferência! 🥚`;
+      iframe = document.createElement('iframe');
+      iframe.id = 'iframe-impressao-oculto';
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
 
-      const link = `https://api.whatsapp.com/send?phone=${fone}&text=${encodeURIComponent(msg)}`;
-      window.open(link, '_blank');
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>${titulo}</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+            body { padding: 15px; color: #000; background: #fff; font-size: 12px; }
+            
+            .receipt-box { 
+              border: 1px dashed #000; 
+              padding: 15px; 
+              border-radius: 6px; 
+              max-width: 400px; 
+              margin: 0 auto 15px auto; 
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
+
+            .recibo-item {
+              page-break-inside: avoid;
+              break-inside: avoid;
+              margin-bottom: 15px;
+            }
+
+            .dashed-divider { border: none; border-top: 1px dashed #000; margin: 10px 0; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; page-break-inside: auto; }
+            tr { page-break-inside: avoid; break-inside: avoid; }
+            th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #ccc; font-size: 11px; }
+            th { background: #f0f0f0; }
+            .stat-card { border: 1px solid #ccc; padding: 8px; border-radius: 4px; margin-bottom: 8px; page-break-inside: avoid; break-inside: avoid; }
+            .stat-title { font-size: 10px; text-transform: uppercase; color: #555; }
+            .stat-value { font-size: 14px; font-weight: bold; }
+            .badge { font-weight: bold; font-size: 10px; }
+
+            @media print {
+              @page { size: auto; margin: 10mm; }
+              body { padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          ${conteudoHtml}
+        </body>
+        </html>
+      `);
+
+      doc.close();
+      iframe.contentWindow.focus();
+
+      setTimeout(() => {
+        iframe.contentWindow.print();
+      }, 250);
     }
 
-    function abrirResumoVendasDia() {
-      const hojeStr = new Date().toDateString();
-      const pedidosHoje = state.pedidos.filter(p => {
-        let d = p.dataCriacao;
-        return d && d.toDateString && d.toDateString() === hojeStr;
-      });
+    function imprimirNota() {
+      const htmlRecibo = document.getElementById('printable-receipt').outerHTML;
+      executarImpressaoSilenciosa(htmlRecibo, 'Comprovante do Pedido');
+    }
 
-      const totalHoje = pedidosHoje.reduce((acc, p) => acc + (p.total || 0), 0);
-      const qtdPedidos = pedidosHoje.length;
-      const ticketMedio = qtdPedidos > 0 ? (totalHoje / qtdPedidos) : 0;
+    function imprimirRelatorio() {
+      const htmlRelatorio = document.getElementById('area-relatorio-impressao').innerHTML;
+      const tituloPeriodo = document.getElementById('resumo-periodo-texto').innerText;
+      const conteudoCompleto = `
+        <h2 style="text-align:center; margin-bottom: 5px;">Relatório de Vendas</h2>
+        <p style="text-align:center; font-weight:bold; margin-bottom: 15px;">${tituloPeriodo}</p>
+        ${htmlRelatorio}
+      `;
+      executarImpressaoSilenciosa(conteudoCompleto, 'Relatório de Vendas');
+    }
+
+    function abrirResumoVendas() {
+      document.getElementById('filtro-periodo').value = 'hoje';
+      atualizarFiltroRelatorio();
+      document.getElementById('modal-resumo').style.display = 'flex';
+    }
+
+    function atualizarFiltroRelatorio() {
+      const tipo = document.getElementById('filtro-periodo').value;
+      const boxDatas = document.getElementById('container-datas-personalizadas');
+      
+      if (tipo === 'personalizado') {
+        boxDatas.style.display = 'grid';
+        if (!document.getElementById('data-inicio').value) {
+          const hojeIso = new Date().toISOString().split('T')[0];
+          document.getElementById('data-inicio').value = hojeIso;
+          document.getElementById('data-fim').value = hojeIso;
+        }
+      } else {
+        boxDatas.style.display = 'none';
+      }
+      renderizarDadosRelatorio();
+    }
+
+    function renderizarDadosRelatorio() {
+      const tipo = document.getElementById('filtro-periodo').value;
+      const agora = new Date();
+      let pedidosFiltrados = [];
+      let textoPeriodo = '';
+
+      if (tipo === 'hoje') {
+        const hojeStr = agora.toDateString();
+        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao.toDateString && p.dataCriacao.toDateString() === hojeStr);
+        textoPeriodo = `Período: Hoje (${agora.toLocaleDateString('pt-BR')})`;
+      } else if (tipo === 'semana') {
+        const seteDiasAtras = new Date();
+        seteDiasAtras.setDate(agora.getDate() - 7);
+        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao >= seteDiasAtras);
+        textoPeriodo = `Período: Últimos 7 dias (Até ${agora.toLocaleDateString('pt-BR')})`;
+      } else if (tipo === 'mes') {
+        const mesAtual = agora.getMonth();
+        const anoAtual = agora.getFullYear();
+        pedidosFiltrados = state.pedidos.filter(p => {
+          if (!p.dataCriacao) return false;
+          return p.dataCriacao.getMonth() === mesAtual && p.dataCriacao.getFullYear() === anoAtual;
+        });
+        textoPeriodo = `Período: Mês Atual (${agora.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })} )`;
+      } else if (tipo === 'personalizado') {
+        const dIniStr = document.getElementById('data-inicio').value;
+        const dFimStr = document.getElementById('data-fim').value;
+        
+        if (dIniStr && dFimStr) {
+          const dIni = new Date(dIniStr + 'T00:00:00');
+          const dFim = new Date(dFimStr + 'T23:59:59');
+          pedidosFiltrados = state.pedidos.filter(p => {
+            if (!p.dataCriacao) return false;
+            return p.dataCriacao >= dIni && p.dataCriacao <= dFim;
+          });
+          textoPeriodo = `Período de ${dIni.toLocaleDateString('pt-BR')} até ${dFim.toLocaleDateString('pt-BR')}`;
+        } else {
+          pedidosFiltrados = [];
+          textoPeriodo = 'Selecione as datas inicial e final';
+        }
+      }
+
+      document.getElementById('resumo-periodo-texto').innerText = textoPeriodo;
+
+      const totalPeriodo = pedidosFiltrados.reduce((acc, p) => acc + (p.total || 0), 0);
+      const qtdPedidos = pedidosFiltrados.length;
+      const ticketMedio = qtdPedidos > 0 ? (totalPeriodo / qtdPedidos) : 0;
 
       const porForma = {};
-      pedidosHoje.forEach(p => {
+      pedidosFiltrados.forEach(p => {
         const forma = p.formaPgto || 'Não especificada';
         porForma[forma] = (porForma[forma] || 0) + (p.total || 0);
       });
 
-      document.getElementById('resumo-data-hoje').innerText = `Data: ${new Date().toLocaleDateString('pt-BR')}`;
-      document.getElementById('resumo-total-hoje').innerText = `R$ ${totalHoje.toFixed(2)}`;
+      document.getElementById('resumo-total-periodo').innerText = `R$ ${totalPeriodo.toFixed(2)}`;
       document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
       document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
 
@@ -1445,20 +1668,21 @@
           <strong>R$ ${porForma[f].toFixed(2)}</strong>
         </div>
       `).join('');
-      document.getElementById('resumo-detalhe-formas').innerHTML = htmlFormas || 'Nenhuma venda hoje.';
+      document.getElementById('resumo-detalhe-formas').innerHTML = htmlFormas || 'Nenhuma venda registrada no período.';
 
-      const tbody = document.getElementById('resumo-tabela-hoje');
-      tbody.innerHTML = pedidosHoje.map(p => `
+      const tbody = document.getElementById('resumo-tabela-periodo');
+      tbody.innerHTML = pedidosFiltrados.map(p => `
         <tr>
           <td>#${p.numeroPedido || ''}</td>
+          <td>${p.dataCriacao ? p.dataCriacao.toLocaleDateString('pt-BR') : ''}</td>
           <td>${p.clienteNome}</td>
           <td>R$ ${parseFloat(p.total).toFixed(2)}</td>
           <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
         </tr>
       `).join('');
-
-      document.getElementById('modal-resumo').style.display = 'flex';
     }
+
+    initApp();
   </script>
 </body>
 </html>
