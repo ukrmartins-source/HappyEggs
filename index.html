@@ -798,6 +798,9 @@
               <button class="btn-warning" style="font-size:0.7rem; padding:4px 8px;" onclick="alternarStatusEmpresa('${emp.id}', '${emp.status}')">
                 ${isAtivo ? 'Bloquear' : 'Ativar'}
               </button>
+              <button class="btn-danger" style="font-size:0.7rem; padding:4px 8px; margin-left:4px;" onclick="excluirEmpresaSaaS('${emp.id}')">
+                🗑️ Apagar
+              </button>
             </td>
           </tr>
         `;
@@ -807,6 +810,17 @@
     async function alternarStatusEmpresa(id, statusAtual) {
       const novoStatus = statusAtual === 'ativo' ? 'bloqueado' : 'ativo';
       await db.collection("empresas_saas").doc(id).update({ status: novoStatus });
+    }
+
+    async function excluirEmpresaSaaS(id) {
+      if (confirm(`Tem certeza que deseja excluir a empresa ${id}? Esta ação não pode ser desfeita.`)) {
+        try {
+          await db.collection("empresas_saas").doc(id).delete();
+          alert('Empresa excluída com sucesso!');
+        } catch (err) {
+          alert('Erro ao excluir empresa: ' + err.message);
+        }
+      }
     }
 
     function alterarMinhaSenha(e) {
