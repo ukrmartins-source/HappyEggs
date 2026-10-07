@@ -141,32 +141,41 @@
       </form>
     </div>
 
-    <!-- PAINEL SUPER ADMIN (SaaS) COM DASHBOARD GLOBAL -->
+    <!-- PAINEL SUPER ADMIN (SaaS) COM DASHBOARD GLOBAL E CONTROLO DE PRIVACIDADE -->
     <div id="view-superadmin" class="view-content" style="display:none;">
       
       <!-- DASHBOARD GLOBAL DO SUPER ADMIN -->
       <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border: none;">
-        <div class="card-header" style="border-color: rgba(255,255,255,0.1);">
+        <div class="card-header" style="border-color: rgba(255,255,255,0.1); margin-bottom: 10px; padding-bottom: 8px;">
           <div class="card-title" style="color: white;">👑 Dashboard Global SaaS</div>
-          <button class="btn btn-back" type="button" onclick="logout()">Sair</button>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn-warning" type="button" style="font-size: 0.75rem; padding: 5px 8px;" onclick="alternarPrivacidadeSuperAdmin()" id="btn-toggle-privacy">👁️ Ocultar</button>
+            <button class="btn btn-back" type="button" onclick="logout()">Sair</button>
+          </div>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px;">
-          <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 8px; text-align: center;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; text-align: center;">
             <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Granjas Ativas</div>
-            <div id="global-granjas-ativas" style="font-size: 1.2rem; font-weight: bold; color: #38bdf8;">0</div>
+            <div id="global-granjas-ativas" style="font-size: 1.4rem; font-weight: bold; color: #38bdf8;">0</div>
           </div>
-          <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 8px; text-align: center;">
+          <div style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; text-align: center;">
             <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Faturamento Global</div>
-            <div id="global-faturamento" style="font-size: 1.1rem; font-weight: bold; color: #34d399;">R$ 0</div>
-          </div>
-          <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 8px; text-align: center;">
-            <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Ovos no Sistema</div>
-            <div id="global-ovos" style="font-size: 1.1rem; font-weight: bold; color: #facc15;">0</div>
+            <div id="global-faturamento" style="font-size: 1.3rem; font-weight: bold; color: #34d399;">R$ 0</div>
           </div>
         </div>
       </div>
 
-      <div class="card" style="border-left: 4px solid var(--warning);">
+      <div class="grid-menu" style="margin-bottom: 15px;">
+        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('cadastro')">
+          <span class="icon">➕</span><span class="label">Nova Granja</span>
+        </button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('empresas')">
+          <span class="icon">🏢</span><span class="label">Listar / Editar Empresas</span>
+        </button>
+      </div>
+
+      <!-- SEÇÃO: CADASTRAR NOVA GRANJA -->
+      <div class="card" id="saas-card-cadastro" style="border-left: 4px solid var(--warning); display: block;">
         <div class="card-title" style="margin-bottom: 12px;">Cadastrar Nova Granja / Empresa Cliente</div>
         
         <form onsubmit="cadastrarEmpresaCliente(event)">
@@ -198,13 +207,18 @@
         </form>
       </div>
 
-      <div class="card">
-        <div class="card-title">Empresas, Planos e Credenciais</div>
+      <!-- SEÇÃO: LISTAR / EDITAR EMPRESAS -->
+      <div class="card" id="saas-card-empresas" style="display: none;">
+        <div class="card-header">
+          <div class="card-title">Empresas, Planos e Credenciais</div>
+          <button class="btn btn-back" type="button" onclick="abrirSecaoSuperAdmin('cadastro')">➕ Voltar Cadastro</button>
+        </div>
         <table>
           <thead><tr><th>Dados e Plano</th><th>Usuários e Senhas</th><th>Ações</th></tr></thead>
           <tbody id="lista-empresas-saas"></tbody>
         </table>
       </div>
+
     </div>
 
     <!-- MENU PRINCIPAL (DASHBOARD) -->
@@ -616,9 +630,7 @@
       usuarios: [],
       empresasSaaS: [],
       todosUsuariosSaaS: [],
-      todasEmpresasGlobal: [],
       todosPedidosGlobal: [],
-      todoEstoqueGlobal: [],
       empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "" },
       produtos: [],
       clientes: [],
@@ -631,6 +643,8 @@
     };
 
     let carrinhoTemp = [];
+    let superAdminPrivacidadeOculto = false;
+    let globalFaturamentoValorReal = 0;
 
     function initApp() {
       db.collection("usuarios").get().then(snapshot => {
@@ -669,21 +683,45 @@
         state.todosPedidosGlobal = snapshot.docs.map(doc => doc.data());
         calcularDashboardGlobal();
       });
-
-      db.collection("estoque_geral").onSnapshot(snapshot => {
-        state.todoEstoqueGlobal = snapshot.docs.map(doc => doc.data());
-        calcularDashboardGlobal();
-      });
     }
 
     function calcularDashboardGlobal() {
       const granjasAtivas = state.empresasSaaS.filter(e => e.status === 'Ativo').length;
-      const faturamentoGlobal = state.todosPedidosGlobal.reduce((acc, p) => acc + (p.total || 0), 0);
-      const totalOvosGlobal = state.todoEstoqueGlobal.reduce((acc, e) => acc + (e.qtdOvos || 0), 0);
+      globalFaturamentoValorReal = state.todosPedidosGlobal.reduce((acc, p) => acc + (p.total || 0), 0);
 
       document.getElementById('global-granjas-ativas').innerText = granjasAtivas;
-      document.getElementById('global-faturamento').innerText = `R$ ${faturamentoGlobal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-      document.getElementById('global-ovos').innerText = `${totalOvosGlobal.toLocaleString('pt-BR')} Ovos`;
+      
+      const fatEl = document.getElementById('global-faturamento');
+      if (superAdminPrivacidadeOculto) {
+        fatEl.innerText = "R$ ••••••";
+      } else {
+        fatEl.innerText = `R$ ${globalFaturamentoValorReal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+      }
+    }
+
+    function alternarPrivacidadeSuperAdmin() {
+      superAdminPrivacidadeOculto = !superAdminPrivacidadeOculto;
+      const btn = document.getElementById('btn-toggle-privacy');
+      if (superAdminPrivacidadeOculto) {
+        btn.innerText = "👁️‍🗨️ Revelar";
+      } else {
+        btn.innerText = "👁️ Ocultar";
+      }
+      calcularDashboardGlobal();
+      renderEmpresasSaaS();
+    }
+
+    function abrirSecaoSuperAdmin(secao) {
+      const cardCadastro = document.getElementById('saas-card-cadastro');
+      const cardEmpresas = document.getElementById('saas-card-empresas');
+
+      if (secao === 'cadastro') {
+        cardCadastro.style.display = 'block';
+        cardEmpresas.style.display = 'none';
+      } else if (secao === 'empresas') {
+        cardCadastro.style.display = 'none';
+        cardEmpresas.style.display = 'block';
+      }
     }
 
     function initListeners() {
@@ -945,15 +983,18 @@
         const isAtivo = emp.status === 'Ativo';
         const usuariosDaEmpresa = state.todosUsuariosSaaS.filter(u => u.empresaId === emp.id);
 
-        const listaUsuariosHtml = usuariosDaEmpresa.map(u => `
-          <div style="background:#f8fafc; padding:6px 8px; border-radius:6px; margin-bottom:4px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <strong>👤 ${u.login}</strong> <span style="font-size:0.7rem; color:#64748b;">(${u.role})</span><br>
-              <span style="font-size:0.8rem; color:#2563eb;">Senha: <strong>${u.pass}</strong></span>
+        const listaUsuariosHtml = usuariosDaEmpresa.map(u => {
+          const senhaExibida = superAdminPrivacidadeOculto ? "••••••" : u.pass;
+          return `
+            <div style="background:#f8fafc; padding:6px 8px; border-radius:6px; margin-bottom:4px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong>👤 ${u.login}</strong> <span style="font-size:0.7rem; color:#64748b;">(${u.role})</span><br>
+                <span style="font-size:0.8rem; color:#2563eb;">Senha: <strong>${senhaExibida}</strong></span>
+              </div>
+              <button class="btn-warning" type="button" style="font-size:0.65rem; padding:3px 6px;" onclick="redefinirSenhaCliente('${u.id}', '${u.login}')">Alterar</button>
             </div>
-            <button class="btn-warning" type="button" style="font-size:0.65rem; padding:3px 6px;" onclick="redefinirSenhaCliente('${u.id}', '${u.login}')">Alterar</button>
-          </div>
-        `).join('') || '<span style="color:#64748b; font-size:0.8rem;">Nenhum usuário.</span>';
+          `;
+        }).join('') || '<span style="color:#64748b; font-size:0.8rem;">Nenhum usuário.</span>';
 
         return `
           <tr>
@@ -1778,7 +1819,6 @@
       csv += `Ticket Médio;${ticketMedio}\n\n`;
       csv += `Numero Pedido;Data;Cliente;Total;Status\n`;
 
-      // Recolher linhas da tabela do relatório
       const linhas = document.querySelectorAll('#resumo-tabela-periodo tr');
       linhas.forEach(tr => {
         const cols = tr.querySelectorAll('td');
