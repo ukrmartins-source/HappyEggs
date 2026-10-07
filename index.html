@@ -133,7 +133,7 @@
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
-      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas[cite: 2]</p>
       <form onsubmit="autenticar(event)">
         <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password"></div>
@@ -541,7 +541,7 @@
     </div>
   </div>
 
-  <!-- MODAL: RELATÓRIO DE VENDAS FLEXÍVEL COM EXPORTAÇÃO PDF/EXCEL -->
+  <!-- MODAL: RELATÓRIO DE VENDAS FLEXÍVEL COM EXPORTAÇÃO EXCEL/IMPRESSÃO (SAFARI FIX) -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 500px;">
       
@@ -607,8 +607,7 @@
         <button class="btn" type="button" style="background:#059669;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
       </div>
       <div style="margin-top: 8px;">
-        <button class="btn" type="button" style="background:#dc2626;" onclick="exportarRelatorioPDF()">📄 Baixar PDF</button>
-        <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b; margin-top:6px;">Fechar</button>
+        <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
     </div>
   </div>
@@ -1789,6 +1788,52 @@
       executarImpressaoSilenciosa(htmlRecibo, 'Comprovante do Pedido');
     }
 
+    function imprimirRelatorio() {
+      const htmlRelatorio = document.getElementById('area-relatorio-impressao').outerHTML;
+      executarImpressaoSilenciosa(htmlRelatorio, 'Relatório de Vendas');
+    }
+
+    function exportarRelatorioExcel() {
+      const tipo = document.getElementById('filtro-periodo').value;
+      const agora = new Date();
+      let pedidosFiltrados = [];
+
+      if (tipo === 'hoje') {
+        const hojeStr = agora.toDateString();
+        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao.toDateString && p.dataCriacao.toDateString() === hojeStr);
+      } else if (tipo === 'semana') {
+        const seteDiasAtras = new Date();
+        seteDiasAtras.setDate(agora.getDate() - 7);
+        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao >= seteDiasAtras);
+      } else if (tipo === 'mes') {
+        const mesAtual = agora.getMonth();
+        const anoAtual = agora.getFullYear();
+        pedidosFiltrados = state.pedidos.filter(p => {
+          if (!p.dataCriacao) return false;
+          return p.dataCriacao.getMonth() === mesAtual && p.dataCriacao.getFullYear() === anoAtual;
+        });
+      } else {
+        pedidosFiltrados = state.pedidos;
+      }
+
+      let csv = "Pedido;Data;Cliente;Total;Status;Forma Pgto\n";
+      pedidosFiltrados.forEach(p => {
+        const dataStr = p.dataCriacao ? p.dataCriacao.toLocaleDateString('pt-BR') : '';
+        const totalStr = (p.total || 0).toFixed(2).replace('.', ',');
+        csv += `#${p.numeroPedido || ''};${dataStr};"${p.clienteNome || ''}";R$ ${totalStr};${p.status || ''};${p.formaPgto || ''}\n`;
+      });
+
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `relatorio_vendas_${tipo}_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
     function abrirResumoVendas() {
       document.getElementById('filtro-periodo').value = 'hoje';
       atualizarFiltroRelatorio();
@@ -1825,6 +1870,21 @@
           return p.dataCriacao.getMonth() === mesAtual && p.dataCriacao.getFullYear() === anoAtual;
         });
         textoPeriodo = `Período: Mês Atual`;
+      } else if (tipo === 'personalizado') {
+        const dInicio = document.getElementById('data-inicio').value;
+        const dFim = document.getElementById('data-fim').value;
+        if (dInicio && dFim) {
+          const inicio = new Date(dInicio + 'T00:00:00');
+          const fim = new Date(dFim + 'T23:59:59');
+          pedidosFiltrados = state.pedidos.filter(p => {
+            if (!p.dataCriacao) return false;
+            return p.dataCriacao >= inicio && p.dataCriacao <= fim;
+          });
+          textoPeriodo = `Período: De ${dInicio.split('-').reverse().join('/')} até ${dFim.split('-').reverse().join('/')}`;
+        } else {
+          pedidosFiltrados = state.pedidos;
+          textoPeriodo = `Período: Personalizado (Selecione as datas)`;
+        }
       }
 
       document.getElementById('resumo-periodo-texto').innerText = textoPeriodo;
@@ -1836,6 +1896,16 @@
       document.getElementById('resumo-total-periodo').innerText = `R$ ${totalPeriodo.toFixed(2)}`;
       document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
       document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
+
+      // Detalhes por forma de pagamento
+      const formas = {};
+      pedidosFiltrados.forEach(p => {
+        const f = p.formaPgto || 'Outros';
+        formas[f] = (formas[f] || 0) + (p.total || 0);
+      });
+      const detalheFormasEl = document.getElementById('resumo-detalhe-formas');
+      const formasHtml = Object.keys(formas).map(f => `• ${f}: <strong>R$ ${formas[f].toFixed(2)}</strong>`).join('<br>');
+      detalheFormasEl.innerHTML = formasHtml || 'Nenhum registro no período.';
 
       const tbody = document.getElementById('resumo-tabela-periodo');
       tbody.innerHTML = pedidosFiltrados.map(p => `
