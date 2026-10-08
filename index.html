@@ -94,48 +94,22 @@
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
-    /* ========================================================= */
-    /* ESTILOS DO RECIBO (PADRÃO PLANILHA MODERNA CORPORATIVA)   */
-    /* ========================================================= */
     .receipt-box { 
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 16px;
-      color: #0f172a;
-      font-size: 0.8rem;
-      line-height: 1.35;
-    }
-
-    .recibo-bloco-interno {
-      height: 48%; 
-      display: flex; 
-      flex-direction: column; 
-      justify-content: space-between;
-      border: 1px solid #e2e8f0;
+      border: 1.5px dashed #4b5563; 
       border-radius: 8px;
-      padding: 12px;
-      background: #fff;
+      padding: 18px; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 0.9rem; 
+      background: #ffffff; 
+      margin-bottom: 16px; 
+      color: #1f2937;
+      text-align: left;
+      width: 100%;
+      word-wrap: break-word;
+      line-height: 1.4;
     }
 
-    .recibo-sheet-header {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      color: #ffffff;
-      padding: 10px 14px;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 3px solid #2563eb;
-    }
-    .recibo-sheet-header h3 {
-      font-size: 0.85rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
+    .dashed-divider { border: none; border-top: 1.5px dashed #9ca3af; margin: 10px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -143,7 +117,9 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
-    /* ESTILOS DO RELATÓRIO DE VENDAS (PLANILHA) */
+    /* ========================================================= */
+    /* ESTILOS DO RELATÓRIO DE VENDAS (PLANILHA)                 */
+    /* ========================================================= */
     .relatorio-sheet-box {
       background: #ffffff;
       border: 1px solid #e2e8f0;
@@ -226,19 +202,23 @@
       background-color: #f8fafc;
     }
 
-    /* REGRAS DE PAGINAÇÃO EXATA PARA IMPRESSÃO (EXATAMENTE 2 RECIBOS POR PÁGINA A 50%) */
+    /* REGRAS DE IMPRESSÃO NATIVA RÁPIDA E LIMPA */
     @media print {
-      body { background: #fff; padding: 0; }
-      header, main, .modal > .modal-content > div:not(.receipt-box), .modal > .modal-content > .card-title, .modal > .modal-content > div:last-child { display: none !important; }
-      .modal { position: static; background: none; display: block !important; }
-      .modal-content { width: 100% !important; max-width: 100% !important; box-shadow: none; padding: 0; margin: 0; border: none; }
-      .receipt-box { border: none !important; padding: 0 !important; background: transparent !important; }
-      .recibo-bloco-interno {
-        height: 48vh !important;
-        page-break-inside: avoid;
-        break-inside: avoid;
-        margin-bottom: 2vh;
+      body * { visibility: hidden !important; }
+      #modal-nota:not([style*="display: none"]) #printable-receipt,
+      #modal-nota:not([style*="display: none"]) #printable-receipt *,
+      #modal-resumo:not([style*="display: none"]) #area-relatorio-impressao,
+      #modal-resumo:not([style*="display: none"]) #area-relatorio-impressao * {
+        visibility: visible !important;
       }
+      #modal-nota:not([style*="display: none"]) #printable-receipt {
+        position: absolute; left: 0; top: 0; width: 100% !important; border: none !important;
+      }
+      #modal-resumo:not([style*="display: none"]) #area-relatorio-impressao {
+        position: absolute; left: 0; top: 0; width: 100% !important; border: none !important;
+      }
+      .modal { position: static !important; background: transparent !important; display: block !important; }
+      .modal-content { max-width: 100% !important; width: 100% !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
     }
   </style>
 </head>
@@ -257,7 +237,7 @@
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
-      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas[cite: 2]</p>
       <form onsubmit="autenticar(event)">
         <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password"></div>
@@ -537,12 +517,12 @@
 
   <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
   <div class="modal" id="modal-nota">
-    <div class="modal-content" style="max-width: 520px;">
+    <div class="modal-content">
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       <div class="receipt-box" id="printable-receipt"></div>
-      <div style="display:flex; flex-direction:column; gap:10px; margin-top: 15px;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
         <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirNota()">🖨️ Imprimir</button>
-        <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b;">Fechar Nota</button>
+        <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:4px;">Fechar Nota</button>
       </div>
     </div>
   </div>
@@ -561,7 +541,7 @@
     </div>
   </div>
 
-  <!-- MODAL: RELATÓRIO DE VENDAS -->
+  <!-- MODAL: RELATÓRIO DE VENDAS (SEM TICKET MÉDIO) -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 520px;">
       <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
@@ -941,43 +921,29 @@
       selecionados.forEach((id, idx) => {
         const ped = state.pedidos.find(p => p.id === id);
         if (!ped) return;
-        const isPago = ped.status === 'Pago';
         const itens = ped.itens || [];
-        const dataStr = ped.dataCriacao ? ped.dataCriacao.toLocaleDateString('pt-BR') : '';
 
         receiptBox.innerHTML += `
-          <div class="recibo-bloco-interno" style="${idx > 0 ? 'margin-top: 15px;' : ''}">
-            <div>
-              <div class="recibo-sheet-header">
-                <h3>Comprovante de Pedido</h3>
-                <span style="font-size: 0.72rem; font-weight: 600;">#${ped.numeroPedido || '---'} | ${dataStr}</span>
-              </div>
-              
-              <div style="font-size: 0.78rem; margin-bottom: 6px; color: #334155;">
-                <div><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
-                <div><strong>Tel:</strong> ${ped.clienteTel || 'N/I'} | <strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-              </div>
-
-              <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 0.75rem;">
-                <thead>
-                  <tr style="background: #eff6ff; color: #1e40af;"><th style="padding: 4px;">Item</th><th style="padding: 4px; text-align: right;">Subtotal</th></tr>
-                </thead>
-                <tbody>
-                  ${itens.map(i => `<tr><td style="padding: 4px; border-bottom: 1px solid #e2e8f0;">${i.qtd}x${i.nome}</td><td style="padding: 4px; text-align: right; border-bottom: 1px solid #e2e8f0;">R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</td></tr>`).join('')}
-                </tbody>
-              </table>
-
-              <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 0.82rem; background: #f8fafc; padding: 6px 8px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                <span>Valor Total (${ped.formaPgto || 'Pix'}):</span><span style="color: #2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
-              </div>
+          <div style="${idx > 0 ? 'margin-top:20px; border-top: 1.5px dashed #4b5563; padding-top: 20px;' : ''}">
+            <div style="text-align:center; margin-bottom:8px;">
+              <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase;">${emp.nome || 'HAPPY EGGS'}</h2>
+              <p style="font-size:0.85rem; color:#374151;">CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}</p>
             </div>
-
-            <!-- EMPRESA E DADOS ESTRICTAMENTE NO RODAPÉ -->
-            <div style="text-align: center; font-size: 0.7rem; color: #64748b; border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 4px;">
-              <div style="font-weight: 800; color: #0f172a; text-transform: uppercase;">${emp.nome || 'Happy Eggs'}</div>
-              <div>CNPJ: ${emp.cnpj || 'N/I'} | Tel/WhatsApp: ${emp.tel || 'N/I'}</div>
-              ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
-              ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
+            <hr class="dashed-divider">
+            <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}</div>
+            <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
+            <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+            <hr class="dashed-divider">
+            <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS:</div>
+            ${itens.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
+            <hr class="dashed-divider">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem;"><span>TOTAL:</span><span>R$ ${parseFloat(ped.total || 0).toFixed(2)}</span></div>
+            <div style="margin-top:4px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'}</div>
+            <hr class="dashed-divider">
+            <div style="text-align:center; font-size:0.75rem; color:#64748b;">
+              <div style="font-weight:800; color:#0f172a; text-transform:uppercase;">${emp.nome || 'Happy Eggs'}</div>
+              <div>${emp.end || ''}</div>
+              ${emp.social ? `<div>${emp.social}</div>` : ''}
             </div>
           </div>
         `;
@@ -1089,42 +1055,27 @@
       const ped = typeof pedidoOuId === 'string' ? state.pedidos.find(p => p.id === pedidoOuId) : pedidoOuId;
       if (!ped) return;
       const emp = state.empresa || {};
-      const dataStr = ped.dataCriacao ? ped.dataCriacao.toLocaleDateString('pt-BR') : '';
 
       document.getElementById('printable-receipt').innerHTML = `
-        <div class="recibo-bloco-interno" style="height: 100%;">
-          <div>
-            <div class="recibo-sheet-header">
-              <h3>Comprovante de Pedido</h3>
-              <span style="font-size: 0.72rem; font-weight: 600;">#${ped.numeroPedido || '---'} | ${dataStr}</span>
-            </div>
-            
-            <div style="font-size: 0.78rem; margin-bottom: 6px; color: #334155;">
-              <div><strong>Cliente:</strong> ${ped.clienteNome}</div>
-              <div><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-            </div>
-
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 0.75rem;">
-              <thead>
-                <tr style="background: #eff6ff; color: #1e40af;"><th style="padding: 4px;">Item</th><th style="padding: 4px; text-align: right;">Subtotal</th></tr>
-              </thead>
-              <tbody>
-                ${(ped.itens || []).map(i => `<tr><td style="padding: 4px; border-bottom: 1px solid #e2e8f0;">${i.qtd}x${i.nome}</td><td style="padding: 4px; text-align: right; border-bottom: 1px solid #e2e8f0;">R$ ${parseFloat(i.subtotal).toFixed(2)}</td></tr>`).join('')}
-              </tbody>
-            </table>
-
-            <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 0.82rem; background: #f8fafc; padding: 6px 8px; border-radius: 6px; border: 1px solid #e2e8f0;">
-              <span>Valor Total (${ped.formaPgto || 'Pix'}):</span><span style="color: #2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
-            </div>
-          </div>
-
-          <!-- EMPRESA E DADOS ESTRICTAMENTE NO RODAPÉ -->
-          <div style="text-align: center; font-size: 0.7rem; color: #64748b; border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 4px;">
-            <div style="font-weight: 800; color: #0f172a; text-transform: uppercase;">${emp.nome || 'Happy Eggs'}</div>
-            <div>CNPJ: ${emp.cnpj || 'N/I'} | Tel/WhatsApp: ${emp.tel || 'N/I'}</div>
-            ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
-            ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
-          </div>
+        <div style="text-align:center; margin-bottom:8px;">
+          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase;">${emp.nome || 'HAPPY EGGS'}</h2>
+          <p style="font-size:0.85rem; color:#374151;">CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}</p>
+        </div>
+        <hr class="dashed-divider">
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}</div>
+        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+        <hr class="dashed-divider">
+        <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS:</div>
+        ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
+        <hr class="dashed-divider">
+        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem;"><span>TOTAL:</span><span>R$ ${parseFloat(ped.total).toFixed(2)}</span></div>
+        <div style="margin-top:4px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'}</div>
+        <hr class="dashed-divider">
+        <div style="text-align:center; font-size:0.75rem; color:#64748b;">
+          <div style="font-weight:800; color:#0f172a; text-transform:uppercase;">${emp.nome || 'Happy Eggs'}</div>
+          <div>${emp.end || ''}</div>
+          ${emp.social ? `<div>${emp.social}</div>` : ''}
         </div>
       `;
       document.getElementById('modal-nota').style.display = 'flex';
