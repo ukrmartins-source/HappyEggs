@@ -94,28 +94,30 @@
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
-    /* DESIGN DOS RECIBOS OTIMIZADOS PARA PDF / IMPRESSÃO */
+    /* DESIGN DOS RECIBOS EXATAMENTE 50% POR BLOCO (2 POR PÁGINA) */
     .receipt-box { 
       background: #ffffff; 
       border: 1px solid #e2e8f0;
       border-radius: 12px;
-      padding: 18px; 
+      padding: 10px; 
       margin-bottom: 16px; 
       color: #0f172a;
       text-align: left;
       width: 100%;
       word-wrap: break-word;
+      max-height: 70vh;
+      overflow-y: auto;
     }
 
     .recibo-bloco-pagina {
-      height: 130mm;
-      max-height: 130mm;
+      height: 135mm;
+      max-height: 135mm;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       box-sizing: border-box;
-      padding: 12mm;
-      margin-bottom: 5mm;
+      padding: 10mm;
+      margin-bottom: 2mm;
       border: 1px dashed #cbd5e1;
       border-radius: 8px;
       background: #ffffff;
@@ -126,16 +128,16 @@
     .recibo-sheet-header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       color: #ffffff;
-      padding: 10px 14px;
+      padding: 8px 12px;
       border-radius: 6px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid #2563eb;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -223,6 +225,14 @@
     }
     .relatorio-tabela-planilha tr:nth-child(even) {
       background-color: #f8fafc;
+    }
+
+    /* REGRAS CSS DE IMPRESSÃO (OCULTAR RODAPÉS/URLS AUTOMÁTICOS DO NAVEGADOR E LINK FOOTPRINTS) */
+    @media print {
+      body * { visibility: hidden; }
+      #printable-receipt, #printable-receipt *, #area-relatorio-impressao, #area-relatorio-impressao * { visibility: visible; }
+      #printable-receipt, #area-relatorio-impressao { position: absolute; left: 0; top: 0; width: 100%; border: none; padding: 0; margin: 0; box-shadow: none; }
+      @page { size: A4; margin: 10mm; }
     }
   </style>
 </head>
@@ -410,7 +420,7 @@
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div class="card-title">Histórico de Pedidos Sequencial</div>
-          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="imprimirPedidosSelecionados()">🖨️ Gerar PDF / Imprimir Selecionados</button>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="imprimirPedidosSelecionados()">🖨️ Imprimir / Baixar Recibos</button>
         </div>
         <table>
           <thead>
@@ -551,9 +561,10 @@
     <div class="modal-content">
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       <div class="receipt-box" id="printable-receipt"></div>
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRecibo()">📥 Baixar PDF / Imprimir (Safari Otimizado)</button>
-        <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:4px;">Fechar Nota</button>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button class="btn" type="button" style="background:#059669;" onclick="imprimirDiretoDispositivo()">🖨️ Imprimir Direto (Chrome / PC)</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRecibo()">📥 Baixar PDF (Safari / Celular)</button>
+        <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:2px;">Fechar Nota</button>
       </div>
     </div>
   </div>
@@ -614,10 +625,13 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
+        <button class="btn" type="button" style="background:#059669;" onclick="imprimirDiretoRelatorio()">🖨️ Imprimir Relatório</button>
         <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRelatorio()">📥 Baixar PDF Relatório</button>
-        <button class="btn" type="button" style="background:#059669;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
       </div>
-      <div style="margin-top: 8px;"><button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button></div>
+      <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:8px;">
+        <button class="btn" type="button" style="background:#475569;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
+        <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
+      </div>
     </div>
   </div>
 
@@ -1047,7 +1061,7 @@
               <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
               <hr class="dashed-divider">
               <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
-              <div style="max-height: 12vh; overflow-y: auto;">
+              <div style="max-height: 10vh; overflow-y: auto;">
                 ${itens.map(i => `<div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:2px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
               </div>
             </div>
@@ -1228,7 +1242,7 @@
             <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
             <hr class="dashed-divider">
             <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
-            <div style="max-height: 12vh; overflow-y: auto;">
+            <div style="max-height: 10vh; overflow-y: auto;">
               ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:2px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
             </div>
           </div>
@@ -1249,7 +1263,15 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    // GERAÇÃO DE PDF OTIMIZADA PARA SAFARI E DISPOSITIVOS MÓVEIS
+    // IMPRESSÃO DIRETA NATIVA (CHROME / DESKTOP) E DOWNLOAD PDF (SAFARI / IPHONE)
+    function imprimirDiretoDispositivo() {
+      window.print();
+    }
+
+    function imprimirDiretoRelatorio() {
+      window.print();
+    }
+
     function gerarPdfRecibo() {
       const elemento = document.getElementById('printable-receipt');
       const opt = {
