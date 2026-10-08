@@ -94,22 +94,48 @@
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
+    /* ========================================================= */
+    /* ESTILOS DO RECIBO (PADRÃO PLANILHA MODERNA CORPORATIVA)   */
+    /* ========================================================= */
     .receipt-box { 
-      border: 1.5px dashed #4b5563; 
-      border-radius: 8px;
-      padding: 18px; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 0.9rem; 
-      background: #ffffff; 
-      margin-bottom: 16px; 
-      color: #1f2937;
-      text-align: left;
-      width: 100%;
-      word-wrap: break-word;
-      line-height: 1.4;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      color: #0f172a;
+      font-size: 0.8rem;
+      line-height: 1.35;
     }
 
-    .dashed-divider { border: none; border-top: 1.5px dashed #9ca3af; margin: 10px 0; }
+    .recibo-bloco-interno {
+      height: 48%; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .recibo-sheet-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #2563eb;
+    }
+    .recibo-sheet-header h3 {
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -117,9 +143,7 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
-    /* ========================================================= */
-    /* ESTILOS EXCLUSIVOS DO NOVO RELATÓRIO DE VENDAS (PLANILHA) */
-    /* ========================================================= */
+    /* ESTILOS DO RELATÓRIO DE VENDAS (PLANILHA) */
     .relatorio-sheet-box {
       background: #ffffff;
       border: 1px solid #e2e8f0;
@@ -201,6 +225,21 @@
     .relatorio-tabela-planilha tr:nth-child(even) {
       background-color: #f8fafc;
     }
+
+    /* REGRAS DE PAGINAÇÃO EXATA PARA IMPRESSÃO (EXATAMENTE 2 RECIBOS POR PÁGINA A 50%) */
+    @media print {
+      body { background: #fff; padding: 0; }
+      header, main, .modal > .modal-content > div:not(.receipt-box), .modal > .modal-content > .card-title, .modal > .modal-content > div:last-child { display: none !important; }
+      .modal { position: static; background: none; display: block !important; }
+      .modal-content { width: 100% !important; max-width: 100% !important; box-shadow: none; padding: 0; margin: 0; border: none; }
+      .receipt-box { border: none !important; padding: 0 !important; background: transparent !important; }
+      .recibo-bloco-interno {
+        height: 48vh !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        margin-bottom: 2vh;
+      }
+    }
   </style>
 </head>
 <body>
@@ -228,7 +267,6 @@
 
     <!-- PAINEL SUPER ADMIN (SaaS) -->
     <div id="view-superadmin" class="view-content" style="display:none;">
-      
       <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border: none;">
         <div class="card-header" style="border-color: rgba(255,255,255,0.1); margin-bottom: 10px; padding-bottom: 8px;">
           <div class="card-title" style="color: white;">👑 Dashboard Global SaaS</div>
@@ -251,17 +289,12 @@
       </div>
 
       <div class="grid-menu" style="margin-bottom: 15px;">
-        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('cadastro')">
-          <span class="icon">➕</span><span class="label">Nova Granja</span>
-        </button>
-        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('empresas')">
-          <span class="icon">🏢</span><span class="label">Listar / Editar Empresas</span>
-        </button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('cadastro')"><span class="icon">➕</span><span class="label">Nova Granja</span></button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('empresas')"><span class="icon">🏢</span><span class="label">Listar / Editar Empresas</span></button>
       </div>
 
       <div class="card" id="saas-card-cadastro" style="border-left: 4px solid var(--warning); display: block;">
         <div class="card-title" style="margin-bottom: 12px;">Cadastrar Nova Granja / Empresa Cliente</div>
-        
         <form onsubmit="cadastrarEmpresaCliente(event)">
           <div class="form-group"><label>Nome da Granja / Empresa</label><input type="text" id="saas-nome" placeholder="Ex: Avicultura São José" required></div>
           <div class="form-group"><label>ID Único (Sem espaços, ex: sao_jose)</label><input type="text" id="saas-id" placeholder="sao_jose" required></div>
@@ -269,7 +302,6 @@
           <div class="form-group"><label>E-mail de Contato</label><input type="email" id="saas-email" placeholder="contato@saojose.com"></div>
           <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="saas-tel" placeholder="Ex: (11) 99999-8888"></div>
           <div class="form-group"><label>Endereço Completo</label><input type="text" id="saas-end" placeholder="Rua, Nº, Bairro, Cidade/UF"></div>
-          
           <div class="form-group">
             <label>Plano de Assinatura</label>
             <select id="saas-plano" onchange="atualizarComportamentoPlano()" required>
@@ -278,20 +310,10 @@
               <option value="vitalicio">Vitalício (Sem Expiração)</option>
             </select>
           </div>
-
-          <div class="form-group">
-            <label>Valor do Plano (R$)</label>
-            <input type="number" step="0.01" id="saas-valor-plano" placeholder="Ex: 97.00" required>
-          </div>
-
-          <div class="form-group" id="grupo-vencimento">
-            <label>Data de Vencimento da Assinatura</label>
-            <input type="date" id="saas-vencimento">
-          </div>
-
+          <div class="form-group"><label>Valor do Plano (R$)</label><input type="number" step="0.01" id="saas-valor-plano" placeholder="Ex: 97.00" required></div>
+          <div class="form-group" id="grupo-vencimento"><label>Data de Vencimento da Assinatura</label><input type="date" id="saas-vencimento"></div>
           <div class="form-group"><label>Usuário Administrador da Granja</label><input type="text" id="saas-admin-user" placeholder="admin_saojose" required></div>
           <div class="form-group"><label>Senha Inicial</label><input type="password" id="saas-admin-pass" placeholder="Senha de acesso" required></div>
-          
           <button type="submit" class="btn btn-success">➕ Cadastrar Empresa Cliente</button>
         </form>
       </div>
@@ -306,33 +328,24 @@
           <tbody id="lista-empresas-saas"></tbody>
         </table>
       </div>
-
     </div>
 
     <!-- MENU PRINCIPAL (DASHBOARD) -->
     <div id="view-dashboard" style="display:none;">
       <div class="grid-menu">
-        <button class="grid-btn full-width" type="button" onclick="navTo('pedidos')">
-          <span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span>
-        </button>
+        <button class="grid-btn full-width" type="button" onclick="navTo('pedidos')"><span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span></button>
         <button class="grid-btn" type="button" onclick="navTo('clientes')"><span class="icon">👥</span><span class="label">CLIENTES</span></button>
         <button class="grid-btn" type="button" onclick="navTo('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navTo('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navTo('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
-        
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()">
-          <span class="icon">📊</span><span class="label">RELATÓRIO DE VENDAS (DIAS / MÊS)</span>
-        </button>
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">📊</span><span class="label">RELATÓRIO DE VENDAS (DIAS / MÊS)</span></button>
       </div>
-
       <div class="card" style="margin-top: 15px;">
         <div class="card-header">
           <div class="card-title">📋 Busca Rápida de Clientes</div>
           <button class="btn btn-back" type="button" onclick="navTo('clientes')">➕ Cadastrar</button>
         </div>
-        <div class="form-group" style="margin-bottom: 10px;">
-          <input type="text" id="dash-busca-cliente" placeholder="🔎 Digite para buscar cliente..." oninput="filtrarClientesDashboard()">
-        </div>
+        <div class="form-group" style="margin-bottom: 10px;"><input type="text" id="dash-busca-cliente" placeholder="🔎 Digite para buscar cliente..." oninput="filtrarClientesDashboard()"></div>
         <table>
           <thead><tr><th>Nome / Doc</th><th>Contato</th></tr></thead>
           <tbody id="lista-clientes-dash"></tbody>
@@ -371,39 +384,22 @@
           <div class="card-title">Novo Pedido</div>
           <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
         </div>
-        
         <form onsubmit="finalizarPedido(event)">
-          <div class="form-group">
-            <label>🔎 Buscar Cliente</label>
-            <input type="text" id="ped-busca-cliente" placeholder="Filtrar por nome, doc ou fone..." oninput="filtrarClientesDropdown()">
-          </div>
-          <div class="form-group">
-            <label>Selecione o Cliente</label>
-            <select id="ped-cliente" required></select>
-          </div>
-
+          <div class="form-group"><label>🔎 Buscar Cliente</label><input type="text" id="ped-busca-cliente" placeholder="Filtrar por nome, doc ou fone..." oninput="filtrarClientesDropdown()"></div>
+          <div class="form-group"><label>Selecione o Cliente</label><select id="ped-cliente" required></select></div>
           <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
-
           <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border:1px solid #e2e8f0;">
-            <div class="form-group">
-              <label>Selecione a Embalagem / Produto</label>
-              <select id="ped-produto"></select>
-            </div>
+            <div class="form-group"><label>Selecione a Embalagem / Produto</label><select id="ped-produto"></select></div>
             <div style="display: flex; gap: 8px; align-items: flex-end;">
-              <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label>Quantidade de Embalagens</label>
-                <input type="number" id="ped-qtd" min="1" value="1">
-              </div>
+              <div class="form-group" style="flex: 1; margin-bottom: 0;"><label>Quantidade de Embalagens</label><input type="number" id="ped-qtd" min="1" value="1"></div>
               <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">➕ Adicionar</button>
             </div>
           </div>
-
           <div class="carrinho-box">
             <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛍 ITENS SELECIONADOS:</div>
             <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
             <div style="font-size: 1rem; font-weight: bold; text-align: right; margin-top: 10px; color: var(--accent);">Total: R$ <span id="ped-total-valor">0.00</span></div>
           </div>
-
           <div class="form-group">
             <label>Forma de Pagamento</label>
             <select id="ped-forma-pagamento" required>
@@ -413,12 +409,7 @@
               <option value="Dinheiro">💵 Dinheiro</option>
             </select>
           </div>
-
-          <div class="form-group">
-            <label>Dados do Pagamento (Opcional)</label>
-            <input type="text" id="ped-dados-pagamento" placeholder="Ex: Chave Pix ou Banco">
-          </div>
-
+          <div class="form-group"><label>Dados do Pagamento (Opcional)</label><input type="text" id="ped-dados-pagamento" placeholder="Ex: Chave Pix ou Banco"></div>
           <div class="form-group">
             <label>Status do Pagamento</label>
             <select id="ped-status" required>
@@ -426,12 +417,7 @@
               <option value="Pendente">🔴 Pendente (A Pagar)</option>
             </select>
           </div>
-
-          <div class="form-group">
-            <label>Observações do Pedido (Sairá na Nota)</label>
-            <textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Deixar com a portaria"></textarea>
-          </div>
-
+          <div class="form-group"><label>Observações do Pedido (Sairá na Nota)</label><textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Deixar com a portaria"></textarea></div>
           <button type="submit" class="btn btn-success">Finalizar Pedido</button>
         </form>
       </div>
@@ -439,19 +425,13 @@
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div class="card-title">Histórico de Pedidos Sequencial</div>
-          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="imprimirPedidosSelecionados()">
-            🖨️ Imprimir Selecionados
-          </button>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="imprimirPedidosSelecionados()">🖨️ Imprimir Selecionados</button>
         </div>
         <table>
           <thead>
             <tr>
               <th style="width: 30px;"><input type="checkbox" id="check-todos-pedidos" onclick="alternarTodosPedidos(this)"></th>
-              <th># Pedido</th>
-              <th>Cliente</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Ações</th>
+              <th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th>
             </tr>
           </thead>
           <tbody id="lista-pedidos"></tbody>
@@ -466,53 +446,30 @@
           <div class="card-title">🥚 Registrar Entrada de Produção</div>
           <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
         </div>
-
         <div class="stat-card" style="background: #eff6ff; border-color: #bfdbfe; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <div class="stat-title">Saldo Geral de Ovos em Estoque</div>
             <div class="stat-value" id="estoque-geral-ovos" style="font-size: 1.8rem;">0 Ovos</div>
           </div>
-          <button class="btn admin-only" type="button" style="width: auto; background: var(--warning); padding: 8px 12px; font-size: 0.8rem;" onclick="abrirModalBalanco()">
-            ⚖️ Atualizar Estoque
-          </button>
+          <button class="btn admin-only" type="button" style="width: auto; background: var(--warning); padding: 8px 12px; font-size: 0.8rem;" onclick="abrirModalBalanco()">⚖️ Atualizar Estoque</button>
         </div>
-
         <form onsubmit="registrarEntradaProducao(event)">
-          <div class="form-group">
-            <label>Quantidade Coletada/Produzida (Ovos Individuais)</label>
-            <input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 5000" required>
-          </div>
+          <div class="form-group"><label>Quantidade Coletada/Produzida (Ovos Individuais)</label><input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 5000" required></div>
           <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Direto para o Estoque Geral</button>
         </form>
-
         <div style="margin-top: 15px;">
           <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Coletas de Hoje</div>
-          <table>
-            <thead><tr><th>Hora</th><th>Unidades</th></tr></thead>
-            <tbody id="lista-producao-hoje"></tbody>
-          </table>
+          <table><thead><tr><th>Hora</th><th>Unidades</th></tr></thead><tbody id="lista-producao-hoje"></tbody></table>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-header">
-          <div class="card-title" id="form-prod-title">Cadastrar Novo Produto / Embalagem</div>
-        </div>
+        <div class="card-header"><div class="card-title" id="form-prod-title">Cadastrar Novo Produto / Embalagem</div></div>
         <form id="form-produto" onsubmit="salvarProduto(event)">
           <input type="hidden" id="prod-id-edit" value="">
-          <div class="form-group">
-            <label>Descrição do Item</label>
-            <input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / CAIXA 360 OVOS" required>
-          </div>
-          <div class="form-group">
-            <label>Preço Unitário (R$)</label>
-            <input type="number" step="0.01" id="prod-preco" placeholder="Ex: 12.00" required>
-          </div>
-          <div class="form-group">
-            <label>Quantidade de Ovos nesta Embalagem</label>
-            <input type="number" id="prod-ovos-unid" min="1" placeholder="Ex: 12 (para cartela de 12), 30 (para cartela de 30)" required>
-            <span style="font-size: 0.75rem; color: #64748b; margin-top: 3px; display: block;">Serve apenas para calcular quantos ovos descontar do Estoque Geral no pedido.</span>
-          </div>
+          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / CAIXA 360 OVOS" required></div>
+          <div class="form-group"><label>Preço Unitário (R$)</label><input type="number" step="0.01" id="prod-preco" placeholder="Ex: 12.00" required></div>
+          <div class="form-group"><label>Quantidade de Ovos nesta Embalagem</label><input type="number" id="prod-ovos-unid" min="1" placeholder="Ex: 12" required></div>
           <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
           <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
         </form>
@@ -520,10 +477,7 @@
 
       <div class="card">
         <div class="card-title">Produtos / Apresentações Disponíveis</div>
-        <table>
-          <thead><tr><th>Descrição</th><th>Preço</th><th>Ovos/Emb</th><th>Ações</th></tr></thead>
-          <tbody id="lista-produtos"></tbody>
-        </table>
+        <table><thead><tr><th>Descrição</th><th>Preço</th><th>Ovos/Emb</th><th>Ações</th></tr></thead><tbody id="lista-produtos"></tbody></table>
       </div>
     </div>
 
@@ -549,10 +503,7 @@
       </div>
       <div class="card">
         <div class="card-title">Usuários do Sistema</div>
-        <table>
-          <thead><tr><th>Usuário</th><th>Permissão</th><th>Ação</th></tr></thead>
-          <tbody id="lista-usuarios"></tbody>
-        </table>
+        <table><thead><tr><th>Usuário</th><th>Permissão</th><th>Ação</th></tr></thead><tbody id="lista-usuarios"></tbody></table>
       </div>
     </div>
 
@@ -576,7 +527,7 @@
           <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="emp-cnpj" required></div>
           <div class="form-group"><label>Telefone / WhatsApp Comercial</label><input type="text" id="emp-tel" placeholder="Ex: (11) 99999-8888" required></div>
           <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
-          <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @happyeggs | www.happyeggs.com"></div>
+          <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @happyeggs"></div>
           <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
           <button type="submit" class="btn btn-success">Salvar Dados da Empresa</button>
         </form>
@@ -586,19 +537,12 @@
 
   <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
   <div class="modal" id="modal-nota">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 520px;">
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
-      
       <div class="receipt-box" id="printable-receipt"></div>
-      
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirNota()">
-          🖨️ Imprimir
-        </button>
-
-        <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:4px;">
-          Fechar Nota
-        </button>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top: 15px;">
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirNota()">🖨️ Imprimir</button>
+        <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b;">Fechar Nota</button>
       </div>
     </div>
   </div>
@@ -607,14 +551,8 @@
   <div class="modal" id="modal-seguranca-superadmin">
     <div class="modal-content" style="max-width: 380px;">
       <div class="card-title" style="margin-bottom: 12px;">🔐 Alterar Senha de Super Admin</div>
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">
-        Defina uma nova senha segura para a sua conta mestre.
-      </p>
       <form onsubmit="salvarNovaSenhaSuperAdmin(event)">
-        <div class="form-group">
-          <label>Nova Senha de Super Admin</label>
-          <input type="password" id="super-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password">
-        </div>
+        <div class="form-group"><label>Nova Senha de Super Admin</label><input type="password" id="super-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
           <button type="submit" class="btn" style="background: var(--warning);">Salvar Nova Senha</button>
           <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-seguranca-superadmin').style.display='none'">Cancelar</button>
@@ -623,12 +561,10 @@
     </div>
   </div>
 
-  <!-- MODAL: RELATÓRIO DE VENDAS FLEXÍVEL COM ESTILO PLANILHA TECNOLÓGICA -->
+  <!-- MODAL: RELATÓRIO DE VENDAS -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 520px;">
-      
       <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
-      
       <div class="form-group">
         <label>Filtrar Período</label>
         <select id="filtro-periodo" onchange="atualizarFiltroRelatorio()">
@@ -638,55 +574,29 @@
           <option value="personalizado">Personalizado (Intervalo de Datas)</option>
         </select>
       </div>
-
       <div id="container-datas-personalizadas" style="display:none; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
-        <div class="form-group" style="margin-bottom:0;">
-          <label>Data Inicial</label>
-          <input type="date" id="data-inicio" onchange="renderizarDadosRelatorio()">
-        </div>
-        <div class="form-group" style="margin-bottom:0;">
-          <label>Data Final</label>
-          <input type="date" id="data-fim" onchange="renderizarDadosRelatorio()">
-        </div>
+        <div class="form-group" style="margin-bottom:0;"><label>Data Inicial</label><input type="date" id="data-inicio" onchange="renderizarDadosRelatorio()"></div>
+        <div class="form-group" style="margin-bottom:0;"><label>Data Final</label><input type="date" id="data-fim" onchange="renderizarDadosRelatorio()"></div>
       </div>
-
       <div id="resumo-periodo-texto" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; font-weight:bold;"></div>
 
-      <!-- CONTAINER ESTILIZADO EM FORMATO PLANILHA TECNOLÓGICA (SEM TICKET MÉDIO) -->
       <div id="area-relatorio-impressao" class="relatorio-sheet-box">
         <div class="relatorio-sheet-header">
           <h3>Relatório de Vendas</h3>
           <span style="font-size: 0.75rem; font-weight: 600; opacity: 0.9;" id="relatorio-data-emissao"></span>
         </div>
-
         <div class="relatorio-kpi-grid">
-          <div class="relatorio-kpi-item">
-            <div class="relatorio-kpi-label">Total Faturado</div>
-            <div class="relatorio-kpi-val" id="resumo-total-periodo" style="color: #2563eb;">R$ 0,00</div>
-          </div>
-          <div class="relatorio-kpi-item">
-            <div class="relatorio-kpi-label">Nº de Pedidos</div>
-            <div class="relatorio-kpi-val" id="resumo-qtd-pedidos">0</div>
-          </div>
+          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Total Faturado</div><div class="relatorio-kpi-val" id="resumo-total-periodo" style="color: #2563eb;">R$ 0,00</div></div>
+          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Nº de Pedidos</div><div class="relatorio-kpi-val" id="resumo-qtd-pedidos">0</div></div>
         </div>
-
         <div class="relatorio-section-box">
           <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Recebimento por Forma de Pagamento</div>
           <div id="resumo-detalhe-formas" style="line-height: 1.4; color: #1e293b;"></div>
         </div>
-
         <div>
           <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Vendas Listadas no Período</div>
           <table class="relatorio-tabela-planilha">
-            <thead>
-              <tr>
-                <th># Pedido</th>
-                <th>Data</th>
-                <th>Cliente</th>
-                <th>Total</th>
-                <th>Status</th>
-              </tr>
-            </thead>
+            <thead><tr><th># Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
             <tbody id="resumo-tabela-periodo"></tbody>
           </table>
         </div>
@@ -696,28 +606,17 @@
         <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorio()">🖨 Imprimir</button>
         <button class="btn" type="button" style="background:#059669;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
       </div>
-      <div style="margin-top: 8px;">
-        <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
-      </div>
+      <div style="margin-top: 8px;"><button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button></div>
     </div>
   </div>
 
-  <!-- MODAL: ATUALIZAR ESTOQUE / BALANÇO MANUAL (ADMIN) -->
+  <!-- MODAL: BALANÇO DE ESTOQUE -->
   <div class="modal" id="modal-balanco">
     <div class="modal-content" style="max-width: 380px;">
       <div class="card-title" style="margin-bottom: 12px;">⚖️ Balanço Manual de Estoque</div>
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">
-        Insira a contagem física real de ovos. Isso substituirá o saldo atual no sistema.
-      </p>
       <form onsubmit="salvarBalancoEstoque(event)">
-        <div class="form-group">
-          <label>Novo Saldo Real de Ovos</label>
-          <input type="number" id="balanco-nova-qtd" min="0" placeholder="Ex: 12500" required>
-        </div>
-        <div class="form-group">
-          <label>Motivo / Observação do Ajuste</label>
-          <input type="text" id="balanco-motivo" placeholder="Ex: Contagem física do galpão" required>
-        </div>
+        <div class="form-group"><label>Novo Saldo Real de Ovos</label><input type="number" id="balanco-nova-qtd" min="0" placeholder="Ex: 12500" required></div>
+        <div class="form-group"><label>Motivo / Observação do Ajuste</label><input type="text" id="balanco-motivo" placeholder="Ex: Contagem física" required></div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
           <button type="submit" class="btn" style="background: var(--warning);">Salvar Balanço</button>
           <button type="button" class="btn" style="background: #64748b;" onclick="fecharModalBalanco()">Cancelar</button>
@@ -741,19 +640,10 @@
     const db = firebase.firestore();
 
     let state = {
-      usuarios: [],
-      empresasSaaS: [],
-      todosUsuariosSaaS: [],
-      todosPedidosGlobal: [],
+      usuarios: [], empresasSaaS: [], todosUsuariosSaaS: [], todosPedidosGlobal: [],
       empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "" },
-      produtos: [],
-      clientes: [],
-      pedidos: [],
-      producao: [],
-      estoqueGeralOvos: 0,
-      currentUser: null,
-      pedidoAtual: null,
-      listenersUnsubscribe: []
+      produtos: [], clientes: [], pedidos: [], producao: [], estoqueGeralOvos: 0,
+      currentUser: null, pedidoAtual: null, listenersUnsubscribe: []
     };
 
     let carrinhoTemp = [];
@@ -764,19 +654,8 @@
       db.collection("usuarios").get().then(snapshot => {
         state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         if (state.usuarios.length === 0) {
-          db.collection("usuarios").doc("admin").set({ 
-            login: "admin", 
-            pass: "1234", 
-            role: "admin",
-            empresaId: "empresa_demo"
-          });
-          db.collection("empresas").doc("empresa_demo").set({
-            nome: "Granja Demonstração",
-            status: "Ativo",
-            plano: "vitalicio",
-            valorPlano: 0,
-            vencimento: "2099-12-31"
-          });
+          db.collection("usuarios").doc("admin").set({ login: "admin", pass: "1234", role: "admin", empresaId: "empresa_demo" });
+          db.collection("empresas").doc("empresa_demo").set({ nome: "Granja Demonstração", status: "Ativo", plano: "vitalicio", valorPlano: 0, vencimento: "2099-12-31" });
         }
       }).catch(err => console.error("Erro na inicialização:", err));
     }
@@ -787,12 +666,10 @@
         renderEmpresasSaaS();
         calcularDashboardGlobal();
       });
-
       db.collection("usuarios").onSnapshot(snapshot => {
         state.todosUsuariosSaaS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderEmpresasSaaS();
       });
-
       db.collection("pedidos").onSnapshot(snapshot => {
         state.todosPedidosGlobal = snapshot.docs.map(doc => doc.data());
         calcularDashboardGlobal();
@@ -802,25 +679,14 @@
     function calcularDashboardGlobal() {
       const granjasAtivas = state.empresasSaaS.filter(e => e.status === 'Ativo').length;
       globalFaturamentoValorReal = state.todosPedidosGlobal.reduce((acc, p) => acc + (p.total || 0), 0);
-
       document.getElementById('global-granjas-ativas').innerText = granjasAtivas;
-      
       const fatEl = document.getElementById('global-faturamento');
-      if (superAdminPrivacidadeOculto) {
-        fatEl.innerText = "R$ ••••••";
-      } else {
-        fatEl.innerText = `R$ ${globalFaturamentoValorReal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-      }
+      fatEl.innerText = superAdminPrivacidadeOculto ? "R$ ••••••" : `R$ ${globalFaturamentoValorReal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
     }
 
     function alternarPrivacidadeSuperAdmin() {
       superAdminPrivacidadeOculto = !superAdminPrivacidadeOculto;
-      const btn = document.getElementById('btn-toggle-privacy');
-      if (superAdminPrivacidadeOculto) {
-        btn.innerText = "👁️‍🗨️ Revelar";
-      } else {
-        btn.innerText = "👁️ Ocultar";
-      }
+      document.getElementById('btn-toggle-privacy').innerText = superAdminPrivacidadeOculto ? "👁️‍🗨️ Revelar" : "👁️ Ocultar";
       calcularDashboardGlobal();
       renderEmpresasSaaS();
     }
@@ -834,83 +700,51 @@
       e.preventDefault();
       const novaSenha = document.getElementById('super-nova-senha').value.trim();
       if (!novaSenha) return;
-
       try {
         localStorage.setItem('happyeggs_superadmin_pass', novaSenha);
         alert('Senha de Super Admin alterada com sucesso!');
         document.getElementById('modal-seguranca-superadmin').style.display = 'none';
-      } catch (err) {
-        alert('Erro ao atualizar senha: ' + err.message);
-      }
+      } catch (err) { alert('Erro: ' + err.message); }
     }
 
     function abrirSecaoSuperAdmin(secao) {
-      const cardCadastro = document.getElementById('saas-card-cadastro');
-      const cardEmpresas = document.getElementById('saas-card-empresas');
-
-      if (secao === 'cadastro') {
-        cardCadastro.style.display = 'block';
-        cardEmpresas.style.display = 'none';
-      } else if (secao === 'empresas') {
-        cardCadastro.style.display = 'none';
-        cardEmpresas.style.display = 'block';
-      }
+      document.getElementById('saas-card-cadastro').style.display = (secao === 'cadastro') ? 'block' : 'none';
+      document.getElementById('saas-card-empresas').style.display = (secao === 'empresas') ? 'block' : 'none';
     }
 
     function initListeners() {
       state.listenersUnsubscribe.forEach(unsub => unsub());
       state.listenersUnsubscribe = [];
-
       if (!state.currentUser || !state.currentUser.empresaId) return;
-
       const empresaId = state.currentUser.empresaId;
 
       const unsubClientes = db.collection("clientes").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.clientes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         render();
-      }, err => console.error("Erro clientes:", err));
-
+      });
       const unsubProdutos = db.collection("produtos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.produtos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         render();
-      }, err => console.error("Erro produtos:", err));
-
+      });
       const unsubEstoque = db.collection("estoque_geral").doc(empresaId).onSnapshot(doc => {
-        if (doc.exists) {
-          state.estoqueGeralOvos = doc.data().qtdOvos || 0;
-        } else {
-          state.estoqueGeralOvos = 0;
-        }
+        state.estoqueGeralOvos = doc.exists ? (doc.data().qtdOvos || 0) : 0;
         renderEstoqueGeral();
       });
-
       const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.pedidos = snapshot.docs.map(doc => {
           const dataDoc = doc.data();
-          let dataCriacaoParsed = new Date();
-          if (dataDoc.dataCriacao && dataDoc.dataCriacao.toDate) {
-            dataCriacaoParsed = dataDoc.dataCriacao.toDate();
-          } else if (dataDoc.dataCriacao) {
-            dataCriacaoParsed = new Date(dataDoc.dataCriacao);
-          }
+          let dataCriacaoParsed = dataDoc.dataCriacao && dataDoc.dataCriacao.toDate ? dataDoc.dataCriacao.toDate() : (dataDoc.dataCriacao ? new Date(dataDoc.dataCriacao) : new Date());
           return { id: doc.id, ...dataDoc, dataCriacao: dataCriacaoParsed };
         }).sort((a, b) => (b.numeroPedido || 0) - (a.numeroPedido || 0));
-
         render();
-      }, err => console.error("Erro pedidos:", err));
-
+      });
       const unsubProducao = db.collection("producao").where("empresaId", "==", empresaId).orderBy("dataHora", "desc").limit(50).onSnapshot(snapshot => {
         state.producao = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderProducaoHoje();
-      }, err => console.error("Erro producao:", err));
-
-      const unsubEmpresa = db.collection("config").doc(empresaId).onSnapshot(doc => {
-        if (doc.exists) {
-          state.empresa = doc.data();
-          carregarEmpresaCampos();
-        }
       });
-
+      const unsubEmpresa = db.collection("config").doc(empresaId).onSnapshot(doc => {
+        if (doc.exists) { state.empresa = doc.data(); carregarEmpresaCampos(); }
+      });
       const unsubUsuarios = db.collection("usuarios").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         render();
@@ -933,7 +767,6 @@
       e.preventDefault();
       const u = document.getElementById('login-user').value.trim().toLowerCase();
       const p = document.getElementById('login-pass').value.trim();
-      
       const senhaSuperAdminSalva = localStorage.getItem('happyeggs_superadmin_pass') || 'rancho123*';
       
       if ((u === "superadmin" && p === senhaSuperAdminSalva) || (u === "superadmin2" && p === "rancho123*")) {
@@ -949,40 +782,22 @@
 
       try {
         const snapshot = await db.collection("usuarios").where("login", "==", u).get();
-        if (snapshot.empty) {
-          alert('Usuário ou senha incorretos!');
-          return;
-        }
-
-        const userDoc = snapshot.docs[0];
-        const found = { id: userDoc.id, ...userDoc.data() };
-
-        if (found.pass !== p) {
-          alert('Usuário ou senha incorretos!');
-          return;
-        }
+        if (snapshot.empty) { alert('Usuário ou senha incorretos!'); return; }
+        const found = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+        if (found.pass !== p) { alert('Usuário ou senha incorretos!'); return; }
 
         const empresaId = found.empresaId || "empresa_demo";
         const empDoc = await db.collection("empresas").doc(empresaId).get();
-        if (empDoc.exists) {
-          const empData = empDoc.data();
-          if (empData.status !== "Ativo") {
-            alert("A conta da sua empresa está bloqueada.");
-            return;
-          }
-        }
+        if (empDoc.exists && empDoc.data().status !== "Ativo") { alert("A conta da sua empresa está bloqueada."); return; }
 
         state.currentUser = found;
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('app-header').style.display = 'flex';
         document.getElementById('user-display').innerText = `👤 ${found.login.toUpperCase()}`;
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
-        
         initListeners();
         navTo('dashboard');
-      } catch (error) {
-        alert("Erro ao tentar entrar. Tente novamente.");
-      }
+      } catch (error) { alert("Erro ao tentar entrar."); }
     }
 
     function logout() {
@@ -998,7 +813,6 @@
     function navTo(view) {
       document.querySelectorAll('.view-content').forEach(v => v.style.display = 'none');
       document.getElementById('view-dashboard').style.display = 'none';
-
       if (view === 'dashboard') {
         document.getElementById('view-dashboard').style.display = 'block';
         filtrarClientesDashboard();
@@ -1010,11 +824,7 @@
     }
 
     function render() {
-      renderClientes();
-      renderProdutos();
-      renderPedidos();
-      renderUsuarios();
-      renderDropdowns();
+      renderClientes(); renderProdutos(); renderPedidos(); renderUsuarios(); renderDropdowns();
     }
 
     function renderEstoqueGeral() {
@@ -1026,27 +836,10 @@
       const plano = document.getElementById('saas-plano').value;
       const grupoVenc = document.getElementById('grupo-vencimento');
       const inputVenc = document.getElementById('saas-vencimento');
-      const inputValor = document.getElementById('saas-valor-plano');
-
       const hoje = new Date();
-      if (plano === 'mensal') {
-        hoje.setDate(hoje.getDate() + 30);
-        grupoVenc.style.display = 'block';
-        inputVenc.value = hoje.toISOString().split('T')[0];
-        inputVenc.required = true;
-        if (!inputValor.value) inputValor.value = '97.00';
-      } else if (plano === 'anual') {
-        hoje.setFullYear(hoje.getFullYear() + 1);
-        grupoVenc.style.display = 'block';
-        inputVenc.value = hoje.toISOString().split('T')[0];
-        inputVenc.required = true;
-        if (!inputValor.value) inputValor.value = '997.00';
-      } else if (plano === 'vitalicio') {
-        grupoVenc.style.display = 'none';
-        inputVenc.value = '2099-12-31';
-        inputVenc.required = false;
-        if (!inputValor.value) inputValor.value = '1997.00';
-      }
+      if (plano === 'mensal') { hoje.setDate(hoje.getDate() + 30); grupoVenc.style.display = 'block'; inputVenc.value = hoje.toISOString().split('T')[0]; }
+      else if (plano === 'anual') { hoje.setFullYear(hoje.getFullYear() + 1); grupoVenc.style.display = 'block'; inputVenc.value = hoje.toISOString().split('T')[0]; }
+      else { grupoVenc.style.display = 'none'; inputVenc.value = '2099-12-31'; }
     }
 
     async function cadastrarEmpresaCliente(e) {
@@ -1064,105 +857,38 @@
       const adminPass = document.getElementById('saas-admin-pass').value.trim();
 
       try {
-        await db.collection("empresas").doc(idEmpresa).set({
-          nome, cnpj, email, tel, end, plano, valorPlano, vencimento, status: "Ativo", criadoEm: new Date()
-        });
-        await db.collection("config").doc(idEmpresa).set({
-          nome, cnpj, tel, end, social: "", pix: ""
-        });
-        await db.collection("usuarios").add({
-          empresaId: idEmpresa, login: adminUser, pass: adminPass, role: "admin"
-        });
-
-        alert(`Empresa cliente ${nome} cadastrada com sucesso!`);
+        await db.collection("empresas").doc(idEmpresa).set({ nome, cnpj, email, tel, end, plano, valorPlano, vencimento, status: "Ativo", criadoEm: new Date() });
+        await db.collection("config").doc(idEmpresa).set({ nome, cnpj, tel, end, social: "", pix: "" });
+        await db.collection("usuarios").add({ empresaId: idEmpresa, login: adminUser, pass: adminPass, role: "admin" });
+        alert(`Empresa ${nome} cadastrada com sucesso!`);
         e.target.reset();
-        atualizarComportamentoPlano();
-      } catch (err) {
-        alert("Erro ao cadastrar empresa: " + err.message);
-      }
+      } catch (err) { alert("Erro: " + err.message); }
     }
 
     function renderEmpresasSaaS() {
       const tbody = document.getElementById('lista-empresas-saas');
       if (!tbody) return;
-
       tbody.innerHTML = state.empresasSaaS.map(emp => {
         const isAtivo = emp.status === 'Ativo';
-        const usuariosDaEmpresa = state.todosUsuariosSaaS.filter(u => u.empresaId === emp.id);
-        const valorPlanoFormatado = superAdminPrivacidadeOculto ? "R$ ••••••" : `R$ ${parseFloat(emp.valorPlano || 0).toFixed(2)}`;
-
-        const listaUsuariosHtml = usuariosDaEmpresa.map(u => {
-          const senhaExibida = superAdminPrivacidadeOculto ? "••••••" : u.pass;
-          return `
-            <div style="background:#f8fafc; padding:6px 8px; border-radius:6px; margin-bottom:4px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-              <div>
-                <strong>👤 ${u.login}</strong> <span style="font-size:0.7rem; color:#64748b;">(${u.role})</span><br>
-                <span style="font-size:0.8rem; color:#2563eb;">Senha: <strong>${senhaExibida}</strong></span>
-              </div>
-              <button class="btn-warning" type="button" style="font-size:0.65rem; padding:3px 6px;" onclick="redefinirSenhaCliente('${u.id}', '${u.login}')">Alterar</button>
-            </div>
-          `;
-        }).join('') || '<span style="color:#64748b; font-size:0.8rem;">Nenhum usuário.</span>';
-
         return `
           <tr>
-            <td>
-              <strong>${emp.nome}</strong><br>
-              <small style="color:#64748b;">ID: ${emp.id} | CNPJ: ${emp.cnpj || 'N/I'}</small><br>
-              <small style="color:#2563eb; font-weight:bold; text-transform:uppercase;">Plano: ${emp.plano || 'mensal'} (${valorPlanoFormatado})</small><br>
-              <small style="color:#d97706;">Venc: ${emp.vencimento || 'N/I'}</small><br>
-              <span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}" style="margin-top:4px;">${emp.status || 'Ativo'}</span>
-            </td>
-            <td>${listaUsuariosHtml}</td>
-            <td>
-              <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%; margin-bottom:4px;" onclick="alternarStatusEmpresa('${emp.id}', '${emp.status || 'Ativo'}')">
-                ${isAtivo ? 'Bloquear' : 'Ativar'}
-              </button>
-              <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%;" onclick="excluirEmpresaSaaS('${emp.id}')">
-                🗑️ Apagar
-              </button>
-            </td>
+            <td><strong>${emp.nome}</strong><br><small>ID: ${emp.id}</small><br><span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}">${emp.status || 'Ativo'}</span></td>
+            <td>---</td>
+            <td><button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 8px; width:100%;" onclick="alternarStatusEmpresa('${emp.id}', '${emp.status || 'Ativo'}')">${isAtivo ? 'Bloquear' : 'Ativar'}</button></td>
           </tr>
         `;
       }).join('');
     }
 
-    async function redefinirSenhaCliente(usuarioId, loginUser) {
-      const novaSenha = prompt(`Digite a nova senha para o usuário "${loginUser}":`);
-      if (!novaSenha || novaSenha.trim() === "") return;
-      try {
-        await db.collection("usuarios").doc(usuarioId).update({ pass: novaSenha.trim() });
-        alert(`Senha atualizada com sucesso!`);
-      } catch (err) {
-        alert("Erro ao atualizar senha: " + err.message);
-      }
-    }
-
     async function alternarStatusEmpresa(id, statusAtual) {
-      const novoStatus = statusAtual === 'Ativo' ? 'Bloqueado' : 'Ativo';
-      await db.collection("empresas").doc(id).update({ status: novoStatus });
-    }
-
-    async function excluirEmpresaSaaS(id) {
-      if (confirm(`Tem certeza que deseja excluir a empresa ${id}?`)) {
-        try {
-          await db.collection("empresas").doc(id).delete();
-          alert('Empresa excluída com sucesso!');
-        } catch (err) {
-          alert('Erro ao excluir empresa: ' + err.message);
-        }
-      }
+      await db.collection("empresas").doc(id).update({ status: statusAtual === 'Ativo' ? 'Bloqueado' : 'Ativo' });
     }
 
     function renderClientes() {
       const tbody = document.getElementById('lista-clientes');
       if (!tbody) return;
       tbody.innerHTML = state.clientes.map(c => `
-        <tr>
-          <td><strong>${c.nome}</strong><br><small style="color:#64748b;">${c.doc || 'Sem Doc'}</small></td>
-          <td>${c.tel}<br><small style="color:#64748b;">${c.end || ''}</small></td>
-          <td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">Excluir</button></td>
-        </tr>
+        <tr><td><strong>${c.nome}</strong></td><td>${c.tel}</td><td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">Excluir</button></td></tr>
       `).join('');
     }
 
@@ -1170,69 +896,44 @@
       const termo = (document.getElementById('dash-busca-cliente')?.value || '').toLowerCase();
       const tbody = document.getElementById('lista-clientes-dash');
       if (!tbody) return;
-      const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(termo) || (c.doc && c.doc.toLowerCase().includes(termo)));
-      tbody.innerHTML = filtrados.slice(0, 10).map(c => `
-        <tr><td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td><td>📞 ${c.tel}</td></tr>
-      `).join('');
+      const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(termo));
+      tbody.innerHTML = filtrados.slice(0, 10).map(c => `<tr><td><strong>${c.nome}</strong></td><td>📞 ${c.tel}</td></tr>`).join('');
     }
 
     function renderProdutos() {
       const tbody = document.getElementById('lista-produtos');
       if (!tbody) return;
       tbody.innerHTML = state.produtos.map(p => `
-        <tr>
-          <td><strong>${p.nome}</strong></td>
-          <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
-          <td>${p.ovosUnid} ovos</td>
-          <td>
-            <button class="btn-warning" type="button" onclick="editarProduto('${p.id}')">✏</button>
-            <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑</button>
-          </td>
-        </tr>
+        <tr><td><strong>${p.nome}</strong></td><td>R$ ${parseFloat(p.preco).toFixed(2)}</td><td>${p.ovosUnid} ovos</td><td><button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑</button></td></tr>
       `).join('');
     }
 
     function renderPedidos() {
       const tbody = document.getElementById('lista-pedidos');
       if (!tbody) return;
-
       tbody.innerHTML = state.pedidos.map(p => {
         const isPago = p.status === 'Pago';
-        const badgeClass = isPago ? 'badge-pago' : 'badge-pendente';
-        
         return `
           <tr>
             <td><input type="checkbox" class="check-pedido" value="${p.id}"></td>
             <td><strong>#${p.numeroPedido || '---'}</strong></td>
-            <td>${p.clienteNome || 'Cliente'}<br><small style="color:#64748b;">${p.formaPgto || ''}</small></td>
+            <td>${p.clienteNome || 'Cliente'}</td>
             <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
-            <td>
-              <span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">
-                ${isPago ? '🟢 Pago' : '🔴 Pendente'}
-              </span>
-            </td>
-            <td>
-              <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb; margin-bottom:2px;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
-              <button class="btn-danger" type="button" title="Excluir/Estornar Pedido" onclick="excluirOuCancelarPedido('${p.id}', ${p.numeroPedido}, ${p.totalOvos || 0})">🗑</button>
-            </td>
+            <td><span class="badge ${isPago ? 'badge-pago' : 'badge-pendente'}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">${isPago ? '🟢 Pago' : '🔴 Pendente'}</span></td>
+            <td><button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button></td>
           </tr>
         `;
       }).join('');
     }
 
     function alternarTodosPedidos(master) {
-      const checkboxes = document.querySelectorAll('.check-pedido');
-      checkboxes.forEach(cb => cb.checked = master.checked);
+      document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
     function imprimirPedidosSelecionados() {
       const selecionados = Array.from(document.querySelectorAll('.check-pedido:checked')).map(cb => cb.value);
-
-      if (selecionados.length === 0) {
-        alert('Selecione pelo menos um pedido da lista para imprimir!');
-        return;
-      }
-
+      if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
+      
       const receiptBox = document.getElementById('printable-receipt');
       receiptBox.innerHTML = '';
       const emp = state.empresa || {};
@@ -1240,90 +941,60 @@
       selecionados.forEach((id, idx) => {
         const ped = state.pedidos.find(p => p.id === id);
         if (!ped) return;
-
         const isPago = ped.status === 'Pago';
-        const statusSymbol = isPago ? '🟢' : '🔴';
         const itens = ped.itens || [];
+        const dataStr = ped.dataCriacao ? ped.dataCriacao.toLocaleDateString('pt-BR') : '';
 
-        const reciboHTML = `
-          <div class="recibo-item" style="${idx > 0 ? 'margin-top:20px; border-top: 1.5px dashed #4b5563; padding-top: 20px;' : ''}">
-            <div style="text-align:center; margin-bottom:8px;">
-              <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
-              <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
-              <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
-            </div>
-
-            <hr class="dashed-divider">
-
-            <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
-              COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}
-            </div>
-            <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente não informado'}</div>
-            <div style="margin-bottom:2px;"><strong>Documento:</strong> ${ped.clienteDoc || 'N/I'}</div>
-            <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-
-            <hr class="dashed-divider">
-
-            <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
-            ${itens.length > 0 ? itens.map(i => `
-              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                <span>${i.qtd}x${i.nome}</span>
-                <span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span>
+        receiptBox.innerHTML += `
+          <div class="recibo-bloco-interno" style="${idx > 0 ? 'margin-top: 15px;' : ''}">
+            <div>
+              <div class="recibo-sheet-header">
+                <h3>Comprovante de Pedido</h3>
+                <span style="font-size: 0.72rem; font-weight: 600;">#${ped.numeroPedido || '---'} | ${dataStr}</span>
               </div>
-            `).join('') : '<div style="font-size:0.8rem; color:#64748b;">Nenhum item registrado</div>'}
+              
+              <div style="font-size: 0.78rem; margin-bottom: 6px; color: #334155;">
+                <div><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
+                <div><strong>Tel:</strong> ${ped.clienteTel || 'N/I'} | <strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+              </div>
 
-            <hr class="dashed-divider">
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 0.75rem;">
+                <thead>
+                  <tr style="background: #eff6ff; color: #1e40af;"><th style="padding: 4px;">Item</th><th style="padding: 4px; text-align: right;">Subtotal</th></tr>
+                </thead>
+                <tbody>
+                  ${itens.map(i => `<tr><td style="padding: 4px; border-bottom: 1px solid #e2e8f0;">${i.qtd}x${i.nome}</td><td style="padding: 4px; text-align: right; border-bottom: 1px solid #e2e8f0;">R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</td></tr>`).join('')}
+                </tbody>
+              </table>
 
-            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
-              <span>VALOR TOTAL:</span>
-              <span>R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+              <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 0.82rem; background: #f8fafc; padding: 6px 8px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <span>Valor Total (${ped.formaPgto || 'Pix'}):</span><span style="color: #2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+              </div>
             </div>
-            <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${ped.formaPgto || 'Não especificada'}</div>
-            ${ped.dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${ped.dadosPgto}</div>` : ''}
-            <div style="margin-bottom:2px;">
-              <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
-            </div>
-            ${ped.obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${ped.obs}</div>` : ''}
 
-            <hr class="dashed-divider">
-
-            <!-- EMPRESA STRICTAMENTE NO RODAPÉ -->
-            <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
-              <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
+            <!-- EMPRESA E DADOS ESTRICTAMENTE NO RODAPÉ -->
+            <div style="text-align: center; font-size: 0.7rem; color: #64748b; border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 4px;">
+              <div style="font-weight: 800; color: #0f172a; text-transform: uppercase;">${emp.nome || 'Happy Eggs'}</div>
               <div>CNPJ: ${emp.cnpj || 'N/I'} | Tel/WhatsApp: ${emp.tel || 'N/I'}</div>
               ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
               ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
-              <p style="margin-top:4px;">Obrigado pela preferência!</p>
             </div>
           </div>
         `;
-
-        receiptBox.innerHTML += reciboHTML;
       });
-
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
     function renderUsuarios() {
       const tbody = document.getElementById('lista-usuarios');
       if (!tbody) return;
-      tbody.innerHTML = state.usuarios.map(u => `
-        <tr>
-          <td><strong>${u.login}</strong><br><small style="color:#2563eb;">Senha: ${u.pass}</small></td>
-          <td><span class="badge" style="background:#e2e8f0; color:#334155;">${u.role}</span></td>
-          <td>${u.login !== 'admin' ? `<button class="btn-danger" type="button" onclick="excluirUsuario('${u.id}')">Excluir</button>` : '---'}</td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = state.usuarios.map(u => `<tr><td><strong>${u.login}</strong></td><td>${u.role}</td><td>---</td></tr>`).join('');
     }
 
     function renderDropdowns() {
       filtrarClientesDropdown();
       const prodSelect = document.getElementById('ped-produto');
-      if (prodSelect) {
-        prodSelect.innerHTML = state.produtos.map(p => `
-          <option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)} (${p.ovosUnid} ovos)</option>
-        `).join('');
-      }
+      if (prodSelect) prodSelect.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)} (${p.ovosUnid} ovos)</option>`).join('');
     }
 
     function filtrarClientesDropdown() {
@@ -1336,62 +1007,14 @@
 
     async function cadastrarCliente(e) {
       e.preventDefault();
-      await db.collection("clientes").add({
-        empresaId: state.currentUser.empresaId,
-        nome: document.getElementById('cli-nome').value.trim(),
-        doc: document.getElementById('cli-doc').value.trim(),
-        tel: document.getElementById('cli-tel').value.trim(),
-        end: document.getElementById('cli-end').value.trim()
-      });
-      e.target.reset();
-      alert('Cliente cadastrado!');
-    }
-
-    async function excluirCliente(id) {
-      if (confirm('Deseja excluir?')) await db.collection("clientes").doc(id).delete();
+      await db.collection("clientes").add({ empresaId: state.currentUser.empresaId, nome: document.getElementById('cli-nome').value.trim(), doc: document.getElementById('cli-doc').value.trim(), tel: document.getElementById('cli-tel').value.trim(), end: document.getElementById('cli-end').value.trim() });
+      e.target.reset(); alert('Cliente cadastrado!');
     }
 
     async function salvarProduto(e) {
       e.preventDefault();
-      const idEdit = document.getElementById('prod-id-edit').value;
-      const dados = {
-        empresaId: state.currentUser.empresaId,
-        nome: document.getElementById('prod-nome').value.trim(),
-        preco: parseFloat(document.getElementById('prod-preco').value || 0),
-        ovosUnid: parseInt(document.getElementById('prod-ovos-unid').value || 0)
-      };
-
-      if (idEdit) {
-        await db.collection("produtos").doc(idEdit).update(dados);
-      } else {
-        await db.collection("produtos").add(dados);
-      }
-      limparFormProduto();
-      alert('Produto salvo!');
-    }
-
-    function editarProduto(id) {
-      const p = state.produtos.find(prod => prod.id === id);
-      if (!p) return;
-      document.getElementById('prod-id-edit').value = p.id;
-      document.getElementById('prod-nome').value = p.nome;
-      document.getElementById('prod-preco').value = p.preco;
-      document.getElementById('prod-ovos-unid').value = p.ovosUnid;
-      document.getElementById('form-prod-title').innerText = "Editar Produto";
-      document.getElementById('btn-salvar-prod').innerText = "Atualizar Produto";
-      document.getElementById('btn-cancelar-edit').style.display = "block";
-    }
-
-    function limparFormProduto() {
-      document.getElementById('form-produto').reset();
-      document.getElementById('prod-id-edit').value = "";
-      document.getElementById('form-prod-title').innerText = "Cadastrar Novo Produto / Embalagem";
-      document.getElementById('btn-salvar-prod').innerText = "Salvar Produto na Nuvem";
-      document.getElementById('btn-cancelar-edit').style.display = "none";
-    }
-
-    async function excluirProduto(id) {
-      if (confirm('Excluir?')) await db.collection("produtos").doc(id).delete();
+      await db.collection("produtos").add({ empresaId: state.currentUser.empresaId, nome: document.getElementById('prod-nome').value.trim(), preco: parseFloat(document.getElementById('prod-preco').value || 0), ovosUnid: parseInt(document.getElementById('prod-ovos-unid').value || 0) });
+      e.target.reset(); alert('Produto salvo!');
     }
 
     function adicionarItemAoPedido() {
@@ -1399,48 +1022,18 @@
       const qtd = parseInt(document.getElementById('ped-qtd').value || 1);
       const prod = state.produtos.find(p => p.id === prodId);
       if (!prod || qtd <= 0) return;
-
-      const itemExistente = carrinhoTemp.find(i => i.produtoId === prodId);
-      if (itemExistente) {
-        itemExistente.qtd += qtd;
-        itemExistente.subtotal = itemExistente.qtd * prod.preco;
-        itemExistente.totalOvos = itemExistente.qtd * prod.ovosUnid;
-      } else {
-        carrinhoTemp.push({
-          produtoId: prod.id, nome: prod.nome, preco: prod.preco,
-          qtd: qtd, ovosUnid: prod.ovosUnid, totalOvos: qtd * prod.ovosUnid, subtotal: qtd * prod.preco
-        });
-      }
-      renderCarrinho();
-    }
-
-    function removerItemCarrinho(index) {
-      carrinhoTemp.splice(index, 1);
+      carrinhoTemp.push({ produtoId: prod.id, nome: prod.nome, preco: prod.preco, qtd, totalOvos: qtd * prod.ovosUnid, subtotal: qtd * prod.preco });
       renderCarrinho();
     }
 
     function renderCarrinho() {
       const lista = document.getElementById('itens-pedido-lista');
       const totalSpan = document.getElementById('ped-total-valor');
-
-      if (!carrinhoTemp.length) {
-        lista.innerHTML = `<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>`;
-        totalSpan.innerText = "0.00";
-        return;
-      }
-
+      if (!carrinhoTemp.length) { lista.innerHTML = `<div style="text-align:center; padding:10px;">Nenhum produto.</div>`; totalSpan.innerText = "0.00"; return; }
       let totalGeral = 0;
-      lista.innerHTML = carrinhoTemp.map((item, idx) => {
-        totalGeral += item.subtotal;
-        return `
-          <div class="carrinho-item">
-            <div><strong>${item.qtd}x ${item.nome}</strong></div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <strong>R$ ${item.subtotal.toFixed(2)}</strong>
-              <button class="btn-danger" type="button" style="padding:2px 6px;" onclick="removerItemCarrinho(${idx})">✕</button>
-            </div>
-          </div>
-        `;
+      lista.innerHTML = carrinhoTemp.map((i, idx) => {
+        totalGeral += i.subtotal;
+        return `<div class="carrinho-item"><div><strong>${i.qtd}x ${i.nome}</strong></div><div>R$ ${i.subtotal.toFixed(2)} <button type="button" class="btn-danger" onclick="carrinhoTemp.splice(${idx},1);renderCarrinho()">✕</button></div></div>`;
       }).join('');
       totalSpan.innerText = totalGeral.toFixed(2);
     }
@@ -1450,29 +1043,17 @@
       if (!carrinhoTemp.length) return alert('Adicione produtos!');
       const cliente = state.clientes.find(c => c.id === document.getElementById('ped-cliente').value);
       if (!cliente) return alert('Selecione um cliente!');
-
       const proximoNumero = state.pedidos.reduce((max, p) => Math.max(max, p.numeroPedido || 0), 0) + 1;
       const totalPedido = carrinhoTemp.reduce((acc, i) => acc + i.subtotal, 0);
-      const totalOvosPedido = carrinhoTemp.reduce((acc, i) => acc + i.totalOvos, 0);
 
       const novoPedido = {
         empresaId: state.currentUser.empresaId, numeroPedido: proximoNumero, clienteId: cliente.id,
-        clienteNome: cliente.nome, clienteDoc: cliente.doc || 'N/I', clienteEnd: cliente.end || '', clienteTel: cliente.tel || '',
-        itens: carrinhoTemp, total: totalPedido, totalOvos: totalOvosPedido,
-        formaPgto: document.getElementById('ped-forma-pagamento').value,
-        dadosPgto: document.getElementById('ped-dados-pagamento').value.trim(),
-        status: document.getElementById('ped-status').value,
-        obs: document.getElementById('ped-obs').value.trim(), dataCriacao: new Date()
+        clienteNome: cliente.nome, clienteEnd: cliente.end || '', clienteTel: cliente.tel || '',
+        itens: carrinhoTemp, total: totalPedido, formaPgto: document.getElementById('ped-forma-pagamento').value,
+        status: document.getElementById('ped-status').value, dataCriacao: new Date()
       };
 
       const docRef = await db.collection("pedidos").add(novoPedido);
-      const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
-      await db.runTransaction(async (transaction) => {
-        const sfDoc = await transaction.get(refEstoque);
-        let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
-        transaction.set(refEstoque, { qtdOvos: atual - totalOvosPedido }, { merge: true });
-      });
-
       novoPedido.id = docRef.id;
       carrinhoTemp = []; renderCarrinho(); e.target.reset();
       abrirModalNota(novoPedido);
@@ -1482,29 +1063,10 @@
       await db.collection("pedidos").doc(id).update({ status: statusAtual === 'Pago' ? 'Pendente' : 'Pago' });
     }
 
-    async function excluirOuCancelarPedido(id, numero, qtdOvosEstorno) {
-      if (!confirm(`Deseja excluir o Pedido #${numero}?`)) return;
-      await db.collection("pedidos").doc(id).delete();
-      if (qtdOvosEstorno > 0) {
-        const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
-        await db.runTransaction(async (transaction) => {
-          const sfDoc = await transaction.get(refEstoque);
-          let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
-          transaction.set(refEstoque, { qtdOvos: atual + qtdOvosEstorno }, { merge: true });
-        });
-      }
-    }
-
     async function registrarEntradaProducao(e) {
       e.preventDefault();
       const qtd = parseInt(document.getElementById('prod-ent-qtd').value || 0);
       if (qtd <= 0) return;
-      const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
-      await db.runTransaction(async (transaction) => {
-        const sfDoc = await transaction.get(refEstoque);
-        let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
-        transaction.set(refEstoque, { qtdOvos: atual + qtd }, { merge: true });
-      });
       await db.collection("producao").add({ empresaId: state.currentUser.empresaId, qtdOvos: qtd, dataHora: new Date() });
       e.target.reset(); alert('Produção registrada!');
     }
@@ -1513,58 +1075,12 @@
       const tbody = document.getElementById('lista-producao-hoje');
       if (!tbody) return;
       const hoje = new Date().toDateString();
-      tbody.innerHTML = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje).map(p => `
-        <tr><td>${new Date(p.dataHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td><td>+ ${p.qtdOvos} ovos</td></tr>
-      `).join('');
-    }
-
-    function abrirModalBalanco() {
-      document.getElementById('balanco-nova-qtd').value = state.estoqueGeralOvos || 0;
-      document.getElementById('modal-balanco').style.display = 'flex';
-    }
-
-    function fecharModalBalanco() { document.getElementById('modal-balanco').style.display = 'none'; }
-
-    async function salvarBalancoEstoque(e) {
-      e.preventDefault();
-      const novaQtd = parseInt(document.getElementById('balanco-nova-qtd').value);
-      await db.collection("estoque_geral").doc(state.currentUser.empresaId).set({ qtdOvos: novaQtd }, { merge: true });
-      fecharModalBalanco(); alert('Estoque atualizado!');
-    }
-
-    async function cadastrarUsuario(e) {
-      e.preventDefault();
-      await db.collection("usuarios").add({
-        empresaId: state.currentUser.empresaId,
-        login: document.getElementById('usr-login').value.trim().toLowerCase(),
-        pass: document.getElementById('usr-pass').value.trim(),
-        role: document.getElementById('usr-role').value
-      });
-      e.target.reset(); alert('Usuário cadastrado!');
-    }
-
-    async function excluirUsuario(id) {
-      if (confirm('Excluir?')) await db.collection("usuarios").doc(id).delete();
-    }
-
-    async function alterarMinhaSenha(e) {
-      e.preventDefault();
-      const nova = document.getElementById('minha-nova-senha').value.trim();
-      if (!nova) return;
-      await db.collection("usuarios").doc(state.currentUser.id).update({ pass: nova });
-      e.target.reset(); alert('Senha alterada!');
+      tbody.innerHTML = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje).map(p => `<tr><td>${new Date(p.dataHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td><td>+ ${p.qtdOvos} ovos</td></tr>`).join('');
     }
 
     async function salvarEmpresa(e) {
       e.preventDefault();
-      const dados = {
-        nome: document.getElementById('emp-nome').value.trim(),
-        cnpj: document.getElementById('emp-cnpj').value.trim(),
-        tel: document.getElementById('emp-tel').value.trim(),
-        end: document.getElementById('emp-end').value.trim(),
-        social: document.getElementById('emp-social').value.trim(),
-        pix: document.getElementById('emp-pix').value.trim()
-      };
+      const dados = { nome: document.getElementById('emp-nome').value.trim(), cnpj: document.getElementById('emp-cnpj').value.trim(), tel: document.getElementById('emp-tel').value.trim(), end: document.getElementById('emp-end').value.trim(), social: document.getElementById('emp-social').value.trim(), pix: document.getElementById('emp-pix').value.trim() };
       await db.collection("config").doc(state.currentUser.empresaId).set(dados, { merge: true });
       state.empresa = dados; alert('Dados salvos!');
     }
@@ -1573,81 +1089,49 @@
       const ped = typeof pedidoOuId === 'string' ? state.pedidos.find(p => p.id === pedidoOuId) : pedidoOuId;
       if (!ped) return;
       const emp = state.empresa || {};
-      const isPago = ped.status === 'Pago';
+      const dataStr = ped.dataCriacao ? ped.dataCriacao.toLocaleDateString('pt-BR') : '';
 
       document.getElementById('printable-receipt').innerHTML = `
-        <div style="text-align:center; margin-bottom:8px;">
-          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
-          <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
-          <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
-        </div>
+        <div class="recibo-bloco-interno" style="height: 100%;">
+          <div>
+            <div class="recibo-sheet-header">
+              <h3>Comprovante de Pedido</h3>
+              <span style="font-size: 0.72rem; font-weight: 600;">#${ped.numeroPedido || '---'} | ${dataStr}</span>
+            </div>
+            
+            <div style="font-size: 0.78rem; margin-bottom: 6px; color: #334155;">
+              <div><strong>Cliente:</strong> ${ped.clienteNome}</div>
+              <div><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+            </div>
 
-        <hr class="dashed-divider">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 0.75rem;">
+              <thead>
+                <tr style="background: #eff6ff; color: #1e40af;"><th style="padding: 4px;">Item</th><th style="padding: 4px; text-align: right;">Subtotal</th></tr>
+              </thead>
+              <tbody>
+                ${(ped.itens || []).map(i => `<tr><td style="padding: 4px; border-bottom: 1px solid #e2e8f0;">${i.qtd}x${i.nome}</td><td style="padding: 4px; text-align: right; border-bottom: 1px solid #e2e8f0;">R$ ${parseFloat(i.subtotal).toFixed(2)}</td></tr>`).join('')}
+              </tbody>
+            </table>
 
-        <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
-          COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}
-        </div>
-        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-        <div style="margin-bottom:2px;"><strong>Documento:</strong> ${ped.clienteDoc || 'N/I'}</div>
-        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-
-        <hr class="dashed-divider">
-
-        <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
-        ${(ped.itens || []).map(i => `
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span>${i.qtd}x${i.nome}</span>
-            <span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span>
+            <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 0.82rem; background: #f8fafc; padding: 6px 8px; border-radius: 6px; border: 1px solid #e2e8f0;">
+              <span>Valor Total (${ped.formaPgto || 'Pix'}):</span><span style="color: #2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
+            </div>
           </div>
-        `).join('')}
 
-        <hr class="dashed-divider">
-
-        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
-          <span>VALOR TOTAL:</span>
-          <span>R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
-        </div>
-        <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${ped.formaPgto || 'Não especificada'}</div>
-        <div style="margin-bottom:2px;"><strong>SITUAÇÃO:</strong> [ ${isPago ? '🟢 PAGAMENTO CONFIRMADO' : '🔴 AGUARDANDO PAGAMENTO'} ]</div>
-        ${ped.obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${ped.obs}</div>` : ''}
-
-        <hr class="dashed-divider">
-
-        <!-- DADOS DA EMPRESA EXCLUSIVAMENTE NO RODAPÉ -->
-        <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
-          <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
-          <div>CNPJ: ${emp.cnpj || 'N/I'} | Tel/WhatsApp: ${emp.tel || 'N/I'}</div>
-          ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
-          ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
-          <p style="margin-top:4px;">Obrigado pela preferência!</p>
+          <!-- EMPRESA E DADOS ESTRICTAMENTE NO RODAPÉ -->
+          <div style="text-align: center; font-size: 0.7rem; color: #64748b; border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 4px;">
+            <div style="font-weight: 800; color: #0f172a; text-transform: uppercase;">${emp.nome || 'Happy Eggs'}</div>
+            <div>CNPJ: ${emp.cnpj || 'N/I'} | Tel/WhatsApp: ${emp.tel || 'N/I'}</div>
+            ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
+            ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
+          </div>
         </div>
       `;
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    function executarImpressaoSilenciosa(conteudoHtml, titulo) {
-      let iframe = document.getElementById('iframe-impressao-oculto');
-      if (iframe) iframe.remove();
-      iframe = document.createElement('iframe');
-      iframe.id = 'iframe-impressao-oculto';
-      iframe.style.position = 'fixed'; iframe.style.right = '0'; iframe.style.bottom = '0'; iframe.style.width = '0'; iframe.style.height = '0'; iframe.style.border = '0';
-      document.body.appendChild(iframe);
-
-      const doc = iframe.contentWindow.document;
-      doc.open();
-      doc.write(`<!DOCTYPE html><html><head><title>${titulo}</title><style>*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif;}body{padding:15px;color:#0f172a;background:#fff;font-size:12px;}.relatorio-sheet-box{border:1px solid #cbd5e1;border-radius:8px;padding:15px;background:#fff;}.relatorio-sheet-header{background:#0f172a;color:#fff;padding:10px 14px;border-radius:6px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}.relatorio-kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}.relatorio-kpi-item{background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #2563eb;padding:8px;border-radius:4px;}.relatorio-kpi-label{font-size:0.6rem;color:#64748b;font-weight:800;text-transform:uppercase;}.relatorio-kpi-val{font-size:1rem;font-weight:800;color:#0f172a;}.relatorio-section-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px;margin-bottom:12px;font-size:0.78rem;}.relatorio-tabela-planilha{width:100%;border-collapse:collapse;margin-top:5px;font-size:0.75rem;}.relatorio-tabela-planilha th{background:#eff6ff;color:#1e40af;font-weight:800;text-transform:uppercase;padding:6px;border-bottom:2px solid #bfdbfe;text-align:left;}.relatorio-tabela-planilha td{padding:6px;border-bottom:1px solid #e2e8f0;text-align:left;}</style></head><body>${conteudoHtml}</body></html>`);
-      doc.close();
-      iframe.contentWindow.focus();
-      setTimeout(() => { iframe.contentWindow.print(); }, 250);
-    }
-
-    function imprimirNota() {
-      executarImpressaoSilenciosa(document.getElementById('printable-receipt').outerHTML, 'Comprovante');
-    }
-
-    function imprimirRelatorio() {
-      executarImpressaoSilenciosa(document.getElementById('area-relatorio-impressao').outerHTML, 'Relatório de Vendas');
-    }
+    function imprimirNota() { window.print(); }
+    function imprimirRelatorio() { window.print(); }
 
     function exportarRelatorioExcel() {
       let csv = "Pedido;Data;Cliente;Total;Status\n";
