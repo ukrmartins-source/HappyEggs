@@ -117,9 +117,6 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
-    /* ========================================================= */
-    /* ESTILOS DO RELATÓRIO DE VENDAS (PLANILHA)                 */
-    /* ========================================================= */
     .relatorio-sheet-box {
       background: #ffffff;
       border: 1px solid #e2e8f0;
@@ -202,12 +199,16 @@
       background-color: #f8fafc;
     }
 
-    /* REGRAS DE IMPRESSÃO EXATA (50% DE ALTURA POR RECIBO E ZERO FUNDOS AZUIS) */
+    /* REGRAS DE IMPRESSÃO LIMPA E SEM PÁGINAS EM BRANCO EXTRAS */
     @media print {
+      @page {
+        size: auto;
+        margin: 5mm;
+      }
       body, html {
         background: #ffffff !important;
         color: #000000 !important;
-        height: 100% !important;
+        height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
       }
@@ -234,14 +235,10 @@
       }
 
       .recibo-bloco-pagina {
-        height: 50vh !important;
-        max-height: 50vh !important;
-        box-sizing: border-box !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
-        overflow: hidden !important;
-        padding: 10px !important;
-        margin-bottom: 0 !important;
+        margin-bottom: 15px !important;
+        padding-bottom: 10px !important;
       }
 
       #modal-resumo:not([style*="display: none"]) #area-relatorio-impressao {
@@ -264,6 +261,7 @@
         box-shadow: none !important;
         padding: 0 !important;
         margin: 0 !important;
+        overflow: visible !important;
       }
     }
   </style>
@@ -1073,8 +1071,29 @@
       e.preventDefault();
       const qtd = parseInt(document.getElementById('prod-ent-qtd').value || 0);
       if (qtd <= 0) return;
-      await db.collection("producao").add({ empresaId: state.currentUser.empresaId, qtdOvos: qtd, dataHora: new Date() });
-      e.target.reset(); alert('Produção registrada!');
+
+      const empresaId = state.currentUser.empresaId;
+      const refEstoque = db.collection("estoque_geral").doc(empresaId);
+
+      try {
+        const docSnap = await refEstoque.get();
+        let atual = docSnap.exists ? (docSnap.data().qtdOvos || 0) : 0;
+        let novoSaldo = atual + qtd;
+
+        await refEstoque.set({ qtdOvos: novoSaldo }, { merge: true });
+
+        await db.collection("producao").add({
+          empresaId: empresaId,
+          qtdOvos: qtd,
+          dataHora: new Date()
+        });
+
+        e.target.reset();
+        alert('Produção registrada e estoque atualizado com sucesso!');
+      } catch (err) {
+        console.error("Erro ao registrar produção:", err);
+        alert("Erro ao atualizar o estoque.");
+      }
     }
 
     function renderProducaoHoje() {
