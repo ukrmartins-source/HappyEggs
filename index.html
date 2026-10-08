@@ -95,21 +95,21 @@
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
     .receipt-box { 
-      border: 1.5px dashed #4b5563; 
+      border: 1px solid #cbd5e1; 
       border-radius: 8px;
-      padding: 18px; 
+      padding: 16px; 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 0.9rem; 
+      font-size: 0.85rem; 
       background: #ffffff; 
       margin-bottom: 16px; 
-      color: #1f2937;
+      color: #1e293b;
       text-align: left;
       width: 100%;
       word-wrap: break-word;
       line-height: 1.4;
     }
 
-    .dashed-divider { border: none; border-top: 1.5px dashed #9ca3af; margin: 10px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 10px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -1275,6 +1275,9 @@
       checkboxes.forEach(cb => cb.checked = master.checked);
     }
 
+    /* ========================================================================= */
+    /* NOVA FUNÇÃO DE IMPRESSÃO DE RECIBOS COM LAYOUT MODERNO & 2 POR PÁGINA     */
+    /* ========================================================================= */
     function imprimirPedidosSelecionados() {
       const selecionados = Array.from(document.querySelectorAll('.check-pedido:checked')).map(cb => cb.value);
 
@@ -1295,54 +1298,51 @@
         const statusSymbol = isPago ? '🟢' : '🔴';
         const itens = ped.itens || [];
 
+        // Força quebra limpa exatamente a cada 2 pedidos para garantir exatos 2 por página (mesmo para ímpares)
+        const deveQuebrarPagina = (idx > 0 && idx % 2 === 0);
+
         const reciboHTML = `
-          <div class="recibo-item" style="${idx > 0 ? 'margin-top:20px; border-top: 1px dashed #cbd5e1; padding-top: 20px;' : ''}">
-            <div style="text-align:center; margin-bottom:8px;">
-              <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
-              <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
-              <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
+          <div class="recibo-pagina-item" style="${deveQuebrarPagina ? 'page-break-before: always; margin-top: 0;' : (idx > 0 ? 'margin-top: 25px; border-top: 2px dashed #cbd5e1; padding-top: 25px;' : '')}">
+            
+            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb;">
+              <h3 style="font-size: 0.9rem; font-weight: 800; text-transform: uppercase;">${emp.nome || 'HAPPY EGGS'}</h3>
+              <span style="font-size: 0.75rem; font-weight: 600;">COMPROVANTE #${ped.numeroPedido || '---'}</span>
             </div>
 
-            <hr class="dashed-divider">
-
-            <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
-              COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}
+            <div style="font-size: 0.82rem; margin-bottom: 10px; color: #334155; line-height: 1.4;">
+              <div><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente não informado'}</div>
+              <div><strong>Documento:</strong> ${ped.clienteDoc || 'N/I'} | <strong>Tel:</strong> ${ped.clienteTel || 'N/I'}</div>
+              <div><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
             </div>
-            <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente não informado'}</div>
-            <div style="margin-bottom:2px;"><strong>Documento:</strong> ${ped.clienteDoc || 'N/I'}</div>
-            <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
 
-            <hr class="dashed-divider">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.8rem;">
+              <thead>
+                <tr style="background: #eff6ff; color: #1e40af;">
+                  <th style="padding: 6px 8px; text-align: left; border-bottom: 2px solid #bfdbfe; font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Item</th>
+                  <th style="padding: 6px 8px; text-align: right; border-bottom: 2px solid #bfdbfe; font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itens.length > 0 ? itens.map(i => `
+                  <tr>
+                    <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; color: #1e293b;">${i.qtd}x${i.nome}</td>
+                    <td style="padding: 6px 8px; text-align: right; border-bottom: 1px solid #e2e8f0; color: #1e293b;">R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</td>
+                  </tr>
+                `).join('') : '<tr><td colspan="2" style="padding: 6px; text-align: center; color: #64748b;">Nenhum item</td></tr>'}
+              </tbody>
+            </table>
 
-            <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
-            ${itens.length > 0 ? itens.map(i => `
-              <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                <span>${i.qtd}x${i.nome}</span>
-                <span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span>
-              </div>
-            `).join('') : '<div style="font-size:0.8rem; color:#64748b;">Nenhum item registrado</div>'}
-
-            <hr class="dashed-divider">
-
-            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
-              <span>VALOR TOTAL:</span>
-              <span>R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+            <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 0.9rem; background: #f8fafc; padding: 10px 12px; border-radius: 6px; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; margin-bottom: 8px;">
+              <span style="color: #64748b; text-transform: uppercase; font-size: 0.7rem;">Valor Total:</span>
+              <span style="color: #2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
             </div>
-            <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${ped.formaPgto || 'Não especificada'}</div>
-            ${ped.dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${ped.dadosPgto}</div>` : ''}
-            <div style="margin-bottom:2px;">
-              <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
-            </div>
-            ${ped.obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${ped.obs}</div>` : ''}
 
-            <hr class="dashed-divider">
-
-            <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
-              <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
-              ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
-              ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
-              <p style="margin-top:4px;">Obrigado pela preferência!</p>
+            <div style="font-size: 0.78rem; color: #475569; line-height: 1.4; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+              <div><strong>Forma de Pagamento:</strong> ${ped.formaPgto || 'Não especificada'} ${ped.dadosPgto ? `(${ped.dadosPgto})` : ''}</div>
+              <div><strong>Situação:</strong> ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'}</div>
+              ${ped.obs ? `<div><strong>Observações:</strong> ${ped.obs}</div>` : ''}
             </div>
+
           </div>
         `;
 
