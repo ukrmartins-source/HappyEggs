@@ -146,7 +146,7 @@
     }
     .relatorio-kpi-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
       margin-bottom: 14px;
     }
@@ -199,7 +199,7 @@
       color: #334155;
     }
     .relatorio-tabela-planilha tr:nth-child(even) {
-      background-color: #f8fafc; /* Efeito zebrado elegante */
+      background-color: #f8fafc;
     }
   </style>
 </head>
@@ -218,7 +218,7 @@
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
-      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas[cite: 2]</p>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
       <form onsubmit="autenticar(event)">
         <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password"></div>
@@ -229,7 +229,6 @@
     <!-- PAINEL SUPER ADMIN (SaaS) -->
     <div id="view-superadmin" class="view-content" style="display:none;">
       
-      <!-- DASHBOARD GLOBAL DO SUPER ADMIN -->
       <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border: none;">
         <div class="card-header" style="border-color: rgba(255,255,255,0.1); margin-bottom: 10px; padding-bottom: 8px;">
           <div class="card-title" style="color: white;">👑 Dashboard Global SaaS</div>
@@ -260,7 +259,6 @@
         </button>
       </div>
 
-      <!-- SEÇÃO: CADASTRAR NOVA GRANJA -->
       <div class="card" id="saas-card-cadastro" style="border-left: 4px solid var(--warning); display: block;">
         <div class="card-title" style="margin-bottom: 12px;">Cadastrar Nova Granja / Empresa Cliente</div>
         
@@ -298,7 +296,6 @@
         </form>
       </div>
 
-      <!-- SEÇÃO: LISTAR / EDITAR EMPRESAS -->
       <div class="card" id="saas-card-empresas" style="display: none;">
         <div class="card-header">
           <div class="card-title">Empresas, Planos e Credenciais</div>
@@ -655,7 +652,7 @@
 
       <div id="resumo-periodo-texto" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; font-weight:bold;"></div>
 
-      <!-- CONTAINER ESTILIZADO EM FORMATO PLANILHA TECNOLÓGICA -->
+      <!-- CONTAINER ESTILIZADO EM FORMATO PLANILHA TECNOLÓGICA (SEM TICKET MÉDIO) -->
       <div id="area-relatorio-impressao" class="relatorio-sheet-box">
         <div class="relatorio-sheet-header">
           <h3>Relatório de Vendas</h3>
@@ -670,10 +667,6 @@
           <div class="relatorio-kpi-item">
             <div class="relatorio-kpi-label">Nº de Pedidos</div>
             <div class="relatorio-kpi-val" id="resumo-qtd-pedidos">0</div>
-          </div>
-          <div class="relatorio-kpi-item">
-            <div class="relatorio-kpi-label">Ticket Médio</div>
-            <div class="relatorio-kpi-val" id="resumo-ticket-medio">R$ 0,00</div>
           </div>
         </div>
 
@@ -734,7 +727,6 @@
   </div>
 
   <script>
-    // --- CONFIGURAÇÃO DO FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyAYmxniwbHyi4HmTH-aVlHo2zp-7pXY_lg",
       authDomain: "happyeggs-534f2.firebaseapp.com",
@@ -789,7 +781,6 @@
       }).catch(err => console.error("Erro na inicialização:", err));
     }
 
-    // --- CARREGAR DADOS DO SUPER ADMIN (DASHBOARD GLOBAL E EMPRESAS) ---
     function initSuperAdminListener() {
       db.collection("empresas").onSnapshot(snapshot => {
         state.empresasSaaS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -846,7 +837,7 @@
 
       try {
         localStorage.setItem('happyeggs_superadmin_pass', novaSenha);
-        alert('Senha de Super Admin alterada com sucesso! Lembre-se da nova senha.');
+        alert('Senha de Super Admin alterada com sucesso!');
         document.getElementById('modal-seguranca-superadmin').style.display = 'none';
       } catch (err) {
         alert('Erro ao atualizar senha: ' + err.message);
@@ -976,19 +967,8 @@
         if (empDoc.exists) {
           const empData = empDoc.data();
           if (empData.status !== "Ativo") {
-            alert("A conta da sua empresa está bloqueada. Entre em contato com o suporte.");
+            alert("A conta da sua empresa está bloqueada.");
             return;
-          }
-
-          if (empData.plano !== "vitalicio" && empData.vencimento) {
-            const hoje = new Date();
-            hoje.setHours(0,0,0,0);
-            const vencimentoDate = new Date(empData.vencimento + 'T00:00:00');
-
-            if (hoje > vencimentoDate) {
-              alert(`Aviso: A assinatura da sua granja expirou em ${vencimentoDate.toLocaleDateString('pt-BR')}. O acesso está temporariamente bloqueado.`);
-              return;
-            }
           }
         }
 
@@ -1001,7 +981,6 @@
         initListeners();
         navTo('dashboard');
       } catch (error) {
-        console.error("Erro na autenticação:", error);
         alert("Erro ao tentar entrar. Tente novamente.");
       }
     }
@@ -1086,32 +1065,13 @@
 
       try {
         await db.collection("empresas").doc(idEmpresa).set({
-          nome,
-          cnpj,
-          email,
-          tel,
-          end,
-          plano,
-          valorPlano,
-          vencimento,
-          status: "Ativo",
-          criadoEm: new Date()
+          nome, cnpj, email, tel, end, plano, valorPlano, vencimento, status: "Ativo", criadoEm: new Date()
         });
-
         await db.collection("config").doc(idEmpresa).set({
-          nome,
-          cnpj,
-          tel,
-          end,
-          social: "",
-          pix: ""
+          nome, cnpj, tel, end, social: "", pix: ""
         });
-
         await db.collection("usuarios").add({
-          empresaId: idEmpresa,
-          login: adminUser,
-          pass: adminPass,
-          role: "admin"
+          empresaId: idEmpresa, login: adminUser, pass: adminPass, role: "admin"
         });
 
         alert(`Empresa cliente ${nome} cadastrada com sucesso!`);
@@ -1170,10 +1130,9 @@
     async function redefinirSenhaCliente(usuarioId, loginUser) {
       const novaSenha = prompt(`Digite a nova senha para o usuário "${loginUser}":`);
       if (!novaSenha || novaSenha.trim() === "") return;
-
       try {
         await db.collection("usuarios").doc(usuarioId).update({ pass: novaSenha.trim() });
-        alert(`Senha do usuário "${loginUser}" atualizada com sucesso!`);
+        alert(`Senha atualizada com sucesso!`);
       } catch (err) {
         alert("Erro ao atualizar senha: " + err.message);
       }
@@ -1185,7 +1144,7 @@
     }
 
     async function excluirEmpresaSaaS(id) {
-      if (confirm(`Tem certeza que deseja excluir a empresa ${id} e seus dados? Esta ação não pode ser desfeita.`)) {
+      if (confirm(`Tem certeza que deseja excluir a empresa ${id}?`)) {
         try {
           await db.collection("empresas").doc(id).delete();
           alert('Empresa excluída com sucesso!');
@@ -1211,18 +1170,9 @@
       const termo = (document.getElementById('dash-busca-cliente')?.value || '').toLowerCase();
       const tbody = document.getElementById('lista-clientes-dash');
       if (!tbody) return;
-
-      const filtrados = state.clientes.filter(c => 
-        c.nome.toLowerCase().includes(termo) || 
-        (c.doc && c.doc.toLowerCase().includes(termo)) ||
-        (c.tel && c.tel.toLowerCase().includes(termo))
-      );
-
+      const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(termo) || (c.doc && c.doc.toLowerCase().includes(termo)));
       tbody.innerHTML = filtrados.slice(0, 10).map(c => `
-        <tr>
-          <td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td>
-          <td>📞 ${c.tel}</td>
-        </tr>
+        <tr><td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td><td>📞 ${c.tel}</td></tr>
       `).join('');
     }
 
@@ -1296,7 +1246,7 @@
         const itens = ped.itens || [];
 
         const reciboHTML = `
-          <div class="recibo-item" style="${idx > 0 ? 'margin-top:20px; border-top: 1px dashed #cbd5e1; padding-top: 20px;' : ''}">
+          <div class="recibo-item" style="${idx > 0 ? 'margin-top:20px; border-top: 1.5px dashed #4b5563; padding-top: 20px;' : ''}">
             <div style="text-align:center; margin-bottom:8px;">
               <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
               <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
@@ -1337,8 +1287,10 @@
 
             <hr class="dashed-divider">
 
+            <!-- EMPRESA STRICTAMENTE NO RODAPÉ -->
             <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
               <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
+              <div>CNPJ: ${emp.cnpj || 'N/I'} | Tel/WhatsApp: ${emp.tel || 'N/I'}</div>
               ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
               ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
               <p style="margin-top:4px;">Obrigado pela preferência!</p>
@@ -1366,7 +1318,6 @@
 
     function renderDropdowns() {
       filtrarClientesDropdown();
-
       const prodSelect = document.getElementById('ped-produto');
       if (prodSelect) {
         prodSelect.innerHTML = state.produtos.map(p => `
@@ -1379,41 +1330,25 @@
       const termo = (document.getElementById('ped-busca-cliente')?.value || '').toLowerCase();
       const cliSelect = document.getElementById('ped-cliente');
       if (!cliSelect) return;
-
-      const filtrados = state.clientes.filter(c => 
-        c.nome.toLowerCase().includes(termo) || 
-        (c.doc && c.doc.toLowerCase().includes(termo)) ||
-        (c.tel && c.tel.toLowerCase().includes(termo))
-      );
-
-      if (filtrados.length === 0) {
-        cliSelect.innerHTML = `<option value="">Nenhum cliente encontrado</option>`;
-      } else {
-        cliSelect.innerHTML = filtrados.map(c => `
-          <option value="${c.id}">${c.nome} (${c.tel})</option>
-        `).join('');
-      }
+      const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(termo));
+      cliSelect.innerHTML = filtrados.length ? filtrados.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('') : '<option value="">Nenhum cliente</option>';
     }
 
     async function cadastrarCliente(e) {
       e.preventDefault();
-      const novo = {
+      await db.collection("clientes").add({
         empresaId: state.currentUser.empresaId,
         nome: document.getElementById('cli-nome').value.trim(),
         doc: document.getElementById('cli-doc').value.trim(),
         tel: document.getElementById('cli-tel').value.trim(),
         end: document.getElementById('cli-end').value.trim()
-      };
-
-      await db.collection("clientes").add(novo);
+      });
       e.target.reset();
-      alert('Cliente cadastrado com sucesso!');
+      alert('Cliente cadastrado!');
     }
 
     async function excluirCliente(id) {
-      if (confirm('Deseja realmente excluir este cliente?')) {
-        await db.collection("clientes").doc(id).delete();
-      }
+      if (confirm('Deseja excluir?')) await db.collection("clientes").doc(id).delete();
     }
 
     async function salvarProduto(e) {
@@ -1428,13 +1363,11 @@
 
       if (idEdit) {
         await db.collection("produtos").doc(idEdit).update(dados);
-        alert('Produto atualizado!');
       } else {
         await db.collection("produtos").add(dados);
-        alert('Produto cadastrado com sucesso!');
       }
-
       limparFormProduto();
+      alert('Produto salvo!');
     }
 
     function editarProduto(id) {
@@ -1458,20 +1391,14 @@
     }
 
     async function excluirProduto(id) {
-      if (confirm('Deseja excluir este produto?')) {
-        await db.collection("produtos").doc(id).delete();
-      }
+      if (confirm('Excluir?')) await db.collection("produtos").doc(id).delete();
     }
 
     function adicionarItemAoPedido() {
       const prodId = document.getElementById('ped-produto').value;
       const qtd = parseInt(document.getElementById('ped-qtd').value || 1);
       const prod = state.produtos.find(p => p.id === prodId);
-
-      if (!prod || qtd <= 0) {
-        alert('Selecione um produto e quantidade válida.');
-        return;
-      }
+      if (!prod || qtd <= 0) return;
 
       const itemExistente = carrinhoTemp.find(i => i.produtoId === prodId);
       if (itemExistente) {
@@ -1480,16 +1407,10 @@
         itemExistente.totalOvos = itemExistente.qtd * prod.ovosUnid;
       } else {
         carrinhoTemp.push({
-          produtoId: prod.id,
-          nome: prod.nome,
-          preco: prod.preco,
-          qtd: qtd,
-          ovosUnid: prod.ovosUnid,
-          totalOvos: qtd * prod.ovosUnid,
-          subtotal: qtd * prod.preco
+          produtoId: prod.id, nome: prod.nome, preco: prod.preco,
+          qtd: qtd, ovosUnid: prod.ovosUnid, totalOvos: qtd * prod.ovosUnid, subtotal: qtd * prod.preco
         });
       }
-
       renderCarrinho();
     }
 
@@ -1502,7 +1423,7 @@
       const lista = document.getElementById('itens-pedido-lista');
       const totalSpan = document.getElementById('ped-total-valor');
 
-      if (carrinhoTemp.length === 0) {
+      if (!carrinhoTemp.length) {
         lista.innerHTML = `<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>`;
         totalSpan.innerText = "0.00";
         return;
@@ -1513,10 +1434,7 @@
         totalGeral += item.subtotal;
         return `
           <div class="carrinho-item">
-            <div>
-              <strong>${item.qtd}x ${item.nome}</strong><br>
-              <small style="color:#64748b;">R$ ${item.preco.toFixed(2)} un | Total Ovos: ${item.totalOvos}</small>
-            </div>
+            <div><strong>${item.qtd}x ${item.nome}</strong></div>
             <div style="display:flex; align-items:center; gap:8px;">
               <strong>R$ ${item.subtotal.toFixed(2)}</strong>
               <button class="btn-danger" type="button" style="padding:2px 6px;" onclick="removerItemCarrinho(${idx})">✕</button>
@@ -1524,100 +1442,56 @@
           </div>
         `;
       }).join('');
-
       totalSpan.innerText = totalGeral.toFixed(2);
     }
 
     async function finalizarPedido(e) {
       e.preventDefault();
-      if (carrinhoTemp.length === 0) {
-        alert('Adicione pelo menos um produto ao pedido!');
-        return;
-      }
+      if (!carrinhoTemp.length) return alert('Adicione produtos!');
+      const cliente = state.clientes.find(c => c.id === document.getElementById('ped-cliente').value);
+      if (!cliente) return alert('Selecione um cliente!');
 
-      const cliId = document.getElementById('ped-cliente').value;
-      const cliente = state.clientes.find(c => c.id === cliId);
-
-      if (!cliente) {
-        alert('Selecione um cliente válido!');
-        return;
-      }
-
-      const maiorNum = state.pedidos.reduce((max, p) => Math.max(max, p.numeroPedido || 0), 0);
-      const proximoNumero = maiorNum + 1;
-
+      const proximoNumero = state.pedidos.reduce((max, p) => Math.max(max, p.numeroPedido || 0), 0) + 1;
       const totalPedido = carrinhoTemp.reduce((acc, i) => acc + i.subtotal, 0);
       const totalOvosPedido = carrinhoTemp.reduce((acc, i) => acc + i.totalOvos, 0);
 
       const novoPedido = {
-        empresaId: state.currentUser.empresaId,
-        numeroPedido: proximoNumero,
-        clienteId: cliente.id,
-        clienteNome: cliente.nome,
-        clienteDoc: cliente.doc || 'N/I',
-        clienteEnd: cliente.end || 'Não informado',
-        clienteTel: cliente.tel || '',
-        itens: carrinhoTemp,
-        total: totalPedido,
-        totalOvos: totalOvosPedido,
+        empresaId: state.currentUser.empresaId, numeroPedido: proximoNumero, clienteId: cliente.id,
+        clienteNome: cliente.nome, clienteDoc: cliente.doc || 'N/I', clienteEnd: cliente.end || '', clienteTel: cliente.tel || '',
+        itens: carrinhoTemp, total: totalPedido, totalOvos: totalOvosPedido,
         formaPgto: document.getElementById('ped-forma-pagamento').value,
         dadosPgto: document.getElementById('ped-dados-pagamento').value.trim(),
         status: document.getElementById('ped-status').value,
-        obs: document.getElementById('ped-obs').value.trim(),
-        dataCriacao: new Date()
+        obs: document.getElementById('ped-obs').value.trim(), dataCriacao: new Date()
       };
 
-      try {
-        const docRef = await db.collection("pedidos").add(novoPedido);
+      const docRef = await db.collection("pedidos").add(novoPedido);
+      const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+      await db.runTransaction(async (transaction) => {
+        const sfDoc = await transaction.get(refEstoque);
+        let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
+        transaction.set(refEstoque, { qtdOvos: atual - totalOvosPedido }, { merge: true });
+      });
 
+      novoPedido.id = docRef.id;
+      carrinhoTemp = []; renderCarrinho(); e.target.reset();
+      abrirModalNota(novoPedido);
+    }
+
+    async function alternarStatusPedido(id, statusAtual) {
+      await db.collection("pedidos").doc(id).update({ status: statusAtual === 'Pago' ? 'Pendente' : 'Pago' });
+    }
+
+    async function excluirOuCancelarPedido(id, numero, qtdOvosEstorno) {
+      if (!confirm(`Deseja excluir o Pedido #${numero}?`)) return;
+      await db.collection("pedidos").doc(id).delete();
+      if (qtdOvosEstorno > 0) {
         const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
         await db.runTransaction(async (transaction) => {
           const sfDoc = await transaction.get(refEstoque);
           let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
-          let novoSaldo = atual - totalOvosPedido;
-          transaction.set(refEstoque, { qtdOvos: novoSaldo }, { merge: true });
+          transaction.set(refEstoque, { qtdOvos: atual + qtdOvosEstorno }, { merge: true });
         });
-
-        alert(`Pedido #${proximoNumero} gerado com sucesso!`);
-        
-        novoPedido.id = docRef.id;
-
-        carrinhoTemp = [];
-        renderCarrinho();
-        e.target.reset();
-
-        abrirModalNota(novoPedido);
-      } catch (err) {
-        console.error("Erro ao gerar pedido:", err);
-        alert("Erro ao salvar pedido na nuvem.");
-      }
-    }
-
-    async function alternarStatusPedido(id, statusAtual) {
-      const novoStatus = statusAtual === 'Pago' ? 'Pendente' : 'Pago';
-      await db.collection("pedidos").doc(id).update({ status: novoStatus });
-    }
-
-    async function excluirOuCancelarPedido(id, numero, qtdOvosEstorno) {
-      if (!confirm(`Tem certeza que deseja excluir o Pedido #${numero || ''}?\nOs ${qtdOvosEstorno || 0} ovos deste pedido retornarão ao Estoque Geral.`)) {
-        return;
-      }
-      try {
-        await db.collection("pedidos").doc(id).delete();
-
-        if (qtdOvosEstorno > 0) {
-          const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
-          await db.runTransaction(async (transaction) => {
-            const sfDoc = await transaction.get(refEstoque);
-            let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
-            transaction.set(refEstoque, { qtdOvos: atual + qtdOvosEstorno }, { merge: true });
-          });
-        }
-
-        alert(`Pedido #${numero || ''} excluído e estoque estornado com sucesso!`);
-      } catch (err) {
-        console.error("Erro ao excluir pedido:", err);
-        alert("Erro ao excluir o pedido.");
       }
     }
 
@@ -1625,117 +1499,60 @@
       e.preventDefault();
       const qtd = parseInt(document.getElementById('prod-ent-qtd').value || 0);
       if (qtd <= 0) return;
-
       const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
-      
       await db.runTransaction(async (transaction) => {
         const sfDoc = await transaction.get(refEstoque);
         let atual = sfDoc.exists ? (sfDoc.data().qtdOvos || 0) : 0;
         transaction.set(refEstoque, { qtdOvos: atual + qtd }, { merge: true });
       });
-
-      await db.collection("producao").add({
-        empresaId: state.currentUser.empresaId,
-        qtdOvos: qtd,
-        dataHora: new Date()
-      });
-
-      e.target.reset();
-      alert('Entrada de produção registrada!');
+      await db.collection("producao").add({ empresaId: state.currentUser.empresaId, qtdOvos: qtd, dataHora: new Date() });
+      e.target.reset(); alert('Produção registrada!');
     }
 
     function renderProducaoHoje() {
       const tbody = document.getElementById('lista-producao-hoje');
       if (!tbody) return;
-
       const hoje = new Date().toDateString();
-      const doDia = state.producao.filter(p => {
-        let d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
-        return d.toDateString() === hoje;
-      });
-
-      tbody.innerHTML = doDia.map(p => {
-        let d = p.dataHora && p.dataHora.toDate ? p.dataHora.toDate() : new Date(p.dataHora);
-        return `
-          <tr>
-            <td>${d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
-            <td><strong>+ ${p.qtdOvos.toLocaleString('pt-BR')} ovos</strong></td>
-          </tr>
-        `;
-      }).join('');
+      tbody.innerHTML = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje).map(p => `
+        <tr><td>${new Date(p.dataHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td><td>+ ${p.qtdOvos} ovos</td></tr>
+      `).join('');
     }
 
     function abrirModalBalanco() {
-      if (!state.currentUser || state.currentUser.role !== 'admin') {
-        alert('Acesso restrito a administradores.');
-        return;
-      }
       document.getElementById('balanco-nova-qtd').value = state.estoqueGeralOvos || 0;
-      document.getElementById('balanco-motivo').value = '';
       document.getElementById('modal-balanco').style.display = 'flex';
     }
 
-    function fecharModalBalanco() {
-      document.getElementById('modal-balanco').style.display = 'none';
-    }
+    function fecharModalBalanco() { document.getElementById('modal-balanco').style.display = 'none'; }
 
     async function salvarBalancoEstoque(e) {
       e.preventDefault();
       const novaQtd = parseInt(document.getElementById('balanco-nova-qtd').value);
-      const motivo = document.getElementById('balanco-motivo').value.trim();
-
-      if (isNaN(novaQtd) || novaQtd < 0) {
-        alert('Insira uma quantidade válida.');
-        return;
-      }
-
-      try {
-        const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
-        await refEstoque.set({ 
-          qtdOvos: novaQtd,
-          ultimoAjusteEm: new Date(),
-          ajustadoPor: state.currentUser.login,
-          motivoAjuste: motivo
-        }, { merge: true });
-
-        alert('Estoque geral atualizado com sucesso!');
-        fecharModalBalanco();
-      } catch (err) {
-        console.error("Erro ao atualizar balanço:", err);
-        alert('Erro ao salvar o balanço no banco de dados.');
-      }
+      await db.collection("estoque_geral").doc(state.currentUser.empresaId).set({ qtdOvos: novaQtd }, { merge: true });
+      fecharModalBalanco(); alert('Estoque atualizado!');
     }
 
     async function cadastrarUsuario(e) {
       e.preventDefault();
-      const login = document.getElementById('usr-login').value.trim().toLowerCase();
-      const pass = document.getElementById('usr-pass').value.trim();
-      const role = document.getElementById('usr-role').value;
-
       await db.collection("usuarios").add({
         empresaId: state.currentUser.empresaId,
-        login, pass, role
+        login: document.getElementById('usr-login').value.trim().toLowerCase(),
+        pass: document.getElementById('usr-pass').value.trim(),
+        role: document.getElementById('usr-role').value
       });
-
-      e.target.reset();
-      alert('Usuário cadastrado com sucesso!');
+      e.target.reset(); alert('Usuário cadastrado!');
     }
 
     async function excluirUsuario(id) {
-      if (confirm('Deseja excluir este usuário?')) {
-        await db.collection("usuarios").doc(id).delete();
-      }
+      if (confirm('Excluir?')) await db.collection("usuarios").doc(id).delete();
     }
 
     async function alterarMinhaSenha(e) {
       e.preventDefault();
       const nova = document.getElementById('minha-nova-senha').value.trim();
       if (!nova) return;
-
       await db.collection("usuarios").doc(state.currentUser.id).update({ pass: nova });
-      state.currentUser.pass = nova;
-      e.target.reset();
-      alert('Sua senha foi alterada com sucesso!');
+      e.target.reset(); alert('Senha alterada!');
     }
 
     async function salvarEmpresa(e) {
@@ -1748,43 +1565,17 @@
         social: document.getElementById('emp-social').value.trim(),
         pix: document.getElementById('emp-pix').value.trim()
       };
-
       await db.collection("config").doc(state.currentUser.empresaId).set(dados, { merge: true });
-      state.empresa = dados;
-      alert('Dados da empresa salvos com sucesso!');
+      state.empresa = dados; alert('Dados salvos!');
     }
 
     function abrirModalNota(pedidoOuId) {
-      let ped = null;
-      if (typeof pedidoOuId === 'string') {
-        ped = state.pedidos.find(p => p.id === pedidoOuId);
-      } else {
-        ped = pedidoOuId;
-      }
-
-      if (!ped) {
-        alert('Erro ao carregar os dados do pedido.');
-        return;
-      }
-
-      state.pedidoAtual = ped;
-      const receipt = document.getElementById('printable-receipt');
+      const ped = typeof pedidoOuId === 'string' ? state.pedidos.find(p => p.id === pedidoOuId) : pedidoOuId;
+      if (!ped) return;
       const emp = state.empresa || {};
-
       const isPago = ped.status === 'Pago';
-      const statusSymbol = isPago ? '🟢' : '🔴';
 
-      const numPedido = ped.numeroPedido || '---';
-      const clienteNome = ped.clienteNome || 'Cliente não informado';
-      const clienteDoc = ped.clienteDoc || 'N/I';
-      const clienteEnd = ped.clienteEnd || 'Não informado';
-      const totalValor = parseFloat(ped.total || 0).toFixed(2);
-      const formaPgto = ped.formaPgto || 'Não especificada';
-      const dadosPgto = ped.dadosPgto || '';
-      const obs = ped.obs || '';
-      const itens = ped.itens || [];
-
-      receipt.innerHTML = `
+      document.getElementById('printable-receipt').innerHTML = `
         <div style="text-align:center; margin-bottom:8px;">
           <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
           <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
@@ -1794,147 +1585,80 @@
         <hr class="dashed-divider">
 
         <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
-          COMPROVANTE DE PEDIDO #${numPedido}
+          COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}
         </div>
-        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${clienteNome}</div>
-        <div style="margin-bottom:2px;"><strong>Documento:</strong> ${clienteDoc}</div>
-        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${clienteEnd}</div>
+        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+        <div style="margin-bottom:2px;"><strong>Documento:</strong> ${ped.clienteDoc || 'N/I'}</div>
+        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
 
         <hr class="dashed-divider">
 
         <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
-        ${itens.length > 0 ? itens.map(i => `
+        ${(ped.itens || []).map(i => `
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
             <span>${i.qtd}x${i.nome}</span>
             <span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span>
           </div>
-        `).join('') : '<div style="font-size:0.8rem; color:#64748b;">Nenhum item registrado</div>'}
+        `).join('')}
 
         <hr class="dashed-divider">
 
         <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
           <span>VALOR TOTAL:</span>
-          <span>R$ ${totalValor}</span>
+          <span>R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
         </div>
-        <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${formaPgto}</div>
-        ${dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${dadosPgto}</div>` : ''}
-        <div style="margin-bottom:2px;">
-          <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
-        </div>
-        ${obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${obs}</div>` : ''}
+        <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${ped.formaPgto || 'Não especificada'}</div>
+        <div style="margin-bottom:2px;"><strong>SITUAÇÃO:</strong> [ ${isPago ? '🟢 PAGAMENTO CONFIRMADO' : '🔴 AGUARDANDO PAGAMENTO'} ]</div>
+        ${ped.obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${ped.obs}</div>` : ''}
 
         <hr class="dashed-divider">
 
+        <!-- DADOS DA EMPRESA EXCLUSIVAMENTE NO RODAPÉ -->
         <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
           <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
+          <div>CNPJ: ${emp.cnpj || 'N/I'} | Tel/WhatsApp: ${emp.tel || 'N/I'}</div>
           ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
           ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
           <p style="margin-top:4px;">Obrigado pela preferência!</p>
         </div>
       `;
-
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
     function executarImpressaoSilenciosa(conteudoHtml, titulo) {
       let iframe = document.getElementById('iframe-impressao-oculto');
-      if (iframe) {
-        iframe.remove();
-      }
-
+      if (iframe) iframe.remove();
       iframe = document.createElement('iframe');
       iframe.id = 'iframe-impressao-oculto';
-      iframe.style.position = 'fixed';
-      iframe.style.right = '0';
-      iframe.style.bottom = '0';
-      iframe.style.width = '0';
-      iframe.style.height = '0';
-      iframe.style.border = '0';
-
+      iframe.style.position = 'fixed'; iframe.style.right = '0'; iframe.style.bottom = '0'; iframe.style.width = '0'; iframe.style.height = '0'; iframe.style.border = '0';
       document.body.appendChild(iframe);
 
       const doc = iframe.contentWindow.document;
       doc.open();
-      doc.write(`
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-          <meta charset="UTF-8">
-          <title>${titulo}</title>
-          <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-            body { padding: 15px; color: #0f172a; background: #fff; font-size: 12px; }
-            .relatorio-sheet-box { border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; background: #fff; }
-            .relatorio-sheet-header { background: #0f172a; color: #fff; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-            .relatorio-sheet-header h3 { font-size: 0.9rem; text-transform: uppercase; font-weight: 800; }
-            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-            .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 8px; border-radius: 4px; }
-            .relatorio-kpi-label { font-size: 0.6rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; }
-            .relatorio-kpi-val { font-size: 1rem; font-weight: 800; color: #0f172a; }
-            .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px; font-size: 0.78rem; }
-            .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.75rem; }
-            .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; padding: 6px 4px; border-bottom: 2px solid #bfdbfe; text-align: left; }
-            .relatorio-tabela-planilha td { padding: 6px 4px; border-bottom: 1px solid #e2e8f0; color: #334155; text-align: left; }
-            .relatorio-tabela-planilha tr:nth-child(even) { background-color: #f8fafc; }
-          </style>
-        </head>
-        <body>${conteudoHtml}</body>
-        </html>
-      `);
+      doc.write(`<!DOCTYPE html><html><head><title>${titulo}</title><style>*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif;}body{padding:15px;color:#0f172a;background:#fff;font-size:12px;}.relatorio-sheet-box{border:1px solid #cbd5e1;border-radius:8px;padding:15px;background:#fff;}.relatorio-sheet-header{background:#0f172a;color:#fff;padding:10px 14px;border-radius:6px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}.relatorio-kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}.relatorio-kpi-item{background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #2563eb;padding:8px;border-radius:4px;}.relatorio-kpi-label{font-size:0.6rem;color:#64748b;font-weight:800;text-transform:uppercase;}.relatorio-kpi-val{font-size:1rem;font-weight:800;color:#0f172a;}.relatorio-section-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px;margin-bottom:12px;font-size:0.78rem;}.relatorio-tabela-planilha{width:100%;border-collapse:collapse;margin-top:5px;font-size:0.75rem;}.relatorio-tabela-planilha th{background:#eff6ff;color:#1e40af;font-weight:800;text-transform:uppercase;padding:6px;border-bottom:2px solid #bfdbfe;text-align:left;}.relatorio-tabela-planilha td{padding:6px;border-bottom:1px solid #e2e8f0;text-align:left;}</style></head><body>${conteudoHtml}</body></html>`);
       doc.close();
       iframe.contentWindow.focus();
       setTimeout(() => { iframe.contentWindow.print(); }, 250);
     }
 
     function imprimirNota() {
-      const htmlRecibo = document.getElementById('printable-receipt').outerHTML;
-      executarImpressaoSilenciosa(htmlRecibo, 'Comprovante do Pedido');
+      executarImpressaoSilenciosa(document.getElementById('printable-receipt').outerHTML, 'Comprovante');
     }
 
     function imprimirRelatorio() {
-      const htmlRelatorio = document.getElementById('area-relatorio-impressao').outerHTML;
-      executarImpressaoSilenciosa(htmlRelatorio, 'Relatório de Vendas');
+      executarImpressaoSilenciosa(document.getElementById('area-relatorio-impressao').outerHTML, 'Relatório de Vendas');
     }
 
     function exportarRelatorioExcel() {
-      const tipo = document.getElementById('filtro-periodo').value;
-      const agora = new Date();
-      let pedidosFiltrados = [];
-
-      if (tipo === 'hoje') {
-        const hojeStr = agora.toDateString();
-        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao.toDateString && p.dataCriacao.toDateString() === hojeStr);
-      } else if (tipo === 'semana') {
-        const seteDiasAtras = new Date();
-        seteDiasAtras.setDate(agora.getDate() - 7);
-        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao >= seteDiasAtras);
-      } else if (tipo === 'mes') {
-        const mesAtual = agora.getMonth();
-        const anoAtual = agora.getFullYear();
-        pedidosFiltrados = state.pedidos.filter(p => {
-          if (!p.dataCriacao) return false;
-          return p.dataCriacao.getMonth() === mesAtual && p.dataCriacao.getFullYear() === anoAtual;
-        });
-      } else {
-        pedidosFiltrados = state.pedidos;
-      }
-
-      let csv = "Pedido;Data;Cliente;Total;Status;Forma Pgto\n";
-      pedidosFiltrados.forEach(p => {
-        const dataStr = p.dataCriacao ? p.dataCriacao.toLocaleDateString('pt-BR') : '';
-        const totalStr = (p.total || 0).toFixed(2).replace('.', ',');
-        csv += `#${p.numeroPedido || ''};${dataStr};"${p.clienteNome || ''}";R$ ${totalStr};${p.status || ''};${p.formaPgto || ''}\n`;
+      let csv = "Pedido;Data;Cliente;Total;Status\n";
+      state.pedidos.forEach(p => {
+        csv += `#${p.numeroPedido || ''};${p.dataCriacao.toLocaleDateString('pt-BR')};"${p.clienteNome || ''}";R$ ${(p.total || 0).toFixed(2).replace('.', ',')};${p.status || ''}\n`;
       });
-
       const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `relatorio_vendas_${tipo}_${new Date().toISOString().slice(0,10)}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      a.href = url; a.download = `relatorio_vendas.csv`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
 
     function abrirResumoVendas() {
@@ -1945,82 +1669,35 @@
 
     function atualizarFiltroRelatorio() {
       const tipo = document.getElementById('filtro-periodo').value;
-      const boxDatas = document.getElementById('container-datas-personalizadas');
-      boxDatas.style.display = (tipo === 'personalizado') ? 'grid' : 'none';
+      document.getElementById('container-datas-personalizadas').style.display = (tipo === 'personalizado') ? 'grid' : 'none';
       renderizarDadosRelatorio();
     }
 
     function renderizarDadosRelatorio() {
       const tipo = document.getElementById('filtro-periodo').value;
       const agora = new Date();
-      let pedidosFiltrados = [];
-      let textoPeriodo = '';
-
+      let pedidosFiltrados = state.pedidos;
       document.getElementById('relatorio-data-emissao').innerText = `Emitido em: ${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
 
       if (tipo === 'hoje') {
-        const hojeStr = agora.toDateString();
-        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao.toDateString && p.dataCriacao.toDateString() === hojeStr);
-        textoPeriodo = `Período: Hoje (${agora.toLocaleDateString('pt-BR')})`;
+        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao.toDateString() === agora.toDateString());
       } else if (tipo === 'semana') {
-        const seteDiasAtras = new Date();
-        seteDiasAtras.setDate(agora.getDate() - 7);
-        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao && p.dataCriacao >= seteDiasAtras);
-        textoPeriodo = `Período: Últimos 7 dias`;
+        const limite = new Date(); limite.setDate(agora.getDate() - 7);
+        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao >= limite);
       } else if (tipo === 'mes') {
-        const mesAtual = agora.getMonth();
-        const anoAtual = agora.getFullYear();
-        pedidosFiltrados = state.pedidos.filter(p => {
-          if (!p.dataCriacao) return false;
-          return p.dataCriacao.getMonth() === mesAtual && p.dataCriacao.getFullYear() === anoAtual;
-        });
-        textoPeriodo = `Período: Mês Atual`;
-      } else if (tipo === 'personalizado') {
-        const dInicio = document.getElementById('data-inicio').value;
-        const dFim = document.getElementById('data-fim').value;
-        if (dInicio && dFim) {
-          const inicio = new Date(dInicio + 'T00:00:00');
-          const fim = new Date(dFim + 'T23:59:59');
-          pedidosFiltrados = state.pedidos.filter(p => {
-            if (!p.dataCriacao) return false;
-            return p.dataCriacao >= inicio && p.dataCriacao <= fim;
-          });
-          textoPeriodo = `Período: De ${dInicio.split('-').reverse().join('/')} até ${dFim.split('-').reverse().join('/')}`;
-        } else {
-          pedidosFiltrados = state.pedidos;
-          textoPeriodo = `Período: Personalizado (Selecione as datas)`;
-        }
+        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao.getMonth() === agora.getMonth() && p.dataCriacao.getFullYear() === agora.getFullYear());
       }
 
-      document.getElementById('resumo-periodo-texto').innerText = textoPeriodo;
-
       const totalPeriodo = pedidosFiltrados.reduce((acc, p) => acc + (p.total || 0), 0);
-      const qtdPedidos = pedidosFiltrados.length;
-      const ticketMedio = qtdPedidos > 0 ? (totalPeriodo / qtdPedidos) : 0;
-
       document.getElementById('resumo-total-periodo').innerText = `R$ ${totalPeriodo.toFixed(2)}`;
-      document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
-      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
+      document.getElementById('resumo-qtd-pedidos').innerText = pedidosFiltrados.length;
 
-      // Detalhes por forma de pagamento
       const formas = {};
-      pedidosFiltrados.forEach(p => {
-        const f = p.formaPgto || 'Outros';
-        formas[f] = (formas[f] || 0) + (p.total || 0);
-      });
-      const detalheFormasEl = document.getElementById('resumo-detalhe-formas');
-      const formasHtml = Object.keys(formas).map(f => `• ${f}: <strong>R$ ${formas[f].toFixed(2)}</strong>`).join('<br>');
-      detalheFormasEl.innerHTML = formasHtml || 'Nenhum registro no período.';
+      pedidosFiltrados.forEach(p => { formas[p.formaPgto || 'Outros'] = (formas[p.formaPgto || 'Outros'] || 0) + (p.total || 0); });
+      document.getElementById('resumo-detalhe-formas').innerHTML = Object.keys(formas).map(f => `• ${f}: <strong>R$ ${formas[f].toFixed(2)}</strong>`).join('<br>') || 'Nenhum registro.';
 
-      const tbody = document.getElementById('resumo-tabela-periodo');
-      tbody.innerHTML = pedidosFiltrados.map(p => `
-        <tr>
-          <td>#${p.numeroPedido || ''}</td>
-          <td>${p.dataCriacao ? p.dataCriacao.toLocaleDateString('pt-BR') : ''}</td>
-          <td>${p.clienteNome}</td>
-          <td>R$ ${parseFloat(p.total).toFixed(2)}</td>
-          <td><span class="badge ${p.status === 'Pago' ? 'badge-pago' : 'badge-pendente'}">${p.status}</span></td>
-        </tr>
+      document.getElementById('resumo-tabela-periodo').innerHTML = pedidosFiltrados.map(p => `
+        <tr><td>#${p.numeroPedido}</td><td>${p.dataCriacao.toLocaleDateString('pt-BR')}</td><td>${p.clienteNome}</td><td>R$ ${p.total.toFixed(2)}</td><td>${p.status}</td></tr>
       `).join('');
     }
 
