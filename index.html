@@ -94,7 +94,7 @@
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
-    /* DESIGN DOS RECIBOS EXATAMENTE 50% POR BLOCO (2 POR PÁGINA) */
+    /* DESIGN DOS RECIBOS */
     .receipt-box { 
       background: #ffffff; 
       border: 1px solid #e2e8f0;
@@ -110,14 +110,14 @@
     }
 
     .recibo-bloco-pagina {
-      height: 135mm;
+      min-height: 120mm;
       max-height: 135mm;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       box-sizing: border-box;
       padding: 10mm;
-      margin-bottom: 2mm;
+      margin-bottom: 4mm;
       border: 1px dashed #cbd5e1;
       border-radius: 8px;
       background: #ffffff;
@@ -227,11 +227,12 @@
       background-color: #f8fafc;
     }
 
-    /* REGRAS CSS DE IMPRESSÃO (OCULTAR RODAPÉS/URLS AUTOMÁTICOS DO NAVEGADOR E LINK FOOTPRINTS) */
+    /* REGRAS DE IMPRESSÃO LIMPA (SEM FUNDO AZUL NAS MARGENS E SEM URLS AUTOMÁTICAS) */
     @media print {
+      body { background-color: #ffffff !important; }
       body * { visibility: hidden; }
       #printable-receipt, #printable-receipt *, #area-relatorio-impressao, #area-relatorio-impressao * { visibility: visible; }
-      #printable-receipt, #area-relatorio-impressao { position: absolute; left: 0; top: 0; width: 100%; border: none; padding: 0; margin: 0; box-shadow: none; }
+      #printable-receipt, #area-relatorio-impressao { position: absolute; left: 0; top: 0; width: 100%; border: none; padding: 0; margin: 0; box-shadow: none; background: #ffffff !important; }
       @page { size: A4; margin: 10mm; }
     }
   </style>
@@ -562,8 +563,8 @@
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       <div class="receipt-box" id="printable-receipt"></div>
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button class="btn" type="button" style="background:#059669;" onclick="imprimirDiretoDispositivo()">🖨️ Imprimir Direto (Chrome / PC)</button>
-        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRecibo()">📥 Baixar PDF (Safari / Celular)</button>
+        <button class="btn" type="button" style="background:#059669;" onclick="imprimirDiretoDispositivo()">🖨️ Imprimir</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRecibo()">📥 Baixar PDF</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:2px;">Fechar Nota</button>
       </div>
     </div>
@@ -625,8 +626,8 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#059669;" onclick="imprimirDiretoRelatorio()">🖨️ Imprimir Relatório</button>
-        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRelatorio()">📥 Baixar PDF Relatório</button>
+        <button class="btn" type="button" style="background:#059669;" onclick="imprimirDiretoRelatorio()">🖨️ Imprimir</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRelatorio()">📥 Baixar PDF</button>
       </div>
       <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:8px;">
         <button class="btn" type="button" style="background:#475569;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
@@ -1038,7 +1039,7 @@
     }
 
     function imprimirPedidosSelecionados() {
-      const selecionados = Array.from(document.querySelectorAll('.check-pedido:checked')).map(cb => cb.value);
+      const selecionados = Array.from(new Set(Array.from(document.querySelectorAll('.check-pedido:checked')).map(cb => cb.value)));
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
       
       const receiptBox = document.getElementById('printable-receipt');
@@ -1263,13 +1264,23 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    // IMPRESSÃO DIRETA NATIVA (CHROME / DESKTOP) E DOWNLOAD PDF (SAFARI / IPHONE)
+    // FUNÇÕES DE IMPRESSÃO UNIVERSAL RÁPIDA (DIRETO NO PC OU CONVERTIDA EM PDF NO IPHONE)
     function imprimirDiretoDispositivo() {
-      window.print();
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (isIOS) {
+        gerarPdfRecibo();
+      } else {
+        window.print();
+      }
     }
 
     function imprimirDiretoRelatorio() {
-      window.print();
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (isIOS) {
+        gerarPdfRelatorio();
+      } else {
+        window.print();
+      }
     }
 
     function gerarPdfRecibo() {
