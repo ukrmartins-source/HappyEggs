@@ -118,43 +118,45 @@
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
     /* ========================================================= */
-    /* ESTILOS EXCLUSIVOS DO NOVO RELATÓRIO DE VENDAS (PLANILHA) */
+    /* ESTILOS EXCLUSIVOS DO RELATÓRIO DE VENDAS (DESIGN RECIBO) */
     /* ========================================================= */
     .relatorio-sheet-box {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 18px;
-      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px;
+      color: #1e293b;
+      font-size: 0.82rem;
+      line-height: 1.35;
     }
     .relatorio-sheet-header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       color: #ffffff;
-      padding: 14px 16px;
+      padding: 10px 14px;
       border-radius: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 3px solid #2563eb;
     }
     .relatorio-sheet-header h3 {
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .relatorio-kpi-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
     }
     .relatorio-kpi-item {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       border-left: 3px solid #2563eb;
-      padding: 10px;
+      padding: 8px 10px;
       border-radius: 6px;
     }
     .relatorio-kpi-label {
@@ -162,7 +164,7 @@
       color: #64748b;
       font-weight: 800;
       text-transform: uppercase;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
     .relatorio-kpi-val {
       font-size: 1.1rem;
@@ -172,34 +174,33 @@
     .relatorio-section-box {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-bottom: 14px;
-      font-size: 0.82rem;
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      font-size: 0.78rem;
     }
     .relatorio-tabela-planilha {
       width: 100%;
       border-collapse: collapse;
       margin-top: 5px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
     }
     .relatorio-tabela-planilha th {
       background: #eff6ff;
       color: #1e40af;
       font-weight: 800;
       text-transform: uppercase;
-      font-size: 0.7rem;
-      padding: 8px 6px;
+      font-size: 0.68rem;
+      padding: 6px;
       border-bottom: 2px solid #bfdbfe;
-      border-top: 1px solid #e2e8f0;
     }
     .relatorio-tabela-planilha td {
-      padding: 8px 6px;
+      padding: 6px;
       border-bottom: 1px solid #e2e8f0;
-      color: #334155;
+      color: #1e293b;
     }
     .relatorio-tabela-planilha tr:nth-child(even) {
-      background-color: #f8fafc; /* Efeito zebrado elegante */
+      background-color: #f8fafc;
     }
   </style>
 </head>
@@ -626,7 +627,7 @@
     </div>
   </div>
 
-  <!-- MODAL: RELATÓRIO DE VENDAS FLEXÍVEL COM ESTILO PLANILHA TECNOLÓGICA -->
+  <!-- MODAL: RELATÓRIO DE VENDAS COM ESTILO DE DESIGN IGUAL AO RECIBO (SEM TICKET MÉDIO) -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 520px;">
       
@@ -655,11 +656,11 @@
 
       <div id="resumo-periodo-texto" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px; font-weight:bold;"></div>
 
-      <!-- CONTAINER ESTILIZADO EM FORMATO PLANILHA TECNOLÓGICA -->
+      <!-- CONTAINER ESTILIZADO IGUAL AO RECIBO -->
       <div id="area-relatorio-impressao" class="relatorio-sheet-box">
         <div class="relatorio-sheet-header">
           <h3>Relatório de Vendas</h3>
-          <span style="font-size: 0.75rem; font-weight: 600; opacity: 0.9;" id="relatorio-data-emissao"></span>
+          <span style="font-size: 0.72rem; font-weight: 600;" id="relatorio-data-emissao"></span>
         </div>
 
         <div class="relatorio-kpi-grid">
@@ -671,19 +672,15 @@
             <div class="relatorio-kpi-label">Nº de Pedidos</div>
             <div class="relatorio-kpi-val" id="resumo-qtd-pedidos">0</div>
           </div>
-          <div class="relatorio-kpi-item">
-            <div class="relatorio-kpi-label">Ticket Médio</div>
-            <div class="relatorio-kpi-val" id="resumo-ticket-medio">R$ 0,00</div>
-          </div>
         </div>
 
         <div class="relatorio-section-box">
-          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Recebimento por Forma de Pagamento</div>
+          <div style="font-size: 0.68rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Recebimento por Forma de Pagamento</div>
           <div id="resumo-detalhe-formas" style="line-height: 1.4; color: #1e293b;"></div>
         </div>
 
         <div>
-          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Vendas Listadas no Período</div>
+          <div style="font-size: 0.68rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Vendas Listadas no Período</div>
           <table class="relatorio-tabela-planilha">
             <thead>
               <tr>
@@ -789,7 +786,6 @@
       }).catch(err => console.error("Erro na inicialização:", err));
     }
 
-    // --- CARREGAR DADOS DO SUPER ADMIN (DASHBOARD GLOBAL E EMPRESAS) ---
     function initSuperAdminListener() {
       db.collection("empresas").onSnapshot(snapshot => {
         state.empresasSaaS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -846,7 +842,7 @@
 
       try {
         localStorage.setItem('happyeggs_superadmin_pass', novaSenha);
-        alert('Senha de Super Admin alterada com sucesso! Lembre-se da nova senha.');
+        alert('Senha de Super Admin alterada com sucesso!');
         document.getElementById('modal-seguranca-superadmin').style.display = 'none';
       } catch (err) {
         alert('Erro ao atualizar senha: ' + err.message);
@@ -976,7 +972,7 @@
         if (empDoc.exists) {
           const empData = empDoc.data();
           if (empData.status !== "Ativo") {
-            alert("A conta da sua empresa está bloqueada. Entre em contato com o suporte.");
+            alert("A conta da sua empresa está bloqueada.");
             return;
           }
 
@@ -986,7 +982,7 @@
             const vencimentoDate = new Date(empData.vencimento + 'T00:00:00');
 
             if (hoje > vencimentoDate) {
-              alert(`Aviso: A assinatura da sua granja expirou em ${vencimentoDate.toLocaleDateString('pt-BR')}. O acesso está temporariamente bloqueado.`);
+              alert(`Aviso: A assinatura da sua granja expirou em ${vencimentoDate.toLocaleDateString('pt-BR')}.`);
               return;
             }
           }
@@ -1002,7 +998,7 @@
         navTo('dashboard');
       } catch (error) {
         console.error("Erro na autenticação:", error);
-        alert("Erro ao tentar entrar. Tente novamente.");
+        alert("Erro ao tentar entrar.");
       }
     }
 
@@ -1086,23 +1082,13 @@
 
       try {
         await db.collection("empresas").doc(idEmpresa).set({
-          nome,
-          cnpj,
-          email,
-          tel,
-          end,
-          plano,
-          valorPlano,
-          vencimento,
+          nome, cnpj, email, tel, end, plano, valorPlano, vencimento,
           status: "Ativo",
           criadoEm: new Date()
         });
 
         await db.collection("config").doc(idEmpresa).set({
-          nome,
-          cnpj,
-          tel,
-          end,
+          nome, cnpj, tel, end,
           social: "",
           pix: ""
         });
@@ -1173,7 +1159,7 @@
 
       try {
         await db.collection("usuarios").doc(usuarioId).update({ pass: novaSenha.trim() });
-        alert(`Senha do usuário "${loginUser}" atualizada com sucesso!`);
+        alert(`Senha atualizada com sucesso!`);
       } catch (err) {
         alert("Erro ao atualizar senha: " + err.message);
       }
@@ -1185,12 +1171,12 @@
     }
 
     async function excluirEmpresaSaaS(id) {
-      if (confirm(`Tem certeza que deseja excluir a empresa ${id} e seus dados? Esta ação não pode ser desfeita.`)) {
+      if (confirm(`Tem certeza que deseja excluir a empresa ${id}?`)) {
         try {
           await db.collection("empresas").doc(id).delete();
           alert('Empresa excluída com sucesso!');
         } catch (err) {
-          alert('Erro ao excluir empresa: ' + err.message);
+          alert('Erro ao excluir: ' + err.message);
         }
       }
     }
@@ -1276,7 +1262,7 @@
     }
 
     /* ========================================================================= */
-    /* FUNÇÃO DE IMPRESSÃO DE RECIBOS COMPLETA (DESIGN CORPORATIVO + 50% / 50%)  */
+    /* FUNÇÃO DE IMPRESSÃO DE RECIBOS (COM DADOS DA EMPRESA APENAS NO RODAPÉ)     */
     /* ========================================================================= */
     function imprimirPedidosSelecionados() {
       const selecionados = Array.from(document.querySelectorAll('.check-pedido:checked')).map(cb => cb.value);
@@ -1298,7 +1284,6 @@
         const statusSymbol = isPago ? '🟢' : '🔴';
         const itens = ped.itens || [];
 
-        // Força quebra limpa exatamente a cada 2 pedidos para garantir exatos 2 por página (50% superior e 50% inferior)
         const deveQuebrarPagina = (idx > 0 && idx % 2 === 0);
 
         const reciboHTML = `
@@ -1308,10 +1293,6 @@
               <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb;">
                 <h3 style="font-size: 0.85rem; font-weight: 800; text-transform: uppercase;">${emp.nome || 'HAPPY EGGS'}</h3>
                 <span style="font-size: 0.72rem; font-weight: 600;">COMPROVANTE #${ped.numeroPedido || '---'}</span>
-              </div>
-
-              <div style="text-align: center; margin-bottom: 6px; font-size: 0.75rem; color: #475569;">
-                <div>CNPJ/CPF: ${emp.cnpj || 'N/I'} | Tel/Whats: ${emp.tel || 'N/I'}</div>
               </div>
 
               <div style="font-size: 0.8rem; margin-bottom: 6px; color: #334155; line-height: 1.3;">
@@ -1349,8 +1330,10 @@
               </div>
             </div>
 
+            <!-- RODAPÉ DA NOTA COM TODOS OS DADOS DA EMPRESA UNIFICADOS -->
             <div style="text-align: center; font-size: 0.72rem; color: #475569; border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 6px;">
               <div style="font-weight: 800; font-size: 0.78rem; color: #0f172a; margin-bottom: 1px;">${emp.nome || 'Happy Eggs'}</div>
+              <div>CNPJ: ${emp.cnpj || 'N/I'} | Tel/WhatsApp: ${emp.tel || 'N/I'}</div>
               ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
               ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
               <div style="font-weight: 600; color: #2563eb; margin-top: 2px;">Obrigado pela preferência!</div>
@@ -1612,7 +1595,7 @@
     }
 
     async function excluirOuCancelarPedido(id, numero, qtdOvosEstorno) {
-      if (!confirm(`Tem certeza que deseja excluir o Pedido #${numero || ''}?\nOs ${qtdOvosEstorno || 0} ovos deste pedido retornarão ao Estoque Geral.`)) {
+      if (!confirm(`Tem certeza que deseja excluir o Pedido #${numero || ''}?\nOs ${qtdOvosEstorno || 0} ovos retornarão ao Estoque Geral.`)) {
         return;
       }
       try {
@@ -1627,7 +1610,7 @@
           });
         }
 
-        alert(`Pedido #${numero || ''} excluído e estoque estornado com sucesso!`);
+        alert(`Pedido #${numero || ''} excluído e estoque estornado!`);
       } catch (err) {
         console.error("Erro ao excluir pedido:", err);
         alert("Erro ao excluir o pedido.");
@@ -1715,7 +1698,7 @@
         fecharModalBalanco();
       } catch (err) {
         console.error("Erro ao atualizar balanço:", err);
-        alert('Erro ao salvar o balanço no banco de dados.');
+        alert('Erro ao salvar.');
       }
     }
 
@@ -1803,10 +1786,6 @@
           <span style="font-size: 0.72rem; font-weight: 600;">COMPROVANTE #${numPedido}</span>
         </div>
 
-        <div style="text-align: center; margin-bottom: 6px; font-size: 0.75rem; color: #475569;">
-          <div>CNPJ/CPF: ${emp.cnpj || 'N/I'} | Tel/Whats: ${emp.tel || 'N/I'}</div>
-        </div>
-
         <div style="font-size: 0.8rem; margin-bottom: 6px; color: #334155; line-height: 1.3;">
           <div><strong>Cliente:</strong> ${clienteNome}</div>
           <div><strong>Documento:</strong> ${clienteDoc}</div>
@@ -1843,6 +1822,7 @@
 
         <div style="text-align: center; font-size: 0.72rem; color: #475569; border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 6px;">
           <div style="font-weight: 800; font-size: 0.78rem; color: #0f172a; margin-bottom: 1px;">${emp.nome || 'Happy Eggs'}</div>
+          <div>CNPJ: ${emp.cnpj || 'N/I'} | Tel/WhatsApp: ${emp.tel || 'N/I'}</div>
           ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
           ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
           <div style="font-weight: 600; color: #2563eb; margin-top: 2px;">Obrigado pela preferência!</div>
@@ -1993,7 +1973,7 @@
           textoPeriodo = `Período: De ${dInicio.split('-').reverse().join('/')} até ${dFim.split('-').reverse().join('/')}`;
         } else {
           pedidosFiltrados = state.pedidos;
-          textoPeriodo = `Período: Personalizado (Selecione as datas)`;
+          textoPeriodo = `Período: Personalizado`;
         }
       }
 
@@ -2001,11 +1981,9 @@
 
       const totalPeriodo = pedidosFiltrados.reduce((acc, p) => acc + (p.total || 0), 0);
       const qtdPedidos = pedidosFiltrados.length;
-      const ticketMedio = qtdPedidos > 0 ? (totalPeriodo / qtdPedidos) : 0;
 
       document.getElementById('resumo-total-periodo').innerText = `R$ ${totalPeriodo.toFixed(2)}`;
       document.getElementById('resumo-qtd-pedidos').innerText = qtdPedidos;
-      document.getElementById('resumo-ticket-medio').innerText = `R$ ${ticketMedio.toFixed(2)}`;
 
       // Detalhes por forma de pagamento
       const formas = {};
