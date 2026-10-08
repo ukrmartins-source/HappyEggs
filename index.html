@@ -202,23 +202,69 @@
       background-color: #f8fafc;
     }
 
-    /* REGRAS DE IMPRESSÃO NATIVA RÁPIDA E LIMPA */
+    /* REGRAS DE IMPRESSÃO EXATA (50% DE ALTURA POR RECIBO E ZERO FUNDOS AZUIS) */
     @media print {
+      body, html {
+        background: #ffffff !important;
+        color: #000000 !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
       body * { visibility: hidden !important; }
+      
+      #modal-nota:not([style*="display: none"]),
       #modal-nota:not([style*="display: none"]) #printable-receipt,
       #modal-nota:not([style*="display: none"]) #printable-receipt *,
+      #modal-resumo:not([style*="display: none"]),
       #modal-resumo:not([style*="display: none"]) #area-relatorio-impressao,
       #modal-resumo:not([style*="display: none"]) #area-relatorio-impressao * {
         visibility: visible !important;
       }
+
       #modal-nota:not([style*="display: none"]) #printable-receipt {
-        position: absolute; left: 0; top: 0; width: 100% !important; border: none !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
       }
+
+      .recibo-bloco-pagina {
+        height: 50vh !important;
+        max-height: 50vh !important;
+        box-sizing: border-box !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        overflow: hidden !important;
+        padding: 10px !important;
+        margin-bottom: 0 !important;
+      }
+
       #modal-resumo:not([style*="display: none"]) #area-relatorio-impressao {
-        position: absolute; left: 0; top: 0; width: 100% !important; border: none !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        padding: 0 !important;
       }
-      .modal { position: static !important; background: transparent !important; display: block !important; }
-      .modal-content { max-width: 100% !important; width: 100% !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+
+      .modal, .modal-content {
+        position: static !important;
+        background: transparent !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
     }
   </style>
 </head>
@@ -237,7 +283,7 @@
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
-      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas[cite: 2]</p>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
       <form onsubmit="autenticar(event)">
         <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password"></div>
@@ -541,7 +587,7 @@
     </div>
   </div>
 
-  <!-- MODAL: RELATÓRIO DE VENDAS (SEM TICKET MÉDIO) -->
+  <!-- MODAL: RELATÓRIO DE VENDAS -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 520px;">
       <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
@@ -918,33 +964,27 @@
       receiptBox.innerHTML = '';
       const emp = state.empresa || {};
 
-      selecionados.forEach((id, idx) => {
+      selecionados.forEach((id) => {
         const ped = state.pedidos.find(p => p.id === id);
         if (!ped) return;
         const itens = ped.itens || [];
 
         receiptBox.innerHTML += `
-          <div style="${idx > 0 ? 'margin-top:20px; border-top: 1.5px dashed #4b5563; padding-top: 20px;' : ''}">
-            <div style="text-align:center; margin-bottom:8px;">
-              <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase;">${emp.nome || 'HAPPY EGGS'}</h2>
-              <p style="font-size:0.85rem; color:#374151;">CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}</p>
+          <div class="recibo-bloco-pagina">
+            <div style="text-align:center; margin-bottom:4px;">
+              <h2 style="font-size:1rem; font-weight:800; text-transform:uppercase;">${emp.nome || 'HAPPY EGGS'}</h2>
+              <p style="font-size:0.75rem; color:#374151;">CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}</p>
             </div>
-            <hr class="dashed-divider">
-            <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}</div>
-            <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
-            <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-            <hr class="dashed-divider">
-            <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS:</div>
-            ${itens.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
-            <hr class="dashed-divider">
-            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem;"><span>TOTAL:</span><span>R$ ${parseFloat(ped.total || 0).toFixed(2)}</span></div>
-            <div style="margin-top:4px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'}</div>
-            <hr class="dashed-divider">
-            <div style="text-align:center; font-size:0.75rem; color:#64748b;">
-              <div style="font-weight:800; color:#0f172a; text-transform:uppercase;">${emp.nome || 'Happy Eggs'}</div>
-              <div>${emp.end || ''}</div>
-              ${emp.social ? `<div>${emp.social}</div>` : ''}
-            </div>
+            <hr class="dashed-divider" style="margin:4px 0;">
+            <div style="font-weight:800; font-size:0.85rem; margin-bottom:4px; text-transform:uppercase;">COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}</div>
+            <div style="font-size:0.8rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
+            <div style="font-size:0.8rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+            <hr class="dashed-divider" style="margin:4px 0;">
+            <div style="font-weight:800; font-size:0.75rem; text-transform:uppercase; margin-bottom:4px;">ITENS:</div>
+            ${itens.map(i => `<div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:2px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
+            <hr class="dashed-divider" style="margin:4px 0;">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.9rem;"><span>TOTAL:</span><span>R$ ${parseFloat(ped.total || 0).toFixed(2)}</span></div>
+            <div style="font-size:0.8rem; margin-top:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'}</div>
           </div>
         `;
       });
@@ -1044,6 +1084,47 @@
       tbody.innerHTML = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje).map(p => `<tr><td>${new Date(p.dataHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td><td>+ ${p.qtdOvos} ovos</td></tr>`).join('');
     }
 
+    function abrirModalBalanco() {
+      if (!state.currentUser || state.currentUser.role !== 'admin') {
+        alert('Acesso restrito a administradores.');
+        return;
+      }
+      document.getElementById('balanco-nova-qtd').value = state.estoqueGeralOvos || 0;
+      document.getElementById('balanco-motivo').value = '';
+      document.getElementById('modal-balanco').style.display = 'flex';
+    }
+
+    function fecharModalBalanco() {
+      document.getElementById('modal-balanco').style.display = 'none';
+    }
+
+    async function salvarBalancoEstoque(e) {
+      e.preventDefault();
+      const novaQtd = parseInt(document.getElementById('balanco-nova-qtd').value);
+      const motivo = document.getElementById('balanco-motivo').value.trim();
+
+      if (isNaN(novaQtd) || novaQtd < 0) {
+        alert('Insira uma quantidade válida.');
+        return;
+      }
+
+      try {
+        const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+        await refEstoque.set({ 
+          qtdOvos: novaQtd,
+          ultimoAjusteEm: new Date(),
+          ajustadoPor: state.currentUser.login,
+          motivoAjuste: motivo
+        }, { merge: true });
+
+        alert('Estoque geral atualizado com sucesso!');
+        fecharModalBalanco();
+      } catch (err) {
+        console.error("Erro ao atualizar balanço:", err);
+        alert('Erro ao salvar o balanço no banco de dados.');
+      }
+    }
+
     async function salvarEmpresa(e) {
       e.preventDefault();
       const dados = { nome: document.getElementById('emp-nome').value.trim(), cnpj: document.getElementById('emp-cnpj').value.trim(), tel: document.getElementById('emp-tel').value.trim(), end: document.getElementById('emp-end').value.trim(), social: document.getElementById('emp-social').value.trim(), pix: document.getElementById('emp-pix').value.trim() };
@@ -1057,25 +1138,21 @@
       const emp = state.empresa || {};
 
       document.getElementById('printable-receipt').innerHTML = `
-        <div style="text-align:center; margin-bottom:8px;">
-          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase;">${emp.nome || 'HAPPY EGGS'}</h2>
-          <p style="font-size:0.85rem; color:#374151;">CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}</p>
-        </div>
-        <hr class="dashed-divider">
-        <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}</div>
-        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-        <hr class="dashed-divider">
-        <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS:</div>
-        ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
-        <hr class="dashed-divider">
-        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem;"><span>TOTAL:</span><span>R$ ${parseFloat(ped.total).toFixed(2)}</span></div>
-        <div style="margin-top:4px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'}</div>
-        <hr class="dashed-divider">
-        <div style="text-align:center; font-size:0.75rem; color:#64748b;">
-          <div style="font-weight:800; color:#0f172a; text-transform:uppercase;">${emp.nome || 'Happy Eggs'}</div>
-          <div>${emp.end || ''}</div>
-          ${emp.social ? `<div>${emp.social}</div>` : ''}
+        <div class="recibo-bloco-pagina">
+          <div style="text-align:center; margin-bottom:4px;">
+            <h2 style="font-size:1rem; font-weight:800; text-transform:uppercase;">${emp.nome || 'HAPPY EGGS'}</h2>
+            <p style="font-size:0.75rem; color:#374151;">CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}</p>
+          </div>
+          <hr class="dashed-divider" style="margin:4px 0;">
+          <div style="font-weight:800; font-size:0.85rem; margin-bottom:4px; text-transform:uppercase;">COMPROVANTE DE PEDIDO #${ped.numeroPedido || '---'}</div>
+          <div style="font-size:0.8rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+          <div style="font-size:0.8rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+          <hr class="dashed-divider" style="margin:4px 0;">
+          <div style="font-weight:800; font-size:0.75rem; text-transform:uppercase; margin-bottom:4px;">ITENS:</div>
+          ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:2px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
+          <hr class="dashed-divider" style="margin:4px 0;">
+          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.9rem;"><span>TOTAL:</span><span>R$ ${parseFloat(ped.total).toFixed(2)}</span></div>
+          <div style="font-size:0.8rem; margin-top:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'}</div>
         </div>
       `;
       document.getElementById('modal-nota').style.display = 'flex';
