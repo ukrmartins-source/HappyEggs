@@ -13,7 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- HTML2PDF PARA GERAR O COMPROVANTE E EXPORTAÇÕES EXATAS -->
+  <!-- HTML2PDF PARA GERAR PDF RÁPIDO E EVITAR TRAVAMENTOS NO SAFARI/IPHONE -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -94,7 +94,7 @@
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
-    /* DESIGN PADRONIZADO PARA RECIBOS */
+    /* DESIGN DOS RECIBOS OTIMIZADOS PARA PDF / IMPRESSÃO */
     .receipt-box { 
       background: #ffffff; 
       border: 1px solid #e2e8f0;
@@ -108,14 +108,14 @@
     }
 
     .recibo-bloco-pagina {
-      height: 47vh;
-      max-height: 47vh;
+      height: 130mm;
+      max-height: 130mm;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       box-sizing: border-box;
-      padding: 10px;
-      margin-bottom: 8px;
+      padding: 12mm;
+      margin-bottom: 5mm;
       border: 1px dashed #cbd5e1;
       border-radius: 8px;
       background: #ffffff;
@@ -126,16 +126,16 @@
     .recibo-sheet-header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       color: #ffffff;
-      padding: 8px 12px;
+      padding: 10px 14px;
       border-radius: 6px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid #2563eb;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -143,7 +143,6 @@
     .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
-    /* ESTILOS DO RELATÓRIO DE VENDAS (PLANILHA) */
     .relatorio-sheet-box {
       background: #ffffff;
       border: 1px solid #e2e8f0;
@@ -225,76 +224,6 @@
     .relatorio-tabela-planilha tr:nth-child(even) {
       background-color: #f8fafc;
     }
-
-    /* REGRAS DE IMPRESSÃO ESTRIITAS SEM PÁGINAS EM BRANCO EXTRAS */
-    @media print {
-      @page {
-        size: A4 portrait;
-        margin: 5mm;
-      }
-      body, html {
-        background: #ffffff !important;
-        color: #000000 !important;
-        height: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-      }
-      body * { visibility: hidden !important; }
-      
-      #modal-nota:not([style*="display: none"]),
-      #modal-nota:not([style*="display: none"]) #printable-receipt,
-      #modal-nota:not([style*="display: none"]) #printable-receipt *,
-      #modal-resumo:not([style*="display: none"]),
-      #modal-resumo:not([style*="display: none"]) #area-relatorio-impressao,
-      #modal-resumo:not([style*="display: none"]) #area-relatorio-impressao * {
-        visibility: visible !important;
-      }
-
-      #modal-nota:not([style*="display: none"]) #printable-receipt {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        border: none !important;
-        background: transparent !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-
-      .recibo-bloco-pagina {
-        height: 47vh !important;
-        max-height: 47vh !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        page-break-after: auto !important;
-        border: 1px dashed #9ca3af !important;
-        margin-bottom: 8px !important;
-      }
-
-      #modal-resumo:not([style*="display: none"]) #area-relatorio-impressao {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        border: none !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-      }
-
-      .modal, .modal-content {
-        position: static !important;
-        background: transparent !important;
-        display: block !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        overflow: visible !important;
-      }
-    }
   </style>
 </head>
 <body>
@@ -375,11 +304,12 @@
 
       <div class="card" id="saas-card-empresas" style="display: none;">
         <div class="card-header">
-          <div class="card-title">Empresas, Planos e Credenciais</div>
+          <div class="card-title">Empresas e Clientes Cadastrados</div>
           <button class="btn btn-back" type="button" onclick="abrirSecaoSuperAdmin('cadastro')">➕ Voltar Cadastro</button>
         </div>
+        <p style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">Clique sobre o nome da empresa para ver detalhes completos, credenciais e alterar senhas:</p>
         <table>
-          <thead><tr><th>Dados e Plano</th><th>Usuários e Senhas</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Empresa / Granja</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody id="lista-empresas-saas"></tbody>
         </table>
       </div>
@@ -480,7 +410,7 @@
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div class="card-title">Histórico de Pedidos Sequencial</div>
-          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="imprimirPedidosSelecionados()">🖨️ Imprimir Selecionados</button>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="imprimirPedidosSelecionados()">🖨️ Gerar PDF / Imprimir Selecionados</button>
         </div>
         <table>
           <thead>
@@ -590,13 +520,39 @@
     </div>
   </main>
 
+  <!-- MODAL: DETALHES DA EMPRESA / CLIENTE NO SUPER ADMIN -->
+  <div class="modal" id="modal-detalhes-empresa">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="card-title" id="detalhe-titulo-modal" style="margin-bottom: 12px; font-size: 1.1rem; color: var(--accent);">Detalhes da Granja</div>
+      <div id="detalhe-corpo-modal" style="font-size: 0.85rem; line-height: 1.5; color: #334155; margin-bottom: 15px;"></div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <button class="btn" type="button" style="background: var(--warning);" onclick="abrirModalRedefinirSenhaDoDetalhe()">🔑 Alterar Senha do Administrador</button>
+        <button class="btn" type="button" style="background: #64748b;" onclick="document.getElementById('modal-detalhes-empresa').style.display='none'">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: REDEFINIR SENHA DO CLIENTE -->
+  <div class="modal" id="modal-redefinir-senha-cli">
+    <div class="modal-content" style="max-width: 380px;">
+      <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha de Acesso</div>
+      <form onsubmit="salvarNovaSenhaClienteAdmin(event)">
+        <div class="form-group"><label>Nova Senha para o Administrador</label><input type="password" id="nova-senha-cli-input" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button type="submit" class="btn" style="background: var(--warning);">Salvar Senha</button>
+          <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-redefinir-senha-cli').style.display='none'">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
   <div class="modal" id="modal-nota">
     <div class="modal-content">
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       <div class="receipt-box" id="printable-receipt"></div>
       <div style="display:flex; flex-direction:column; gap:10px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirNota()">🖨️ Imprimir</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRecibo()">📥 Baixar PDF / Imprimir (Safari Otimizado)</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:4px;">Fechar Nota</button>
       </div>
     </div>
@@ -658,7 +614,7 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorio()">🖨 Imprimir</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRelatorio()">📥 Baixar PDF Relatório</button>
         <button class="btn" type="button" style="background:#059669;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
       </div>
       <div style="margin-top: 8px;"><button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button></div>
@@ -703,6 +659,7 @@
 
     let carrinhoTemp = [];
     let superAdminPrivacidadeOculto = false;
+    let empresaSelecionadaParaDetalhes = null;
 
     function initApp() {
       db.collection("usuarios").get().then(snapshot => {
@@ -911,7 +868,14 @@
       try {
         await db.collection("empresas").doc(idEmpresa).set({ nome, cnpj, email, tel, end, plano, valorPlano, vencimento, status: "Ativo", criadoEm: new Date() });
         await db.collection("config").doc(idEmpresa).set({ nome, cnpj, tel, end, social: "", pix: "" });
-        await db.collection("usuarios").add({ empresaId: idEmpresa, login: adminUser, pass: adminPass, role: "admin" });
+        
+        const queryUser = await db.collection("usuarios").where("empresaId", "==", idEmpresa).where("login", "==", adminUser).get();
+        if (queryUser.empty) {
+          await db.collection("usuarios").add({ empresaId: idEmpresa, login: adminUser, pass: adminPass, role: "admin" });
+        } else {
+          await queryUser.docs[0].ref.update({ pass: adminPass, role: "admin" });
+        }
+
         alert(`Empresa ${nome} cadastrada com sucesso!`);
         e.target.reset();
         atualizarComportamentoPlano();
@@ -923,32 +887,14 @@
       if (!tbody) return;
       tbody.innerHTML = state.empresasSaaS.map(emp => {
         const isAtivo = emp.status === 'Ativo';
-        const usuariosDaEmpresa = state.todosUsuariosSaaS.filter(u => u.empresaId === emp.id);
-        const valorPlanoFormatado = superAdminPrivacidadeOculto ? "R$ ••••••" : `R$ ${parseFloat(emp.valorPlano || 0).toFixed(2)}`;
-
-        const listaUsuariosHtml = usuariosDaEmpresa.map(u => {
-          const senhaExibida = superAdminPrivacidadeOculto ? "••••••" : u.pass;
-          return `
-            <div style="background:#f8fafc; padding:6px 8px; border-radius:6px; margin-bottom:4px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-              <div>
-                <strong>👤 ${u.login}</strong> <span style="font-size:0.7rem; color:#64748b;">(${u.role})</span><br>
-                <span style="font-size:0.8rem; color:#2563eb;">Senha: <strong>${senhaExibida}</strong></span>
-              </div>
-              <button class="btn-warning" type="button" style="font-size:0.65rem; padding:3px 6px;" onclick="redefinirSenhaCliente('${u.id}', '${u.login}')">Alterar</button>
-            </div>
-          `;
-        }).join('') || '<span style="color:#64748b; font-size:0.8rem;">Nenhum usuário.</span>';
-
         return `
           <tr>
             <td>
-              <strong>${emp.nome}</strong><br>
+              <strong style="cursor: pointer; color: var(--accent); font-size: 0.95rem;" onclick="abrirDetalhesEmpresa('${emp.id}')">🏢 ${emp.nome}</strong><br>
               <small style="color:#64748b;">ID: ${emp.id} | CNPJ: ${emp.cnpj || 'N/I'}</small><br>
-              <small style="color:#2563eb; font-weight:bold;">Plano: ${emp.plano || 'mensal'} (${valorPlanoFormatado})</small><br>
-              <small style="color:#d97706;">Venc: ${emp.vencimento || 'N/I'}</small><br>
-              <span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}" style="margin-top:4px;">${emp.status || 'Ativo'}</span>
+              <small style="color:#2563eb; font-weight:bold;">Plano: ${emp.plano || 'mensal'}</small>
             </td>
-            <td>${listaUsuariosHtml}</td>
+            <td><span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}">${emp.status || 'Ativo'}</span></td>
             <td>
               <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%; margin-bottom:4px;" onclick="alternarStatusEmpresa('${emp.id}', '${emp.status || 'Ativo'}')">${isAtivo ? 'Bloquear' : 'Ativar'}</button>
               <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%;" onclick="excluirEmpresaSaaS('${emp.id}')">🗑️ Apagar</button>
@@ -958,13 +904,60 @@
       }).join('');
     }
 
-    async function redefinirSenhaCliente(usuarioId, loginUser) {
-      const novaSenha = prompt(`Digite a nova senha para o usuário "${loginUser}":`);
-      if (!novaSenha || novaSenha.trim() === "") return;
+    function abrirDetalhesEmpresa(empresaId) {
+      const emp = state.empresasSaaS.find(e => e.id === empresaId);
+      if (!emp) return;
+      empresaSelecionadaParaDetalhes = emp;
+
+      const usuariosDaEmpresa = state.todosUsuariosSaaS.filter(u => u.empresaId === empresaId);
+      const valorPlanoFmt = `R$ ${parseFloat(emp.valorPlano || 0).toFixed(2)}`;
+
+      let htmlUsuarios = usuariosDaEmpresa.map(u => `<div>👤 <strong>${u.login}</strong> (${u.role}) — Senha: <code>${superAdminPrivacidadeOculto ? '••••••' : u.pass}</code></div>`).join('') || 'Nenhum usuário cadastrado.';
+
+      const htmlConteudo = `
+        <p style="margin-bottom:6px;"><strong>Nome Fantasia:</strong> ${emp.nome}</p>
+        <p style="margin-bottom:6px;"><strong>ID do Sistema:</strong> ${emp.id}</p>
+        <p style="margin-bottom:6px;"><strong>CNPJ / CPF:</strong> ${emp.cnpj || 'Não informado'}</p>
+        <p style="margin-bottom:6px;"><strong>E-mail:</strong> ${emp.email || 'Não informado'}</p>
+        <p style="margin-bottom:6px;"><strong>Telefone:</strong> ${emp.tel || 'Não informado'}</p>
+        <p style="margin-bottom:6px;"><strong>Endereço:</strong> ${emp.end || 'Não informado'}</p>
+        <p style="margin-bottom:6px;"><strong>Plano:</strong> ${emp.plano || '---'} (${valorPlanoFmt})</p>
+        <p style="margin-bottom:10px;"><strong>Vencimento:</strong> ${emp.vencimento || '---'}</p>
+        <hr style="border:none; border-top:1px solid #e2e8f0; margin:10px 0;">
+        <div style="font-weight:bold; margin-bottom:4px; color:#0f172a;">Acessos e Credenciais:</div>
+        ${htmlUsuarios}
+      `;
+
+      document.getElementById('detalhe-titulo-modal').innerText = `Granja: ${emp.nome}`;
+      document.getElementById('detalhe-corpo-modal').innerHTML = htmlConteudo;
+      document.getElementById('modal-detalhes-empresa').style.display = 'flex';
+    }
+
+    function abrirModalRedefinirSenhaDoDetalhe() {
+      if (!empresaSelecionadaParaDetalhes) return;
+      document.getElementById('nova-senha-cli-input').value = '';
+      document.getElementById('modal-detalhes-empresa').style.display = 'none';
+      document.getElementById('modal-redefinir-senha-cli').style.display = 'flex';
+    }
+
+    async function salvarNovaSenhaClienteAdmin(e) {
+      e.preventDefault();
+      const novaSenha = document.getElementById('nova-senha-cli-input').value.trim();
+      if (!novaSenha || !empresaSelecionadaParaDetalhes) return;
+
       try {
-        await db.collection("usuarios").doc(usuarioId).update({ pass: novaSenha.trim() });
-        alert(`Senha do usuário "${loginUser}" atualizada com sucesso!`);
-      } catch (err) { alert("Erro ao atualizar senha: " + err.message); }
+        const empresaId = empresaSelecionadaParaDetalhes.id;
+        const usuariosDaEmpresa = state.todosUsuariosSaaS.filter(u => u.empresaId === empresaId);
+        
+        if (usuariosDaEmpresa.length > 0) {
+          await db.collection("usuarios").doc(usuariosDaEmpresa[0].id).update({ pass: novaSenha });
+        } else {
+          await db.collection("usuarios").add({ empresaId: empresaId, login: "admin_" + empresaId, pass: novaSenha, role: "admin" });
+        }
+
+        alert('Senha atualizada com sucesso!');
+        document.getElementById('modal-redefinir-senha-cli').style.display = 'none';
+      } catch (err) { alert('Erro ao alterar senha: ' + err.message); }
     }
 
     async function alternarStatusEmpresa(id, statusAtual) {
@@ -1256,8 +1249,30 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    function imprimirNota() { window.print(); }
-    function imprimirRelatorio() { window.print(); }
+    // GERAÇÃO DE PDF OTIMIZADA PARA SAFARI E DISPOSITIVOS MÓVEIS
+    function gerarPdfRecibo() {
+      const elemento = document.getElementById('printable-receipt');
+      const opt = {
+        margin:       5,
+        filename:     'recibo_pedido.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().from(elemento).set(opt).save();
+    }
+
+    function gerarPdfRelatorio() {
+      const elemento = document.getElementById('area-relatorio-impressao');
+      const opt = {
+        margin:       5,
+        filename:     'relatorio_vendas.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().from(elemento).set(opt).save();
+    }
 
     function exportarRelatorioExcel() {
       let csv = "Pedido;Data;Cliente;Total;Status\n";
