@@ -99,17 +99,17 @@
       border-radius: 8px;
       padding: 16px; 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 0.85rem; 
+      font-size: 0.82rem; 
       background: #ffffff; 
       margin-bottom: 16px; 
       color: #1e293b;
       text-align: left;
       width: 100%;
       word-wrap: break-word;
-      line-height: 1.4;
+      line-height: 1.35;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 10px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -1276,7 +1276,7 @@
     }
 
     /* ========================================================================= */
-    /* NOVA FUNÇÃO DE IMPRESSÃO DE RECIBOS COM LAYOUT MODERNO & 2 POR PÁGINA     */
+    /* FUNÇÃO DE IMPRESSÃO DE RECIBOS COMPLETA (DESIGN CORPORATIVO + 50% / 50%)  */
     /* ========================================================================= */
     function imprimirPedidosSelecionados() {
       const selecionados = Array.from(document.querySelectorAll('.check-pedido:checked')).map(cb => cb.value);
@@ -1298,49 +1298,62 @@
         const statusSymbol = isPago ? '🟢' : '🔴';
         const itens = ped.itens || [];
 
-        // Força quebra limpa exatamente a cada 2 pedidos para garantir exatos 2 por página (mesmo para ímpares)
+        // Força quebra limpa exatamente a cada 2 pedidos para garantir exatos 2 por página (50% superior e 50% inferior)
         const deveQuebrarPagina = (idx > 0 && idx % 2 === 0);
 
         const reciboHTML = `
-          <div class="recibo-pagina-item" style="${deveQuebrarPagina ? 'page-break-before: always; margin-top: 0;' : (idx > 0 ? 'margin-top: 25px; border-top: 2px dashed #cbd5e1; padding-top: 25px;' : '')}">
+          <div class="recibo-pagina-item" style="${deveQuebrarPagina ? 'page-break-before: always; margin-top: 0;' : (idx > 0 ? 'margin-top: 15px; border-top: 2px dashed #cbd5e1; padding-top: 15px;' : '')} height: 48%; display: flex; flex-direction: column; justify-content: space-between;">
             
-            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb;">
-              <h3 style="font-size: 0.9rem; font-weight: 800; text-transform: uppercase;">${emp.nome || 'HAPPY EGGS'}</h3>
-              <span style="font-size: 0.75rem; font-weight: 600;">COMPROVANTE #${ped.numeroPedido || '---'}</span>
-            </div>
+            <div>
+              <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb;">
+                <h3 style="font-size: 0.85rem; font-weight: 800; text-transform: uppercase;">${emp.nome || 'HAPPY EGGS'}</h3>
+                <span style="font-size: 0.72rem; font-weight: 600;">COMPROVANTE #${ped.numeroPedido || '---'}</span>
+              </div>
 
-            <div style="font-size: 0.82rem; margin-bottom: 10px; color: #334155; line-height: 1.4;">
-              <div><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente não informado'}</div>
-              <div><strong>Documento:</strong> ${ped.clienteDoc || 'N/I'} | <strong>Tel:</strong> ${ped.clienteTel || 'N/I'}</div>
-              <div><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-            </div>
+              <div style="text-align: center; margin-bottom: 6px; font-size: 0.75rem; color: #475569;">
+                <div>CNPJ/CPF: ${emp.cnpj || 'N/I'} | Tel/Whats: ${emp.tel || 'N/I'}</div>
+              </div>
 
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.8rem;">
-              <thead>
-                <tr style="background: #eff6ff; color: #1e40af;">
-                  <th style="padding: 6px 8px; text-align: left; border-bottom: 2px solid #bfdbfe; font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Item</th>
-                  <th style="padding: 6px 8px; text-align: right; border-bottom: 2px solid #bfdbfe; font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${itens.length > 0 ? itens.map(i => `
-                  <tr>
-                    <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; color: #1e293b;">${i.qtd}x${i.nome}</td>
-                    <td style="padding: 6px 8px; text-align: right; border-bottom: 1px solid #e2e8f0; color: #1e293b;">R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</td>
+              <div style="font-size: 0.8rem; margin-bottom: 6px; color: #334155; line-height: 1.3;">
+                <div><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente não informado'}</div>
+                <div><strong>Documento:</strong> ${ped.clienteDoc || 'N/I'} | <strong>Tel:</strong> ${ped.clienteTel || 'N/I'}</div>
+                <div><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+              </div>
+
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 0.78rem;">
+                <thead>
+                  <tr style="background: #eff6ff; color: #1e40af;">
+                    <th style="padding: 5px 6px; text-align: left; border-bottom: 2px solid #bfdbfe; font-weight: 800; font-size: 0.68rem; text-transform: uppercase;">Item</th>
+                    <th style="padding: 5px 6px; text-align: right; border-bottom: 2px solid #bfdbfe; font-weight: 800; font-size: 0.68rem; text-transform: uppercase;">Subtotal</th>
                   </tr>
-                `).join('') : '<tr><td colspan="2" style="padding: 6px; text-align: center; color: #64748b;">Nenhum item</td></tr>'}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  ${itens.length > 0 ? itens.map(i => `
+                    <tr>
+                      <td style="padding: 5px 6px; border-bottom: 1px solid #e2e8f0; color: #1e293b;">${i.qtd}x${i.nome}</td>
+                      <td style="padding: 5px 6px; text-align: right; border-bottom: 1px solid #e2e8f0; color: #1e293b;">R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</td>
+                    </tr>
+                  `).join('') : '<tr><td colspan="2" style="padding: 5px; text-align: center; color: #64748b;">Nenhum item</td></tr>'}
+                </tbody>
+              </table>
 
-            <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 0.9rem; background: #f8fafc; padding: 10px 12px; border-radius: 6px; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; margin-bottom: 8px;">
-              <span style="color: #64748b; text-transform: uppercase; font-size: 0.7rem;">Valor Total:</span>
-              <span style="color: #2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+              <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 0.85rem; background: #f8fafc; padding: 8px 10px; border-radius: 6px; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; margin-bottom: 6px;">
+                <span style="color: #64748b; text-transform: uppercase; font-size: 0.68rem;">Valor Total:</span>
+                <span style="color: #2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+              </div>
+
+              <div style="font-size: 0.75rem; color: #475569; line-height: 1.3; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div><strong>Forma de Pagamento:</strong> ${ped.formaPgto || 'Não especificada'} ${ped.dadosPgto ? `(${ped.dadosPgto})` : ''}</div>
+                <div><strong>Situação:</strong> ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'}</div>
+                ${ped.obs ? `<div><strong>Observações:</strong> ${ped.obs}</div>` : ''}
+              </div>
             </div>
 
-            <div style="font-size: 0.78rem; color: #475569; line-height: 1.4; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-              <div><strong>Forma de Pagamento:</strong> ${ped.formaPgto || 'Não especificada'} ${ped.dadosPgto ? `(${ped.dadosPgto})` : ''}</div>
-              <div><strong>Situação:</strong> ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'}</div>
-              ${ped.obs ? `<div><strong>Observações:</strong> ${ped.obs}</div>` : ''}
+            <div style="text-align: center; font-size: 0.72rem; color: #475569; border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 6px;">
+              <div style="font-weight: 800; font-size: 0.78rem; color: #0f172a; margin-bottom: 1px;">${emp.nome || 'Happy Eggs'}</div>
+              ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
+              ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
+              <div style="font-weight: 600; color: #2563eb; margin-top: 2px;">Obrigado pela preferência!</div>
             </div>
 
           </div>
@@ -1785,51 +1798,54 @@
       const itens = ped.itens || [];
 
       receipt.innerHTML = `
-        <div style="text-align:center; margin-bottom:8px;">
-          <h2 style="font-size:1.15rem; font-weight:800; text-transform:uppercase; margin-bottom:2px;">${emp.nome || 'HAPPY EGGS'}</h2>
-          <p style="font-size:0.85rem; color:#374151;">CNPJ/CPF: ${emp.cnpj || 'N/I'}</p>
-          <p style="font-size:0.85rem; color:#374151;">Tel/Whats: ${emp.tel || 'N/I'}</p>
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb;">
+          <h3 style="font-size: 0.85rem; font-weight: 800; text-transform: uppercase;">${emp.nome || 'HAPPY EGGS'}</h3>
+          <span style="font-size: 0.72rem; font-weight: 600;">COMPROVANTE #${numPedido}</span>
         </div>
 
-        <hr class="dashed-divider">
-
-        <div style="font-weight:800; font-size:0.95rem; margin-bottom:6px; text-transform:uppercase;">
-          COMPROVANTE DE PEDIDO #${numPedido}
+        <div style="text-align: center; margin-bottom: 6px; font-size: 0.75rem; color: #475569;">
+          <div>CNPJ/CPF: ${emp.cnpj || 'N/I'} | Tel/Whats: ${emp.tel || 'N/I'}</div>
         </div>
-        <div style="margin-bottom:2px;"><strong>Cliente:</strong> ${clienteNome}</div>
-        <div style="margin-bottom:2px;"><strong>Documento:</strong> ${clienteDoc}</div>
-        <div style="margin-bottom:2px;"><strong>Endereço:</strong> ${clienteEnd}</div>
 
-        <hr class="dashed-divider">
-
-        <div style="font-weight:800; text-transform:uppercase; margin-bottom:6px;">ITENS DO PEDIDO:</div>
-        ${itens.length > 0 ? itens.map(i => `
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span>${i.qtd}x${i.nome}</span>
-            <span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span>
-          </div>
-        `).join('') : '<div style="font-size:0.8rem; color:#64748b;">Nenhum item registrado</div>'}
-
-        <hr class="dashed-divider">
-
-        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; margin-bottom:6px;">
-          <span>VALOR TOTAL:</span>
-          <span>R$ ${totalValor}</span>
+        <div style="font-size: 0.8rem; margin-bottom: 6px; color: #334155; line-height: 1.3;">
+          <div><strong>Cliente:</strong> ${clienteNome}</div>
+          <div><strong>Documento:</strong> ${clienteDoc}</div>
+          <div><strong>Endereço:</strong> ${clienteEnd}</div>
         </div>
-        <div style="margin-bottom:2px;"><strong>FORMA DE PGTO:</strong> ${formaPgto}</div>
-        ${dadosPgto ? `<div style="margin-bottom:2px;"><strong>DADOS PGTO:</strong> ${dadosPgto}</div>` : ''}
-        <div style="margin-bottom:2px;">
-          <strong>SITUAÇÃO:</strong> [ ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'} ]
+
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 0.78rem;">
+          <thead>
+            <tr style="background: #eff6ff; color: #1e40af;">
+              <th style="padding: 5px 6px; text-align: left; border-bottom: 2px solid #bfdbfe; font-weight: 800; font-size: 0.68rem; text-transform: uppercase;">Item</th>
+              <th style="padding: 5px 6px; text-align: right; border-bottom: 2px solid #bfdbfe; font-weight: 800; font-size: 0.68rem; text-transform: uppercase;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itens.length > 0 ? itens.map(i => `
+              <tr>
+                <td style="padding: 5px 6px; border-bottom: 1px solid #e2e8f0; color: #1e293b;">${i.qtd}x${i.nome}</td>
+                <td style="padding: 5px 6px; text-align: right; border-bottom: 1px solid #e2e8f0; color: #1e293b;">R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</td>
+              </tr>
+            `).join('') : '<tr><td colspan="2" style="padding: 5px; text-align: center; color: #64748b;">Nenhum item</td></tr>'}
+          </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 0.85rem; background: #f8fafc; padding: 8px 10px; border-radius: 6px; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; margin-bottom: 6px;">
+          <span style="color: #64748b; text-transform: uppercase; font-size: 0.68rem;">Valor Total:</span>
+          <span style="color: #2563eb;">R$ ${totalValor}</span>
         </div>
-        ${obs ? `<div style="margin-top:6px; font-style:italic;"><strong>Obs:</strong> ${obs}</div>` : ''}
 
-        <hr class="dashed-divider">
+        <div style="font-size: 0.75rem; color: #475569; line-height: 1.3; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
+          <div><strong>Forma de Pagamento:</strong> ${formaPgto} ${dadosPgto ? `(${dadosPgto})` : ''}</div>
+          <div><strong>Situação:</strong> ${statusSymbol} ${isPago ? 'PAGAMENTO CONFIRMADO' : 'AGUARDANDO PAGAMENTO'}</div>
+          ${obs ? `<div><strong>Observações:</strong> ${obs}</div>` : ''}
+        </div>
 
-        <div style="text-align:center; font-size:0.85rem; margin-top:8px;">
-          <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${emp.nome || 'Happy Eggs'}</div>
+        <div style="text-align: center; font-size: 0.72rem; color: #475569; border-top: 1px dashed #cbd5e1; padding-top: 6px; margin-top: 6px;">
+          <div style="font-weight: 800; font-size: 0.78rem; color: #0f172a; margin-bottom: 1px;">${emp.nome || 'Happy Eggs'}</div>
           ${emp.end ? `<div>📍 ${emp.end}</div>` : ''}
           ${emp.social ? `<div>🌐 ${emp.social}</div>` : ''}
-          <p style="margin-top:4px;">Obrigado pela preferência!</p>
+          <div style="font-weight: 600; color: #2563eb; margin-top: 2px;">Obrigado pela preferência!</div>
         </div>
       `;
 
@@ -1863,19 +1879,8 @@
           <title>${titulo}</title>
           <style>
             * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-            body { padding: 15px; color: #0f172a; background: #fff; font-size: 12px; }
-            .relatorio-sheet-box { border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; background: #fff; }
-            .relatorio-sheet-header { background: #0f172a; color: #fff; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-            .relatorio-sheet-header h3 { font-size: 0.9rem; text-transform: uppercase; font-weight: 800; }
-            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-            .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 8px; border-radius: 4px; }
-            .relatorio-kpi-label { font-size: 0.6rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; }
-            .relatorio-kpi-val { font-size: 1rem; font-weight: 800; color: #0f172a; }
-            .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px; font-size: 0.78rem; }
-            .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.75rem; }
-            .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; padding: 6px 4px; border-bottom: 2px solid #bfdbfe; text-align: left; }
-            .relatorio-tabela-planilha td { padding: 6px 4px; border-bottom: 1px solid #e2e8f0; color: #334155; text-align: left; }
-            .relatorio-tabela-planilha tr:nth-child(even) { background-color: #f8fafc; }
+            body { padding: 10px; color: #0f172a; background: #fff; font-size: 11px; height: 100vh; }
+            @page { size: A4; margin: 10mm; }
           </style>
         </head>
         <body>${conteudoHtml}</body>
