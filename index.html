@@ -118,7 +118,7 @@
     .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
     /* ========================================================= */
-    /* ESTILOS EXCLUSIVOS DO RELATÓRIO DE VENDAS (DESIGN RECIBO) */
+    /* ESTILOS DO RELATÓRIO DE VENDAS (PADRÃO MODERNO RECIBO)    */
     /* ========================================================= */
     .relatorio-sheet-box {
       background: #ffffff;
@@ -627,7 +627,7 @@
     </div>
   </div>
 
-  <!-- MODAL: RELATÓRIO DE VENDAS COM ESTILO DE DESIGN IGUAL AO RECIBO (SEM TICKET MÉDIO) -->
+  <!-- MODAL: RELATÓRIO DE VENDAS COM DESIGN MODERNO (SEM TICKET MÉDIO) -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 520px;">
       
@@ -663,7 +663,7 @@
           <span style="font-size: 0.72rem; font-weight: 600;" id="relatorio-data-emissao"></span>
         </div>
 
-        <div class="relatorio-kpi-grid">
+        <div class="relatorio-kpi-grid" style="grid-template-columns: repeat(2, 1fr);">
           <div class="relatorio-kpi-item">
             <div class="relatorio-kpi-label">Total Faturado</div>
             <div class="relatorio-kpi-val" id="resumo-total-periodo" style="color: #2563eb;">R$ 0,00</div>
@@ -786,6 +786,7 @@
       }).catch(err => console.error("Erro na inicialização:", err));
     }
 
+    // --- CARREGAR DADOS DO SUPER ADMIN (DASHBOARD GLOBAL E EMPRESAS) ---
     function initSuperAdminListener() {
       db.collection("empresas").onSnapshot(snapshot => {
         state.empresasSaaS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
