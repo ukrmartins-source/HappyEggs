@@ -105,10 +105,10 @@
 
     .a4-pagina-lote {
       width: 100%;
-      height: 275mm;
-      max-height: 275mm;
+      height: 270mm;
+      max-height: 270mm;
       background: #ffffff;
-      padding: 5mm;
+      padding: 4mm;
       margin-bottom: 10px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
@@ -123,11 +123,11 @@
 
     .recibo-bloco-metade {
       width: 100%;
-      height: 48.5%;
+      height: 48%;
       background: #ffffff;
       border: 1px dashed #94a3b8;
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 6px 8px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -137,15 +137,15 @@
     .recibo-sheet-header {
       background: #0f172a;
       color: #ffffff;
-      padding: 5px 10px;
+      padding: 4px 8px;
       border-radius: 6px;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 3px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -1117,7 +1117,7 @@
               <span style="font-size:0.75rem; font-weight:600;">${nomeEmpresa}</span>
             </div>
             <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
-            <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+            <div style="font-size:0.75rem; margin-bottom:3px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
             <hr class="dashed-divider">
             <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
             <div>
@@ -1126,12 +1126,12 @@
           </div>
           <div>
             <hr class="dashed-divider">
-            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.85rem; color:#0f172a; margin-bottom:3px;">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.85rem; color:#0f172a; margin-bottom:2px;">
               <span>TOTAL:</span>
               <span style="color:#2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
             </div>
-            <div style="font-size:0.7rem; color:#475569; margin-bottom:3px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:3px; text-align:center; font-size:0.65rem; color:#64748b;">
+            <div style="font-size:0.7rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.65rem; color:#64748b;">
               <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
             </div>
           </div>
@@ -1157,7 +1157,7 @@
                 <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
               </div>
               <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-              <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+              <div style="font-size:0.75rem; margin-bottom:3px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
               <hr class="dashed-divider">
               <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
               <div>
@@ -1166,12 +1166,12 @@
             </div>
             <div>
               <hr class="dashed-divider">
-              <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.85rem; color:#0f172a; margin-bottom:4px;">
+              <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.85rem; color:#0f172a; margin-bottom:3px;">
                 <span>TOTAL:</span>
                 <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
               </div>
-              <div style="font-size:0.7rem; color:#475569; margin-bottom:6px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-              <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:4px; text-align:center; font-size:0.65rem; color:#64748b;">
+              <div style="font-size:0.7rem; color:#475569; margin-bottom:3px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+              <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:3px; text-align:center; font-size:0.65rem; color:#64748b;">
                 <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
               </div>
             </div>
@@ -1196,12 +1196,16 @@
           <meta charset="UTF-8">
           <title>Impressão - HappyEggs</title>
           <style>
+            @page {
+              size: A4;
+              margin: 5mm;
+            }
             * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-            body { background: #fff; color: #0f172a; padding: 10px; }
-            .a4-pagina-lote { width: 100%; height: 275mm; max-height: 275mm; background: #ffffff; padding: 5mm; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; }
-            .recibo-bloco-metade { width: 100%; height: 48.5%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
-            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 5px 10px; border-radius: 6px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
+            body { background: #fff; color: #0f172a; padding: 5px; }
+            .a4-pagina-lote { width: 100%; height: 270mm; max-height: 270mm; background: #ffffff; padding: 4mm; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; }
+            .recibo-bloco-metade { width: 100%; height: 48%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 6px 8px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 4px 8px; border-radius: 6px; margin-bottom: 3px; display: flex; justify-content: space-between; align-items: center; }
+            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 3px 0; }
             .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; }
             .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
             .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
