@@ -106,13 +106,13 @@
       word-wrap: break-word;
     }
 
-    /* 50% DA PÁGINA PARA CADA PEDIDO NO LOTE */
+    /* 50% DA PÁGINA (EXATAMENTE 130MM POR BLOCO) PARA O LOTE DE PEDIDOS */
     .recibo-bloco-pagina {
       width: 100%;
-      height: 48vh;
-      max-height: 48vh;
+      height: 125mm;
+      max-height: 125mm;
       background: #ffffff;
-      padding: 10px;
+      padding: 12px;
       margin-bottom: 10px;
       border: 1px dashed #cbd5e1;
       border-radius: 8px;
@@ -126,15 +126,15 @@
     .recibo-sheet-header {
       background: #0f172a;
       color: #ffffff;
-      padding: 6px 10px;
+      padding: 8px 12px;
       border-radius: 6px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -148,6 +148,9 @@
       border-radius: 12px;
       padding: 18px;
       color: #0f172a;
+      width: 100%;
+      max-width: 190mm;
+      margin: 0 auto;
     }
     .relatorio-sheet-header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -551,8 +554,7 @@
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       <div class="receipt-box" id="printable-receipt"></div>
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button class="btn" type="button" style="background:#059669;" onclick="imprimirDiretoDispositivo()">🖨️ Imprimir</button>
-        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRecibo()">📥 Baixar PDF</button>
+        <button class="btn" type="button" style="background:#059669;" onclick="gerarPdfRecibo()">📥 Baixar PDF / Imprimir</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:2px;">Fechar Nota</button>
       </div>
     </div>
@@ -613,11 +615,8 @@
         </div>
       </div>
 
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#059669;" onclick="imprimirDiretoRelatorio()">🖨️ Imprimir</button>
-        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRelatorio()">📥 Baixar PDF</button>
-      </div>
-      <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:8px;">
+      <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:15px;">
+        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRelatorio()">📥 Baixar PDF / Imprimir Relatório</button>
         <button class="btn" type="button" style="background:#475569;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
@@ -1026,14 +1025,14 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
-    // IMPRESSÃO EM LOTE: 50% DA PÁGINA PARA CADA PEDIDO
+    // IMPRESSÃO EM LOTE: DOIS RECIBOS POR PÁGINA (50% CADA)
     function imprimirPedidosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
       
       const emp = state.empresa || {};
-      let htmlBlocos = '';
+      let htmlBlocos = '<div style="width: 190mm; margin: 0 auto; background: #ffffff;">';
 
       selecionados.forEach((id) => {
         const ped = state.pedidos.find(p => p.id === id);
@@ -1069,8 +1068,19 @@
           </div>
         `;
       });
+      htmlBlocos += '</div>';
 
-      executarImpressaoOuPdfIsolado(htmlBlocos, 'recibos_lote.pdf');
+      const opt = {
+        margin:       5,
+        filename:     'recibos_lote.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 800 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      const containerTemp = document.createElement('div');
+      containerTemp.innerHTML = htmlBlocos;
+      html2pdf().from(containerTemp).set(opt).save();
     }
 
     function renderUsuarios() {
@@ -1252,119 +1262,13 @@
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    function imprimirDiretoDispositivo() {
-      const reciboHtml = document.getElementById('printable-receipt').innerHTML;
-      executarImpressaoOuPdfIsolado(reciboHtml, 'recibo_pedido.pdf');
-    }
-
-    function imprimirDiretoRelatorio() {
-      const relatorioHtml = document.getElementById('area-relatorio-impressao').outerHTML;
-      executarImpressaoOuPdfIsolado(relatorioHtml, 'relatorio_vendas.pdf');
-    }
-
-    function executarImpressaoOuPdfIsolado(conteudoHtml, nomeArquivoPdf) {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-      let iframePrint = document.getElementById('iframe-print-oculto');
-      if (!iframePrint) {
-        iframePrint = document.createElement('iframe');
-        iframePrint.id = 'iframe-print-oculto';
-        iframePrint.style.position = 'fixed';
-        iframePrint.style.right = '0';
-        iframePrint.style.bottom = '0';
-        iframePrint.style.width = '0';
-        iframePrint.style.height = '0';
-        iframePrint.style.border = 'none';
-        document.body.appendChild(iframePrint);
-      }
-
-      const docContent = `
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-          <meta charset="UTF-8">
-          <title>Documento</title>
-          <style>
-            @page { size: A4; margin: 10mm; }
-            * { box-sizing: border-box; -webkit-print-color-adjust: exact; }
-            body { font-family: Arial, sans-serif; color: #0f172a; background: #fff; margin: 0; padding: 0; }
-            .recibo-bloco-pagina {
-              width: 100%;
-              height: 48vh;
-              max-height: 48vh;
-              background: #ffffff;
-              padding: 10px;
-              margin-bottom: 10px;
-              border: 1px dashed #cbd5e1;
-              border-radius: 8px;
-              display: flex;
-              flex-direction: column;
-              justify-content: space-between;
-              page-break-inside: avoid;
-              break-inside: avoid;
-            }
-            .recibo-sheet-header {
-              background: #0f172a;
-              color: #ffffff;
-              padding: 6px 10px;
-              border-radius: 6px;
-              margin-bottom: 6px;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-            }
-            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
-            .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; }
-            .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
-            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-            .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 10px; border-radius: 6px; }
-            .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 3px; }
-            .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
-            .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.82rem; }
-            .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8rem; }
-            .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; border-top: 1px solid #e2e8f0; }
-            .relatorio-tabela-planilha td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
-          </style>
-        </head>
-        <body>
-          ${conteudoHtml}
-        </body>
-        </html>
-      `;
-
-      const doc = iframePrint.contentWindow.document;
-      doc.open();
-      doc.write(docContent);
-      doc.close();
-
-      setTimeout(() => {
-        try {
-          if (isIOS) {
-            html2pdf().from(doc.body).set({
-              margin: 5,
-              filename: nomeArquivoPdf,
-              image: { type: 'jpeg', quality: 0.98 },
-              html2canvas: { scale: 2, useCORS: true, letterRendering: true, width: 650, windowWidth: 850 },
-              jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).save();
-          } else {
-            iframePrint.contentWindow.focus();
-            iframePrint.contentWindow.print();
-          }
-        } catch (err) {
-          console.error("Erro na impressão isolada:", err);
-          window.print();
-        }
-      }, 600);
-    }
-
     function gerarPdfRecibo() {
       const elemento = document.getElementById('printable-receipt');
       const opt = {
         margin:       5,
         filename:     'recibo_pedido.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, width: 600, windowWidth: 800 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 800 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
       html2pdf().from(elemento).set(opt).save();
@@ -1376,7 +1280,7 @@
         margin:       5,
         filename:     'relatorio_vendas.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, width: 700, windowWidth: 900 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 900 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
       html2pdf().from(elemento).set(opt).save();
