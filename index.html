@@ -1165,12 +1165,7 @@
     }
 
     function abrirJanelaImpressao(htmlConteudo) {
-      const janela = window.open('', '_blank');
-      if (!janela) {
-        alert('O navegador bloqueou a abertura da janela de impressão. Permita pop-ups para este site.');
-        return;
-      }
-      janela.document.write(`
+      const documentoCompleto = `
         <!DOCTYPE html>
         <html lang="pt-BR">
         <head>
@@ -1208,8 +1203,15 @@
           <\/script>
         </body>
         </html>
-      `);
-      janela.document.close();
+      `;
+
+      const blob = new Blob([documentoCompleto], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const janela = window.open(url, '_blank');
+      
+      if (!janela) {
+        alert('O navegador bloqueou a abertura da janela de impressão. Permita pop-ups para este site.');
+      }
     }
 
     function renderUsuarios() {
