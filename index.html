@@ -104,18 +104,21 @@
       text-align: left;
       width: 100%;
       word-wrap: break-word;
-      max-height: 70vh;
-      overflow-y: auto;
     }
 
+    /* 50% DA PÁGINA PARA CADA PEDIDO NO LOTE */
     .recibo-bloco-pagina {
       width: 100%;
-      min-height: 110mm;
+      height: 48vh;
+      max-height: 48vh;
       background: #ffffff;
-      padding: 12px;
-      margin-bottom: 15px;
+      padding: 10px;
+      margin-bottom: 10px;
       border: 1px dashed #cbd5e1;
       border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       page-break-inside: avoid;
       break-inside: avoid;
     }
@@ -123,15 +126,15 @@
     .recibo-sheet-header {
       background: #0f172a;
       color: #ffffff;
-      padding: 8px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -219,14 +222,6 @@
     }
     .relatorio-tabela-planilha tr:nth-child(even) {
       background-color: #f8fafc;
-    }
-
-    @media print {
-      body { background-color: #ffffff !important; }
-      body * { visibility: hidden; }
-      #printable-receipt, #printable-receipt *, #area-relatorio-impressao, #area-relatorio-impressao * { visibility: visible; }
-      #printable-receipt, #area-relatorio-impressao { position: absolute; left: 0; top: 0; width: 100%; border: none; padding: 0; margin: 0; box-shadow: none; background: #ffffff !important; }
-      @page { size: A4; margin: 10mm; }
     }
   </style>
 </head>
@@ -1031,7 +1026,7 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
-    // CORREÇÃO DEFINITIVA VIA IFRAME ISOLADO PARA IMPRESSÃO EM LOTE
+    // IMPRESSÃO EM LOTE: 50% DA PÁGINA PARA CADA PEDIDO
     function imprimirPedidosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
@@ -1049,27 +1044,26 @@
           <div class="recibo-bloco-pagina">
             <div>
               <div class="recibo-sheet-header">
-                <h3 style="font-size:0.85rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-                <span style="font-size:0.7rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
+                <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+                <span style="font-size:0.65rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
               </div>
-              <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
-              <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+              <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
+              <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
               <hr class="dashed-divider">
-              <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
+              <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
               <div>
-                ${itens.map(i => `<div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:2px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
+                ${itens.map(i => `<div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:1px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
               </div>
             </div>
             <div>
               <hr class="dashed-divider">
-              <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.85rem; color:#0f172a; margin-bottom:4px;">
+              <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
                 <span>TOTAL:</span>
                 <span style="color:#2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
               </div>
-              <div style="font-size:0.7rem; color:#475569; margin-bottom:6px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-              <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:4px; text-align:center; font-size:0.65rem; color:#64748b;">
-                <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}<br>
-                <span>${emp.end || ''}</span> ${emp.social ? `| <span>${emp.social}</span>` : ''}
+              <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+              <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
+                <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
               </div>
             </div>
           </div>
@@ -1228,7 +1222,7 @@
       const emp = state.empresa || {};
 
       document.getElementById('printable-receipt').innerHTML = `
-        <div class="recibo-bloco-pagina">
+        <div class="recibo-bloco-pagina" style="height: auto; max-height: none;">
           <div>
             <div class="recibo-sheet-header">
               <h3 style="font-size:0.85rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
@@ -1250,8 +1244,7 @@
             </div>
             <div style="font-size:0.7rem; color:#475569; margin-bottom:6px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
             <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:4px; text-align:center; font-size:0.65rem; color:#64748b;">
-              <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}<br>
-              <span>${emp.end || ''}</span> ${emp.social ? `| <span>${emp.social}</span>` : ''}
+              <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
             </div>
           </div>
         </div>
@@ -1269,7 +1262,6 @@
       executarImpressaoOuPdfIsolado(relatorioHtml, 'relatorio_vendas.pdf');
     }
 
-    // FUNÇÃO ROBUSTA DE SUPORTE UNIFICADO PARA MOBILE / IOS E DESKTOP (IFRAME ISOLADO)
     function executarImpressaoOuPdfIsolado(conteudoHtml, nomeArquivoPdf) {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
@@ -1298,32 +1290,30 @@
             body { font-family: Arial, sans-serif; color: #0f172a; background: #fff; margin: 0; padding: 0; }
             .recibo-bloco-pagina {
               width: 100%;
-              min-height: 110mm;
+              height: 48vh;
+              max-height: 48vh;
               background: #ffffff;
-              padding: 12px;
-              margin-bottom: 15px;
+              padding: 10px;
+              margin-bottom: 10px;
               border: 1px dashed #cbd5e1;
               border-radius: 8px;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
               page-break-inside: avoid;
               break-inside: avoid;
-              page-break-after: always;
-              break-after: page;
-            }
-            .recibo-bloco-pagina:last-child {
-              page-break-after: auto;
-              break-after: auto;
             }
             .recibo-sheet-header {
               background: #0f172a;
               color: #ffffff;
-              padding: 8px 12px;
+              padding: 6px 10px;
               border-radius: 6px;
-              margin-bottom: 8px;
+              margin-bottom: 6px;
               display: flex;
               justify-content: space-between;
               align-items: center;
             }
-            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
+            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
             .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; }
             .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
             .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
@@ -1350,7 +1340,6 @@
       setTimeout(() => {
         try {
           if (isIOS) {
-            // No iOS/Safari mobile, se a impressora direta falhar, utiliza html2pdf com o elemento isolado do iframe
             html2pdf().from(doc.body).set({
               margin: 5,
               filename: nomeArquivoPdf,
