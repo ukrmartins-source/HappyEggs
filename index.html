@@ -236,10 +236,11 @@
       background-color: #f8fafc;
     }
 
+    /* REGRAS DE IMPRESSÃO ISOLADA */
     @media print {
       body * { visibility: hidden !important; }
       #print-area-global, #print-area-global * { visibility: visible !important; }
-      #print-area-global { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+      #print-area-global { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; }
       .modal { display: none !important; }
     }
   </style>
@@ -775,8 +776,15 @@
       const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.pedidos = snapshot.docs.map(doc => {
           const dataDoc = doc.data();
-          let dataCriacaoParsed = dataDoc.dataCriacao && dataDoc.dataCriacao.toDate ? dataDoc.dataCriacao.toDate() : (dataDoc.dataCriacao ? new Date(dataDoc.dataCriacao) : new Date());
-          return { id: doc.id, ...dataDoc, dataCriacao: dataCriacaoParsed };
+          let dataParsed = new Date();
+          if (dataDoc.dataCriacao) {
+            if (typeof dataDoc.dataCriacao.toDate === 'function') {
+              dataParsed = dataDoc.dataCriacao.toDate();
+            } else {
+              dataParsed = new Date(dataDoc.dataCriacao);
+            }
+          }
+          return { id: doc.id, ...dataDoc, dataCriacao: dataParsed };
         }).sort((a, b) => (b.numeroPedido || 0) - (a.numeroPedido || 0));
         render();
       });
@@ -1169,28 +1177,27 @@
           </div>
         </div>
       `;
-      dispararImpressaoGlobal(htmlBloco);
       document.getElementById('modal-nota').style.display = 'none';
+      dispararImpressaoGlobal(htmlBloco);
     }
 
     function imprimirRelatorioDireto() {
       const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
-      dispararImpressaoGlobal(conteudoHtml);
       document.getElementById('modal-resumo').style.display = 'none';
+      dispararImpressaoGlobal(conteudoHtml);
     }
 
     function dispararImpressaoGlobal(htmlConteudo) {
       const area = document.getElementById('print-area-global');
       area.innerHTML = htmlConteudo;
-      area.style.display = 'block';
-      
-      document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
       
       setTimeout(() => {
         window.print();
-        area.style.display = 'none';
-        area.innerHTML = '';
-      }, 300);
+        setTimeout(() => {
+          area.innerHTML = '';
+          area.style.display = 'none';
+        }, 500);
+      }, 250);
     }
 
     function renderUsuarios() {
