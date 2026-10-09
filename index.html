@@ -103,7 +103,6 @@
       word-wrap: break-word;
     }
 
-    /* FOLHA A4 RETRATO COM PAGINAÇÃO RÍGIDA (2 RECIBOS POR PÁGINA) */
     .a4-pagina-lote {
       width: 100%;
       min-height: 275mm;
@@ -237,7 +236,6 @@
       background-color: #f8fafc;
     }
 
-    /* ESTILO DE IMPRESSÃO PURA (@media print) */
     @media print {
       body * { visibility: hidden !important; }
       #print-area-global, #print-area-global * { visibility: visible !important; }
@@ -540,7 +538,7 @@
     </div>
   </main>
 
-  <!-- CONTAINER GLOBAL DE IMPRESSÃO PURA (NATIVO SEM POPUPS) -->
+  <!-- CONTAINER GLOBAL DE IMPRESSÃO PURA -->
   <div id="print-area-global" style="display:none;"></div>
 
   <!-- MODAL: DETALHES DA EMPRESA / CLIENTE NO SUPER ADMIN -->
@@ -725,7 +723,7 @@
       
       document.getElementById('global-granjas-ativas').innerText = granjasAtivas;
       const fatEl = document.getElementById('global-faturamento');
-      fatEl.innerText = superAdminPrivacidadeOculto ? "R$ ••••••" : `R$ ${faturamentoPlanos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+      fatEl.innerText = superAdminPrivacidadeOculto ? "R$ ••••••" : "R$ " + faturamentoPlanos.toLocaleString('pt-BR', {minimumFractionDigits: 2});
     }
 
     function alternarPrivacidadeSuperAdmin() {
@@ -817,7 +815,7 @@
         state.currentUser = { login: u, role: "superadmin" };
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('app-header').style.display = 'flex';
-        document.getElementById('user-display').innerText = `👑 SUPER ADMIN (${u})`;
+        document.getElementById('user-display').innerText = "👑 SUPER ADMIN (" + u + ")";
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
         navTo('superadmin');
         initSuperAdminListener();
@@ -837,7 +835,7 @@
         state.currentUser = found;
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('app-header').style.display = 'flex';
-        document.getElementById('user-display').innerText = `👤 ${found.login.toUpperCase()}`;
+        document.getElementById('user-display').innerText = "👤 " + found.login.toUpperCase();
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
         initListeners();
         navTo('dashboard');
@@ -861,7 +859,7 @@
         document.getElementById('view-dashboard').style.display = 'block';
         filtrarClientesDashboard();
       } else {
-        const el = document.getElementById(`view-${view}`);
+        const el = document.getElementById('view-' + view);
         if (el) el.style.display = 'block';
       }
       render();
@@ -873,7 +871,7 @@
 
     function renderEstoqueGeral() {
       const el = document.getElementById('estoque-geral-ovos');
-      if (el) el.innerText = `${(state.estoqueGeralOvos || 0).toLocaleString('pt-BR')} Ovos`;
+      if (el) el.innerText = (state.estoqueGeralOvos || 0).toLocaleString('pt-BR') + ' Ovos';
     }
 
     function atualizarComportamentoPlano() {
@@ -912,7 +910,7 @@
           await queryUser.docs[0].ref.update({ pass: adminPass, role: "admin" });
         }
 
-        alert(`Empresa ${nome} cadastrada com sucesso!`);
+        alert("Empresa " + nome + " cadastrada com sucesso!");
         e.target.reset();
         atualizarComportamentoPlano();
       } catch (err) { alert("Erro: " + err.message); }
@@ -946,7 +944,7 @@
       empresaSelecionadaParaDetalhes = emp;
 
       const usuariosDaEmpresa = state.todosUsuariosSaaS.filter(u => u.empresaId === empresaId);
-      const valorPlanoFmt = `R$ ${parseFloat(emp.valorPlano || 0).toFixed(2)}`;
+      const valorPlanoFmt = "R$ " + parseFloat(emp.valorPlano || 0).toFixed(2);
 
       let htmlUsuarios = usuariosDaEmpresa.map(u => `<div>👤 <strong>${u.login}</strong> (${u.role}) — Senha: <code>${superAdminPrivacidadeOculto ? '••••••' : u.pass}</code></div>`).join('') || 'Nenhum usuário cadastrado.';
 
@@ -964,7 +962,7 @@
         ${htmlUsuarios}
       `;
 
-      document.getElementById('detalhe-titulo-modal').innerText = `Granja: ${emp.nome}`;
+      document.getElementById('detalhe-titulo-modal').innerText = "Granja: " + emp.nome;
       document.getElementById('detalhe-corpo-modal').innerHTML = htmlConteudo;
       document.getElementById('modal-detalhes-empresa').style.display = 'flex';
     }
@@ -1001,7 +999,7 @@
     }
 
     async function excluirEmpresaSaaS(id) {
-      if (confirm(`Tem certeza que deseja excluir a empresa ${id}?`)) {
+      if (confirm("Tem certeza que deseja excluir a empresa " + id + "?")) {
         try {
           await db.collection("empresas").doc(id).delete();
           alert('Empresa excluída com sucesso!');
@@ -1079,27 +1077,26 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
-    // IMPRESSÃO EM LOTE: 2 RECIBOS EXATOS POR PÁGINA A4 VIA CONTÊINER GLOBAL
     function preVisualizarRecibosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
       
       const emp = state.empresa || {};
-      let htmlPaginas = '';
+      let htmlPaginas = "";
       
       for (let i = 0; i < selecionados.length; i += 2) {
         const ped1 = state.pedidos.find(p => p.id === selecionados[i]);
         const ped2 = selecionados[i + 1] ? state.pedidos.find(p => p.id === selecionados[i + 1]) : null;
 
-        htmlPaginas += `<div class="a4-pagina-lote">`;
+        htmlPaginas += '<div class="a4-pagina-lote">';
         if (ped1) htmlPaginas += construirHtmlReciboMetade(ped1, emp);
         if (ped2) {
           htmlPaginas += construirHtmlReciboMetade(ped2, emp);
         } else {
-          htmlPaginas += `<div class="recibo-bloco-metade" style="border: 1px dashed #e2e8f0; background: #fafafa; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem;">(Espaço reservado / Fim do lote)</div>`;
+          htmlPaginas += '<div class="recibo-bloco-metade" style="border: 1px dashed #e2e8f0; background: #fafafa; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem;">(Espaço reservado / Fim do lote)</div>';
         }
-        htmlPaginas += `</div>`;
+        htmlPaginas += '</div>';
       }
 
       dispararImpressaoGlobal(htmlPaginas);
@@ -1137,7 +1134,6 @@
       `;
     }
 
-    // IMPRESSÃO DE RECIBO ÚNICO
     function imprimirReciboUnico() {
       if (!pedidoSelecionadoModal) return;
       const ped = pedidoSelecionadoModal;
@@ -1177,14 +1173,12 @@
       document.getElementById('modal-nota').style.display = 'none';
     }
 
-    // IMPRESSÃO DE RELATÓRIO DE VENDAS
     function imprimirRelatorioDireto() {
       const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
       dispararImpressaoGlobal(conteudoHtml);
       document.getElementById('modal-resumo').style.display = 'none';
     }
 
-    // DISPARADOR DE IMPRESSÃO GLOBAL ESTÁVEL (SEM POPUPS)
     function dispararImpressaoGlobal(htmlConteudo) {
       const area = document.getElementById('print-area-global');
       area.innerHTML = htmlConteudo;
@@ -1202,13 +1196,13 @@
     function renderUsuarios() {
       const tbody = document.getElementById('lista-usuarios');
       if (!tbody) return;
-      tbody.innerHTML = state.usuarios.map(u => `<tr><td><strong>${u.login}</strong></td><td>${u.role}</td><td>---</td></tr>`).join('');
+      tbody.innerHTML = state.usuarios.map(u => '<tr><td><strong>' + u.login + '</strong></td><td>' + u.role + '</td><td>---</td></tr>').join('');
     }
 
     function renderDropdowns() {
       filtrarClientesDropdown();
       const prodSelect = document.getElementById('ped-produto');
-      if (prodSelect) prodSelect.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)} (${p.ovosUnid} ovos)</option>`).join('');
+      if (prodSelect) prodSelect.innerHTML = state.produtos.map(p => '<option value="' + p.id + '">' + p.nome + ' - R$ ' + parseFloat(p.preco).toFixed(2) + ' (' + p.ovosUnid + ' ovos)</option>').join('');
     }
 
     function filtrarClientesDropdown() {
@@ -1216,7 +1210,7 @@
       const cliSelect = document.getElementById('ped-cliente');
       if (!cliSelect) return;
       const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(termo));
-      cliSelect.innerHTML = filtrados.length ? filtrados.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('') : '<option value="">Nenhum cliente</option>';
+      cliSelect.innerHTML = filtrados.length ? filtrados.map(c => '<option value="' + c.id + '">' + c.nome + ' (' + c.tel + ')</option>').join('') : '<option value="">Nenhum cliente</option>';
     }
 
     async function cadastrarCliente(e) {
@@ -1243,11 +1237,11 @@
     function renderCarrinho() {
       const lista = document.getElementById('itens-pedido-lista');
       const totalSpan = document.getElementById('ped-total-valor');
-      if (!carrinhoTemp.length) { lista.innerHTML = `<div style="text-align:center; padding:10px;">Nenhum produto.</div>`; totalSpan.innerText = "0.00"; return; }
+      if (!carrinhoTemp.length) { lista.innerHTML = '<div style="text-align:center; padding:10px;">Nenhum produto.</div>'; totalSpan.innerText = "0.00"; return; }
       let totalGeral = 0;
       lista.innerHTML = carrinhoTemp.map((i, idx) => {
         totalGeral += i.subtotal;
-        return `<div class="carrinho-item"><div><strong>${i.qtd}x ${i.nome}</strong></div><div>R$ ${i.subtotal.toFixed(2)} <button type="button" class="btn-danger" onclick="carrinhoTemp.splice(${idx},1);renderCarrinho()">✕</button></div></div>`;
+        return '<div class="carrinho-item"><div><strong>' + i.qtd + 'x ' + i.nome + '</strong></div><div>R$ ' + i.subtotal.toFixed(2) + ' <button type="button" class="btn-danger" onclick="carrinhoTemp.splice(' + idx + ',1);renderCarrinho()">✕</button></div></div>';
       }).join('');
       totalSpan.innerText = totalGeral.toFixed(2);
     }
@@ -1302,7 +1296,7 @@
       const tbody = document.getElementById('lista-producao-hoje');
       if (!tbody) return;
       const hoje = new Date().toDateString();
-      tbody.innerHTML = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje).map(p => `<tr><td>${new Date(p.dataHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td><td>+ ${p.qtdOvos} ovos</td></tr>`).join('');
+      tbody.innerHTML = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje).map(p => '<tr><td>' + new Date(p.dataHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '</td><td>+ ' + p.qtdOvos + ' ovos</td></tr>').join('');
     }
 
     function abrirModalBalanco() {
@@ -1373,12 +1367,12 @@
     function exportarRelatorioExcel() {
       let csv = "Pedido;Data;Cliente;Total;Status\n";
       state.pedidos.forEach(p => {
-        csv += `#${p.numeroPedido || ''};${p.dataCriacao.toLocaleDateString('pt-BR')};"${p.clienteNome || ''}";R$ ${(p.total || 0).toFixed(2).replace('.', ',')};${p.status || ''}\n`;
+        csv += "#" + (p.numeroPedido || '') + ";" + p.dataCriacao.toLocaleDateString('pt-BR') + ";\"" + (p.clienteNome || '') + "\";R$ " + (p.total || 0).toFixed(2).replace('.', ',') + ";" + (p.status || '') + "\n";
       });
       const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = `relatorio_vendas.csv`;
+      a.href = url; a.download = 'relatorio_vendas.csv';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
 
@@ -1398,7 +1392,7 @@
       const tipo = document.getElementById('filtro-periodo').value;
       const agora = new Date();
       let pedidosFiltrados = state.pedidos;
-      document.getElementById('relatorio-data-emissao').innerText = `Emitido em: ${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+      document.getElementById('relatorio-data-emissao').innerText = "Emitido em: " + agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
       if (tipo === 'hoje') {
         pedidosFiltrados = state.pedidos.filter(p => {
@@ -1432,16 +1426,16 @@
       }
 
       const totalPeriodo = pedidosFiltrados.reduce((acc, p) => acc + (parseFloat(p.total) || 0), 0);
-      document.getElementById('resumo-total-periodo').innerText = `R$ ${totalPeriodo.toFixed(2)}`;
+      document.getElementById('resumo-total-periodo').innerText = "R$ " + totalPeriodo.toFixed(2);
       document.getElementById('resumo-qtd-pedidos').innerText = pedidosFiltrados.length;
 
       const formas = {};
       pedidosFiltrados.forEach(p => { const pgto = p.formaPgto || 'Outros'; formas[pgto] = (formas[pgto] || 0) + (parseFloat(p.total) || 0); });
-      document.getElementById('resumo-detalhe-formas').innerHTML = Object.keys(formas).map(f => `• ${f}: <strong>R$ ${formas[f].toFixed(2)}</strong>`).join('<br>') || 'Nenhum registro no período.';
+      document.getElementById('resumo-detalhe-formas').innerHTML = Object.keys(formas).map(f => "• " + f + ": <strong>R$ " + formas[f].toFixed(2) + "</strong>").join('<br>') || 'Nenhum registro no período.';
 
       document.getElementById('resumo-tabela-periodo').innerHTML = pedidosFiltrados.length > 0 ? pedidosFiltrados.map(p => `
         <tr><td>#${p.numeroPedido || '---'}</td><td>${new Date(p.dataCriacao).toLocaleDateString('pt-BR')}</td><td>${p.clienteNome || 'Cliente'}</td><td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td><td>${p.status || 'Pendente'}</td></tr>
-      `).join('') : `<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhum pedido encontrado neste período.</td></tr>`;
+      `).join('') : '<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhum pedido encontrado neste período.</td></tr>';
     }
 
     initApp();
