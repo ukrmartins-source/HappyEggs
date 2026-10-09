@@ -13,9 +13,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- HTML2PDF PARA GERAR PDF RÁPIDO E EVITAR TRAVAMENTOS NO SAFARI/IPHONE -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
   <style>
     :root {
       --primary: #1e293b;
@@ -98,7 +95,7 @@
       background: #ffffff; 
       border: 1px solid #e2e8f0;
       border-radius: 12px;
-      padding: 10px; 
+      padding: 12px; 
       margin-bottom: 16px; 
       color: #0f172a;
       text-align: left;
@@ -106,21 +103,13 @@
       word-wrap: break-word;
     }
 
-    /* 50% DA PÁGINA (EXATAMENTE 130MM POR BLOCO) PARA O LOTE DE PEDIDOS */
     .recibo-bloco-pagina {
       width: 100%;
-      height: 125mm;
-      max-height: 125mm;
       background: #ffffff;
-      padding: 12px;
-      margin-bottom: 10px;
-      border: 1px dashed #cbd5e1;
+      padding: 16px;
+      margin-bottom: 15px;
+      border: 1px solid #cbd5e1;
       border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      page-break-inside: avoid;
-      break-inside: avoid;
     }
 
     .recibo-sheet-header {
@@ -128,13 +117,13 @@
       color: #ffffff;
       padding: 8px 12px;
       border-radius: 6px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 10px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -149,8 +138,6 @@
       padding: 18px;
       color: #0f172a;
       width: 100%;
-      max-width: 190mm;
-      margin: 0 auto;
     }
     .relatorio-sheet-header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -412,7 +399,7 @@
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div class="card-title">Histórico de Pedidos Sequencial</div>
-          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="imprimirPedidosSelecionados()">🖨️ Imprimir / Baixar Recibos</button>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="baixarRecibosSelecionadosArquivo()">📥 Baixar Arquivo de Recibos</button>
         </div>
         <table>
           <thead>
@@ -554,7 +541,7 @@
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       <div class="receipt-box" id="printable-receipt"></div>
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button class="btn" type="button" style="background:#059669;" onclick="gerarPdfRecibo()">📥 Baixar PDF / Imprimir</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="baixarReciboUnicoArquivo()">📥 Baixar Arquivo do Recibo</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:2px;">Fechar Nota</button>
       </div>
     </div>
@@ -616,7 +603,7 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRelatorio()">📥 Baixar PDF / Imprimir Relatório</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="baixarRelatorioArquivo()">📥 Baixar Arquivo do Relatório</button>
         <button class="btn" type="button" style="background:#475569;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
@@ -662,6 +649,7 @@
     let carrinhoTemp = [];
     let superAdminPrivacidadeOculto = false;
     let empresaSelecionadaParaDetalhes = null;
+    let pedidoSelecionadoModal = null;
 
     function initApp() {
       db.collection("usuarios").get().then(snapshot => {
@@ -1025,14 +1013,14 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
-    // IMPRESSÃO EM LOTE: DOIS RECIBOS POR PÁGINA (50% CADA)
-    function imprimirPedidosSelecionados() {
+    // DOWNLOAD DE ARQUIVO UNIVERSAL (HTML) PARA RECIBOS EM LOTE
+    function baixarRecibosSelecionadosArquivo() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
       
       const emp = state.empresa || {};
-      let htmlBlocos = '<div style="width: 190mm; margin: 0 auto; background: #ffffff;">';
+      let htmlBlocos = '';
 
       selecionados.forEach((id) => {
         const ped = state.pedidos.find(p => p.id === id);
@@ -1041,46 +1029,120 @@
 
         htmlBlocos += `
           <div class="recibo-bloco-pagina">
-            <div>
-              <div class="recibo-sheet-header">
-                <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-                <span style="font-size:0.65rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
-              </div>
-              <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
-              <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-              <hr class="dashed-divider">
-              <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
-              <div>
-                ${itens.map(i => `<div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:1px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
-              </div>
+            <div class="recibo-sheet-header">
+              <h3 style="font-size:0.9rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+              <span style="font-size:0.8rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
             </div>
+            <div style="font-size:0.85rem; margin-bottom:4px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
+            <div style="font-size:0.85rem; margin-bottom:8px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+            <hr class="dashed-divider">
+            <div style="font-size:0.75rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:4px;">ITENS DO PEDIDO</div>
             <div>
-              <hr class="dashed-divider">
-              <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
-                <span>TOTAL:</span>
-                <span style="color:#2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
-              </div>
-              <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-              <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
-                <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
-              </div>
+              ${itens.map(i => `<div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
+            </div>
+            <hr class="dashed-divider">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1rem; color:#0f172a; margin-bottom:6px;">
+              <span>TOTAL:</span>
+              <span style="color:#2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+            </div>
+            <div style="font-size:0.8rem; color:#475569; margin-bottom:8px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:6px; text-align:center; font-size:0.75rem; color:#64748b;">
+              <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
             </div>
           </div>
         `;
       });
-      htmlBlocos += '</div>';
 
-      const opt = {
-        margin:       5,
-        filename:     'recibos_lote.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 800 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
+      gerarEBaixarArquivoHtml(htmlBlocos, 'recibos_lote.html');
+    }
 
-      const containerTemp = document.createElement('div');
-      containerTemp.innerHTML = htmlBlocos;
-      html2pdf().from(containerTemp).set(opt).save();
+    // DOWNLOAD DE ARQUIVO UNIVERSAL PARA RECIBO ÚNICO
+    function baixarReciboUnicoArquivo() {
+      if (!pedidoSelecionadoModal) return;
+      const ped = pedidoSelecionadoModal;
+      const emp = state.empresa || {};
+
+      let htmlBlocos = `
+        <div class="recibo-bloco-pagina">
+          <div class="recibo-sheet-header">
+            <h3 style="font-size:0.9rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+            <span style="font-size:0.8rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
+          </div>
+          <div style="font-size:0.85rem; margin-bottom:4px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+          <div style="font-size:0.85rem; margin-bottom:8px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+          <hr class="dashed-divider">
+          <div style="font-size:0.75rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:4px;">ITENS DO PEDIDO</div>
+          <div>
+            ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
+          </div>
+          <hr class="dashed-divider">
+          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1rem; color:#0f172a; margin-bottom:6px;">
+            <span>TOTAL:</span>
+            <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
+          </div>
+          <div style="font-size:0.8rem; color:#475569; margin-bottom:8px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+          <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:6px; text-align:center; font-size:0.75rem; color:#64748b;">
+            <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
+          </div>
+        </div>
+      `;
+
+      gerarEBaixarArquivoHtml(htmlBlocos, `recibo_pedido_${ped.numeroPedido || 'nota'}.html`);
+    }
+
+    // DOWNLOAD DE ARQUIVO UNIVERSAL PARA RELATÓRIO
+    function baixarRelatorioArquivo() {
+      const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
+      gerarEBaixarArquivoHtml(conteudoHtml, 'relatorio_vendas.html');
+    }
+
+    // FUNÇÃO AUXILIAR PARA CRIAR E BAIXAR O ARQUIVO HTML UNIVERSAL
+    function gerarEBaixarArquivoHtml(conteudoHtml, nomeArquivo) {
+      const arquivoCompleto = `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${nomeArquivo}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f1f5f9; color: #0f172a; padding: 20px; margin: 0; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .btn-imprimir { background: #2563eb; color: white; border: none; padding: 14px 20px; border-radius: 8px; font-size: 1rem; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
+            .recibo-bloco-pagina { background: #ffffff; padding: 20px; margin-bottom: 20px; border: 1px solid #cbd5e1; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 12px 0; }
+            .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; color: #0f172a; }
+            .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
+            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+            .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 10px; border-radius: 6px; }
+            .relatorio-kpi-label { font-size: 0.7rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 3px; }
+            .relatorio-kpi-val { font-size: 1.2rem; font-weight: 800; color: #0f172a; }
+            .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.9rem; }
+            .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.85rem; }
+            .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; }
+            .relatorio-tabela-planilha td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+            @media print { .btn-imprimir { display: none; } body { background: #ffffff; padding: 0; } .container { max-width: 100%; } }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir ou Salvar como PDF</button>
+            ${conteudoHtml}
+          </div>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(["\uFEFF" + arquivoCompleto], { type: 'text/html;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nomeArquivo;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     function renderUsuarios() {
@@ -1229,61 +1291,34 @@
     function abrirModalNota(pedidoOuId) {
       const ped = typeof pedidoOuId === 'string' ? state.pedidos.find(p => p.id === pedidoOuId) : pedidoOuId;
       if (!ped) return;
+      pedidoSelecionadoModal = ped;
       const emp = state.empresa || {};
 
       document.getElementById('printable-receipt').innerHTML = `
-        <div class="recibo-bloco-pagina" style="height: auto; max-height: none;">
-          <div>
-            <div class="recibo-sheet-header">
-              <h3 style="font-size:0.85rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-              <span style="font-size:0.7rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
-            </div>
-            <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-            <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-            <hr class="dashed-divider">
-            <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
-            <div>
-              ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:2px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
-            </div>
+        <div>
+          <div class="recibo-sheet-header">
+            <h3 style="font-size:0.85rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+            <span style="font-size:0.7rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
           </div>
+          <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+          <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+          <hr class="dashed-divider">
+          <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
           <div>
-            <hr class="dashed-divider">
-            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.85rem; color:#0f172a; margin-bottom:4px;">
-              <span>TOTAL:</span>
-              <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
-            </div>
-            <div style="font-size:0.7rem; color:#475569; margin-bottom:6px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:4px; text-align:center; font-size:0.65rem; color:#64748b;">
-              <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
-            </div>
+            ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:2px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
+          </div>
+          <hr class="dashed-divider">
+          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.85rem; color:#0f172a; margin-bottom:4px;">
+            <span>TOTAL:</span>
+            <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
+          </div>
+          <div style="font-size:0.7rem; color:#475569; margin-bottom:6px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+          <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:4px; text-align:center; font-size:0.65rem; color:#64748b;">
+            <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
           </div>
         </div>
       `;
       document.getElementById('modal-nota').style.display = 'flex';
-    }
-
-    function gerarPdfRecibo() {
-      const elemento = document.getElementById('printable-receipt');
-      const opt = {
-        margin:       5,
-        filename:     'recibo_pedido.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 800 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().from(elemento).set(opt).save();
-    }
-
-    function gerarPdfRelatorio() {
-      const elemento = document.getElementById('area-relatorio-impressao');
-      const opt = {
-        margin:       5,
-        filename:     'relatorio_vendas.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 900 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().from(elemento).set(opt).save();
     }
 
     function exportarRelatorioExcel() {
