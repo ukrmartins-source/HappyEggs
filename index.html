@@ -103,7 +103,7 @@
       word-wrap: break-word;
     }
 
-    /* REGRA RIGOROSA: 2 RECIBOS POR FOLHA A4 RETRATO (EXATAMENTE 50% DA ALTURA CADA) */
+    /* FOLHA A4 RETRATO COM PAGINAÇÃO RÍGIDA (2 RECIBOS POR PÁGINA) */
     .a4-pagina-lote {
       width: 100%;
       min-height: 275mm;
@@ -235,6 +235,15 @@
     }
     .relatorio-tabela-planilha tr:nth-child(even) {
       background-color: #f8fafc;
+    }
+
+    /* ESTILOS DE IMPRESSÃO PURA (@media print) */
+    @media print {
+      body * { visibility: hidden; }
+      #print-area-global, #print-area-global * { visibility: visible; }
+      #print-area-global { position: absolute; left: 0; top: 0; width: 100%; }
+      .a4-pagina-lote { border: none; margin: 0; padding: 5mm; height: 100vh; page-break-after: always; break-after: page; }
+      .no-print { display: none !important; }
     }
   </style>
 </head>
@@ -422,7 +431,7 @@
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div class="card-title">Histórico de Pedidos Sequencial</div>
-          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">👁️ Visualizar Recibos Selecionados</button>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">🖨️ Imprimir / Salvar Recibos</button>
         </div>
         <table>
           <thead>
@@ -532,6 +541,9 @@
     </div>
   </main>
 
+  <!-- CONTAINER OCULTO PARA IMPRESSÃO GLOBAL PURA -->
+  <div id="print-area-global" style="display:none;"></div>
+
   <!-- MODAL: DETALHES DA EMPRESA / CLIENTE NO SUPER ADMIN -->
   <div class="modal" id="modal-detalhes-empresa">
     <div class="modal-content" style="max-width: 440px;">
@@ -564,7 +576,7 @@
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       <div class="receipt-box" id="printable-receipt"></div>
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="baixarReciboUnicoArquivo()">📥 Baixar Arquivo do Recibo</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirReciboUnico()">🖨️ Imprimir / Salvar PDF</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:2px;">Fechar Nota</button>
       </div>
     </div>
@@ -576,7 +588,7 @@
       <div class="card-title" id="preview-titulo" style="margin-bottom:12px; font-weight:800;">Central de Impressão e Visualização</div>
       <div id="preview-corpo-conteudo" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; max-height: 60vh; overflow-y: auto; margin-bottom: 15px;"></div>
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button class="btn" type="button" style="background:#2563eb;" id="btn-confirmar-download-preview">📥 Baixar Documento em Arquivo</button>
+        <button class="btn" type="button" style="background:#2563eb;" id="btn-confirmar-impressao-preview">🖨️ Imprimir / Salvar em PDF</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-preview-geral').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
     </div>
@@ -638,7 +650,7 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="preVisualizarRelatorio()">👁️ Visualizar Relatório antes de Baixar</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorioDireto()">🖨️ Imprimir / Salvar Relatório</button>
         <button class="btn" type="button" style="background:#475569;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
@@ -1048,7 +1060,7 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
-    // LÓGICA RIGOROSA: 2 RECIBOS EXATOS POR PÁGINA A4 (50% ALTURA CADA)
+    // IMPRESSÃO EM LOTE: 2 RECIBOS EXATOS POR PÁGINA A4 (50% ALTURA CADA)
     function preVisualizarRecibosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
@@ -1080,7 +1092,7 @@
 
       document.getElementById('preview-titulo').innerText = "Visualização de Recibos (2 por Página A4)";
       document.getElementById('preview-corpo-conteudo').innerHTML = htmlPaginas;
-      document.getElementById('btn-confirmar-download-preview').onclick = () => gerarEBaixarArquivoHtml(htmlPaginas, 'recibos_lote.html');
+      document.getElementById('btn-confirmar-impressao-preview').onclick = () => executarImpressaoGlobal(htmlPaginas);
       document.getElementById('modal-preview-geral').style.display = 'flex';
     }
 
@@ -1116,98 +1128,66 @@
       `;
     }
 
-    // PRÉ-VISUALIZAÇÃO DE RECIBO ÚNICO
-    function baixarReciboUnicoArquivo() {
+    // IMPRESSÃO DE RECIBO ÚNICO
+    function imprimirReciboUnico() {
       if (!pedidoSelecionadoModal) return;
       const ped = pedidoSelecionadoModal;
       const emp = state.empresa || {};
 
-      let htmlBlocos = `
-        <div style="width: 100%; max-width: 190mm; margin: 0 auto; background: #ffffff; padding: 15px; border: 1px solid #cbd5e1; border-radius: 8px;">
-          <div class="recibo-sheet-header">
-            <h3 style="font-size:0.9rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-            <span style="font-size:0.8rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
-          </div>
-          <div style="font-size:0.85rem; margin-bottom:4px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-          <div style="font-size:0.85rem; margin-bottom:8px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-          <hr class="dashed-divider">
-          <div style="font-size:0.75rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:4px;">ITENS DO PEDIDO</div>
-          <div>
-            ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
-          </div>
-          <hr class="dashed-divider">
-          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1rem; color:#0f172a; margin-bottom:6px;">
-            <span>TOTAL:</span>
-            <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
-          </div>
-          <div style="font-size:0.8rem; color:#475569; margin-bottom:8px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-          <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:6px; text-align:center; font-size:0.75rem; color:#64748b;">
-            <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
+      let htmlBloco = `
+        <div class="a4-pagina-lote" style="min-height: auto; height: 130mm;">
+          <div class="recibo-bloco-metade" style="height: 100%;">
+            <div>
+              <div class="recibo-sheet-header">
+                <h3 style="font-size:0.85rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+                <span style="font-size:0.7rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
+              </div>
+              <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+              <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+              <hr class="dashed-divider">
+              <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
+              <div>
+                ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:2px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
+              </div>
+            </div>
+            <div>
+              <hr class="dashed-divider">
+              <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.85rem; color:#0f172a; margin-bottom:4px;">
+                <span>TOTAL:</span>
+                <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
+              </div>
+              <div style="font-size:0.7rem; color:#475569; margin-bottom:6px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+              <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:4px; text-align:center; font-size:0.65rem; color:#64748b;">
+                <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
+              </div>
+            </div>
           </div>
         </div>
       `;
-
-      gerarEBaixarArquivoHtml(htmlBlocos, `recibo_pedido_${ped.numeroPedido || 'nota'}.html`);
+      executarImpressaoGlobal(htmlBloco);
     }
 
-    // PRÉ-VISUALIZAÇÃO DE RELATÓRIO DE VENDAS
+    // IMPRESSÃO DE RELATÓRIO DE VENDAS
     function preVisualizarRelatorio() {
       const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
       document.getElementById('preview-titulo').innerText = "Pré-visualização do Relatório de Vendas";
       document.getElementById('preview-corpo-conteudo').innerHTML = conteudoHtml;
-      document.getElementById('btn-confirmar-download-preview').onclick = () => gerarEBaixarArquivoHtml(conteudoHtml, 'relatorio_vendas.html');
+      document.getElementById('btn-confirmar-impressao-preview').onclick = () => executarImpressaoGlobal(conteudoHtml);
       document.getElementById('modal-preview-geral').style.display = 'flex';
     }
 
-    // FUNÇÃO AUXILIAR PARA CRIAR E BAIXAR O ARQUIVO HTML UNIVERSAL
-    function gerarEBaixarArquivoHtml(conteudoHtml, nomeArquivo) {
-      const arquivoCompleto = `
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${nomeArquivo}</title>
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f1f5f9; color: #0f172a; padding: 20px; margin: 0; }
-            .container { max-width: 700px; margin: 0 auto; }
-            .btn-imprimir { background: #2563eb; color: white; border: none; padding: 14px 20px; border-radius: 8px; font-size: 1rem; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
-            .a4-pagina-lote { width: 100%; min-height: 275mm; background: #ffffff; padding: 10mm; margin-bottom: 20px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; }
-            .recibo-bloco-metade { width: 100%; height: 48%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
-            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 12px 0; }
-            .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; color: #0f172a; }
-            .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
-            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-            .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 10px; border-radius: 6px; }
-            .relatorio-kpi-label { font-size: 0.7rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 3px; }
-            .relatorio-kpi-val { font-size: 1.2rem; font-weight: 800; color: #0f172a; }
-            .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.9rem; }
-            .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.85rem; }
-            .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; }
-            .relatorio-tabela-planilha td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
-            @media print { .btn-imprimir { display: none; } body { background: #ffffff; padding: 0; } .container { max-width: 100%; } }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir ou Salvar como PDF</button>
-            ${conteudoHtml}
-          </div>
-        </body>
-        </html>
-      `;
+    function imprimirRelatorioDireto() {
+      const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
+      executarImpressaoGlobal(conteudoHtml);
+    }
 
-      const blob = new Blob(["\uFEFF" + arquivoCompleto], { type: 'text/html;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = nomeArquivo;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+    // DISPARADOR DA IMPRESSÃO NATIVA SEGURA
+    function executarImpressaoGlobal(conteudoHtml) {
+      const areaPrint = document.getElementById('print-area-global');
+      areaPrint.innerHTML = conteudoHtml;
+      window.print();
       document.getElementById('modal-preview-geral').style.display = 'none';
+      document.getElementById('modal-nota').style.display = 'none';
     }
 
     function renderUsuarios() {
