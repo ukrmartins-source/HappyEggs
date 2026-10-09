@@ -240,7 +240,7 @@
     @media print {
       body * { visibility: hidden !important; }
       #print-area-global, #print-area-global * { visibility: visible !important; }
-      #print-area-global { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; }
+      #print-area-global { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; z-index: 9999; }
       .modal { display: none !important; }
     }
   </style>
@@ -576,18 +576,6 @@
       <div style="display:flex; flex-direction:column; gap:8px;">
         <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirReciboUnico()">🖨️ Imprimir / Salvar PDF</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:2px;">Fechar Nota</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: PRÉ-VISUALIZAÇÃO DE DOCUMENTOS (CENTRAL DE IMPRESSÃO) -->
-  <div class="modal" id="modal-preview-geral">
-    <div class="modal-content" style="max-width: 580px;">
-      <div class="card-title" id="preview-titulo" style="margin-bottom:12px; font-weight:800;">Central de Impressão e Visualização</div>
-      <div id="preview-corpo-conteudo" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; max-height: 60vh; overflow-y: auto; margin-bottom: 15px;"></div>
-      <div style="display:flex; flex-direction:column; gap:8px;">
-        <button class="btn" type="button" style="background:#2563eb;" id="btn-confirmar-impressao-preview">🖨️ Imprimir / Salvar em PDF</button>
-        <button class="btn" type="button" onclick="document.getElementById('modal-preview-geral').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
     </div>
   </div>
@@ -1178,26 +1166,27 @@
         </div>
       `;
       document.getElementById('modal-nota').style.display = 'none';
-      dispararImpressaoGlobal(htmlBloco);
+      setTimeout(() => { dispararImpressaoGlobal(htmlBloco); }, 100);
     }
 
     function imprimirRelatorioDireto() {
       const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
       document.getElementById('modal-resumo').style.display = 'none';
-      dispararImpressaoGlobal(conteudoHtml);
+      setTimeout(() => { dispararImpressaoGlobal(conteudoHtml); }, 100);
     }
 
     function dispararImpressaoGlobal(htmlConteudo) {
       const area = document.getElementById('print-area-global');
       area.innerHTML = htmlConteudo;
+      area.style.display = 'block';
       
       setTimeout(() => {
         window.print();
         setTimeout(() => {
-          area.innerHTML = '';
           area.style.display = 'none';
-        }, 500);
-      }, 250);
+          area.innerHTML = '';
+        }, 800);
+      }, 200);
     }
 
     function renderUsuarios() {
