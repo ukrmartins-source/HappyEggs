@@ -236,6 +236,14 @@
     .relatorio-tabela-planilha tr:nth-child(even) {
       background-color: #f8fafc;
     }
+
+    /* ESTILO DE IMPRESSÃO PURA (@media print) */
+    @media print {
+      body * { visibility: hidden !important; }
+      #print-area-global, #print-area-global * { visibility: visible !important; }
+      #print-area-global { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+      .modal { display: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -531,6 +539,9 @@
       </div>
     </div>
   </main>
+
+  <!-- CONTAINER GLOBAL DE IMPRESSÃO PURA (NATIVO SEM POPUPS) -->
+  <div id="print-area-global" style="display:none;"></div>
 
   <!-- MODAL: DETALHES DA EMPRESA / CLIENTE NO SUPER ADMIN -->
   <div class="modal" id="modal-detalhes-empresa">
@@ -1011,7 +1022,7 @@
     }
 
     async function excluirCliente(id) {
-      if (confirm('Tem certeza que deseja excluir este cliente?')) {
+      if (window.confirm('Tem certeza que deseja excluir este cliente?')) {
         try {
           await db.collection("clientes").doc(id).delete();
           alert('Cliente excluído com sucesso!');
@@ -1068,7 +1079,7 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
-    // IMPRESSÃO EM LOTE: 2 RECIBOS EXATOS POR PÁGINA A4
+    // IMPRESSÃO EM LOTE: 2 RECIBOS EXATOS POR PÁGINA A4 VIA CONTÊINER GLOBAL
     function preVisualizarRecibosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
@@ -1091,10 +1102,7 @@
         htmlPaginas += `</div>`;
       }
 
-      document.getElementById('preview-titulo').innerText = "Visualização de Recibos (2 por Página A4)";
-      document.getElementById('preview-corpo-conteudo').innerHTML = htmlPaginas;
-      document.getElementById('btn-confirmar-impressao-preview').onclick = () => dispararJanelaImpressao(htmlPaginas, 'Recibos_Lote');
-      document.getElementById('modal-preview-geral').style.display = 'flex';
+      dispararImpressaoGlobal(htmlPaginas);
     }
 
     function construirHtmlReciboMetade(ped, emp) {
@@ -1165,71 +1173,30 @@
           </div>
         </div>
       `;
-      dispararJanelaImpressao(htmlBloco, `Recibo_Pedido_${ped.numeroPedido}`);
+      dispararImpressaoGlobal(htmlBloco);
+      document.getElementById('modal-nota').style.display = 'none';
     }
 
     // IMPRESSÃO DE RELATÓRIO DE VENDAS
-    function preVisualizarRelatorio() {
-      const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
-      document.getElementById('preview-titulo').innerText = "Pré-visualização do Relatório de Vendas";
-      document.getElementById('preview-corpo-conteudo').innerHTML = conteudoHtml;
-      document.getElementById('btn-confirmar-impressao-preview').onclick = () => dispararJanelaImpressao(conteudoHtml, 'Relatorio_Vendas');
-      document.getElementById('modal-preview-geral').style.display = 'flex';
-    }
-
     function imprimirRelatorioDireto() {
       const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
-      dispararJanelaImpressao(conteudoHtml, 'Relatorio_Vendas');
+      dispararImpressaoGlobal(conteudoHtml);
+      document.getElementById('modal-resumo').style.display = 'none';
     }
 
-    // DISPARADOR DE IMPRESSÃO ESTÁVEL VIA JANELA ISOLADA
-    function dispararJanelaImpressao(conteudoHtml, titulo) {
-      const janela = window.open('', '_blank');
-      if (!janela) {
-        alert('Por favor, permita pop-ups no seu navegador para imprimir ou gerar o PDF.');
-        return;
-      }
+    // DISPARADOR DE IMPRESSÃO GLOBAL ESTÁVEL (SEM POPUPS)
+    function dispararImpressaoGlobal(htmlConteudo) {
+      const area = document.getElementById('print-area-global');
+      area.innerHTML = htmlConteudo;
+      area.style.display = 'block';
       
-      janela.document.write(`<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>${titulo}</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #ffffff; color: #0f172a; padding: 20px; margin: 0; }
-    .a4-pagina-lote { width: 100%; min-height: 275mm; max-height: 275mm; background: #ffffff; padding: 10mm; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; page-break-inside: avoid; break-inside: avoid; }
-    .recibo-bloco-metade { width: 100%; height: 48%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
-    .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
-    .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; }
-    .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
-    .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-    .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 10px; border-radius: 6px; }
-    .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 3px; }
-    .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
-    .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.82rem; }
-    .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8rem; }
-    .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; }
-    .relatorio-tabela-planilha td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
-    @media print { body { padding: 0; } .no-print { display: none !important; } }
-  </style>
-</head>
-<body>
-  <div style="text-align: center; margin-bottom: 20px;" class="no-print">
-    <button onclick="window.print()" style="background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;">🖨️ Imprimir / Salvar como PDF</button>
-  </div>
-  ${conteudoHtml}
-  <script>
-    window.onload = function() {
-      setTimeout(() => { window.print(); }, 400);
-    };
-  </script>
-</body>
-</html>`);
-      janela.document.close();
-      document.getElementById('modal-preview-geral').style.display = 'none';
-      document.getElementById('modal-nota').style.display = 'none';
-      document.getElementById('modal-resumo').style.display = 'none';
+      document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+      
+      setTimeout(() => {
+        window.print();
+        area.style.display = 'none';
+        area.innerHTML = '';
+      }, 300);
     }
 
     function renderUsuarios() {
@@ -1434,19 +1401,31 @@
       document.getElementById('relatorio-data-emissao').innerText = `Emitido em: ${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
 
       if (tipo === 'hoje') {
-        pedidosFiltrados = state.pedidos.filter(p => new Date(p.dataCriacao).toDateString() === agora.toDateString());
+        pedidosFiltrados = state.pedidos.filter(p => {
+          const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+          return d.toDateString() === agora.toDateString();
+        });
       } else if (tipo === 'semana') {
         const limite = new Date(); limite.setDate(agora.getDate() - 7); limite.setHours(0,0,0,0);
-        pedidosFiltrados = state.pedidos.filter(p => new Date(p.dataCriacao) >= limite);
+        pedidosFiltrados = state.pedidos.filter(p => {
+          const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+          return d >= limite;
+        });
       } else if (tipo === 'mes') {
-        pedidosFiltrados = state.pedidos.filter(p => new Date(p.dataCriacao).getMonth() === agora.getMonth() && new Date(p.dataCriacao).getFullYear() === agora.getFullYear());
+        pedidosFiltrados = state.pedidos.filter(p => {
+          const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+          return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+        });
       } else if (tipo === 'personalizado') {
         const dataInicio = document.getElementById('data-inicio').value;
         const dataFim = document.getElementById('data-fim').value;
         if (dataInicio && dataFim) {
           const ini = new Date(dataInicio + 'T00:00:00');
           const fim = new Date(dataFim + 'T23:59:59');
-          pedidosFiltrados = state.pedidos.filter(p => new Date(p.dataCriacao) >= ini && new Date(p.dataCriacao) <= fim);
+          pedidosFiltrados = state.pedidos.filter(p => {
+            const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+            return d >= ini && d <= fim;
+          });
         } else {
           pedidosFiltrados = [];
         }
