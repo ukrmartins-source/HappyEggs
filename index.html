@@ -108,8 +108,8 @@
       height: 275mm;
       max-height: 275mm;
       background: #ffffff;
-      padding: 8mm;
-      margin-bottom: 15px;
+      padding: 5mm;
+      margin-bottom: 10px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
       display: flex;
@@ -127,7 +127,7 @@
       background: #ffffff;
       border: 1px dashed #94a3b8;
       border-radius: 8px;
-      padding: 10px;
+      padding: 8px 10px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -137,15 +137,15 @@
     .recibo-sheet-header {
       background: #0f172a;
       color: #ffffff;
-      padding: 6px 10px;
+      padding: 5px 10px;
       border-radius: 6px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -1104,12 +1104,17 @@
 
     function construirHtmlReciboMetade(ped, emp) {
       const itens = ped.itens || [];
+      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
+      const cnpjEmpresa = emp.cnpj || 'N/I';
+      const telEmpresa = emp.tel || 'N/I';
+      const endEmpresa = emp.end || 'N/I';
+
       return `
         <div class="recibo-bloco-metade">
           <div>
             <div class="recibo-sheet-header">
               <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-              <span style="font-size:0.75rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
+              <span style="font-size:0.75rem; font-weight:600;">${nomeEmpresa}</span>
             </div>
             <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
             <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
@@ -1127,7 +1132,7 @@
             </div>
             <div style="font-size:0.7rem; color:#475569; margin-bottom:3px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
             <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:3px; text-align:center; font-size:0.65rem; color:#64748b;">
-              <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
+              <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
             </div>
           </div>
         </div>
@@ -1138,6 +1143,10 @@
       if (!pedidoSelecionadoModal) return;
       const ped = pedidoSelecionadoModal;
       const emp = state.empresa || {};
+      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
+      const cnpjEmpresa = emp.cnpj || 'N/I';
+      const telEmpresa = emp.tel || 'N/I';
+      const endEmpresa = emp.end || 'N/I';
 
       let htmlBloco = `
         <div class="a4-pagina-lote" style="min-height: auto; height: 130mm;">
@@ -1145,7 +1154,7 @@
             <div>
               <div class="recibo-sheet-header">
                 <h3 style="font-size:0.85rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-                <span style="font-size:0.7rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
+                <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
               </div>
               <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
               <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
@@ -1163,7 +1172,7 @@
               </div>
               <div style="font-size:0.7rem; color:#475569; margin-bottom:6px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
               <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:4px; text-align:center; font-size:0.65rem; color:#64748b;">
-                <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
+                <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
               </div>
             </div>
           </div>
@@ -1188,11 +1197,11 @@
           <title>Impressão - HappyEggs</title>
           <style>
             * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-            body { background: #fff; color: #0f172a; padding: 15px; }
-            .a4-pagina-lote { width: 100%; height: 275mm; max-height: 275mm; background: #ffffff; padding: 8mm; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; }
-            .recibo-bloco-metade { width: 100%; height: 48.5%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
-            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 6px 10px; border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
-            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
+            body { background: #fff; color: #0f172a; padding: 10px; }
+            .a4-pagina-lote { width: 100%; height: 275mm; max-height: 275mm; background: #ffffff; padding: 5mm; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; }
+            .recibo-bloco-metade { width: 100%; height: 48.5%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 5px 10px; border-radius: 6px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
             .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; }
             .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
             .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
@@ -1419,12 +1428,16 @@
       if (!ped) return;
       pedidoSelecionadoModal = ped;
       const emp = state.empresa || {};
+      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
+      const cnpjEmpresa = emp.cnpj || 'N/I';
+      const telEmpresa = emp.tel || 'N/I';
+      const endEmpresa = emp.end || 'N/I';
 
       document.getElementById('printable-receipt').innerHTML = `
         <div>
           <div class="recibo-sheet-header">
             <h3 style="font-size:0.85rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-            <span style="font-size:0.7rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
+            <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
           </div>
           <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
           <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
@@ -1440,7 +1453,7 @@
           </div>
           <div style="font-size:0.7rem; color:#475569; margin-bottom:6px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
           <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:4px; text-align:center; font-size:0.65rem; color:#64748b;">
-            <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
+            <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
           </div>
         </div>
       `;
