@@ -399,7 +399,7 @@
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div class="card-title">Histórico de Pedidos Sequencial</div>
-          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="baixarRecibosSelecionadosArquivo()">📥 Baixar Arquivo de Recibos</button>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">👁️ Visualizar Recibos Selecionados</button>
         </div>
         <table>
           <thead>
@@ -547,6 +547,18 @@
     </div>
   </div>
 
+  <!-- MODAL: PRÉ-VISUALIZAÇÃO DE DOCUMENTOS (RELATÓRIO OU LOTE DE RECIBOS) -->
+  <div class="modal" id="modal-preview-geral">
+    <div class="modal-content" style="max-width: 540px;">
+      <div class="card-title" id="preview-titulo" style="margin-bottom:12px; font-weight:800;">Visualização do Documento</div>
+      <div id="preview-corpo-conteudo" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; max-height: 60vh; overflow-y: auto; margin-bottom: 15px;"></div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button class="btn" type="button" style="background:#2563eb;" id="btn-confirmar-download-preview">📥 Baixar Arquivo Definitivo</button>
+        <button class="btn" type="button" onclick="document.getElementById('modal-preview-geral').style.display='none'" style="background:#64748b;">Fechar Visualização</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: ALTERAR SENHA DO SUPER ADMIN -->
   <div class="modal" id="modal-seguranca-superadmin">
     <div class="modal-content" style="max-width: 380px;">
@@ -603,7 +615,7 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="baixarRelatorioArquivo()">📥 Baixar Arquivo do Relatório</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="preVisualizarRelatorio()">👁️ Visualizar Relatório antes de Baixar</button>
         <button class="btn" type="button" style="background:#475569;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
@@ -1013,8 +1025,8 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
-    // DOWNLOAD DE ARQUIVO UNIVERSAL (HTML) PARA RECIBOS EM LOTE
-    function baixarRecibosSelecionadosArquivo() {
+    // PRÉ-VISUALIZAÇÃO DE RECIBOS EM LOTE ANTES DE BAIXAR
+    function preVisualizarRecibosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
@@ -1053,10 +1065,13 @@
         `;
       });
 
-      gerarEBaixarArquivoHtml(htmlBlocos, 'recibos_lote.html');
+      document.getElementById('preview-titulo').innerText = "Pré-visualização dos Recibos";
+      document.getElementById('preview-corpo-conteudo').innerHTML = htmlBlocos;
+      document.getElementById('btn-confirmar-download-preview').onclick = () => gerarEBaixarArquivoHtml(htmlBlocos, 'recibos_lote.html');
+      document.getElementById('modal-preview-geral').style.display = 'flex';
     }
 
-    // DOWNLOAD DE ARQUIVO UNIVERSAL PARA RECIBO ÚNICO
+    // PRÉ-VISUALIZAÇÃO DE RECIBO ÚNICO
     function baixarReciboUnicoArquivo() {
       if (!pedidoSelecionadoModal) return;
       const ped = pedidoSelecionadoModal;
@@ -1090,10 +1105,13 @@
       gerarEBaixarArquivoHtml(htmlBlocos, `recibo_pedido_${ped.numeroPedido || 'nota'}.html`);
     }
 
-    // DOWNLOAD DE ARQUIVO UNIVERSAL PARA RELATÓRIO
-    function baixarRelatorioArquivo() {
+    // PRÉ-VISUALIZAÇÃO DE RELATÓRIO DE VENDAS
+    function preVisualizarRelatorio() {
       const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
-      gerarEBaixarArquivoHtml(conteudoHtml, 'relatorio_vendas.html');
+      document.getElementById('preview-titulo').innerText = "Pré-visualização do Relatório de Vendas";
+      document.getElementById('preview-corpo-conteudo').innerHTML = conteudoHtml;
+      document.getElementById('btn-confirmar-download-preview').onclick = () => gerarEBaixarArquivoHtml(conteudoHtml, 'relatorio_vendas.html');
+      document.getElementById('modal-preview-geral').style.display = 'flex';
     }
 
     // FUNÇÃO AUXILIAR PARA CRIAR E BAIXAR O ARQUIVO HTML UNIVERSAL
@@ -1143,6 +1161,7 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      document.getElementById('modal-preview-geral').style.display = 'none';
     }
 
     function renderUsuarios() {
