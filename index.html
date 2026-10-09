@@ -9,11 +9,9 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="icon" href="logo.png">
 
-  <!-- SDKs DO FIREBASE -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- HTML2PDF PARA GERAR PDF RÁPIDO E EVITAR TRAVAMENTOS NO SAFARI/IPHONE -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -94,7 +92,6 @@
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
-    /* CORREÇÃO DE RENDERIZAÇÃO PARA O SAFARI MÓVEL (EVITA PÁGINA EM BRANCO) */
     .receipt-box { 
       background: #ffffff; 
       border: 1px solid #e2e8f0;
@@ -113,7 +110,7 @@
       width: 100%;
       min-height: 110mm;
       background: #ffffff;
-      padding: 10px;
+      padding: 12px;
       margin-bottom: 15px;
       border: 1px dashed #cbd5e1;
       border-radius: 8px;
@@ -233,7 +230,6 @@
 </head>
 <body>
 
-  <!-- CABEÇALHO -->
   <header id="app-header" style="display:none;">
     <div class="brand"><span id="header-title">🥚 HAPPY EGGS</span></div>
     <div class="user-info">
@@ -243,7 +239,6 @@
   </header>
 
   <main>
-    <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
       <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
@@ -254,7 +249,6 @@
       </form>
     </div>
 
-    <!-- PAINEL SUPER ADMIN (SaaS) -->
     <div id="view-superadmin" class="view-content" style="display:none;">
       <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border: none;">
         <div class="card-header" style="border-color: rgba(255,255,255,0.1); margin-bottom: 10px; padding-bottom: 8px;">
@@ -320,7 +314,6 @@
       </div>
     </div>
 
-    <!-- MENU PRINCIPAL (DASHBOARD) -->
     <div id="view-dashboard" style="display:none;">
       <div class="grid-menu">
         <button class="grid-btn full-width" type="button" onclick="navTo('pedidos')"><span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span></button>
@@ -343,7 +336,6 @@
       </div>
     </div>
 
-    <!-- TELA: CLIENTES -->
     <div id="view-clientes" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
@@ -367,7 +359,6 @@
       </div>
     </div>
 
-    <!-- TELA: PEDIDOS -->
     <div id="view-pedidos" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
@@ -429,7 +420,6 @@
       </div>
     </div>
 
-    <!-- TELA: ESTOQUE E EMBALAGENS -->
     <div id="view-produtos" class="view-content" style="display:none;">
       <div class="card" style="border-left: 4px solid var(--accent);">
         <div class="card-header">
@@ -471,7 +461,6 @@
       </div>
     </div>
 
-    <!-- TELA: GESTÃO DE USUÁRIOS -->
     <div id="view-usuarios" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
@@ -497,7 +486,6 @@
       </div>
     </div>
 
-    <!-- TELA: EMPRESA & MINHA SENHA -->
     <div id="view-empresa" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
@@ -525,7 +513,6 @@
     </div>
   </main>
 
-  <!-- MODAL: DETALHES DA EMPRESA / CLIENTE NO SUPER ADMIN -->
   <div class="modal" id="modal-detalhes-empresa">
     <div class="modal-content" style="max-width: 440px;">
       <div class="card-title" id="detalhe-titulo-modal" style="margin-bottom: 12px; font-size: 1.1rem; color: var(--accent);">Detalhes da Granja</div>
@@ -537,7 +524,6 @@
     </div>
   </div>
 
-  <!-- MODAL: REDEFINIR SENHA DO CLIENTE -->
   <div class="modal" id="modal-redefinir-senha-cli">
     <div class="modal-content" style="max-width: 380px;">
       <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha de Acesso</div>
@@ -551,7 +537,6 @@
     </div>
   </div>
 
-  <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
   <div class="modal" id="modal-nota">
     <div class="modal-content">
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
@@ -564,7 +549,6 @@
     </div>
   </div>
 
-  <!-- MODAL: ALTERAR SENHA DO SUPER ADMIN -->
   <div class="modal" id="modal-seguranca-superadmin">
     <div class="modal-content" style="max-width: 380px;">
       <div class="card-title" style="margin-bottom: 12px;">🔐 Alterar Senha de Super Admin</div>
@@ -578,7 +562,6 @@
     </div>
   </div>
 
-  <!-- MODAL: RELATÓRIO DE VENDAS -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 520px;">
       <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
@@ -630,7 +613,6 @@
     </div>
   </div>
 
-  <!-- MODAL: BALANÇO DE ESTOQUE -->
   <div class="modal" id="modal-balanco">
     <div class="modal-content" style="max-width: 380px;">
       <div class="card-title" style="margin-bottom: 12px;">⚖️ Balanço Manual de Estoque</div>
@@ -1032,7 +1014,7 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
-    // CORREÇÃO CRítica: FILTRAGEM DE IDs ÚNICOS SEM DUPLICAÇÃO
+    // CORREÇÃO CRÍTICA: FILTRAGEM DE IDs ÚNICOS SEM DUPLICAÇÃO
     function imprimirPedidosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
