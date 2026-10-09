@@ -1182,7 +1182,7 @@
       dispararJanelaImpressao(conteudoHtml, 'Relatorio_Vendas');
     }
 
-    // DISPARADOR DE IMPRESSÃO ESTÁVEL VIA JANELA ISOLADA (100% COMPATÍVEL COM IOS/ANDROID/PC)
+    // DISPARADOR DE IMPRESSÃO ESTÁVEL VIA JANELA ISOLADA
     function dispararJanelaImpressao(conteudoHtml, titulo) {
       const janela = window.open('', '_blank');
       if (!janela) {
@@ -1190,47 +1190,42 @@
         return;
       }
       
-      janela.document.write(`
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-          <meta charset="UTF-8">
-          <title>${titulo}</title>
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #ffffff; color: #0f172a; padding: 20px; margin: 0; }
-            .a4-pagina-lote { width: 100%; min-height: 275mm; max-height: 275mm; background: #ffffff; padding: 10mm; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; page-break-inside: avoid; break-inside: avoid; }
-            .recibo-bloco-metade { width: 100%; height: 48%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
-            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
-            .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; }
-            .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
-            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-            .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 10px; border-radius: 6px; }
-            .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 3px; }
-            .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
-            .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.82rem; }
-            .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8rem; }
-            .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; }
-            .relatorio-tabela-planilha td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
-            @media print {
-              body { padding: 0; }
-              .no-print { display: none !important; }
-            }
-          </style>
-        </head>
-        <body>
-          <div style="text-align: center; margin-bottom: 20px;" class="no-print">
-            <button onclick="window.print()" style="background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;">🖨️ Imprimir / Salvar como PDF</button>
-          </div>
-          ${conteudoHtml}
-          <script>
-            window.onload = function() {
-              setTimeout(() => { window.print(); }, 400);
-            };
-          </script>
-        </body>
-        </html>
-      `);
+      janela.document.write(`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>${titulo}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #ffffff; color: #0f172a; padding: 20px; margin: 0; }
+    .a4-pagina-lote { width: 100%; min-height: 275mm; max-height: 275mm; background: #ffffff; padding: 10mm; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; page-break-inside: avoid; break-inside: avoid; }
+    .recibo-bloco-metade { width: 100%; height: 48%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+    .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
+    .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; }
+    .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
+    .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+    .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 10px; border-radius: 6px; }
+    .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 3px; }
+    .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
+    .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.82rem; }
+    .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8rem; }
+    .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; }
+    .relatorio-tabela-planilha td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+    @media print { body { padding: 0; } .no-print { display: none !important; } }
+  </style>
+</head>
+<body>
+  <div style="text-align: center; margin-bottom: 20px;" class="no-print">
+    <button onclick="window.print()" style="background: #2563eb; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;">🖨️ Imprimir / Salvar como PDF</button>
+  </div>
+  ${conteudoHtml}
+  <script>
+    window.onload = function() {
+      setTimeout(() => { window.print(); }, 400);
+    };
+  </script>
+</body>
+</html>`);
       janela.document.close();
       document.getElementById('modal-preview-geral').style.display = 'none';
       document.getElementById('modal-nota').style.display = 'none';
