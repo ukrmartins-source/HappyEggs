@@ -9,9 +9,11 @@
   <link rel="apple-touch-icon" href="logo.png">
   <link rel="icon" href="logo.png">
 
+  <!-- SDKs DO FIREBASE -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+  <!-- HTML2PDF PARA GERAR PDF RÁPIDO E EVITAR TRAVAMENTOS NO SAFARI/IPHONE -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -230,6 +232,7 @@
 </head>
 <body>
 
+  <!-- CABEÇALHO -->
   <header id="app-header" style="display:none;">
     <div class="brand"><span id="header-title">🥚 HAPPY EGGS</span></div>
     <div class="user-info">
@@ -239,6 +242,7 @@
   </header>
 
   <main>
+    <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
       <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
@@ -249,6 +253,7 @@
       </form>
     </div>
 
+    <!-- PAINEL SUPER ADMIN (SaaS) -->
     <div id="view-superadmin" class="view-content" style="display:none;">
       <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border: none;">
         <div class="card-header" style="border-color: rgba(255,255,255,0.1); margin-bottom: 10px; padding-bottom: 8px;">
@@ -314,6 +319,7 @@
       </div>
     </div>
 
+    <!-- MENU PRINCIPAL (DASHBOARD) -->
     <div id="view-dashboard" style="display:none;">
       <div class="grid-menu">
         <button class="grid-btn full-width" type="button" onclick="navTo('pedidos')"><span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span></button>
@@ -336,6 +342,7 @@
       </div>
     </div>
 
+    <!-- TELA: CLIENTES -->
     <div id="view-clientes" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
@@ -359,6 +366,7 @@
       </div>
     </div>
 
+    <!-- TELA: PEDIDOS -->
     <div id="view-pedidos" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
@@ -420,6 +428,7 @@
       </div>
     </div>
 
+    <!-- TELA: ESTOQUE E EMBALAGENS -->
     <div id="view-produtos" class="view-content" style="display:none;">
       <div class="card" style="border-left: 4px solid var(--accent);">
         <div class="card-header">
@@ -461,6 +470,7 @@
       </div>
     </div>
 
+    <!-- TELA: GESTÃO DE USUÁRIOS -->
     <div id="view-usuarios" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
@@ -486,6 +496,7 @@
       </div>
     </div>
 
+    <!-- TELA: EMPRESA & MINHA SENHA -->
     <div id="view-empresa" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
@@ -513,6 +524,7 @@
     </div>
   </main>
 
+  <!-- MODAL: DETALHES DA EMPRESA / CLIENTE NO SUPER ADMIN -->
   <div class="modal" id="modal-detalhes-empresa">
     <div class="modal-content" style="max-width: 440px;">
       <div class="card-title" id="detalhe-titulo-modal" style="margin-bottom: 12px; font-size: 1.1rem; color: var(--accent);">Detalhes da Granja</div>
@@ -524,6 +536,7 @@
     </div>
   </div>
 
+  <!-- MODAL: REDEFINIR SENHA DO CLIENTE -->
   <div class="modal" id="modal-redefinir-senha-cli">
     <div class="modal-content" style="max-width: 380px;">
       <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha de Acesso</div>
@@ -537,6 +550,7 @@
     </div>
   </div>
 
+  <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
   <div class="modal" id="modal-nota">
     <div class="modal-content">
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
@@ -549,6 +563,7 @@
     </div>
   </div>
 
+  <!-- MODAL: ALTERAR SENHA DO SUPER ADMIN -->
   <div class="modal" id="modal-seguranca-superadmin">
     <div class="modal-content" style="max-width: 380px;">
       <div class="card-title" style="margin-bottom: 12px;">🔐 Alterar Senha de Super Admin</div>
@@ -562,6 +577,7 @@
     </div>
   </div>
 
+  <!-- MODAL: RELATÓRIO DE VENDAS -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 520px;">
       <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
@@ -613,6 +629,7 @@
     </div>
   </div>
 
+  <!-- MODAL: BALANÇO DE ESTOQUE -->
   <div class="modal" id="modal-balanco">
     <div class="modal-content" style="max-width: 380px;">
       <div class="card-title" style="margin-bottom: 12px;">⚖️ Balanço Manual de Estoque</div>
@@ -1014,22 +1031,21 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
-    // CORREÇÃO CRÍTICA: FILTRAGEM DE IDs ÚNICOS SEM DUPLICAÇÃO
+    // CORREÇÃO DEFINITIVA VIA IFRAME ISOLADO PARA IMPRESSÃO EM LOTE
     function imprimirPedidosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
       
-      const receiptBox = document.getElementById('printable-receipt');
-      receiptBox.innerHTML = '';
       const emp = state.empresa || {};
+      let htmlBlocos = '';
 
       selecionados.forEach((id) => {
         const ped = state.pedidos.find(p => p.id === id);
         if (!ped) return;
         const itens = ped.itens || [];
 
-        receiptBox.innerHTML += `
+        htmlBlocos += `
           <div class="recibo-bloco-pagina">
             <div>
               <div class="recibo-sheet-header">
@@ -1059,7 +1075,8 @@
           </div>
         `;
       });
-      document.getElementById('modal-nota').style.display = 'flex';
+
+      executarImpressaoOuPdfIsolado(htmlBlocos, 'recibos_lote.pdf');
     }
 
     function renderUsuarios() {
@@ -1243,24 +1260,115 @@
     }
 
     function imprimirDiretoDispositivo() {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      if (isIOS) {
-        gerarPdfRecibo();
-      } else {
-        window.print();
-      }
+      const reciboHtml = document.getElementById('printable-receipt').innerHTML;
+      executarImpressaoOuPdfIsolado(reciboHtml, 'recibo_pedido.pdf');
     }
 
     function imprimirDiretoRelatorio() {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      if (isIOS) {
-        gerarPdfRelatorio();
-      } else {
-        window.print();
-      }
+      const relatorioHtml = document.getElementById('area-relatorio-impressao').outerHTML;
+      executarImpressaoOuPdfIsolado(relatorioHtml, 'relatorio_vendas.pdf');
     }
 
-    // CORREÇÃO CRÍTICA SAFARI: FORÇAR LARGURA EXPLÍCITA NO HTML2CANVAS PARA EVITAR PÁGINA EM BRANCO
+    // FUNÇÃO ROBUSTA DE SUPORTE UNIFICADO PARA MOBILE / IOS E DESKTOP (IFRAME ISOLADO)
+    function executarImpressaoOuPdfIsolado(conteudoHtml, nomeArquivoPdf) {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+      let iframePrint = document.getElementById('iframe-print-oculto');
+      if (!iframePrint) {
+        iframePrint = document.createElement('iframe');
+        iframePrint.id = 'iframe-print-oculto';
+        iframePrint.style.position = 'fixed';
+        iframePrint.style.right = '0';
+        iframePrint.style.bottom = '0';
+        iframePrint.style.width = '0';
+        iframePrint.style.height = '0';
+        iframePrint.style.border = 'none';
+        document.body.appendChild(iframePrint);
+      }
+
+      const docContent = `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>Documento</title>
+          <style>
+            @page { size: A4; margin: 10mm; }
+            * { box-sizing: border-box; -webkit-print-color-adjust: exact; }
+            body { font-family: Arial, sans-serif; color: #0f172a; background: #fff; margin: 0; padding: 0; }
+            .recibo-bloco-pagina {
+              width: 100%;
+              min-height: 110mm;
+              background: #ffffff;
+              padding: 12px;
+              margin-bottom: 15px;
+              border: 1px dashed #cbd5e1;
+              border-radius: 8px;
+              page-break-inside: avoid;
+              break-inside: avoid;
+              page-break-after: always;
+              break-after: page;
+            }
+            .recibo-bloco-pagina:last-child {
+              page-break-after: auto;
+              break-after: auto;
+            }
+            .recibo-sheet-header {
+              background: #0f172a;
+              color: #ffffff;
+              padding: 8px 12px;
+              border-radius: 6px;
+              margin-bottom: 8px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
+            .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; }
+            .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
+            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+            .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 10px; border-radius: 6px; }
+            .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 3px; }
+            .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
+            .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.82rem; }
+            .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8rem; }
+            .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; border-top: 1px solid #e2e8f0; }
+            .relatorio-tabela-planilha td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+          </style>
+        </head>
+        <body>
+          ${conteudoHtml}
+        </body>
+        </html>
+      `;
+
+      const doc = iframePrint.contentWindow.document;
+      doc.open();
+      doc.write(docContent);
+      doc.close();
+
+      setTimeout(() => {
+        try {
+          if (isIOS) {
+            // No iOS/Safari mobile, se a impressora direta falhar, utiliza html2pdf com o elemento isolado do iframe
+            html2pdf().from(doc.body).set({
+              margin: 5,
+              filename: nomeArquivoPdf,
+              image: { type: 'jpeg', quality: 0.98 },
+              html2canvas: { scale: 2, useCORS: true, letterRendering: true, width: 650, windowWidth: 850 },
+              jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).save();
+          } else {
+            iframePrint.contentWindow.focus();
+            iframePrint.contentWindow.print();
+          }
+        } catch (err) {
+          console.error("Erro na impressão isolada:", err);
+          window.print();
+        }
+      }, 600);
+    }
+
     function gerarPdfRecibo() {
       const elemento = document.getElementById('printable-receipt');
       const opt = {
