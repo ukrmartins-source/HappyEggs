@@ -105,10 +105,10 @@
 
     .a4-pagina-lote {
       width: 100%;
-      min-height: 275mm;
+      height: 275mm;
       max-height: 275mm;
       background: #ffffff;
-      padding: 10mm;
+      padding: 8mm;
       margin-bottom: 15px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
@@ -123,11 +123,11 @@
 
     .recibo-bloco-metade {
       width: 100%;
-      height: 48%;
+      height: 48.5%;
       background: #ffffff;
       border: 1px dashed #94a3b8;
       border-radius: 8px;
-      padding: 12px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -137,15 +137,15 @@
     .recibo-sheet-header {
       background: #0f172a;
       color: #ffffff;
-      padding: 8px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -557,6 +557,20 @@
     </div>
   </div>
 
+  <!-- MODAL: REDEFINIR SENHA DE USUÁRIO/VENDEDOR -->
+  <div class="modal" id="modal-redefinir-senha-usuario">
+    <div class="modal-content" style="max-width: 380px;">
+      <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha do Usuário</div>
+      <form onsubmit="salvarNovaSenhaUsuario(event)">
+        <div class="form-group"><label>Nova Senha</label><input type="password" id="nova-senha-usuario-input" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button type="submit" class="btn" style="background: var(--warning);">Salvar Senha</button>
+          <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-redefinir-senha-usuario').style.display='none'">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
   <div class="modal" id="modal-nota">
     <div class="modal-content">
@@ -672,6 +686,7 @@
     let superAdminPrivacidadeOculto = false;
     let empresaSelecionadaParaDetalhes = null;
     let pedidoSelecionadoModal = null;
+    let usuarioSelecionadoId = null;
 
     function initApp() {
       db.collection("usuarios").get().then(snapshot => {
@@ -1174,10 +1189,10 @@
           <style>
             * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
             body { background: #fff; color: #0f172a; padding: 15px; }
-            .a4-pagina-lote { width: 100%; min-height: 275mm; max-height: 275mm; background: #ffffff; padding: 10mm; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; }
-            .recibo-bloco-metade { width: 100%; height: 48%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
-            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
+            .a4-pagina-lote { width: 100%; height: 275mm; max-height: 275mm; background: #ffffff; padding: 8mm; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; }
+            .recibo-bloco-metade { width: 100%; height: 48.5%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 6px 10px; border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
             .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; }
             .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
             .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
@@ -1214,10 +1229,57 @@
       }
     }
 
+    async function cadastrarUsuario(e) {
+      e.preventDefault();
+      const login = document.getElementById('usr-login').value.trim().toLowerCase();
+      const pass = document.getElementById('usr-pass').value.trim();
+      const role = document.getElementById('usr-role').value;
+      try {
+        await db.collection("usuarios").add({ empresaId: state.currentUser.empresaId, login, pass, role });
+        e.target.reset();
+        alert('Usuário cadastrado com sucesso!');
+      } catch (err) { alert('Erro ao cadastrar usuário: ' + err.message); }
+    }
+
     function renderUsuarios() {
       const tbody = document.getElementById('lista-usuarios');
       if (!tbody) return;
-      tbody.innerHTML = state.usuarios.map(u => '<tr><td><strong>' + u.login + '</strong></td><td>' + u.role + '</td><td>---</td></tr>').join('');
+      tbody.innerHTML = state.usuarios.map(u => `
+        <tr>
+          <td><strong>${u.login}</strong></td>
+          <td>${u.role}</td>
+          <td>
+            <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 6px; margin-right:4px;" onclick="abrirModalAlterarSenhaUsuario('${u.id}')">🔑 Senha</button>
+            <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 6px;" onclick="excluirUsuario('${u.id}')">🗑️ Excluir</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function abrirModalAlterarSenhaUsuario(id) {
+      usuarioSelecionadoId = id;
+      document.getElementById('nova-senha-usuario-input').value = '';
+      document.getElementById('modal-redefinir-senha-usuario').style.display = 'flex';
+    }
+
+    async function salvarNovaSenhaUsuario(e) {
+      e.preventDefault();
+      const novaSenha = document.getElementById('nova-senha-usuario-input').value.trim();
+      if (!novaSenha || !usuarioSelecionadoId) return;
+      try {
+        await db.collection("usuarios").doc(usuarioSelecionadoId).update({ pass: novaSenha });
+        alert('Senha alterada com sucesso!');
+        document.getElementById('modal-redefinir-senha-usuario').style.display = 'none';
+      } catch (err) { alert('Erro ao alterar senha: ' + err.message); }
+    }
+
+    async function excluirUsuario(id) {
+      if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        try {
+          await db.collection("usuarios").doc(id).delete();
+          alert('Usuário excluído com sucesso!');
+        } catch (err) { alert('Erro ao excluir usuário: ' + err.message); }
+      }
     }
 
     function renderDropdowns() {
