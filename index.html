@@ -235,14 +235,6 @@
     .relatorio-tabela-planilha tr:nth-child(even) {
       background-color: #f8fafc;
     }
-
-    /* REGRAS DE IMPRESSÃO ISOLADA */
-    @media print {
-      body * { visibility: hidden !important; }
-      #print-area-global, #print-area-global * { visibility: visible !important; }
-      #print-area-global { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; z-index: 9999; }
-      .modal { display: none !important; }
-    }
   </style>
 </head>
 <body>
@@ -538,9 +530,6 @@
       </div>
     </div>
   </main>
-
-  <!-- CONTAINER GLOBAL DE IMPRESSÃO PURA -->
-  <div id="print-area-global" style="display:none;"></div>
 
   <!-- MODAL: DETALHES DA EMPRESA / CLIENTE NO SUPER ADMIN -->
   <div class="modal" id="modal-detalhes-empresa">
@@ -1095,7 +1084,7 @@
         htmlPaginas += '</div>';
       }
 
-      dispararImpressaoGlobal(htmlPaginas);
+      abrirJanelaImpressao(htmlPaginas);
     }
 
     function construirHtmlReciboMetade(ped, emp) {
@@ -1166,27 +1155,61 @@
         </div>
       `;
       document.getElementById('modal-nota').style.display = 'none';
-      setTimeout(() => { dispararImpressaoGlobal(htmlBloco); }, 100);
+      abrirJanelaImpressao(htmlBloco);
     }
 
     function imprimirRelatorioDireto() {
       const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
       document.getElementById('modal-resumo').style.display = 'none';
-      setTimeout(() => { dispararImpressaoGlobal(conteudoHtml); }, 100);
+      abrirJanelaImpressao(conteudoHtml);
     }
 
-    function dispararImpressaoGlobal(htmlConteudo) {
-      const area = document.getElementById('print-area-global');
-      area.innerHTML = htmlConteudo;
-      area.style.display = 'block';
-      
-      setTimeout(() => {
-        window.print();
-        setTimeout(() => {
-          area.style.display = 'none';
-          area.innerHTML = '';
-        }, 800);
-      }, 200);
+    function abrirJanelaImpressao(htmlConteudo) {
+      const janela = window.open('', '_blank');
+      if (!janela) {
+        alert('O navegador bloqueou a abertura da janela de impressão. Permita pop-ups para este site.');
+        return;
+      }
+      janela.document.write(`
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>Impressão - HappyEggs</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+            body { background: #fff; color: #0f172a; padding: 15px; }
+            .a4-pagina-lote { width: 100%; min-height: 275mm; max-height: 275mm; background: #ffffff; padding: 10mm; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; }
+            .recibo-bloco-metade { width: 100%; height: 48%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
+            .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; }
+            .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
+            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+            .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 10px; border-radius: 6px; }
+            .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 3px; }
+            .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
+            .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.82rem; }
+            .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8rem; }
+            .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; border-top: 1px solid #e2e8f0; }
+            .relatorio-tabela-planilha td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+            .relatorio-tabela-planilha tr:nth-child(even) { background-color: #f8fafc; }
+            @media print { body { padding: 0; } }
+          </style>
+        </head>
+        <body>
+          ${htmlConteudo}
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 400);
+            };
+          <\/script>
+        </body>
+        </html>
+      `);
+      janela.document.close();
     }
 
     function renderUsuarios() {
