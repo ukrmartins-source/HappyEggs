@@ -89,7 +89,7 @@
     th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
 
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
-    .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+    .modal-content { background: white; width: 92%; max-width: 480px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
     .receipt-box { 
       background: #ffffff; 
@@ -103,13 +103,36 @@
       word-wrap: break-word;
     }
 
-    .recibo-bloco-pagina {
+    /* REGRA RIGOROSA: 2 RECIBOS POR FOLHA A4 RETRATO (EXATAMENTE 50% DA ALTURA CADA) */
+    .a4-pagina-lote {
       width: 100%;
+      min-height: 275mm;
+      max-height: 275mm;
       background: #ffffff;
-      padding: 16px;
+      padding: 10mm;
       margin-bottom: 15px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      break-after: page;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .recibo-bloco-metade {
+      width: 100%;
+      height: 48%;
+      background: #ffffff;
+      border: 1px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
     }
 
     .recibo-sheet-header {
@@ -117,13 +140,13 @@
       color: #ffffff;
       padding: 8px 12px;
       border-radius: 6px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 10px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -547,14 +570,14 @@
     </div>
   </div>
 
-  <!-- MODAL: PRÉ-VISUALIZAÇÃO DE DOCUMENTOS (RELATÓRIO OU LOTE DE RECIBOS) -->
+  <!-- MODAL: PRÉ-VISUALIZAÇÃO DE DOCUMENTOS (CENTRAL DE IMPRESSÃO) -->
   <div class="modal" id="modal-preview-geral">
-    <div class="modal-content" style="max-width: 540px;">
-      <div class="card-title" id="preview-titulo" style="margin-bottom:12px; font-weight:800;">Visualização do Documento</div>
+    <div class="modal-content" style="max-width: 580px;">
+      <div class="card-title" id="preview-titulo" style="margin-bottom:12px; font-weight:800;">Central de Impressão e Visualização</div>
       <div id="preview-corpo-conteudo" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; max-height: 60vh; overflow-y: auto; margin-bottom: 15px;"></div>
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button class="btn" type="button" style="background:#2563eb;" id="btn-confirmar-download-preview">📥 Baixar Arquivo Definitivo</button>
-        <button class="btn" type="button" onclick="document.getElementById('modal-preview-geral').style.display='none'" style="background:#64748b;">Fechar Visualização</button>
+        <button class="btn" type="button" style="background:#2563eb;" id="btn-confirmar-download-preview">📥 Baixar Documento em Arquivo</button>
+        <button class="btn" type="button" onclick="document.getElementById('modal-preview-geral').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
     </div>
   </div>
@@ -1025,50 +1048,72 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
-    // PRÉ-VISUALIZAÇÃO DE RECIBOS EM LOTE ANTES DE BAIXAR
+    // LÓGICA RIGOROSA: 2 RECIBOS EXATOS POR PÁGINA A4 (50% ALTURA CADA)
     function preVisualizarRecibosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
       
       const emp = state.empresa || {};
-      let htmlBlocos = '';
+      let htmlPaginas = '';
+      
+      for (let i = 0; i < selecionados.length; i += 2) {
+        const ped1 = state.pedidos.find(p => p.id === selecionados[i]);
+        const ped2 = selecionados[i + 1] ? state.pedidos.find(p => p.id === selecionados[i + 1]) : null;
 
-      selecionados.forEach((id) => {
-        const ped = state.pedidos.find(p => p.id === id);
-        if (!ped) return;
-        const itens = ped.itens || [];
+        htmlPaginas += `<div class="a4-pagina-lote">`;
+        
+        // RECIBO METADE SUPERIOR
+        if (ped1) {
+          htmlPaginas += construirHtmlReciboMetade(ped1, emp);
+        }
 
-        htmlBlocos += `
-          <div class="recibo-bloco-pagina">
+        // RECIBO METADE INFERIOR (OU ESPAÇO VAZIO SE ÍMPAR)
+        if (ped2) {
+          htmlPaginas += construirHtmlReciboMetade(ped2, emp);
+        } else {
+          htmlPaginas += `<div class="recibo-bloco-metade" style="border: 1px dashed #e2e8f0; background: #fafafa; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem;">(Espaço reservado / Fim do lote)</div>`;
+        }
+
+        htmlPaginas += `</div>`;
+      }
+
+      document.getElementById('preview-titulo').innerText = "Visualização de Recibos (2 por Página A4)";
+      document.getElementById('preview-corpo-conteudo').innerHTML = htmlPaginas;
+      document.getElementById('btn-confirmar-download-preview').onclick = () => gerarEBaixarArquivoHtml(htmlPaginas, 'recibos_lote.html');
+      document.getElementById('modal-preview-geral').style.display = 'flex';
+    }
+
+    function construirHtmlReciboMetade(ped, emp) {
+      const itens = ped.itens || [];
+      return `
+        <div class="recibo-bloco-metade">
+          <div>
             <div class="recibo-sheet-header">
-              <h3 style="font-size:0.9rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-              <span style="font-size:0.8rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
+              <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+              <span style="font-size:0.75rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
             </div>
-            <div style="font-size:0.85rem; margin-bottom:4px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
-            <div style="font-size:0.85rem; margin-bottom:8px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+            <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
+            <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
             <hr class="dashed-divider">
-            <div style="font-size:0.75rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:4px;">ITENS DO PEDIDO</div>
+            <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
             <div>
-              ${itens.map(i => `<div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
+              ${itens.map(i => `<div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:2px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
             </div>
+          </div>
+          <div>
             <hr class="dashed-divider">
-            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1rem; color:#0f172a; margin-bottom:6px;">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.85rem; color:#0f172a; margin-bottom:3px;">
               <span>TOTAL:</span>
               <span style="color:#2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
             </div>
-            <div style="font-size:0.8rem; color:#475569; margin-bottom:8px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:6px; text-align:center; font-size:0.75rem; color:#64748b;">
+            <div style="font-size:0.7rem; color:#475569; margin-bottom:3px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:3px; text-align:center; font-size:0.65rem; color:#64748b;">
               <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}
             </div>
           </div>
-        `;
-      });
-
-      document.getElementById('preview-titulo').innerText = "Pré-visualização dos Recibos";
-      document.getElementById('preview-corpo-conteudo').innerHTML = htmlBlocos;
-      document.getElementById('btn-confirmar-download-preview').onclick = () => gerarEBaixarArquivoHtml(htmlBlocos, 'recibos_lote.html');
-      document.getElementById('modal-preview-geral').style.display = 'flex';
+        </div>
+      `;
     }
 
     // PRÉ-VISUALIZAÇÃO DE RECIBO ÚNICO
@@ -1078,7 +1123,7 @@
       const emp = state.empresa || {};
 
       let htmlBlocos = `
-        <div class="recibo-bloco-pagina">
+        <div style="width: 100%; max-width: 190mm; margin: 0 auto; background: #ffffff; padding: 15px; border: 1px solid #cbd5e1; border-radius: 8px;">
           <div class="recibo-sheet-header">
             <h3 style="font-size:0.9rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
             <span style="font-size:0.8rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
@@ -1125,9 +1170,10 @@
           <title>${nomeArquivo}</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f1f5f9; color: #0f172a; padding: 20px; margin: 0; }
-            .container { max-width: 600px; margin: 0 auto; }
+            .container { max-width: 700px; margin: 0 auto; }
             .btn-imprimir { background: #2563eb; color: white; border: none; padding: 14px 20px; border-radius: 8px; font-size: 1rem; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(37,99,235,0.3); }
-            .recibo-bloco-pagina { background: #ffffff; padding: 20px; margin-bottom: 20px; border: 1px solid #cbd5e1; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+            .a4-pagina-lote { width: 100%; min-height: 275mm; background: #ffffff; padding: 10mm; margin-bottom: 20px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; }
+            .recibo-bloco-metade { width: 100%; height: 48%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
             .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
             .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 12px 0; }
             .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; color: #0f172a; }
