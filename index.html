@@ -13,9 +13,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- HTML2PDF PARA GERAR PDF RÁPIDO E EVITAR TRAVAMENTOS NO SAFARI/IPHONE -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
   <style>
     :root {
       --primary: #1e293b;
@@ -92,53 +89,63 @@
     th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
 
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
-    .modal-content { background: white; width: 92%; max-width: 440px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+    .modal-content { background: white; width: 92%; max-width: 480px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
-    /* CORREÇÃO DO LAYOUT DE RECIBOS PARA O SAFARI: ESTRUTURA ORGANIZADA SEM PÁGINA DENTRO DA OUTRA */
     .receipt-box { 
       background: #ffffff; 
       border: 1px solid #e2e8f0;
       border-radius: 12px;
-      padding: 10px; 
+      padding: 12px; 
       margin-bottom: 16px; 
       color: #0f172a;
       text-align: left;
       width: 100%;
       word-wrap: break-word;
-      max-height: 70vh;
-      overflow-y: auto;
     }
 
-    .recibo-bloco-pagina {
+    /* CORREÇÃO DO CORPO DO RECIBO NO CELULAR: ALTURA FLUIDA E AJUSTADA */
+    .a4-pagina-lote {
       width: 100%;
-      box-sizing: border-box;
+      min-height: auto;
       background: #ffffff;
-      padding: 12px;
+      padding: 4mm;
       margin-bottom: 12px;
-      border: 1px dashed #cbd5e1;
+      border: 1px solid #cbd5e1;
       border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      break-after: page;
       page-break-inside: avoid;
       break-inside: avoid;
     }
 
-    /* A CADA DOIS RECIBOS, INSERE QUEBRA DE PÁGINA LIMPA NA IMPRESSÃO OU PDF */
-    .recibo-bloco-pagina:nth-child(2n) {
-      page-break-after: always;
-      break-after: page;
+    .recibo-bloco-metade {
+      width: 100%;
+      min-height: 110mm;
+      background: #ffffff;
+      border: 1px dashed #94a3b8;
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
     .recibo-sheet-header {
       background: #0f172a;
       color: #ffffff;
-      padding: 8px 12px;
-      border-radius: 6px;
-      margin-bottom: 8px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
     .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
 
@@ -152,6 +159,7 @@
       border-radius: 12px;
       padding: 18px;
       color: #0f172a;
+      width: 100%;
     }
     .relatorio-sheet-header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -226,14 +234,6 @@
     }
     .relatorio-tabela-planilha tr:nth-child(even) {
       background-color: #f8fafc;
-    }
-
-    @media print {
-      body { background-color: #ffffff !important; }
-      body * { visibility: hidden; }
-      #printable-receipt, #printable-receipt *, #area-relatorio-impressao, #area-relatorio-impressao * { visibility: visible; }
-      #printable-receipt, #area-relatorio-impressao { position: absolute; left: 0; top: 0; width: 100%; border: none; padding: 0; margin: 0; box-shadow: none; background: #ffffff !important; }
-      @page { size: A4; margin: 10mm; }
     }
   </style>
 </head>
@@ -421,7 +421,7 @@
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div class="card-title">Histórico de Pedidos Sequencial</div>
-          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="imprimirPedidosSelecionados()">🖨️ Imprimir / Baixar Recibos</button>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">🖨️ Imprimir / Salvar Recibos</button>
         </div>
         <table>
           <thead>
@@ -557,14 +557,27 @@
     </div>
   </div>
 
+  <!-- MODAL: REDEFINIR SENHA DE USUÁRIO/VENDEDOR -->
+  <div class="modal" id="modal-redefinir-senha-usuario">
+    <div class="modal-content" style="max-width: 380px;">
+      <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha do Usuário</div>
+      <form onsubmit="salvarNovaSenhaUsuario(event)">
+        <div class="form-group"><label>Nova Senha</label><input type="password" id="nova-senha-usuario-input" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button type="submit" class="btn" style="background: var(--warning);">Salvar Senha</button>
+          <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-redefinir-senha-usuario').style.display='none'">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL DE COMPROVANTE / NOTA FISCAL -->
   <div class="modal" id="modal-nota">
     <div class="modal-content">
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       <div class="receipt-box" id="printable-receipt"></div>
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button class="btn" type="button" style="background:#059669;" onclick="imprimirDiretoDispositivo()">🖨️ Imprimir</button>
-        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRecibo()">📥 Baixar PDF</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirReciboUnico()">🖨️ Imprimir / Salvar PDF</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:2px;">Fechar Nota</button>
       </div>
     </div>
@@ -625,11 +638,8 @@
         </div>
       </div>
 
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#059669;" onclick="imprimirDiretoRelatorio()">🖨️ Imprimir</button>
-        <button class="btn" type="button" style="background:#2563eb;" onclick="gerarPdfRelatorio()">📥 Baixar PDF</button>
-      </div>
-      <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:8px;">
+      <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:15px;">
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorioDireto()">🖨️ Imprimir / Salvar Relatório</button>
         <button class="btn" type="button" style="background:#475569;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
@@ -675,6 +685,8 @@
     let carrinhoTemp = [];
     let superAdminPrivacidadeOculto = false;
     let empresaSelecionadaParaDetalhes = null;
+    let pedidoSelecionadoModal = null;
+    let usuarioSelecionadoId = null;
 
     function initApp() {
       db.collection("usuarios").get().then(snapshot => {
@@ -704,7 +716,7 @@
       
       document.getElementById('global-granjas-ativas').innerText = granjasAtivas;
       const fatEl = document.getElementById('global-faturamento');
-      fatEl.innerText = superAdminPrivacidadeOculto ? "R$ ••••••" : `R$ ${faturamentoPlanos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+      fatEl.innerText = superAdminPrivacidadeOculto ? "R$ ••••••" : "R$ " + faturamentoPlanos.toLocaleString('pt-BR', {minimumFractionDigits: 2});
     }
 
     function alternarPrivacidadeSuperAdmin() {
@@ -756,8 +768,15 @@
       const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.pedidos = snapshot.docs.map(doc => {
           const dataDoc = doc.data();
-          let dataCriacaoParsed = dataDoc.dataCriacao && dataDoc.dataCriacao.toDate ? dataDoc.dataCriacao.toDate() : (dataDoc.dataCriacao ? new Date(dataDoc.dataCriacao) : new Date());
-          return { id: doc.id, ...dataDoc, dataCriacao: dataCriacaoParsed };
+          let dataParsed = new Date();
+          if (dataDoc.dataCriacao) {
+            if (typeof dataDoc.dataCriacao.toDate === 'function') {
+              dataParsed = dataDoc.dataCriacao.toDate();
+            } else {
+              dataParsed = new Date(dataDoc.dataCriacao);
+            }
+          }
+          return { id: doc.id, ...dataDoc, dataCriacao: dataParsed };
         }).sort((a, b) => (b.numeroPedido || 0) - (a.numeroPedido || 0));
         render();
       });
@@ -796,7 +815,7 @@
         state.currentUser = { login: u, role: "superadmin" };
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('app-header').style.display = 'flex';
-        document.getElementById('user-display').innerText = `👑 SUPER ADMIN (${u})`;
+        document.getElementById('user-display').innerText = "👑 SUPER ADMIN (" + u + ")";
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
         navTo('superadmin');
         initSuperAdminListener();
@@ -816,7 +835,7 @@
         state.currentUser = found;
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('app-header').style.display = 'flex';
-        document.getElementById('user-display').innerText = `👤 ${found.login.toUpperCase()}`;
+        document.getElementById('user-display').innerText = "👤 " + found.login.toUpperCase();
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
         initListeners();
         navTo('dashboard');
@@ -840,7 +859,7 @@
         document.getElementById('view-dashboard').style.display = 'block';
         filtrarClientesDashboard();
       } else {
-        const el = document.getElementById(`view-${view}`);
+        const el = document.getElementById('view-' + view);
         if (el) el.style.display = 'block';
       }
       render();
@@ -852,7 +871,7 @@
 
     function renderEstoqueGeral() {
       const el = document.getElementById('estoque-geral-ovos');
-      if (el) el.innerText = `${(state.estoqueGeralOvos || 0).toLocaleString('pt-BR')} Ovos`;
+      if (el) el.innerText = (state.estoqueGeralOvos || 0).toLocaleString('pt-BR') + ' Ovos';
     }
 
     function atualizarComportamentoPlano() {
@@ -891,7 +910,7 @@
           await queryUser.docs[0].ref.update({ pass: adminPass, role: "admin" });
         }
 
-        alert(`Empresa ${nome} cadastrada com sucesso!`);
+        alert("Empresa " + nome + " cadastrada com sucesso!");
         e.target.reset();
         atualizarComportamentoPlano();
       } catch (err) { alert("Erro: " + err.message); }
@@ -925,7 +944,7 @@
       empresaSelecionadaParaDetalhes = emp;
 
       const usuariosDaEmpresa = state.todosUsuariosSaaS.filter(u => u.empresaId === empresaId);
-      const valorPlanoFmt = `R$ ${parseFloat(emp.valorPlano || 0).toFixed(2)}`;
+      const valorPlanoFmt = "R$ " + parseFloat(emp.valorPlano || 0).toFixed(2);
 
       let htmlUsuarios = usuariosDaEmpresa.map(u => `<div>👤 <strong>${u.login}</strong> (${u.role}) — Senha: <code>${superAdminPrivacidadeOculto ? '••••••' : u.pass}</code></div>`).join('') || 'Nenhum usuário cadastrado.';
 
@@ -943,7 +962,7 @@
         ${htmlUsuarios}
       `;
 
-      document.getElementById('detalhe-titulo-modal').innerText = `Granja: ${emp.nome}`;
+      document.getElementById('detalhe-titulo-modal').innerText = "Granja: " + emp.nome;
       document.getElementById('detalhe-corpo-modal').innerHTML = htmlConteudo;
       document.getElementById('modal-detalhes-empresa').style.display = 'flex';
     }
@@ -980,7 +999,7 @@
     }
 
     async function excluirEmpresaSaaS(id) {
-      if (confirm(`Tem certeza que deseja excluir a empresa ${id}?`)) {
+      if (confirm("Tem certeza que deseja excluir a empresa " + id + "?")) {
         try {
           await db.collection("empresas").doc(id).delete();
           alert('Empresa excluída com sucesso!');
@@ -1000,6 +1019,17 @@
       `).join('');
     }
 
+    async function excluirCliente(id) {
+      if (window.confirm('Tem certeza que deseja excluir este cliente?')) {
+        try {
+          await db.collection("clientes").doc(id).delete();
+          alert('Cliente excluído com sucesso!');
+        } catch (err) {
+          alert('Erro ao excluir cliente: ' + err.message);
+        }
+      }
+    }
+
     function filtrarClientesDashboard() {
       const termo = (document.getElementById('dash-busca-cliente')?.value || '').toLowerCase();
       const tbody = document.getElementById('lista-clientes-dash');
@@ -1014,6 +1044,15 @@
       tbody.innerHTML = state.produtos.map(p => `
         <tr><td><strong>${p.nome}</strong></td><td>R$ ${parseFloat(p.preco).toFixed(2)}</td><td>${p.ovosUnid} ovos</td><td><button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑</button></td></tr>
       `).join('');
+    }
+
+    async function excluirProduto(id) {
+      if (confirm('Tem certeza que deseja excluir este produto?')) {
+        try {
+          await db.collection("produtos").doc(id).delete();
+          alert('Produto excluído com sucesso!');
+        } catch (err) { alert('Erro ao excluir produto: ' + err.message); }
+      }
     }
 
     function renderPedidos() {
@@ -1038,63 +1077,228 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
-    function imprimirPedidosSelecionados() {
+    function preVisualizarRecibosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
       
-      const receiptBox = document.getElementById('printable-receipt');
-      receiptBox.innerHTML = '';
       const emp = state.empresa || {};
+      let htmlPaginas = "";
+      
+      for (let i = 0; i < selecionados.length; i += 2) {
+        const ped1 = state.pedidos.find(p => p.id === selecionados[i]);
+        const ped2 = selecionados[i + 1] ? state.pedidos.find(p => p.id === selecionados[i + 1]) : null;
 
-      selecionados.forEach((id) => {
-        const ped = state.pedidos.find(p => p.id === id);
-        if (!ped) return;
-        const itens = ped.itens || [];
+        htmlPaginas += '<div class="a4-pagina-lote">';
+        if (ped1) htmlPaginas += construirHtmlReciboMetade(ped1, emp);
+        if (ped2) {
+          htmlPaginas += construirHtmlReciboMetade(ped2, emp);
+        } else {
+          htmlPaginas += '<div class="recibo-bloco-metade" style="border: 1px dashed #e2e8f0; background: #fafafa; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem;">(Espaço reservado / Fim do lote)</div>';
+        }
+        htmlPaginas += '</div>';
+      }
 
-        receiptBox.innerHTML += `
-          <div class="recibo-bloco-pagina">
+      abrirJanelaImpressao(htmlPaginas);
+    }
+
+    function construirHtmlReciboMetade(ped, emp) {
+      const itens = ped.itens || [];
+      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
+      const cnpjEmpresa = emp.cnpj || 'N/I';
+      const telEmpresa = emp.tel || 'N/I';
+      const endEmpresa = emp.end || 'N/I';
+
+      return `
+        <div class="recibo-bloco-metade">
+          <div>
+            <div class="recibo-sheet-header">
+              <h3 style="font-size:0.75rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+              <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
+            </div>
+            <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
+            <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+            <hr class="dashed-divider">
+            <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
+            <div>
+              ${itens.map(i => `<div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:1px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
+            </div>
+          </div>
+          <div>
+            <hr class="dashed-divider">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
+              <span>TOTAL:</span>
+              <span style="color:#2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+            </div>
+            <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
+              <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function imprimirReciboUnico() {
+      if (!pedidoSelecionadoModal) return;
+      const ped = pedidoSelecionadoModal;
+      const emp = state.empresa || {};
+      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
+      const cnpjEmpresa = emp.cnpj || 'N/I';
+      const telEmpresa = emp.tel || 'N/I';
+      const endEmpresa = emp.end || 'N/I';
+
+      let htmlBloco = `
+        <div class="a4-pagina-lote" style="min-height: auto; height: auto;">
+          <div class="recibo-bloco-metade" style="height: auto;">
             <div>
               <div class="recibo-sheet-header">
-                <h3 style="font-size:0.85rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-                <span style="font-size:0.7rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
+                <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+                <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
               </div>
-              <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
-              <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+              <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+              <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
               <hr class="dashed-divider">
-              <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
+              <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
               <div>
-                ${itens.map(i => `<div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:2px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
+                ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:1px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
               </div>
             </div>
             <div>
               <hr class="dashed-divider">
-              <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.85rem; color:#0f172a; margin-bottom:4px;">
+              <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
                 <span>TOTAL:</span>
-                <span style="color:#2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+                <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
               </div>
-              <div style="font-size:0.7rem; color:#475569; margin-bottom:6px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-              <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:4px; text-align:center; font-size:0.65rem; color:#64748b;">
-                <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}<br>
-                <span>${emp.end || ''}</span> ${emp.social ? `| <span>${emp.social}</span>` : ''}
+              <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+              <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
+                <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
               </div>
             </div>
           </div>
-        `;
-      });
-      document.getElementById('modal-nota').style.display = 'flex';
+        </div>
+      `;
+      document.getElementById('modal-nota').style.display = 'none';
+      abrirJanelaImpressao(htmlBloco);
+    }
+
+    function imprimirRelatorioDireto() {
+      const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
+      document.getElementById('modal-resumo').style.display = 'none';
+      abrirJanelaImpressao(conteudoHtml);
+    }
+
+    function abrirJanelaImpressao(htmlConteudo) {
+      const documentoCompleto = `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>Impressão - HappyEggs</title>
+          <style>
+            @page {
+              size: A4;
+              margin: 5mm;
+            }
+            * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+            body { background: #fff; color: #0f172a; padding: 2px; }
+            .a4-pagina-lote { width: 100%; min-height: auto; background: #ffffff; padding: 4mm; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; break-after: page; }
+            .recibo-bloco-metade { width: 100%; min-height: 110mm; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 6px; padding: 8px 10px; margin-bottom: 10px; display: flex; flex-direction: column; justify-content: space-between; }
+            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
+            .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; }
+            .relatorio-sheet-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb; }
+            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+            .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 10px; border-radius: 6px; }
+            .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 3px; }
+            .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
+            .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.82rem; }
+            .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8rem; }
+            .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; border-top: 1px solid #e2e8f0; }
+            .relatorio-tabela-planilha td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+            .relatorio-tabela-planilha tr:nth-child(even) { background-color: #f8fafc; }
+            @media print { body { padding: 0; } }
+          </style>
+        </head>
+        <body>
+          ${htmlConteudo}
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 400);
+            };
+          <\/script>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob([documentoCompleto], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const janela = window.open(url, '_blank');
+      
+      if (!janela) {
+        alert('O navegador bloqueou a abertura da janela de impressão. Permita pop-ups para este site.');
+      }
+    }
+
+    async function cadastrarUsuario(e) {
+      e.preventDefault();
+      const login = document.getElementById('usr-login').value.trim().toLowerCase();
+      const pass = document.getElementById('usr-pass').value.trim();
+      const role = document.getElementById('usr-role').value;
+      try {
+        await db.collection("usuarios").add({ empresaId: state.currentUser.empresaId, login, pass, role });
+        e.target.reset();
+        alert('Usuário cadastrado com sucesso!');
+      } catch (err) { alert('Erro ao cadastrar usuário: ' + err.message); }
     }
 
     function renderUsuarios() {
       const tbody = document.getElementById('lista-usuarios');
       if (!tbody) return;
-      tbody.innerHTML = state.usuarios.map(u => `<tr><td><strong>${u.login}</strong></td><td>${u.role}</td><td>---</td></tr>`).join('');
+      tbody.innerHTML = state.usuarios.map(u => `
+        <tr>
+          <td><strong>${u.login}</strong></td>
+          <td>${u.role}</td>
+          <td>
+            <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 6px; margin-right:4px;" onclick="abrirModalAlterarSenhaUsuario('${u.id}')">🔑 Senha</button>
+            <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 6px;" onclick="excluirUsuario('${u.id}')">🗑️ Excluir</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function abrirModalAlterarSenhaUsuario(id) {
+      usuarioSelecionadoId = id;
+      document.getElementById('nova-senha-usuario-input').value = '';
+      document.getElementById('modal-redefinir-senha-usuario').style.display = 'flex';
+    }
+
+    async function salvarNovaSenhaUsuario(e) {
+      e.preventDefault();
+      const novaSenha = document.getElementById('nova-senha-usuario-input').value.trim();
+      if (!novaSenha || !usuarioSelecionadoId) return;
+      try {
+        await db.collection("usuarios").doc(usuarioSelecionadoId).update({ pass: novaSenha });
+        alert('Senha alterada com sucesso!');
+        document.getElementById('modal-redefinir-senha-usuario').style.display = 'none';
+      } catch (err) { alert('Erro ao alterar senha: ' + err.message); }
+    }
+
+    async function excluirUsuario(id) {
+      if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        try {
+          await db.collection("usuarios").doc(id).delete();
+          alert('Usuário excluído com sucesso!');
+        } catch (err) { alert('Erro ao excluir usuário: ' + err.message); }
+      }
     }
 
     function renderDropdowns() {
       filtrarClientesDropdown();
       const prodSelect = document.getElementById('ped-produto');
-      if (prodSelect) prodSelect.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${parseFloat(p.preco).toFixed(2)} (${p.ovosUnid} ovos)</option>`).join('');
+      if (prodSelect) prodSelect.innerHTML = state.produtos.map(p => '<option value="' + p.id + '">' + p.nome + ' - R$ ' + parseFloat(p.preco).toFixed(2) + ' (' + p.ovosUnid + ' ovos)</option>').join('');
     }
 
     function filtrarClientesDropdown() {
@@ -1102,7 +1306,7 @@
       const cliSelect = document.getElementById('ped-cliente');
       if (!cliSelect) return;
       const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(termo));
-      cliSelect.innerHTML = filtrados.length ? filtrados.map(c => `<option value="${c.id}">${c.nome} (${c.tel})</option>`).join('') : '<option value="">Nenhum cliente</option>';
+      cliSelect.innerHTML = filtrados.length ? filtrados.map(c => '<option value="' + c.id + '">' + c.nome + ' (' + c.tel + ')</option>').join('') : '<option value="">Nenhum cliente</option>';
     }
 
     async function cadastrarCliente(e) {
@@ -1129,11 +1333,11 @@
     function renderCarrinho() {
       const lista = document.getElementById('itens-pedido-lista');
       const totalSpan = document.getElementById('ped-total-valor');
-      if (!carrinhoTemp.length) { lista.innerHTML = `<div style="text-align:center; padding:10px;">Nenhum produto.</div>`; totalSpan.innerText = "0.00"; return; }
+      if (!carrinhoTemp.length) { lista.innerHTML = '<div style="text-align:center; padding:10px;">Nenhum produto.</div>'; totalSpan.innerText = "0.00"; return; }
       let totalGeral = 0;
       lista.innerHTML = carrinhoTemp.map((i, idx) => {
         totalGeral += i.subtotal;
-        return `<div class="carrinho-item"><div><strong>${i.qtd}x ${i.nome}</strong></div><div>R$ ${i.subtotal.toFixed(2)} <button type="button" class="btn-danger" onclick="carrinhoTemp.splice(${idx},1);renderCarrinho()">✕</button></div></div>`;
+        return '<div class="carrinho-item"><div><strong>' + i.qtd + 'x ' + i.nome + '</strong></div><div>R$ ' + i.subtotal.toFixed(2) + ' <button type="button" class="btn-danger" onclick="carrinhoTemp.splice(' + idx + ',1);renderCarrinho()">✕</button></div></div>';
       }).join('');
       totalSpan.innerText = totalGeral.toFixed(2);
     }
@@ -1177,12 +1381,7 @@
         let novoSaldo = atual + qtd;
 
         await refEstoque.set({ qtdOvos: novoSaldo }, { merge: true });
-
-        await db.collection("producao").add({
-          empresaId: empresaId,
-          qtdOvos: qtd,
-          dataHora: new Date()
-        });
+        await db.collection("producao").add({ empresaId: empresaId, qtdOvos: qtd, dataHora: new Date() });
 
         e.target.reset();
         alert('Produção registrada e estoque atualizado com sucesso!');
@@ -1193,7 +1392,7 @@
       const tbody = document.getElementById('lista-producao-hoje');
       if (!tbody) return;
       const hoje = new Date().toDateString();
-      tbody.innerHTML = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje).map(p => `<tr><td>${new Date(p.dataHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td><td>+ ${p.qtdOvos} ovos</td></tr>`).join('');
+      tbody.innerHTML = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje).map(p => '<tr><td>' + new Date(p.dataHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '</td><td>+ ' + p.qtdOvos + ' ovos</td></tr>').join('');
     }
 
     function abrirModalBalanco() {
@@ -1231,91 +1430,49 @@
     function abrirModalNota(pedidoOuId) {
       const ped = typeof pedidoOuId === 'string' ? state.pedidos.find(p => p.id === pedidoOuId) : pedidoOuId;
       if (!ped) return;
+      pedidoSelecionadoModal = ped;
       const emp = state.empresa || {};
+      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
+      const cnpjEmpresa = emp.cnpj || 'N/I';
+      const telEmpresa = emp.tel || 'N/I';
+      const endEmpresa = emp.end || 'N/I';
 
       document.getElementById('printable-receipt').innerHTML = `
-        <div class="recibo-bloco-pagina">
-          <div>
-            <div class="recibo-sheet-header">
-              <h3 style="font-size:0.85rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-              <span style="font-size:0.7rem; font-weight:600;">${emp.nome || 'HAPPY EGGS'}</span>
-            </div>
-            <div style="font-size:0.75rem; margin-bottom:2px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-            <div style="font-size:0.75rem; margin-bottom:4px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-            <hr class="dashed-divider">
-            <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:2px;">ITENS DO PEDIDO</div>
-            <div>
-              ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:2px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
-            </div>
+        <div>
+          <div class="recibo-sheet-header">
+            <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+            <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
           </div>
+          <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+          <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+          <hr class="dashed-divider">
+          <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
           <div>
-            <hr class="dashed-divider">
-            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.85rem; color:#0f172a; margin-bottom:4px;">
-              <span>TOTAL:</span>
-              <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
-            </div>
-            <div style="font-size:0.7rem; color:#475569; margin-bottom:6px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:4px; text-align:center; font-size:0.65rem; color:#64748b;">
-              <strong>${emp.nome || 'Happy Eggs'}</strong> | CNPJ: ${emp.cnpj || 'N/I'} | Tel: ${emp.tel || 'N/I'}<br>
-              <span>${emp.end || ''}</span> ${emp.social ? `| <span>${emp.social}</span>` : ''}
-            </div>
+            ${(ped.itens || []).map(i => `<div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:1px;"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
+          </div>
+          <hr class="dashed-divider">
+          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
+            <span>TOTAL:</span>
+            <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
+          </div>
+          <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+          <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
+            <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
           </div>
         </div>
       `;
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    function imprimirDiretoDispositivo() {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      if (isIOS) {
-        gerarPdfRecibo();
-      } else {
-        window.print();
-      }
-    }
-
-    function imprimirDiretoRelatorio() {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      if (isIOS) {
-        gerarPdfRelatorio();
-      } else {
-        window.print();
-      }
-    }
-
-    function gerarPdfRecibo() {
-      const elemento = document.getElementById('printable-receipt');
-      const opt = {
-        margin:       5,
-        filename:     'recibo_pedido.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, width: 600, windowWidth: 800 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().from(elemento).set(opt).save();
-    }
-
-    function gerarPdfRelatorio() {
-      const elemento = document.getElementById('area-relatorio-impressao');
-      const opt = {
-        margin:       5,
-        filename:     'relatorio_vendas.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, width: 700, windowWidth: 900 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().from(elemento).set(opt).save();
-    }
-
     function exportarRelatorioExcel() {
       let csv = "Pedido;Data;Cliente;Total;Status\n";
       state.pedidos.forEach(p => {
-        csv += `#${p.numeroPedido || ''};${p.dataCriacao.toLocaleDateString('pt-BR')};"${p.clienteNome || ''}";R$ ${(p.total || 0).toFixed(2).replace('.', ',')};${p.status || ''}\n`;
+        csv += "#" + (p.numeroPedido || '') + ";" + p.dataCriacao.toLocaleDateString('pt-BR') + ";\"" + (p.clienteNome || '') + "\";R$ " + (p.total || 0).toFixed(2).replace('.', ',') + ";" + (p.status || '') + "\n";
       });
       const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = `relatorio_vendas.csv`;
+      a.href = url; a.download = 'relatorio_vendas.csv';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
 
@@ -1335,28 +1492,50 @@
       const tipo = document.getElementById('filtro-periodo').value;
       const agora = new Date();
       let pedidosFiltrados = state.pedidos;
-      document.getElementById('relatorio-data-emissao').innerText = `Emitido em: ${agora.toLocaleDateString('pt-BR')} ${agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+      document.getElementById('relatorio-data-emissao').innerText = "Emitido em: " + agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
       if (tipo === 'hoje') {
-        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao.toDateString() === agora.toDateString());
+        pedidosFiltrados = state.pedidos.filter(p => {
+          const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+          return d.toDateString() === agora.toDateString();
+        });
       } else if (tipo === 'semana') {
-        const limite = new Date(); limite.setDate(agora.getDate() - 7);
-        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao >= limite);
+        const limite = new Date(); limite.setDate(agora.getDate() - 7); limite.setHours(0,0,0,0);
+        pedidosFiltrados = state.pedidos.filter(p => {
+          const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+          return d >= limite;
+        });
       } else if (tipo === 'mes') {
-        pedidosFiltrados = state.pedidos.filter(p => p.dataCriacao.getMonth() === agora.getMonth() && p.dataCriacao.getFullYear() === agora.getFullYear());
+        pedidosFiltrados = state.pedidos.filter(p => {
+          const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+          return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+        });
+      } else if (tipo === 'personalizado') {
+        const dataInicio = document.getElementById('data-inicio').value;
+        const dataFim = document.getElementById('data-fim').value;
+        if (dataInicio && dataFim) {
+          const ini = new Date(dataInicio + 'T00:00:00');
+          const fim = new Date(dataFim + 'T23:59:59');
+          pedidosFiltrados = state.pedidos.filter(p => {
+            const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+            return d >= ini && d <= fim;
+          });
+        } else {
+          pedidosFiltrados = [];
+        }
       }
 
-      const totalPeriodo = pedidosFiltrados.reduce((acc, p) => acc + (p.total || 0), 0);
-      document.getElementById('resumo-total-periodo').innerText = `R$ ${totalPeriodo.toFixed(2)}`;
+      const totalPeriodo = pedidosFiltrados.reduce((acc, p) => acc + (parseFloat(p.total) || 0), 0);
+      document.getElementById('resumo-total-periodo').innerText = "R$ " + totalPeriodo.toFixed(2);
       document.getElementById('resumo-qtd-pedidos').innerText = pedidosFiltrados.length;
 
       const formas = {};
-      pedidosFiltrados.forEach(p => { formas[p.formaPgto || 'Outros'] = (formas[p.formaPgto || 'Outros'] || 0) + (p.total || 0); });
-      document.getElementById('resumo-detalhe-formas').innerHTML = Object.keys(formas).map(f => `• ${f}: <strong>R$ ${formas[f].toFixed(2)}</strong>`).join('<br>') || 'Nenhum registro.';
+      pedidosFiltrados.forEach(p => { const pgto = p.formaPgto || 'Outros'; formas[pgto] = (formas[pgto] || 0) + (parseFloat(p.total) || 0); });
+      document.getElementById('resumo-detalhe-formas').innerHTML = Object.keys(formas).map(f => "• " + f + ": <strong>R$ " + formas[f].toFixed(2) + "</strong>").join('<br>') || 'Nenhum registro no período.';
 
-      document.getElementById('resumo-tabela-periodo').innerHTML = pedidosFiltrados.map(p => `
-        <tr><td>#${p.numeroPedido}</td><td>${p.dataCriacao.toLocaleDateString('pt-BR')}</td><td>${p.clienteNome}</td><td>R$ ${p.total.toFixed(2)}</td><td>${p.status}</td></tr>
-      `).join('');
+      document.getElementById('resumo-tabela-periodo').innerHTML = pedidosFiltrados.length > 0 ? pedidosFiltrados.map(p => `
+        <tr><td>#${p.numeroPedido || '---'}</td><td>${new Date(p.dataCriacao).toLocaleDateString('pt-BR')}</td><td>${p.clienteNome || 'Cliente'}</td><td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td><td>${p.status || 'Pendente'}</td></tr>
+      `).join('') : '<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhum pedido encontrado neste período.</td></tr>';
     }
 
     initApp();
