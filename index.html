@@ -316,11 +316,11 @@
     <div id="view-controle_tecnico" class="view-content" style="display:none;">
       <div class="card" style="border-left: 4px solid var(--tech);">
         <div class="card-header">
-          <div class="card-title">📊 Ficheiro Técnico: Gestão de Lotes & Postura</div>
+          <div class="card-title">📊 Ficheiro Técnico: Lotes, Postura, Mortalidade & Vacinas</div>
           <button class="btn btn-back" type="button" onclick="navTo('dashboard')">🏠 Início</button>
         </div>
         <div style="font-size:0.8rem; color:#64748b; margin-bottom: 15px;">
-          Controle zootécnico isolado do lote, acompanhamento de taxas de postura diária/mensal, mortalidade e ambiência.
+          Controle zootécnico isolado, acompanhamento de taxas de postura, mortalidade e plano sanitário de vacinação.
         </div>
       </div>
 
@@ -348,27 +348,63 @@
 
       <!-- 2. REGISTRO DIÁRIO DE POSTURA E TAXAS -->
       <div class="card">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🥚 Registo Diário de Postura & Mortalidade</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🥚 Registo Diário de Postura</div>
         <form onsubmit="registrarPosturaDiaria(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="postura-lote-id" required></select></div>
           <div class="form-group"><label>Data da Coleta</label><input type="date" id="postura-data" required></div>
           <div class="form-group"><label>Ovos Colhidos no Dia (Unidades)</label><input type="number" id="postura-ovos-colhidos" min="0" placeholder="Ex: 750" required></div>
-          <div class="form-group"><label>Mortalidade / Baixas no Dia (Opcional)</label><input type="number" id="postura-mortalidade" min="0" value="0"></div>
           <div class="form-group"><label>Consumo de Ração no Dia (Kg - Opcional)</label><input type="number" step="0.1" id="postura-racao" placeholder="Ex: 110.5"></div>
           <div class="form-group"><label>Temperatura Média / Obs Ambiência</label><input type="text" id="postura-obs" placeholder="Ex: Temp 24°C / Luz 16h"></div>
           <button type="submit" class="btn btn-success">✅ Registar Produção & Calcular Taxa</button>
         </form>
       </div>
 
-      <!-- HISTÓRICO E MÉDIAS TÉCNICAS -->
+      <!-- 3. REGISTRO DE MORTALIDADE -->
+      <div class="card" style="border-left: 4px solid var(--danger);">
+        <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">⚰️ Registo de Mortalidade / Baixas</div>
+        <form onsubmit="registrarMortalidadeTecnica(event)">
+          <div class="form-group"><label>Selecione o Lote</label><select id="morte-lote-id" required></select></div>
+          <div class="form-group"><label>Data do Ocorrido</label><input type="date" id="morte-data" required></div>
+          <div class="form-group"><label>Quantidade de Aves Mortas</label><input type="number" id="morte-qtd" min="1" placeholder="Ex: 1" required></div>
+          <div class="form-group"><label>Motivo / Observação</label><input type="text" id="morte-obs" placeholder="Ex: Doença, calor, etc."></div>
+          <button type="submit" class="btn btn-danger">⚠️ Registar Mortalidade</button>
+        </form>
+      </div>
+
+      <!-- 4. CONTROLE DE VACINAÇÃO -->
+      <div class="card" style="border-left: 4px solid var(--warning);">
+        <div class="card-title" style="margin-bottom: 12px; color: var(--warning);">💉 Controle & Histórico de Vacinação</div>
+        <form onsubmit="registrarVacinacaoTecnica(event)">
+          <div class="form-group"><label>Selecione o Lote</label><select id="vacina-lote-id" required></select></div>
+          <div class="form-group"><label>Tipo / Nome da Vacina</label><input type="text" id="vacina-nome" placeholder="Ex: Newcastle / Gumboro" required></div>
+          <div class="form-group"><label>Quantidade de Aves Vacinadas</label><input type="number" id="vacina-qtd-aves" min="1" placeholder="Ex: 1000" required></div>
+          <div class="form-group"><label>Data da Aplicação</label><input type="date" id="vacina-data" required></div>
+          <button type="submit" class="btn btn-warning" style="color:#fff;">💉 Registar Vacinação</button>
+        </form>
+      </div>
+
+      <!-- HISTÓRICO E INDICADORES TÉCNICOS -->
       <div class="card">
-        <div class="card-title">Histórico de Postura & Indicadores Zootécnicos</div>
+        <div class="card-title">Indicadores Zootécnicos & Histórico Geral</div>
         <div style="margin-top: 10px; font-size: 0.85rem; background: #f8fafc; padding: 10px; border-radius: 8px; border:1px solid #e2e8f0; margin-bottom: 10px;">
           <div>📊 <strong>Média de Postura do Mês Atual:</strong> <span id="kpi-media-mensal" style="color:var(--tech); font-weight:bold;">0%</span></div>
         </div>
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Histórico de Postura</div>
         <table>
-          <thead><tr><th>Data</th><th>Lote</th><th>Ovos</th><th>Taxa Postura</th><th>Mortalidade</th></tr></thead>
+          <thead><tr><th>Data</th><th>Lote</th><th>Ovos</th><th>Taxa Postura</th></tr></thead>
           <tbody id="lista-historico-postura"></tbody>
+        </table>
+
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--danger); text-transform:uppercase; margin-top:15px;">Histórico de Mortalidade</div>
+        <table>
+          <thead><tr><th>Data</th><th>Lote</th><th>Baixas</th><th>Motivo</th></tr></thead>
+          <tbody id="lista-historico-mortalidade"></tbody>
+        </table>
+
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--warning); text-transform:uppercase; margin-top:15px;">Histórico de Vacinação</div>
+        <table>
+          <thead><tr><th>Data</th><th>Lote</th><th>Vacina</th><th>Aves Vacinadas</th></tr></thead>
+          <tbody id="lista-historico-vacinacao"></tbody>
         </table>
       </div>
     </div>
@@ -703,7 +739,7 @@
       usuarios: [], empresasSaaS: [], todosUsuariosSaaS: [],
       empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "" },
       produtos: [], clientes: [], pedidos: [], producao: [], estoqueGeralOvos: 0,
-      lotesTecnicos: [], historicoPosturaTecnica: [],
+      lotesTecnicos: [], historicoPosturaTecnica: [], historicoMortalidade: [], historicoVacinacao: [],
       currentUser: null, pedidoAtual: null, listenersUnsubscribe: []
     };
 
@@ -826,8 +862,16 @@
         state.historicoPosturaTecnica = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderControleTecnico();
       });
+      const unsubMortalidade = db.collection("mortalidade_tecnica").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.historicoMortalidade = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderControleTecnico();
+      });
+      const unsubVacinacao = db.collection("vacinacao_tecnica").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.historicoVacinacao = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderControleTecnico();
+      });
 
-      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica);
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao);
     }
 
     function carregarEmpresaCampos() {
@@ -944,43 +988,91 @@
       const loteId = document.getElementById('postura-lote-id').value;
       const data = document.getElementById('postura-data').value;
       const ovosColhidos = parseInt(document.getElementById('postura-ovos-colhidos').value || 0);
-      const mortalidade = parseInt(document.getElementById('postura-mortalidade').value || 0);
       const racaoKg = parseFloat(document.getElementById('postura-racao').value || 0);
       const obs = document.getElementById('postura-obs').value.trim();
 
       const lote = state.lotesTecnicos.find(l => l.id === loteId);
       if (!lote) return alert('Selecione um lote válido.');
 
-      const avesAtivas = Math.max(0, (lote.qtdAtual || lote.qtdInicial) - mortalidade);
+      const avesAtivas = lote.qtdAtual || lote.qtdInicial;
       const taxaPostura = avesAtivas > 0 ? ((ovosColhidos / avesAtivas) * 100).toFixed(1) : 0;
 
       try {
         await db.collection("producao_zootecnica").add({
           empresaId: state.currentUser.empresaId,
-          loteId, loteNome: lote.nome, data, ovosColhidos, mortalidade, racaoKg, obs, taxaPostura: parseFloat(taxaPostura), criadoEm: new Date()
+          loteId, loteNome: lote.nome, data, ovosColhidos, racaoKg, obs, taxaPostura: parseFloat(taxaPostura), criadoEm: new Date()
         });
-
-        if (mortalidade > 0) {
-          await db.collection("lotes_tecnicos").doc(loteId).update({ qtdAtual: avesAtivas });
-        }
 
         e.target.reset();
         alert(`Registo efetuado com sucesso! Taxa de Postura do dia: ${taxaPostura}%`);
       } catch (err) { alert('Erro: ' + err.message); }
     }
 
+    async function registrarMortalidadeTecnica(e) {
+      e.preventDefault();
+      if (!state.currentUser) return;
+      const loteId = document.getElementById('morte-lote-id').value;
+      const data = document.getElementById('morte-data').value;
+      const qtdMortas = parseInt(document.getElementById('morte-qtd').value || 0);
+      const motivo = document.getElementById('morte-obs').value.trim();
+
+      const lote = state.lotesTecnicos.find(l => l.id === loteId);
+      if (!lote) return alert('Selecione um lote válido.');
+
+      const novaQtdAtual = Math.max(0, (lote.qtdAtual || lote.qtdInicial) - qtdMortas);
+
+      try {
+        await db.collection("mortalidade_tecnica").add({
+          empresaId: state.currentUser.empresaId,
+          loteId, loteNome: lote.nome, data, qtdMortas, motivo, criadoEm: new Date()
+        });
+
+        await db.collection("lotes_tecnicos").doc(loteId).update({ qtdAtual: novaQtdAtual });
+
+        e.target.reset();
+        alert('Mortalidade registada com sucesso e abatida do lote!');
+      } catch (err) { alert('Erro: ' + err.message); }
+    }
+
+    async function registrarVacinacaoTecnica(e) {
+      e.preventDefault();
+      if (!state.currentUser) return;
+      const loteId = document.getElementById('vacina-lote-id').value;
+      const vacinaNome = document.getElementById('vacina-nome').value.trim();
+      const qtdAves = parseInt(document.getElementById('vacina-qtd-aves').value || 0);
+      const data = document.getElementById('vacina-data').value;
+
+      const lote = state.lotesTecnicos.find(l => l.id === loteId);
+      if (!lote) return alert('Selecione um lote válido.');
+
+      try {
+        await db.collection("vacinacao_tecnica").add({
+          empresaId: state.currentUser.empresaId,
+          loteId, loteNome: lote.nome, vacinaNome, qtdAves, data, criadoEm: new Date()
+        });
+
+        e.target.reset();
+        alert('Vacinação registada com sucesso no histórico sanitário!');
+      } catch (err) { alert('Erro: ' + err.message); }
+    }
+
     function renderControleTecnico() {
-      const selectLote = document.getElementById('postura-lote-id');
+      const selectLotePostura = document.getElementById('postura-lote-id');
+      const selectLoteMorte = document.getElementById('morte-lote-id');
+      const selectLoteVacina = document.getElementById('vacina-lote-id');
       const tabelaLotes = document.getElementById('lista-lotes-tecnicos');
       const tabelaHistorico = document.getElementById('lista-historico-postura');
+      const tabelaMortalidade = document.getElementById('lista-historico-mortalidade');
+      const tabelaVacinacao = document.getElementById('lista-historico-vacinacao');
       const kpiMediaMensal = document.getElementById('kpi-media-mensal');
 
-      if (!selectLote || !tabelaLotes || !tabelaHistorico) return;
+      if (!tabelaLotes) return;
 
-      // Dropdown de lotes
-      selectLote.innerHTML = state.lotesTecnicos.map(l => `<option value="${l.id}">${l.nome} (${l.linhagem} - ${l.qtdAtual || l.qtdInicial} aves)</option>`).join('') || '<option value="">Cadastre um lote primeiro</option>';
+      const optionsLotes = state.lotesTecnicos.map(l => `<option value="${l.id}">${l.nome} (${l.linhagem} - ${l.qtdAtual || l.qtdInicial} aves)</option>`).join('') || '<option value="">Cadastre um lote primeiro</option>';
+      if (selectLotePostura) selectLotePostura.innerHTML = optionsLotes;
+      if (selectLoteMorte) selectLoteMorte.innerHTML = optionsLotes;
+      if (selectLoteVacina) selectLoteVacina.innerHTML = optionsLotes;
 
-      // Tabela de lotes ativos com idade calculada
       tabelaLotes.innerHTML = state.lotesTecnicos.map(l => {
         let semanasAtuais = l.idadeInicialSemanas || 0;
         if (l.dataAlojamento) {
@@ -997,7 +1089,6 @@
         `;
       }).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum lote alojado.</td></tr>';
 
-      // Histórico e Média Mensal de Postura
       const agora = new Date();
       const mesAtual = agora.getMonth();
       const anoAtual = agora.getFullYear();
@@ -1011,17 +1102,40 @@
       let somaTaxas = 0;
       registrosMes.forEach(r => somaTaxas += (r.taxaPostura || 0));
       const mediaMes = registrosMes.length > 0 ? (somaTaxas / registrosMes.length).toFixed(1) : 0;
-      kpiMediaMensal.innerText = mediaMes + '%';
+      if (kpiMediaMensal) kpiMediaMensal.innerText = mediaMes + '%';
 
-      tabelaHistorico.innerHTML = state.historicoPosturaTecnica.slice(0, 20).map(h => `
-        <tr>
-          <td>${h.data ? new Date(h.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
-          <td>${h.loteNome || 'Lote'}</td>
-          <td>${h.ovosColhidos} ovos</td>
-          <td><span class="badge badge-ativo">${h.taxaPostura || 0}%</span></td>
-          <td>${h.mortalidade || 0} aves</td>
-        </tr>
-      `).join('') || '<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhum registo de postura encontrado.</td></tr>';
+      if (tabelaHistorico) {
+        tabelaHistorico.innerHTML = state.historicoPosturaTecnica.slice(0, 15).map(h => `
+          <tr>
+            <td>${h.data ? new Date(h.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
+            <td>${h.loteNome || 'Lote'}</td>
+            <td>${h.ovosColhidos} ovos</td>
+            <td><span class="badge badge-ativo">${h.taxaPostura || 0}%</span></td>
+          </tr>
+        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo.</td></tr>';
+      }
+
+      if (tabelaMortalidade) {
+        tabelaMortalidade.innerHTML = state.historicoMortalidade.slice(0, 15).map(m => `
+          <tr>
+            <td>${m.data ? new Date(m.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
+            <td>${m.loteNome || 'Lote'}</td>
+            <td><span class="badge badge-pendente">-${m.qtdMortas} aves</span></td>
+            <td>${m.motivo || 'Sem obs'}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo de mortalidade.</td></tr>';
+      }
+
+      if (tabelaVacinacao) {
+        tabelaVacinacao.innerHTML = state.historicoVacinacao.slice(0, 15).map(v => `
+          <tr>
+            <td>${v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
+            <td>${v.loteNome || 'Lote'}</td>
+            <td><strong>${v.vacinaNome}</strong></td>
+            <td>${v.qtdAves} aves</td>
+          </tr>
+        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo de vacinação.</td></tr>';
+      }
     }
 
     function atualizarComportamentoPlano() {
