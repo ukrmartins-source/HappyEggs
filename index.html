@@ -104,7 +104,6 @@
       word-wrap: break-word;
     }
 
-    /* FORMATAÇÃO LIMPA PARA IMPRESSÃO SEM FUNDOS/SOMBRAS SOBRANDO */
     .a4-pagina-lote {
       width: 100%;
       background: #ffffff;
@@ -131,6 +130,8 @@
       flex-direction: column;
       justify-content: space-between;
       box-sizing: border-box;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
     .recibo-sheet-header {
@@ -146,7 +147,6 @@
 
     .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
     
-    /* EFEITO ZEBRADO EXCLUSIVO PARA AS LINHAS DE PRODUTOS */
     .item-linha-zebrado {
       display: flex;
       justify-content: space-between;
@@ -1071,7 +1071,6 @@
       }
     }
 
-    /* RENDERIZAÇÃO DE PEDIDOS COM NOVO BOTÃO 'FINALIZAR' */
     function renderPedidos() {
       const tbody = document.getElementById('lista-pedidos');
       if (!tbody) return;
@@ -1112,28 +1111,23 @@
       document.querySelectorAll('.check-pedido').forEach(cb => cb.checked = master.checked);
     }
 
+    /* RENDERIZAÇÃO FLUIDA DE RECIBOS MULTIPLOS (QUANTOS COUBEREM DE FORMA NATURAL) */
     function preVisualizarRecibosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
       
       const emp = state.empresa || {};
-      let htmlPaginas = "";
+      let htmlPaginas = '<div class="a4-pagina-lote">';
       
-      for (let i = 0; i < selecionados.length; i += 2) {
-        const ped1 = state.pedidos.find(p => p.id === selecionados[i]);
-        const ped2 = selecionados[i + 1] ? state.pedidos.find(p => p.id === selecionados[i + 1]) : null;
-
-        htmlPaginas += '<div class="a4-pagina-lote">';
-        if (ped1) htmlPaginas += construirHtmlReciboMetade(ped1, emp);
-        if (ped2) {
-          htmlPaginas += construirHtmlReciboMetade(ped2, emp);
-        } else {
-          htmlPaginas += '<div class="recibo-bloco-metade" style="border: 1px dashed #cbd5e1; background: #ffffff; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem; height:120mm;">(Espaço reservado / Fim do lote)</div>';
+      selecionados.forEach((id, index) => {
+        const ped = state.pedidos.find(p => p.id === id);
+        if (ped) {
+          htmlPaginas += construirHtmlReciboMetade(ped, emp);
         }
-        htmlPaginas += '</div>';
-      }
+      });
 
+      htmlPaginas += '</div>';
       abrirJanelaImpressaoOtimizada(htmlPaginas);
     }
 
@@ -1223,8 +1217,6 @@
       abrirJanelaImpressaoOtimizada(conteudoHtml);
     }
 
-    /* SISTEMA DE IMPRESSÃO RÁPIDO VIA IFRAME SILENCIOSO (SEM TRAVAMENTOS / SEM SO
-BRAS DE CORES) */
     function abrirJanelaImpressaoOtimizada(htmlConteudo) {
       let iframe = document.getElementById('iframe-impressao-direta');
       if (!iframe) {
@@ -1248,13 +1240,13 @@ BRAS DE CORES) */
           <style>
             @page {
               size: A4;
-              margin: 3mm;
+              margin: 4mm;
             }
             * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
             html, body { background: #ffffff !important; color: #0f172a; width: 100%; height: 100%; padding: 0; margin: 0; }
             
-            .a4-pagina-lote { width: 100%; background: #ffffff; padding: 0; margin: 0; border: none; display: flex; flex-direction: column; page-break-after: always; break-after: page; }
-            .recibo-bloco-metade { width: 100%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; display: flex; flex-direction: column; justify-content: space-between; }
+            .a4-pagina-lote { width: 100%; background: #ffffff; padding: 0; margin: 0; border: none; display: flex; flex-direction: column; }
+            .recibo-bloco-metade { width: 100%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-inside: avoid; break-inside: avoid; }
             .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
             .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
             
