@@ -81,6 +81,7 @@
     .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; cursor: pointer; display: inline-block; }
     .badge-pago { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
     .badge-pendente { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .badge-finalizado { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
     .badge-ativo { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
     .badge-bloqueado { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
@@ -103,19 +104,16 @@
       word-wrap: break-word;
     }
 
-    /* CORREÇÃO DO SAFARI MÓVEL: AJUSTE DE ALTURA E MARGENS PARA EVITAR PÁGINA EXTRA */
+    /* FORMATAÇÃO LIMPA PARA IMPRESSÃO SEM FUNDOS/SOMBRAS SOBRANDO */
     .a4-pagina-lote {
       width: 100%;
-      min-height: auto;
-      max-height: 238mm;
       background: #ffffff;
-      padding: 3mm;
-      margin-bottom: 6px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
+      padding: 0;
+      margin: 0;
+      border: none;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       page-break-after: always;
       break-after: page;
       page-break-inside: avoid;
@@ -124,38 +122,37 @@
 
     .recibo-bloco-metade {
       width: 100%;
-      min-height: 104mm;
-      max-height: 112mm;
       background: #ffffff;
       border: 1px dashed #94a3b8;
       border-radius: 6px;
-      padding: 6px 8px;
-      margin-bottom: 4px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      overflow: hidden;
+      box-sizing: border-box;
     }
 
     .recibo-sheet-header {
       background: #0f172a;
       color: #ffffff;
-      padding: 3px 6px;
+      padding: 4px 8px;
       border-radius: 4px;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 3px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
     
     /* EFEITO ZEBRADO EXCLUSIVO PARA AS LINHAS DE PRODUTOS */
     .item-linha-zebrado {
       display: flex;
       justify-content: space-between;
-      font-size: 0.7rem;
-      padding: 3px 4px;
+      font-size: 0.72rem;
+      padding: 3px 6px;
+      border-radius: 4px;
     }
     .item-linha-zebrado:nth-child(odd) {
       background-color: #f8fafc;
@@ -178,6 +175,7 @@
       padding: 18px;
       color: #0f172a;
       width: 100%;
+      box-sizing: border-box;
     }
     .relatorio-sheet-header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -252,18 +250,6 @@
     }
     .relatorio-tabela-planilha tr:nth-child(even) {
       background-color: #f8fafc;
-    }
-
-    /* CONTAINER OCULTO PARA IMPRESSÃO DIRETA NA MESMA PÁGINA (GOOGLE MÓVEL) */
-    #area-impressao-oculta {
-      display: none;
-    }
-
-    @media print {
-      body * { visibility: hidden; }
-      #area-impressao-oculta, #area-impressao-oculta * { visibility: visible; }
-      #area-impressao-oculta { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
-      @page { size: A4; margin: 4mm; }
     }
   </style>
 </head>
@@ -451,7 +437,7 @@
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div class="card-title">Histórico de Pedidos Sequencial</div>
-          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">🖨️ Imprimir / Salvar Recibos</button>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">🖨️ Imprimir Recibos</button>
         </div>
         <table>
           <thead>
@@ -690,9 +676,6 @@
       </form>
     </div>
   </div>
-
-  <!-- DIV OCULTA PARA IMPRESSÃO DIRETA NA MESMA PÁGINA (GOOGLE MÓVEL) -->
-  <div id="area-impressao-oculta"></div>
 
   <script>
     const firebaseConfig = {
@@ -1088,22 +1071,41 @@
       }
     }
 
+    /* RENDERIZAÇÃO DE PEDIDOS COM NOVO BOTÃO 'FINALIZAR' */
     function renderPedidos() {
       const tbody = document.getElementById('lista-pedidos');
       if (!tbody) return;
       tbody.innerHTML = state.pedidos.map(p => {
         const isPago = p.status === 'Pago';
+        const isFinalizado = p.status === 'Finalizado';
+        
+        let badgeClass = 'badge-pendente';
+        let badgeLabel = '🔴 Pendente';
+        if (isFinalizado) { badgeClass = 'badge-finalizado'; badgeLabel = '🟦 Finalizado'; }
+        else if (isPago) { badgeClass = 'badge-pago'; badgeLabel = '🟢 Pago'; }
+
         return `
           <tr>
             <td><input type="checkbox" class="check-pedido" data-id="${p.id}" value="${p.id}"></td>
             <td><strong>#${p.numeroPedido || '---'}</strong></td>
             <td>${p.clienteNome || 'Cliente'}</td>
             <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
-            <td><span class="badge ${isPago ? 'badge-pago' : 'badge-pendente'}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">${isPago ? '🟢 Pago' : '🔴 Pendente'}</span></td>
-            <td><button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#2563eb;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button></td>
+            <td><span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">${badgeLabel}</span></td>
+            <td>
+              <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                <button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#2563eb;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
+                ${!isFinalizado ? `<button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#10b981;" onclick="marcarComoFinalizado('${p.id}')">✔️ Finalizar</button>` : ''}
+              </div>
+            </td>
           </tr>
         `;
       }).join('');
+    }
+
+    async function marcarComoFinalizado(id) {
+      if (confirm("Marcar este pedido como Finalizado / Entregue?")) {
+        await db.collection("pedidos").doc(id).update({ status: 'Finalizado' });
+      }
     }
 
     function alternarTodosPedidos(master) {
@@ -1127,12 +1129,12 @@
         if (ped2) {
           htmlPaginas += construirHtmlReciboMetade(ped2, emp);
         } else {
-          htmlPaginas += '<div class="recibo-bloco-metade" style="border: 1px dashed #e2e8f0; background: #fafafa; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem;">(Espaço reservado / Fim do lote)</div>';
+          htmlPaginas += '<div class="recibo-bloco-metade" style="border: 1px dashed #cbd5e1; background: #ffffff; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem; height:120mm;">(Espaço reservado / Fim do lote)</div>';
         }
         htmlPaginas += '</div>';
       }
 
-      executarImpressaoNaMesmaPagina(htmlPaginas);
+      abrirJanelaImpressaoOtimizada(htmlPaginas);
     }
 
     function construirHtmlReciboMetade(ped, emp) {
@@ -1182,8 +1184,8 @@
       const endEmpresa = emp.end || 'N/I';
 
       let htmlBloco = `
-        <div class="a4-pagina-lote" style="min-height: auto; height: auto;">
-          <div class="recibo-bloco-metade" style="height: auto;">
+        <div class="a4-pagina-lote">
+          <div class="recibo-bloco-metade">
             <div>
               <div class="recibo-sheet-header">
                 <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
@@ -1212,21 +1214,82 @@
         </div>
       `;
       document.getElementById('modal-nota').style.display = 'none';
-      executarImpressaoNaMesmaPagina(htmlBloco);
+      abrirJanelaImpressaoOtimizada(htmlBloco);
     }
 
     function imprimirRelatorioDireto() {
       const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
       document.getElementById('modal-resumo').style.display = 'none';
-      executarImpressaoNaMesmaPagina(conteudoHtml);
+      abrirJanelaImpressaoOtimizada(conteudoHtml);
     }
 
-    function executarImpressaoNaMesmaPagina(htmlConteudo) {
-      const areaOculta = document.getElementById('area-impressao-oculta');
-      areaOculta.innerHTML = htmlConteudo;
+    /* SISTEMA DE IMPRESSÃO RÁPIDO VIA IFRAME SILENCIOSO (SEM TRAVAMENTOS / SEM SO
+BRAS DE CORES) */
+    function abrirJanelaImpressaoOtimizada(htmlConteudo) {
+      let iframe = document.getElementById('iframe-impressao-direta');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'iframe-impressao-direta';
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = '0px';
+        document.body.appendChild(iframe);
+      }
+
+      const docHtml = `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>Impressão</title>
+          <style>
+            @page {
+              size: A4;
+              margin: 3mm;
+            }
+            * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+            html, body { background: #ffffff !important; color: #0f172a; width: 100%; height: 100%; padding: 0; margin: 0; }
+            
+            .a4-pagina-lote { width: 100%; background: #ffffff; padding: 0; margin: 0; border: none; display: flex; flex-direction: column; page-break-after: always; break-after: page; }
+            .recibo-bloco-metade { width: 100%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; display: flex; flex-direction: column; justify-content: space-between; }
+            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
+            
+            .item-linha-zebrado { display: flex; justify-content: space-between; font-size: 0.72rem; padding: 3px 6px; border-radius: 4px; }
+            .item-linha-zebrado:nth-child(odd) { background-color: #f8fafc; }
+            .item-linha-zebrado:nth-child(even) { background-color: #ffffff; }
+
+            .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; color: #0f172a; width: 100%; }
+            .relatorio-sheet-header { background: #0f172a; color: #ffffff; padding: 10px; border-radius: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+            .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; }
+            .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
+            .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
+            .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; margin-bottom: 10px; font-size: 0.8rem; }
+            .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+            .relatorio-tabela-planilha th { background: #f1f5f9; color: #1e293b; font-weight: 800; padding: 6px; border-bottom: 2px solid #cbd5e1; }
+            .relatorio-tabela-planilha td { padding: 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+            .relatorio-tabela-planilha tr:nth-child(even) { background-color: #f8fafc; }
+          </style>
+        </head>
+        <body>
+          ${htmlConteudo}
+        </body>
+        </html>
+      `;
+
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(docHtml);
+      doc.close();
+
       setTimeout(() => {
-        window.print();
-      }, 50);
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      }, 150);
     }
 
     async function cadastrarUsuario(e) {
@@ -1351,7 +1414,8 @@
     }
 
     async function alternarStatusPedido(id, statusAtual) {
-      await db.collection("pedidos").doc(id).update({ status: statusAtual === 'Pago' ? 'Pendente' : 'Pago' });
+      const novoStatus = statusAtual === 'Pago' ? 'Pendente' : 'Pago';
+      await db.collection("pedidos").doc(id).update({ status: novoStatus });
     }
 
     async function registrarEntradaProducao(e) {
