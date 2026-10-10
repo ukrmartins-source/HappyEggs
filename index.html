@@ -103,7 +103,6 @@
       word-wrap: break-word;
     }
 
-    /* AJUSTE FINO NO SAFARI MÓVEL: EVITA TRANSBORDAR PARA NOVA PÁGINA */
     .a4-pagina-lote {
       width: 100%;
       min-height: auto;
@@ -150,7 +149,6 @@
 
     .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 3px 0; }
     
-    /* ESTILO ZEBRADO NAS LINHAS DE PRODUTOS DO RECIBO */
     .item-linha-zebrado {
       display: flex;
       justify-content: space-between;
@@ -254,7 +252,6 @@
       background-color: #f8fafc;
     }
 
-    /* CONTAINER OCULTO PARA IMPRESSÃO DIRETA NA MESMA PÁGINA (SEM ABRIR ABAS) */
     #area-impressao-oculta {
       display: none;
     }
@@ -691,7 +688,6 @@
     </div>
   </div>
 
-  <!-- DIV OCULTA PARA IMPRESSÃO DIRETA NA MESMA PÁGINA (SEM ABRIR NOVAS ABAS) -->
   <div id="area-impressao-oculta"></div>
 
   <script>
@@ -1115,24 +1111,26 @@
       const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
       
-      const emp = state.empresa || {};
-      let htmlPaginas = "";
-      
-      for (let i = 0; i < selecionados.length; i += 2) {
-        const ped1 = state.pedidos.find(p => p.id === selecionados[i]);
-        const ped2 = selecionados[i + 1] ? state.pedidos.find(p => p.id === selecionados[i + 1]) : null;
+      requestAnimationFrame(() => {
+        const emp = state.empresa || {};
+        let htmlPaginas = "";
+        
+        for (let i = 0; i < selecionados.length; i += 2) {
+          const ped1 = state.pedidos.find(p => p.id === selecionados[i]);
+          const ped2 = selecionados[i + 1] ? state.pedidos.find(p => p.id === selecionados[i + 1]) : null;
 
-        htmlPaginas += '<div class="a4-pagina-lote">';
-        if (ped1) htmlPaginas += construirHtmlReciboMetade(ped1, emp);
-        if (ped2) {
-          htmlPaginas += construirHtmlReciboMetade(ped2, emp);
-        } else {
-          htmlPaginas += '<div class="recibo-bloco-metade" style="border: 1px dashed #e2e8f0; background: #fafafa; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem;">(Espaço reservado / Fim do lote)</div>';
+          htmlPaginas += '<div class="a4-pagina-lote">';
+          if (ped1) htmlPaginas += construirHtmlReciboMetade(ped1, emp);
+          if (ped2) {
+            htmlPaginas += construirHtmlReciboMetade(ped2, emp);
+          } else {
+            htmlPaginas += '<div class="recibo-bloco-metade" style="border: 1px dashed #e2e8f0; background: #fafafa; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:0.8rem;">(Espaço reservado / Fim do lote)</div>';
+          }
+          htmlPaginas += '</div>';
         }
-        htmlPaginas += '</div>';
-      }
 
-      executarImpressaoNaMesmaPagina(htmlPaginas);
+        executarImpressaoNaMesmaPagina(htmlPaginas);
+      });
     }
 
     function construirHtmlReciboMetade(ped, emp) {
@@ -1181,51 +1179,56 @@
       const telEmpresa = emp.tel || 'N/I';
       const endEmpresa = emp.end || 'N/I';
 
-      let htmlBloco = `
-        <div class="a4-pagina-lote" style="min-height: auto; height: auto;">
-          <div class="recibo-bloco-metade" style="height: auto;">
-            <div>
-              <div class="recibo-sheet-header">
-                <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-                <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
-              </div>
-              <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-              <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-              <hr class="dashed-divider">
-              <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
+      requestAnimationFrame(() => {
+        let htmlBloco = `
+          <div class="a4-pagina-lote" style="min-height: auto; height: auto;">
+            <div class="recibo-bloco-metade" style="height: auto;">
               <div>
-                ${(ped.itens || []).map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
+                <div class="recibo-sheet-header">
+                  <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+                  <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
+                </div>
+                <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+                <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+                <hr class="dashed-divider">
+                <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
+                <div>
+                  ${(ped.itens || []).map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
+                </div>
               </div>
-            </div>
-            <div>
-              <hr class="dashed-divider">
-              <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
-                <span>TOTAL:</span>
-                <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
-              </div>
-              <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-              <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
-                <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
+              <div>
+                <hr class="dashed-divider">
+                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
+                  <span>TOTAL:</span>
+                  <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
+                </div>
+                <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+                <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
+                  <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      `;
-      document.getElementById('modal-nota').style.display = 'none';
-      executarImpressaoNaMesmaPagina(htmlBloco);
+        `;
+        document.getElementById('modal-nota').style.display = 'none';
+        executarImpressaoNaMesmaPagina(htmlBloco);
+      });
     }
 
     function imprimirRelatorioDireto() {
       const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
       document.getElementById('modal-resumo').style.display = 'none';
-      executarImpressaoNaMesmaPagina(conteudoHtml);
+      requestAnimationFrame(() => {
+        executarImpressaoNaMesmaPagina(conteudoHtml);
+      });
     }
 
-    /* FUNÇÃO PARA IMPRIMIR DIRETAMENTE NA MESMA PÁGINA (SEM ABRIR NOVAS ABAS) */
     function executarImpressaoNaMesmaPagina(htmlConteudo) {
       const areaOculta = document.getElementById('area-impressao-oculta');
       areaOculta.innerHTML = htmlConteudo;
-      window.print();
+      setTimeout(() => {
+        window.print();
+      }, 100);
     }
 
     async function cadastrarUsuario(e) {
@@ -1463,9 +1466,11 @@
     }
 
     function abrirResumoVendas() {
-      document.getElementById('filtro-periodo').value = 'hoje';
-      atualizarFiltroRelatorio();
-      document.getElementById('modal-resumo').style.display = 'flex';
+      requestAnimationFrame(() => {
+        document.getElementById('filtro-periodo').value = 'hoje';
+        atualizarFiltroRelatorio();
+        document.getElementById('modal-resumo').style.display = 'flex';
+      });
     }
 
     function atualizarFiltroRelatorio() {
