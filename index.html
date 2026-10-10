@@ -44,7 +44,7 @@
     .btn-logout { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: 0.2s; }
     .btn-logout:hover { background: var(--danger); border-color: var(--danger); }
 
-    /* ABAS SUPERIORES DE NAVEGAÇÃO */
+    /* ABAS FIXAS NO TOPO */
     .top-nav-tabs {
       display: flex; background: #0f172a; padding: 0 12px; gap: 6px; border-bottom: 1px solid rgba(255,255,255,0.1);
     }
@@ -73,6 +73,8 @@
     .grid-btn .label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
     .grid-btn.full-width { grid-column: span 2; background: linear-gradient(145deg, #2563eb, #1d4ed8); border-color: var(--accent-light); }
     .grid-btn.tech-btn { grid-column: span 2; background: linear-gradient(145deg, #0d9488, #115e59); border-color: #2dd4bf; }
+    .grid-btn.tech-action { background: linear-gradient(145deg, #334155, #1e293b); }
+    .grid-btn.danger-action { background: linear-gradient(145deg, #7f1d1d, #450a0a); border-color: #f87171; }
 
     .card { background: white; border-radius: 12px; padding: 18px; border: 1px solid var(--border); margin-bottom: 15px; box-shadow: 0 2px 8px rgba(15,23,42,0.05); }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
@@ -327,23 +329,24 @@
       </div>
     </div>
 
-    <!-- ABA 2: CONTROLE TÉCNICO & ZOOTECNIA (FICHEIRO) -->
+    <!-- ABA 2: CONTROLE TÉCNICO & ZOOTECNIA (COM LAYOUT EM GRID E RELATÓRIO/ZERAR NO FINAL) -->
     <div id="view-tecnico" class="view-content" style="display:none;">
-      <div class="card" style="border-left: 4px solid var(--tech);">
-        <div class="card-header">
-          <div class="card-title">📊 Ficheiro Técnico: Lotes, Postura, Mortalidade & Vacinas</div>
-          <div style="display:flex; gap:6px;">
-            <button class="btn" type="button" style="width:auto; padding:6px 10px; font-size:0.75rem; background:#2563eb;" onclick="abrirModalRelatorioTecnico()">🖨️ Relatório Geral</button>
-            <button class="btn-danger" type="button" style="padding:6px 10px; font-size:0.75rem;" onclick="abrirModalZerarDadosTecnicos()">⚠️ Zerar Dados</button>
-          </div>
-        </div>
-        <div style="font-size:0.8rem; color:#64748b; margin-bottom: 5px;">
-          Controle zootécnico isolado, acompanhamento de taxas de postura, mortalidade e plano sanitário de vacinação.
-        </div>
+      
+      <!-- MENU GRID DA ABA TÉCNICA -->
+      <div class="grid-menu" id="tec-menu-grid">
+        <button class="grid-btn full-width tech-btn" type="button" onclick="abrirSecaoTecnica('lotes')"><span class="icon">🐔</span><span class="label">CADASTRO / ALOJAMENTO DE LOTE</span></button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoTecnica('postura')"><span class="icon">🥚</span><span class="label">REGISTRO DIÁRIO DE POSTURA</span></button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoTecnica('mortalidade')"><span class="icon">⚰️</span><span class="label">REGISTRO DE MORTALIDADE</span></button>
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #d97706, #b45309);" onclick="abrirSecaoTecnica('vacinacao')"><span class="icon">💉</span><span class="label">CONTROLE DE VACINAÇÃO</span></button>
+      </div>
+
+      <!-- BOTÃO DE VOLTAR AO MENU TÉCNICO (APARECE QUANDO UM FORMULÁRIO ESTÁ ABERTO) -->
+      <div id="tec-btn-voltar-container" style="display:none; margin-bottom: 12px;">
+        <button class="btn btn-back" type="button" onclick="voltarMenuTecnico()">◀️ Voltar ao Menu Técnico</button>
       </div>
 
       <!-- 1. CADASTRO DE LOTES -->
-      <div class="card">
+      <div class="card tec-secao-form" id="tec-form-lotes" style="display: none; border-left: 4px solid var(--tech);">
         <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🐔 Cadastrar / Alojamento de Lote</div>
         <form onsubmit="cadastrarLoteTecnico(event)">
           <div class="form-group"><label>Nome / Identificação do Lote</label><input type="text" id="lote-nome" placeholder="Ex: Lote 01 - Galpão A" required></div>
@@ -355,17 +358,8 @@
         </form>
       </div>
 
-      <!-- LISTA DE LOTES ATIVOS -->
-      <div class="card">
-        <div class="card-title">Lotes Alojados Atualmente</div>
-        <table>
-          <thead><tr><th>Lote / Linhagem</th><th>Aves Vivas</th><th>Idade Atual</th><th>Ação</th></tr></thead>
-          <tbody id="lista-lotes-tecnicos"></tbody>
-        </table>
-      </div>
-
-      <!-- 2. REGISTRO DIÁRIO DE POSTURA E TAXAS -->
-      <div class="card">
+      <!-- 2. REGISTRO DIÁRIO DE POSTURA -->
+      <div class="card tec-secao-form" id="tec-form-postura" style="display: none; border-left: 4px solid var(--tech);">
         <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🥚 Registo Diário de Postura</div>
         <form onsubmit="registrarPosturaDiaria(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="postura-lote-id" required></select></div>
@@ -378,7 +372,7 @@
       </div>
 
       <!-- 3. REGISTRO DE MORTALIDADE -->
-      <div class="card" style="border-left: 4px solid var(--danger);">
+      <div class="card tec-secao-form" id="tec-form-mortalidade" style="display: none; border-left: 4px solid var(--danger);">
         <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">⚰️ Registo de Mortalidade / Baixas</div>
         <form onsubmit="registrarMortalidadeTecnica(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="morte-lote-id" required></select></div>
@@ -390,7 +384,7 @@
       </div>
 
       <!-- 4. CONTROLE DE VACINAÇÃO -->
-      <div class="card" style="border-left: 4px solid var(--warning);">
+      <div class="card tec-secao-form" id="tec-form-vacinacao" style="display: none; border-left: 4px solid var(--warning);">
         <div class="card-title" style="margin-bottom: 12px; color: var(--warning);">💉 Controle & Histórico de Vacinação</div>
         <form onsubmit="registrarVacinacaoTecnica(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="vacina-lote-id" required></select></div>
@@ -401,13 +395,20 @@
         </form>
       </div>
 
-      <!-- HISTÓRICO E INDICADORES TÉCNICOS -->
-      <div class="card">
+      <!-- HISTÓRICO E INDICADORES TÉCNICOS (VISÍVEL NO TOPO DA ABA OU DIRETO) -->
+      <div class="card" id="tec-painel-historicos">
         <div class="card-title">Indicadores Zootécnicos & Histórico Geral</div>
         <div style="margin-top: 10px; font-size: 0.85rem; background: #f8fafc; padding: 10px; border-radius: 8px; border:1px solid #e2e8f0; margin-bottom: 10px;">
           <div>📊 <strong>Média de Postura do Mês Atual:</strong> <span id="kpi-media-mensal" style="color:var(--tech); font-weight:bold;">0%</span></div>
         </div>
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Histórico de Postura</div>
+
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Lotes Alojados Atualmente</div>
+        <table>
+          <thead><tr><th>Lote / Linhagem</th><th>Aves Vivas</th><th>Idade Atual</th><th>Ação</th></tr></thead>
+          <tbody id="lista-lotes-tecnicos"></tbody>
+        </table>
+
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:15px;">Histórico de Postura</div>
         <table>
           <thead><tr><th>Data</th><th>Lote</th><th>Ovos</th><th>Taxa Postura</th></tr></thead>
           <tbody id="lista-historico-postura"></tbody>
@@ -425,6 +426,13 @@
           <tbody id="lista-historico-vacinacao"></tbody>
         </table>
       </div>
+
+      <!-- BOTÕES DE RELATÓRIO GERAL E ZERAR DADOS NO FINAL DA PÁGINA TÉCNICA -->
+      <div class="grid-menu" style="margin-top: 20px; margin-bottom: 20px;">
+        <button class="grid-btn full-width tech-action" type="button" onclick="abrirModalRelatorioTecnico()"><span class="icon">🖨️</span><span class="label">RELATÓRIO TÉCNICO GERAL (IMPRESSÃO)</span></button>
+        <button class="grid-btn full-width danger-action" type="button" onclick="abrirModalZerarDadosTecnicos()"><span class="icon">⚠️</span><span class="label">ZERAR DADOS DO CONTROLE TÉCNICO</span></button>
+      </div>
+
     </div>
 
     <!-- TELA: CLIENTES -->
@@ -1023,9 +1031,28 @@
       } else if (aba === 'tecnico') {
         document.getElementById('tab-btn-tecnico').classList.add('active');
         document.getElementById('view-tecnico').style.display = 'block';
+        voltarMenuTecnico();
         renderControleTecnico();
       }
       render();
+    }
+
+    function abrirSecaoTecnica(secao) {
+      document.getElementById('tec-menu-grid').style.display = 'none';
+      document.getElementById('tec-painel-historicos').style.display = 'none';
+      document.getElementById('tec-btn-voltar-container').style.display = 'block';
+
+      document.querySelectorAll('.tec-secao-form').forEach(el => el.style.display = 'none');
+      const alvo = document.getElementById('tec-form-' + secao);
+      if (alvo) alvo.style.display = 'block';
+    }
+
+    function voltarMenuTecnico() {
+      document.getElementById('tec-menu-grid').style.display = 'grid';
+      document.getElementById('tec-painel-historicos').style.display = 'block';
+      document.getElementById('tec-btn-voltar-container').style.display = 'none';
+      document.querySelectorAll('.tec-secao-form').forEach(el => el.style.display = 'none');
+      renderControleTecnico();
     }
 
     function navToSub(view) {
@@ -1068,6 +1095,7 @@
         });
         e.target.reset();
         alert('Lote técnico cadastrado com sucesso!');
+        voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
 
@@ -1103,6 +1131,7 @@
 
         e.target.reset();
         alert(`Registo efetuado com sucesso! Taxa de Postura do dia: ${taxaPostura}%`);
+        voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
 
@@ -1129,6 +1158,7 @@
 
         e.target.reset();
         alert('Mortalidade registada com sucesso e abatida do lote!');
+        voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
 
@@ -1151,6 +1181,7 @@
 
         e.target.reset();
         alert('Vacinação registada com sucesso no histórico sanitário!');
+        voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
 
