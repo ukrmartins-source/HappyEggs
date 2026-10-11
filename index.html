@@ -329,7 +329,7 @@
       </div>
     </div>
 
-    <!-- ABA 2: CONTROLE TÉCNICO & ZOOTECNIA (COM LAYOUT EM GRID E RELATÓRIO/ZERAR NO FINAL) -->
+    <!-- ABA 2: CONTROLE TÉCNICO & ZOOTECNIA -->
     <div id="view-tecnico" class="view-content" style="display:none;">
       
       <!-- MENU GRID DA ABA TÉCNICA -->
@@ -340,7 +340,7 @@
         <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #d97706, #b45309);" onclick="abrirSecaoTecnica('vacinacao')"><span class="icon">💉</span><span class="label">CONTROLE DE VACINAÇÃO</span></button>
       </div>
 
-      <!-- BOTÃO DE VOLTAR AO MENU TÉCNICO (APARECE QUANDO UM FORMULÁRIO ESTÁ ABERTO) -->
+      <!-- BOTÃO DE VOLTAR AO MENU TÉCNICO -->
       <div id="tec-btn-voltar-container" style="display:none; margin-bottom: 12px;">
         <button class="btn btn-back" type="button" onclick="voltarMenuTecnico()">◀️ Voltar ao Menu Técnico</button>
       </div>
@@ -395,7 +395,7 @@
         </form>
       </div>
 
-      <!-- HISTÓRICO E INDICADORES TÉCNICOS (VISÍVEL NO TOPO DA ABA OU DIRETO) -->
+      <!-- HISTÓRICO E INDICADORES TÉCNICOS -->
       <div class="card" id="tec-painel-historicos">
         <div class="card-title">Indicadores Zootécnicos & Histórico Geral</div>
         <div style="margin-top: 10px; font-size: 0.85rem; background: #f8fafc; padding: 10px; border-radius: 8px; border:1px solid #e2e8f0; margin-bottom: 10px;">
@@ -427,7 +427,7 @@
         </table>
       </div>
 
-      <!-- BOTÕES DE RELATÓRIO GERAL E ZERAR DADOS NO FINAL DA PÁGINA TÉCNICA -->
+      <!-- BOTÕES DE RELATÓRIO GERAL E ZERAR DADOS -->
       <div class="grid-menu" style="margin-top: 20px; margin-bottom: 20px;">
         <button class="grid-btn full-width tech-action" type="button" onclick="abrirModalRelatorioTecnico()"><span class="icon">🖨️</span><span class="label">RELATÓRIO TÉCNICO GERAL (IMPRESSÃO)</span></button>
         <button class="grid-btn full-width danger-action" type="button" onclick="abrirModalZerarDadosTecnicos()"><span class="icon">⚠️</span><span class="label">ZERAR DADOS DO CONTROLE TÉCNICO</span></button>
@@ -1591,11 +1591,45 @@
               <div style="display:flex; gap:4px; flex-wrap:wrap;">
                 <button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#2563eb;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
                 ${!isFinalizado ? `<button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#10b981;" onclick="marcarComoFinalizado('${p.id}')">✔️ Finalizar</button>` : ''}
+                <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 6px;" onclick="cancelarExcluirPedido('${p.id}')">❌ Cancelar</button>
               </div>
             </td>
           </tr>
         `;
       }).join('');
+    }
+
+    async function cancelarExcluirPedido(id) {
+      if (!confirm("Deseja realmente cancelar e excluir este pedido? As quantidades de ovos dos produtos serão devolvidas para o estoque.")) return;
+      
+      const ped = state.pedidos.find(p => p.id === id);
+      if (!ped) return;
+
+      try {
+        const empresaId = state.currentUser.empresaId;
+        const refEstoque = db.collection("estoque_geral").doc(empresaId);
+        
+        // Calcula o total de ovos dos itens do pedido a serem devolvidos
+        let totalOvosDevolucao = 0;
+        if (ped.itens && Array.isArray(ped.itens)) {
+          ped.itens.forEach(item => {
+            const prodRef = state.produtos.find(p => p.id === item.produtoId);
+            const qtdOvosPorUnidade = prodRef ? (prodRef.ovosUnid || 0) : (item.totalOvos ? item.totalOvos / item.qtd : 0);
+            totalOvosDevolucao += (item.qtd || 0) * qtdOvosPorUnidade;
+          });
+        }
+
+        // Atualiza o estoque devolvendo os ovos
+        const docEstoque = await refEstoque.get();
+        let saldoAtual = docEstoque.exists ? (docEstoque.data().qtdOvos || 0) : 0;
+        await refEstoque.set({ qtdOvos: saldoAtual + totalOvosDevolucao }, { merge: true });
+
+        // Exclui o pedido do banco de dados
+        await db.collection("pedidos").doc(id).delete();
+        alert("Pedido cancelado e excluído com sucesso! Estoque atualizado.");
+      } catch (err) {
+        alert("Erro ao cancelar pedido: " + err.message);
+      }
     }
 
     async function marcarComoFinalizado(id) {
@@ -1711,7 +1745,6 @@
     }
 
     function abrirJanelaImpressaoOtimizada(htmlConteudo) {
-      // Detecção exata para Chrome no mobile (Android/iOS) permitindo múltiplos recibos por página
       const ua = navigator.userAgent;
       const isMobileChrome = /CriOS/.test(ua) || (/Android/.test(ua) && /Chrome/.test(ua));
 
@@ -1769,7 +1802,6 @@
         return;
       }
 
-      // Comportamento normal para Desktop e outros navegadores
       let iframe = document.getElementById('iframe-impressao-direta');
       if (!iframe) {
         iframe = document.createElement('iframe');
