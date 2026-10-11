@@ -329,7 +329,7 @@
       </div>
     </div>
 
-    <!-- ABA 2: CONTROLE TÉCNICO & ZOOTECNIA (COM LAYOUT EM GRID E RELATÓRIO/ZERAR NO FINAL) -->
+    <!-- ABA 2: CONTROLE TÉCNICO & ZOOTECNIA (COM LAYOUT EN GRID E RELATÓRIO/ZERAR NO FINAL) -->
     <div id="view-tecnico" class="view-content" style="display:none;">
       
       <!-- MENU GRID DA ABA TÉCNICA -->
@@ -1614,16 +1614,15 @@
       if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
       
       const emp = state.empresa || {};
-      let htmlPaginas = '<div class="a4-pagina-lote">';
+      let htmlPaginas = '';
       
       selecionados.forEach((id, index) => {
         const ped = state.pedidos.find(p => p.id === id);
         if (ped) {
-          htmlPaginas += construirHtmlReciboMetade(ped, emp);
+          htmlPaginas += `<div class="a4-pagina-lote">${construirHtmlReciboMetade(ped, emp)}</div>`;
         }
       });
 
-      htmlPaginas += '</div>';
       abrirJanelaImpressaoOtimizada(htmlPaginas);
     }
 
@@ -1714,7 +1713,7 @@
     }
 
     function abrirJanelaImpressaoOtimizada(htmlConteudo) {
-      // Detecção exata para Chrome no mobile (Android/iOS)
+      // Detecção exata para Chrome no mobile (Android/iOS) corrigindo quebras de página
       const ua = navigator.userAgent;
       const isMobileChrome = /CriOS/.test(ua) || (/Android/.test(ua) && /Chrome/.test(ua));
 
@@ -1728,24 +1727,32 @@
               <meta charset="UTF-8">
               <title>Recibo / Impressão</title>
               <style>
-                @page { size: A4; margin: 4mm; }
+                @page { size: A4; margin: 5mm; }
                 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-                body { background: #ffffff !important; color: #0f172a; padding: 10px; }
-                .a4-pagina-lote { width: 100%; background: #ffffff; display: flex; flex-direction: column; }
-                .recibo-bloco-metade { width: 100%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-inside: avoid; break-inside: avoid; }
-                .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-                .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
-                .item-linha-zebrado { display: flex; justify-content: space-between; font-size: 0.72rem; padding: 3px 6px; border-radius: 4px; }
+                body { background: #ffffff !important; color: #0f172a; padding: 5px; }
+                .a4-pagina-lote { width: 100%; background: #ffffff; display: block; page-break-after: always; break-after: page; }
+                .recibo-bloco-metade { 
+                  width: 100%; 
+                  background: #ffffff; 
+                  border: 1px dashed #94a3b8; 
+                  border-radius: 6px; 
+                  padding: 8px; 
+                  margin-bottom: 12px; 
+                  page-break-inside: avoid !important; 
+                  break-inside: avoid !important; 
+                }
+                .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 6px 10px; border-radius: 4px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+                .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
+                .item-linha-zebrado { display: flex; justify-content: space-between; font-size: 0.75rem; padding: 4px 6px; }
                 .item-linha-zebrado:nth-child(odd) { background-color: #f8fafc; }
-                .item-linha-zebrado:nth-child(even) { background-color: #ffffff; }
-                .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; color: #0f172a; width: 100%; }
-                .relatorio-sheet-header { background: #0f172a; color: #ffffff; padding: 10px; border-radius: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+                .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; width: 100%; page-break-inside: avoid !important; break-inside: avoid !important; }
+                .relatorio-sheet-header { background: #0f172a; color: #ffffff; padding: 12px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
                 .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
                 .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; }
-                .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
-                .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
-                .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; margin-bottom: 10px; font-size: 0.8rem; }
-                .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+                .relatorio-kpi-label { font-size: 0.7rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
+                .relatorio-kpi-val { font-size: 1.2rem; font-weight: 800; color: #0f172a; }
+                .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-size: 0.85rem; }
+                .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
                 .relatorio-tabela-planilha th { background: #f1f5f9; color: #1e293b; font-weight: 800; padding: 6px; border-bottom: 2px solid #cbd5e1; }
                 .relatorio-tabela-planilha td { padding: 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
               </style>
