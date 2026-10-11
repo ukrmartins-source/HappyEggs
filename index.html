@@ -329,7 +329,7 @@
       </div>
     </div>
 
-    <!-- ABA 2: CONTROLE TÉCNICO & ZOOTECNIA (COM LAYOUT EN GRID E RELATÓRIO/ZERAR NO FINAL) -->
+    <!-- ABA 2: CONTROLE TÉCNICO & ZOOTECNIA (COM LAYOUT EM GRID E RELATÓRIO/ZERAR NO FINAL) -->
     <div id="view-tecnico" class="view-content" style="display:none;">
       
       <!-- MENU GRID DA ABA TÉCNICA -->
@@ -1619,7 +1619,7 @@
       selecionados.forEach((id, index) => {
         const ped = state.pedidos.find(p => p.id === id);
         if (ped) {
-          htmlPaginas += `<div class="a4-pagina-lote">${construirHtmlReciboMetade(ped, emp)}</div>`;
+          htmlPaginas += construirHtmlReciboMetade(ped, emp);
         }
       });
 
@@ -1673,31 +1673,29 @@
       const endEmpresa = emp.end || 'N/I';
 
       let htmlBloco = `
-        <div class="a4-pagina-lote">
-          <div class="recibo-bloco-metade">
-            <div>
-              <div class="recibo-sheet-header">
-                <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-                <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
-              </div>
-              <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-              <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-              <hr class="dashed-divider">
-              <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
-              <div>
-                ${(ped.itens || []).map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
-              </div>
+        <div class="recibo-bloco-metade">
+          <div>
+            <div class="recibo-sheet-header">
+              <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+              <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
             </div>
+            <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+            <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
+            <hr class="dashed-divider">
+            <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
             <div>
-              <hr class="dashed-divider">
-              <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
-                <span>TOTAL:</span>
-                <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
-              </div>
-              <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-              <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
-                <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
-              </div>
+              ${(ped.itens || []).map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
+            </div>
+          </div>
+          <div>
+            <hr class="dashed-divider">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
+              <span>TOTAL:</span>
+              <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
+            </div>
+            <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
+              <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
             </div>
           </div>
         </div>
@@ -1713,7 +1711,7 @@
     }
 
     function abrirJanelaImpressaoOtimizada(htmlConteudo) {
-      // Detecção exata para Chrome no mobile (Android/iOS) corrigindo quebras de página
+      // Detecção exata para Chrome no mobile (Android/iOS) permitindo múltiplos recibos por página
       const ua = navigator.userAgent;
       const isMobileChrome = /CriOS/.test(ua) || (/Android/.test(ua) && /Chrome/.test(ua));
 
@@ -1730,7 +1728,6 @@
                 @page { size: A4; margin: 5mm; }
                 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
                 body { background: #ffffff !important; color: #0f172a; padding: 5px; }
-                .a4-pagina-lote { width: 100%; background: #ffffff; display: block; page-break-after: always; break-after: page; }
                 .recibo-bloco-metade { 
                   width: 100%; 
                   background: #ffffff; 
