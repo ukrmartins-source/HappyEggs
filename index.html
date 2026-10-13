@@ -85,6 +85,12 @@
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: #f8fafc; }
     .form-group input:focus, .form-group select:focus { border-color: var(--accent); outline: none; background: #fff; }
 
+    .input-pass-wrapper { position: relative; display: flex; align-items: center; }
+    .input-pass-wrapper input { padding-right: 40px; }
+    .btn-toggle-pass {
+      position: absolute; right: 10px; background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--text-muted);
+    }
+
     .btn { background: var(--accent); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 0.9rem; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
     .btn:hover { background: var(--accent-light); }
     .btn-back { background: #475569; padding: 6px 12px; width: auto; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px; }
@@ -235,7 +241,13 @@
       <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
       <form onsubmit="autenticar(event)">
         <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
-        <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password"></div>
+        <div class="form-group">
+          <label>Senha</label>
+          <div class="input-pass-wrapper">
+            <input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password">
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('login-pass', this)">👁️</button>
+          </div>
+        </div>
         <button type="submit" class="btn" style="margin-top:10px;">Entrar no Sistema</button>
       </form>
     </div>
@@ -288,7 +300,13 @@
           <div class="form-group"><label>Valor do Plano (R$)</label><input type="number" step="0.01" id="saas-valor-plano" placeholder="Ex: 97.00" required></div>
           <div class="form-group" id="grupo-vencimento"><label>Data de Vencimento da Assinatura</label><input type="date" id="saas-vencimento"></div>
           <div class="form-group"><label>Usuário Administrador da Granja</label><input type="text" id="saas-admin-user" placeholder="admin_saojose" required></div>
-          <div class="form-group"><label>Senha Inicial</label><input type="password" id="saas-admin-pass" placeholder="Senha de acesso" required></div>
+          <div class="form-group">
+            <label>Senha Inicial</label>
+            <div class="input-pass-wrapper">
+              <input type="password" id="saas-admin-pass" placeholder="Senha de acesso" required>
+              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('saas-admin-pass', this)">👁️</button>
+            </div>
+          </div>
           <button type="submit" class="btn btn-success">➕ Cadastrar Empresa Cliente</button>
         </form>
       </div>
@@ -572,7 +590,13 @@
         </div>
         <form onsubmit="cadastrarUsuario(event)">
           <div class="form-group"><label>Login / Nome</label><input type="text" id="usr-login" required autocomplete="username"></div>
-          <div class="form-group"><label>Senha de Acesso</label><input type="password" id="usr-pass" required autocomplete="new-password"></div>
+          <div class="form-group">
+            <label>Senha de Acesso</label>
+            <div class="input-pass-wrapper">
+              <input type="password" id="usr-pass" required autocomplete="new-password">
+              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('usr-pass', this)">👁️</button>
+            </div>
+          </div>
           <div class="form-group">
             <label>Nível de Permissão</label>
             <select id="usr-role">
@@ -597,7 +621,13 @@
           <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
         </div>
         <form onsubmit="alterarMinhaSenha(event)">
-          <div class="form-group"><label>Nova Senha</label><input type="password" id="minha-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
+          <div class="form-group">
+            <label>Nova Senha</label>
+            <div class="input-pass-wrapper">
+              <input type="password" id="minha-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password">
+              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('minha-nova-senha', this)">👁️</button>
+            </div>
+          </div>
           <button type="submit" class="btn" style="background:var(--warning);">Atualizar Minha Senha</button>
         </form>
       </div>
@@ -696,7 +726,13 @@
     <div class="modal-content" style="max-width: 380px;">
       <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha de Acesso</div>
       <form onsubmit="salvarNovaSenhaClienteAdmin(event)">
-        <div class="form-group"><label>Nova Senha para o Administrador</label><input type="password" id="nova-senha-cli-input" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
+        <div class="form-group">
+          <label>Nova Senha para o Administrador</label>
+          <div class="input-pass-wrapper">
+            <input type="password" id="nova-senha-cli-input" placeholder="Digite a nova senha" required autocomplete="new-password">
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('nova-senha-cli-input', this)">👁️</button>
+          </div>
+        </div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
           <button type="submit" class="btn" style="background: var(--warning);">Salvar Senha</button>
           <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-redefinir-senha-cli').style.display='none'">Cancelar</button>
@@ -710,7 +746,13 @@
     <div class="modal-content" style="max-width: 380px;">
       <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha do Usuário</div>
       <form onsubmit="salvarNovaSenhaUsuario(event)">
-        <div class="form-group"><label>Nova Senha</label><input type="password" id="nova-senha-usuario-input" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
+        <div class="form-group">
+          <label>Nova Senha</label>
+          <div class="input-pass-wrapper">
+            <input type="password" id="nova-senha-usuario-input" placeholder="Digite a nova senha" required autocomplete="new-password">
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('nova-senha-usuario-input', this)">👁️</button>
+          </div>
+        </div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
           <button type="submit" class="btn" style="background: var(--warning);">Salvar Senha</button>
           <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-redefinir-senha-usuario').style.display='none'">Cancelar</button>
@@ -736,7 +778,13 @@
     <div class="modal-content" style="max-width: 380px;">
       <div class="card-title" style="margin-bottom: 12px;">🔐 Alterar Senha de Super Admin</div>
       <form onsubmit="salvarNovaSenhaSuperAdmin(event)">
-        <div class="form-group"><label>Nova Senha de Super Admin</label><input type="password" id="super-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password"></div>
+        <div class="form-group">
+          <label>Nova Senha de Super Admin</label>
+          <div class="input-pass-wrapper">
+            <input type="password" id="super-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password">
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('super-nova-senha', this)">👁️</button>
+          </div>
+        </div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
           <button type="submit" class="btn" style="background: var(--warning);">Salvar Nova Senha</button>
           <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-seguranca-superadmin').style.display='none'">Cancelar</button>
@@ -836,6 +884,19 @@
     let empresaSelecionadaParaDetalhes = null;
     let pedidoSelecionadoModal = null;
     let usuarioSelecionadoId = null;
+
+    // Função utilitária para ver/ocultar senha
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerText = '🙈';
+      } else {
+        input.type = 'password';
+        btn.innerText = '👁️';
+      }
+    }
 
     function initApp() {
       db.collection("usuarios").get().then(snapshot => {
@@ -1520,6 +1581,27 @@
       }
     }
 
+    // CORREÇÃO CRUCIAL: Atualiza corretamente a senha do usuário logado no Firestore e reflete no Super Admin
+    async function alterarMinhaSenha(e) {
+      e.preventDefault();
+      const novaSenha = document.getElementById('minha-nova-senha').value.trim();
+      if (!novaSenha) return;
+      if (!state.currentUser || !state.currentUser.id) {
+        alert('Sessão expirada. Faça login novamente.');
+        logout();
+        return;
+      }
+
+      try {
+        await db.collection("usuarios").doc(state.currentUser.id).update({ pass: novaSenha });
+        state.currentUser.pass = novaSenha;
+        alert('Senha alterada com sucesso! Faça login novamente com a nova senha.');
+        logout();
+      } catch (err) {
+        alert('Erro ao alterar senha: ' + err.message);
+      }
+    }
+
     function renderClientes() {
       const tbody = document.getElementById('lista-clientes');
       if (!tbody) return;
@@ -1609,7 +1691,6 @@
         const empresaId = state.currentUser.empresaId;
         const refEstoque = db.collection("estoque_geral").doc(empresaId);
         
-        // Calcula o total de ovos dos itens do pedido a serem devolvidos
         let totalOvosDevolucao = 0;
         if (ped.itens && Array.isArray(ped.itens)) {
           ped.itens.forEach(item => {
@@ -1619,12 +1700,10 @@
           });
         }
 
-        // Atualiza o estoque devolvendo os ovos
         const docEstoque = await refEstoque.get();
         let saldoAtual = docEstoque.exists ? (docEstoque.data().qtdOvos || 0) : 0;
         await refEstoque.set({ qtdOvos: saldoAtual + totalOvosDevolucao }, { merge: true });
 
-        // Exclui o pedido do banco de dados
         await db.collection("pedidos").doc(id).delete();
         alert("Pedido cancelado e excluído com sucesso! Estoque atualizado.");
       } catch (err) {
