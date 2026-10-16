@@ -811,7 +811,14 @@
       <div class="card-title" style="margin-bottom: 12px;">🔐 Alterar Senha de Super Admin</div>
       <form onsubmit="salvarNovaSenhaSuperAdmin(event)">
         <div class="form-group">
-          <label>Nova Senha de Super Admin</label>
+          <label>Selecione qual Super Admin deseja alterar</label>
+          <select id="super-admin-alvo" required style="margin-bottom: 10px;">
+            <option value="superadmin">Super Admin 1 (superadmin)</option>
+            <option value="superadmin2">Super Admin 2 (superadmin2)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nova Senha</label>
           <div class="input-pass-wrapper">
             <input type="password" id="super-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password">
             <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('super-nova-senha', this)">👁️</button>
@@ -930,14 +937,27 @@
       }
     }
 
-    function initApp() {
-      db.collection("usuarios").get().then(snapshot => {
+    async function initApp() {
+      try {
+        const snapshot = await db.collection("usuarios").get();
         state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (state.usuarios.length === 0) {
-          db.collection("usuarios").doc("admin").set({ login: "admin", pass: "1234", role: "admin", empresaId: "empresa_demo" });
-          db.collection("empresas").doc("empresa_demo").set({ nome: "Granja Demonstração", status: "Ativo", plano: "vitalicio", valorPlano: 0, vencimento: "2099-12-31" });
+        
+        // Garante a existência das contas de Super Admin no Firestore se não existirem
+        const hasSuperAdmin = state.usuarios.some(u => u.login === 'superadmin' && u.role === 'superadmin');
+        const hasSuperAdmin2 = state.usuarios.some(u => u.login === 'superadmin2' && u.role === 'superadmin');
+
+        if (!hasSuperAdmin) {
+          await db.collection("usuarios").add({ login: "superadmin", pass: "rancho123*", role: "superadmin" });
         }
-      }).catch(err => console.error("Erro na inicialização:", err));
+        if (!hasSuperAdmin2) {
+          await db.collection("usuarios").add({ login: "superadmin2", pass: "rancho123*", role: "superadmin" });
+        }
+
+        if (state.usuarios.length === 0 || !state.usuarios.some(u => u.login === 'admin')) {
+          await db.collection("usuarios").doc("admin").set({ login: "admin", pass: "1234", role: "admin", empresaId: "empresa_demo" });
+          await db.collection("empresas").doc("empresa_demo").set({ nome: "Granja Demonstração", status: "Ativo", plano: "vitalicio", valorPlano: 0, vencimento: "2099-12-31" });
+        }
+      } catch (err) { console.error("Erro na inicialização:", err); }
     }
 
     function initSuperAdminListener() {
@@ -975,13 +995,20 @@
 
     async function salvarNovaSenhaSuperAdmin(e) {
       e.preventDefault();
+      const loginAlvo = document.getElementById('super-admin-alvo').value;
       const novaSenha = document.getElementById('super-nova-senha').value.trim();
       if (!novaSenha) return;
+
       try {
-        localStorage.setItem('happyeggs_superadmin_pass', novaSenha);
-        alert('Senha de Super Admin alterada com sucesso!');
+        const snap = await db.collection("usuarios").where("login", "==", loginAlvo).where("role", "==", "superadmin").get();
+        if (!snap.empty) {
+          await snap.docs[0].ref.update({ pass: novaSenha });
+        } else {
+          await db.collection("usuarios").add({ login: loginAlvo, pass: novaSenha, role: "superadmin" });
+        }
+        alert('Senha do ' + loginAlvo + ' alterada com sucesso na nuvem!');
         document.getElementById('modal-seguranca-superadmin').style.display = 'none';
-      } catch (err) { alert('Erro: ' + err.message); }
+      } catch (err) { alert('Erro ao atualizar senha do Super Admin: ' + err.message); }
     }
 
     function abrirSecaoSuperAdmin(secao) {
@@ -1069,24 +1096,23 @@
       e.preventDefault();
       const u = document.getElementById('login-user').value.trim().toLowerCase();
       const p = document.getElementById('login-pass').value.trim();
-      const senhaSuperAdminSalva = localStorage.getItem('happyeggs_superadmin_pass') || 'rancho123*';
-      
-      if ((u === "superadmin" && p === senhaSuperAdminSalva) || (u === "superadmin2" && p === "rancho123*")) {
-        state.currentUser = { login: u, role: "superadmin" };
-        document.getElementById('view-login').style.display = 'none';
-        document.getElementById('app-header').style.display = 'flex';
-        document.getElementById('user-display').innerText = "👑 SUPER ADMIN (" + u + ")";
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
-        navTo('superadmin');
-        initSuperAdminListener();
-        return;
-      }
 
       try {
         const snapshot = await db.collection("usuarios").where("login", "==", u).get();
         if (snapshot.empty) { alert('Usuário ou senha incorretos!'); return; }
         const found = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
         if (found.pass !== p) { alert('Usuário ou senha incorretos!'); return; }
+
+        if (found.role === "superadmin") {
+          state.currentUser = { login: found.login, role: "superadmin" };
+          document.getElementById('view-login').style.display = 'none';
+          document.getElementById('app-header').style.display = 'flex';
+          document.getElementById('user-display').innerText = "👑 SUPER ADMIN (" + found.login.toUpperCase() + ")";
+          document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
+          navTo('superadmin');
+          initSuperAdminListener();
+          return;
+        }
 
         const empresaId = found.empresaId || "empresa_demo";
         const empDoc = await db.collection("empresas").doc(empresaId).get();
@@ -1100,7 +1126,7 @@
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
         initListeners();
         mudarAbaTopo('financeiro');
-      } catch (error) { alert("Erro ao tentar entrar."); }
+      } catch (error) { alert("Erro ao tentar entrar: " + error.message); }
     }
 
     function logout() {
@@ -1665,20 +1691,21 @@
       }
     }
 
-    // CORREÇÃO CRUCIAL: Atualiza corretamente a senha do usuário logado no Firestore e reflete no Super Admin
     async function alterarMinhaSenha(e) {
       e.preventDefault();
       const novaSenha = document.getElementById('minha-nova-senha').value.trim();
       if (!novaSenha) return;
-      if (!state.currentUser || !state.currentUser.id) {
+      if (!state.currentUser || !state.currentUser.login) {
         alert('Sessão expirada. Faça login novamente.');
         logout();
         return;
       }
 
       try {
-        await db.collection("usuarios").doc(state.currentUser.id).update({ pass: novaSenha });
-        state.currentUser.pass = novaSenha;
+        const snap = await db.collection("usuarios").where("login", "==", state.currentUser.login).get();
+        if (!snap.empty) {
+          await snap.docs[0].ref.update({ pass: novaSenha });
+        }
         alert('Senha alterada com sucesso! Faça login novamente com a nova senha.');
         logout();
       } catch (err) {
