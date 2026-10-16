@@ -316,7 +316,10 @@
           <div class="card-title">Empresas e Clientes Cadastrados</div>
           <button class="btn btn-back" type="button" onclick="abrirSecaoSuperAdmin('cadastro')">➕ Voltar Cadastro</button>
         </div>
-        <p style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">Clique sobre o nome da empresa para ver detalhes completos, credenciais e alterar senhas:</p>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <input type="text" id="saas-busca-empresa" placeholder="🔎 Pesquisar cliente por nome, ID ou CNPJ..." oninput="renderEmpresasSaaS()">
+        </div>
+        <p style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">Clique sobre o nome da empresa para ver detalhes completos ou use o botão de editar (✏️):</p>
         <table>
           <thead><tr><th>Empresa / Granja</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody id="lista-empresas-saas"></tbody>
@@ -718,6 +721,35 @@
         <button class="btn" type="button" style="background: var(--warning);" onclick="abrirModalRedefinirSenhaDoDetalhe()">🔑 Alterar Senha do Administrador</button>
         <button class="btn" type="button" style="background: #64748b;" onclick="document.getElementById('modal-detalhes-empresa').style.display='none'">Fechar</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR EMPRESA / CLIENTE NO SUPER ADMIN -->
+  <div class="modal" id="modal-editar-empresa">
+    <div class="modal-content" style="max-width: 460px;">
+      <div class="card-title" style="margin-bottom: 12px; color: var(--accent);">✏️ Editar Empresa / Granja</div>
+      <form onsubmit="salvarEdicaoEmpresa(event)">
+        <input type="hidden" id="edit-emp-id-original">
+        <div class="form-group"><label>Nome da Granja / Empresa</label><input type="text" id="edit-emp-nome" required></div>
+        <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="edit-emp-cnpj"></div>
+        <div class="form-group"><label>E-mail de Contato</label><input type="email" id="edit-emp-email"></div>
+        <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="edit-emp-tel"></div>
+        <div class="form-group"><label>Endereço Completo</label><input type="text" id="edit-emp-end"></div>
+        <div class="form-group">
+          <label>Plano de Assinatura</label>
+          <select id="edit-emp-plano" required>
+            <option value="mensal">Mensal (30 Dias)</option>
+            <option value="anual">Anual (365 Dias)</option>
+            <option value="vitalicio">Vitalício (Sem Expiração)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Valor do Plano (R$)</label><input type="number" step="0.01" id="edit-emp-valor" required></div>
+        <div class="form-group"><label>Data de Vencimento</label><input type="date" id="edit-emp-vencimento" required></div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button type="submit" class="btn btn-success">Salvar Alterações</button>
+          <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-editar-empresa').style.display='none'">Cancelar</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1493,23 +1525,75 @@
     function renderEmpresasSaaS() {
       const tbody = document.getElementById('lista-empresas-saas');
       if (!tbody) return;
-      tbody.innerHTML = state.empresasSaaS.map(emp => {
+      const termoBusca = (document.getElementById('saas-busca-empresa')?.value || '').toLowerCase();
+      
+      const filtradas = state.empresasSaaS.filter(emp => {
+        const nome = (emp.nome || '').toLowerCase();
+        const id = (emp.id || '').toLowerCase();
+        const cnpj = (emp.cnpj || '').toLowerCase();
+        return nome.includes(termoBusca) || id.includes(termoBusca) || cnpj.includes(termoBusca);
+      });
+
+      tbody.innerHTML = filtradas.map(emp => {
         const isAtivo = emp.status === 'Ativo';
         return `
           <tr>
             <td>
               <strong style="cursor: pointer; color: var(--accent); font-size: 0.95rem;" onclick="abrirDetalhesEmpresa('${emp.id}')">🏢 ${emp.nome}</strong><br>
               <small style="color:#64748b;">ID: ${emp.id} | CNPJ: ${emp.cnpj || 'N/I'}</small><br>
-              <small style="color:#2563eb; font-weight:bold;">Plano: ${emp.plano || 'mensal'}</small>
+              <small style="color:#2563eb; font-weight:bold;">Plano: ${emp.plano || 'mensal'} (Venc: ${emp.vencimento || '---'})</small>
             </td>
             <td><span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}">${emp.status || 'Ativo'}</span></td>
             <td>
+              <button class="btn" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%; margin-bottom:4px; background:#2563eb;" onclick="abrirModalEditarEmpresa('${emp.id}')">✏️ Editar</button>
               <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%; margin-bottom:4px;" onclick="alternarStatusEmpresa('${emp.id}', '${emp.status || 'Ativo'}')">${isAtivo ? 'Bloquear' : 'Ativar'}</button>
               <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%;" onclick="excluirEmpresaSaaS('${emp.id}')">🗑️ Apagar</button>
             </td>
           </tr>
         `;
-      }).join('');
+      }).join('') || '<tr><td colspan="3" style="text-align:center; color:#64748b;">Nenhuma empresa encontrada.</td></tr>';
+    }
+
+    function abrirModalEditarEmpresa(empresaId) {
+      const emp = state.empresasSaaS.find(e => e.id === empresaId);
+      if (!emp) return;
+
+      document.getElementById('edit-emp-id-original').value = emp.id;
+      document.getElementById('edit-emp-nome').value = emp.nome || '';
+      document.getElementById('edit-emp-cnpj').value = emp.cnpj || '';
+      document.getElementById('edit-emp-email').value = emp.email || '';
+      document.getElementById('edit-emp-tel').value = emp.tel || '';
+      document.getElementById('edit-emp-end').value = emp.end || '';
+      document.getElementById('edit-emp-plano').value = emp.plano || 'mensal';
+      document.getElementById('edit-emp-valor').value = emp.valorPlano || 0;
+      document.getElementById('edit-emp-vencimento').value = emp.vencimento || '';
+
+      document.getElementById('modal-editar-empresa').style.display = 'flex';
+    }
+
+    async function salvarEdicaoEmpresa(e) {
+      e.preventDefault();
+      const idOriginal = document.getElementById('edit-emp-id-original').value;
+      const nome = document.getElementById('edit-emp-nome').value.trim();
+      const cnpj = document.getElementById('edit-emp-cnpj').value.trim();
+      const email = document.getElementById('edit-emp-email').value.trim();
+      const tel = document.getElementById('edit-emp-tel').value.trim();
+      const end = document.getElementById('edit-emp-end').value.trim();
+      const plano = document.getElementById('edit-emp-plano').value;
+      const valorPlano = parseFloat(document.getElementById('edit-emp-valor').value || 0);
+      const vencimento = document.getElementById('edit-emp-vencimento').value;
+
+      try {
+        await db.collection("empresas").doc(idOriginal).update({
+          nome, cnpj, email, tel, end, plano, valorPlano, vencimento
+        });
+        await db.collection("config").doc(idOriginal).set({ nome, cnpj, tel, end }, { merge: true });
+
+        alert('Dados da empresa atualizados com sucesso!');
+        document.getElementById('modal-editar-empresa').style.display = 'none';
+      } catch (err) {
+        alert('Erro ao atualizar empresa: ' + err.message);
+      }
     }
 
     function abrirDetalhesEmpresa(empresaId) {
