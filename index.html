@@ -679,8 +679,11 @@
           <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Total Ovos Coletados</div><div class="relatorio-kpi-val" id="tec-kpi-ovos">0</div></div>
         </div>
         <div class="relatorio-section-box">
-          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Mortalidade e Vacinas no Período</div>
-          <div id="tec-resumo-baixas-vacinas" style="line-height: 1.4; color: #1e293b;"></div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Mortalidade e Baixas</div>
+          <div id="tec-resumo-baixas" style="line-height: 1.4; color: #1e293b; margin-bottom: 8px;"></div>
+          
+          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; border-top: 1px dashed #cbd5e1; padding-top: 6px;">Histórico de Vacinações no Período</div>
+          <div id="tec-resumo-vacinas-lista" style="line-height: 1.4; color: #1e293b;"></div>
         </div>
         <div>
           <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Lotes Alojados</div>
@@ -942,7 +945,6 @@
         const snapshot = await db.collection("usuarios").get();
         state.usuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         
-        // Garante a existência das contas de Super Admin no Firestore se não existirem
         const hasSuperAdmin = state.usuarios.some(u => u.login === 'superadmin' && u.role === 'superadmin');
         const hasSuperAdmin2 = state.usuarios.some(u => u.login === 'superadmin2' && u.role === 'superadmin');
 
@@ -1061,7 +1063,6 @@
         render();
       });
 
-      // LISTENERS ISOLADOS DO CONTROLE TÉCNICO (ZOOTECNIA)
       const unsubLotesTecnicos = db.collection("lotes_tecnicos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.lotesTecnicos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderControleTecnico();
@@ -1197,7 +1198,6 @@
       if (el) el.innerText = (state.estoqueGeralOvos || 0).toLocaleString('pt-BR') + ' Ovos';
     }
 
-    // --- FUNÇÕES EXCLUSIVAS DO CONTROLE TÉCNICO (ZOOTECNIA) ---
     async function cadastrarLoteTecnico(e) {
       e.preventDefault();
       if (!state.currentUser) return;
@@ -1406,12 +1406,15 @@
       document.getElementById('tec-kpi-ovos').innerText = totalOvosPeriodo.toLocaleString('pt-BR') + ' ovos';
 
       const totalMortes = mortalidadeFiltrada.reduce((acc, m) => acc + (m.qtdMortas || 0), 0);
-      const totalVacinasAplicadas = vacinasFiltradas.reduce((acc, v) => acc + (v.qtdAves || 0), 0);
+      document.getElementById('tec-resumo-baixas').innerHTML = `• Total de Baixas / Mortalidade no período: <strong>${totalMortes} aves</strong>`;
 
-      document.getElementById('tec-resumo-baixas-vacinas').innerHTML = `
-        • Total de Baixas / Mortalidade: <strong>${totalMortes} aves</strong><br>
-        • Total de Aplicações de Vacinas: <strong>${totalVacinasAplicadas} doses</strong> (${vacinasFiltradas.length} campanhas)
-      `;
+      // Renderiza detalhadamente cada vacina aplicada no período selecionado
+      const listaVacinasHtml = vacinasFiltradas.length > 0 ? vacinasFiltradas.map(v => {
+        const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
+        return `• [${dataFmt}] Lote: <strong>${v.loteNome || 'Lote'}</strong> — Vacina: <strong>${v.vacinaNome}</strong> (${v.qtdAves} doses/aves)`;
+      }).join('<br>') : '<span style="color:#64748b;">Nenhum registo de vacinação neste período.</span>';
+
+      document.getElementById('tec-resumo-vacinas-lista').innerHTML = listaVacinasHtml;
 
       document.getElementById('tec-resumo-tabela-lotes').innerHTML = state.lotesTecnicos.map(l => `
         <tr><td><strong>${l.nome}</strong><br><small>${l.linhagem}</small></td><td>${l.qtdAtual || l.qtdInicial} aves</td><td>${l.dataAlojamento || '---'}</td></tr>
