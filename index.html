@@ -1057,16 +1057,21 @@
         state.lotesTecnicos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderControleTecnico();
       });
+
+      // ORDENAÇÃO POR DATA (MAIS RECENTE PRIMEIRO) AQUI NO LISTENER
       const unsubPosturaTecnica = db.collection("producao_zootecnica").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.historicoPosturaTecnica = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        state.historicoPosturaTecnica = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
         renderControleTecnico();
       });
       const unsubMortalidade = db.collection("mortalidade_tecnica").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.historicoMortalidade = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        state.historicoMortalidade = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
         renderControleTecnico();
       });
       const unsubVacinacao = db.collection("vacinacao_tecnica").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.historicoVacinacao = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        state.historicoVacinacao = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
         renderControleTecnico();
       });
 
@@ -1469,6 +1474,11 @@
           posturaFiltrada = []; mortalidadeFiltrada = []; vacinasFiltradas = [];
         }
       }
+
+      // GARANTE A ORDENAÇÃO POR DATA (MAIS RECENTE PRIMEIRO)
+      posturaFiltrada.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+      mortalidadeFiltrada.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+      vacinasFiltradas.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
 
       let somaTaxas = 0; let totalOvosPeriodo = 0;
       posturaFiltrada.forEach(p => { somaTaxas += (p.taxaPostura || 0); totalOvosPeriodo += (p.ovosColhidos || 0); });
