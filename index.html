@@ -125,21 +125,6 @@
       word-wrap: break-word;
     }
 
-    .a4-pagina-lote {
-      width: 100%;
-      background: #ffffff;
-      padding: 0;
-      margin: 0;
-      border: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      page-break-after: always;
-      break-after: page;
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
-
     .recibo-bloco-metade {
       width: 100%;
       background: #ffffff;
@@ -379,16 +364,27 @@
         </form>
       </div>
 
-      <!-- 2. REGISTRO DIÁRIO DE POSTURA -->
+      <!-- 2. REGISTRO DIÁRIO DE POSTURA & PESAGEM -->
       <div class="card tec-secao-form" id="tec-form-postura" style="display: none; border-left: 4px solid var(--tech);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🥚 Registo Diário de Postura</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🥚 Registo Diário de Postura & Pesagem</div>
         <form onsubmit="registrarPosturaDiaria(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="postura-lote-id" required></select></div>
           <div class="form-group"><label>Data da Coleta</label><input type="date" id="postura-data" required></div>
           <div class="form-group"><label>Ovos Colhidos no Dia (Unidades)</label><input type="number" id="postura-ovos-colhidos" min="0" placeholder="Ex: 750" required></div>
           <div class="form-group"><label>Consumo de Ração no Dia (Kg - Opcional)</label><input type="number" step="0.1" id="postura-racao" placeholder="Ex: 110.5"></div>
           <div class="form-group"><label>Temperatura Média / Obs Ambiência</label><input type="text" id="postura-obs" placeholder="Ex: Temp 24°C / Luz 16h"></div>
-          <button type="submit" class="btn btn-success">✅ Registar Produção & Calcular Taxa</button>
+          
+          <!-- SEÇÃO DE PESAGEM DAS AVES -->
+          <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border);">
+          <div style="font-weight: 700; font-size: 0.9rem; color: var(--tech); margin-bottom: 8px;">⚖️ Pesagem de Amostra de Aves (Opcional)</div>
+          <div class="form-group">
+            <label>Número de Aves a Pesar</label>
+            <input type="number" id="pesagem-qtd-aves" min="0" value="0" placeholder="Ex: 3 ou 10" oninput="gerarCamposPesagemAves()">
+          </div>
+          <div id="container-pesagem-individual" style="margin-bottom: 10px;"></div>
+          <div id="resultado-peso-medio" style="font-size: 0.85rem; font-weight: bold; color: var(--tech); margin-bottom: 12px; display: none;"></div>
+
+          <button type="submit" class="btn btn-success">✅ Registar Produção & Pesagem</button>
         </form>
       </div>
 
@@ -429,9 +425,9 @@
           <tbody id="lista-lotes-tecnicos"></tbody>
         </table>
 
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:15px;">Histórico de Postura</div>
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:15px;">Histórico de Postura & Pesagem</div>
         <table>
-          <thead><tr><th>Data</th><th>Lote</th><th>Ovos</th><th>Taxa Postura</th></tr></thead>
+          <thead><tr><th>Data</th><th>Lote</th><th>Ovos</th><th>Taxa / Pesagem</th></tr></thead>
           <tbody id="lista-historico-postura"></tbody>
         </table>
 
@@ -927,7 +923,6 @@
     let pedidoSelecionadoModal = null;
     let usuarioSelecionadoId = null;
 
-    // Função utilitária para ver/ocultar senha
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
       if (!input) return;
@@ -953,11 +948,6 @@
         }
         if (!hasSuperAdmin2) {
           await db.collection("usuarios").add({ login: "superadmin2", pass: "rancho123*", role: "superadmin" });
-        }
-
-        if (state.usuarios.length === 0 || !state.usuarios.some(u => u.login === 'admin')) {
-          await db.collection("usuarios").doc("admin").set({ login: "admin", pass: "1234", role: "admin", empresaId: "empresa_demo" });
-          await db.collection("empresas").doc("empresa_demo").set({ nome: "Granja Demonstração", status: "Ativo", plano: "vitalicio", valorPlano: 0, vencimento: "2099-12-31" });
         }
       } catch (err) { console.error("Erro na inicialização:", err); }
     }
@@ -1227,6 +1217,52 @@
       }
     }
 
+    // --- FUNÇÕES DE PESAGEM DINÂMICA DAS AVES ---
+    function gerarCamposPesagemAves() {
+      const qtd = parseInt(document.getElementById('pesagem-qtd-aves').value || 0);
+      const container = document.getElementById('container-pesagem-individual');
+      const resDiv = document.getElementById('resultado-peso-medio');
+      
+      if (qtd <= 0) {
+        container.innerHTML = '';
+        resDiv.style.display = 'none';
+        return;
+      }
+
+      let html = '<div style="font-size:0.75rem; color:#64748b; margin-bottom:6px;">Insira o peso de cada ave (em kg):</div>';
+      html += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; max-height: 160px; overflow-y: auto;">';
+      for (let i = 1; i <= qtd; i++) {
+        html += `<div style="display:flex; align-items:center; gap:4px;"><small>Ave ${i}:</small><input type="number" step="0.01" class="input-peso-ave" placeholder="Ex: 1.850" oninput="calcularPesoMedioAves()" style="padding:6px; font-size:0.8rem;"></div>`;
+      }
+      html += '</div>';
+      container.innerHTML = html;
+      resDiv.style.display = 'block';
+      calcularPesoMedioAves();
+    }
+
+    function calcularPesoMedioAves() {
+      const inputs = document.querySelectorAll('.input-peso-ave');
+      const resDiv = document.getElementById('resultado-peso-medio');
+      if (inputs.length === 0) return;
+
+      let soma = 0;
+      let count = 0;
+      inputs.forEach(input => {
+        const val = parseFloat(input.value);
+        if (!isNaN(val) && val > 0) {
+          soma += val;
+          count++;
+        }
+      });
+
+      if (count > 0) {
+        const media = (soma / count).toFixed(3);
+        resDiv.innerText = `📊 Peso Médio Calculado: ${media} kg (${count} aves pesadas)`;
+      } else {
+        resDiv.innerText = `📊 Insira os pesos para calcular a média.`;
+      }
+    }
+
     async function registrarPosturaDiaria(e) {
       e.preventDefault();
       if (!state.currentUser) return;
@@ -1235,6 +1271,28 @@
       const ovosColhidos = parseInt(document.getElementById('postura-ovos-colhidos').value || 0);
       const racaoKg = parseFloat(document.getElementById('postura-racao').value || 0);
       const obs = document.getElementById('postura-obs').value.trim();
+
+      // Coletar dados de pesagem
+      const qtdAvesPesadas = parseInt(document.getElementById('pesagem-qtd-aves').value || 0);
+      let pesosIndividuais = [];
+      let pesoMedio = 0;
+
+      if (qtdAvesPesadas > 0) {
+        const inputs = document.querySelectorAll('.input-peso-ave');
+        let soma = 0;
+        let validos = 0;
+        inputs.forEach(inp => {
+          const p = parseFloat(inp.value);
+          if (!isNaN(p) && p > 0) {
+            pesosIndividuais.push(p);
+            soma += p;
+            validos++;
+          }
+        });
+        if (validos > 0) {
+          pesoMedio = parseFloat((soma / validos).toFixed(3));
+        }
+      }
 
       const lote = state.lotesTecnicos.find(l => l.id === loteId);
       if (!lote) return alert('Selecione um lote válido.');
@@ -1245,11 +1303,25 @@
       try {
         await db.collection("producao_zootecnica").add({
           empresaId: state.currentUser.empresaId,
-          loteId, loteNome: lote.nome, data, ovosColhidos, racaoKg, obs, taxaPostura: parseFloat(taxaPostura), criadoEm: new Date()
+          loteId, 
+          loteNome: lote.nome, 
+          data, 
+          ovosColhidos, 
+          racaoKg, 
+          obs, 
+          taxaPostura: parseFloat(taxaPostura),
+          pesagem: {
+            qtdAvesPesadas,
+            pesosIndividuais,
+            pesoMedio
+          },
+          criadoEm: new Date()
         });
 
         e.target.reset();
-        alert(`Registo efetuado com sucesso! Taxa de Postura do dia: ${taxaPostura}%`);
+        document.getElementById('container-pesagem-individual').innerHTML = '';
+        document.getElementById('resultado-peso-medio').style.display = 'none';
+        alert(`Registo efetuado com sucesso! Taxa de Postura: ${taxaPostura}% ${pesoMedio > 0 ? '| Peso Médio: ' + pesoMedio + 'kg' : ''}`);
         voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
@@ -1408,7 +1480,6 @@
       const totalMortes = mortalidadeFiltrada.reduce((acc, m) => acc + (m.qtdMortas || 0), 0);
       document.getElementById('tec-resumo-baixas').innerHTML = `• Total de Baixas / Mortalidade no período: <strong>${totalMortes} aves</strong>`;
 
-      // Renderiza detalhadamente cada vacina aplicada no período selecionado
       const listaVacinasHtml = vacinasFiltradas.length > 0 ? vacinasFiltradas.map(v => {
         const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
         return `• [${dataFmt}] Lote: <strong>${v.loteNome || 'Lote'}</strong> — Vacina: <strong>${v.vacinaNome}</strong> (${v.qtdAves} doses/aves)`;
@@ -1481,7 +1552,10 @@
             <td>${h.data ? new Date(h.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
             <td>${h.loteNome || 'Lote'}</td>
             <td>${h.ovosColhidos} ovos</td>
-            <td><span class="badge badge-ativo">${h.taxaPostura || 0}%</span></td>
+            <td>
+              <span class="badge badge-ativo">${h.taxaPostura || 0}%</span>
+              ${h.pesagem && h.pesagem.pesoMedio ? `<br><small style="color:var(--tech);">⚖️ Média: ${h.pesagem.pesoMedio}kg</small>` : ''}
+            </td>
           </tr>
         `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo.</td></tr>';
       }
@@ -2019,7 +2093,6 @@
             * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
             html, body { background: #ffffff !important; color: #0f172a; width: 100%; height: 100%; padding: 0; margin: 0; }
             
-            .a4-pagina-lote { width: 100%; background: #ffffff; padding: 0; margin: 0; border: none; display: flex; flex-direction: column; }
             .recibo-bloco-metade { width: 100%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-inside: avoid; break-inside: avoid; }
             .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
             .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
