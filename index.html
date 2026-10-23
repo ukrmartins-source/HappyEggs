@@ -99,9 +99,7 @@
     .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; cursor: pointer; display: inline-block; }
     .badge-pago { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
     .badge-pendente { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-    .badge-finalizado { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
     .badge-ativo { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-    .badge-bloqueado { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
@@ -114,7 +112,7 @@
       background: #ffffff; 
       border: 1px solid #e2e8f0;
       border-radius: 12px;
-      padding: 12px; 
+      padding: 14px; 
       margin-bottom: 16px; 
       color: #0f172a;
       text-align: left;
@@ -126,9 +124,9 @@
       width: 100%;
       background: #ffffff;
       border: 1px dashed #94a3b8;
-      border-radius: 6px;
-      padding: 10px;
-      margin-bottom: 10px;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -140,71 +138,44 @@
     .recibo-sheet-header {
       background: #0f172a;
       color: #ffffff;
-      padding: 6px 10px;
-      border-radius: 4px;
-      margin-bottom: 6px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-size: 0.85rem;
+      font-weight: 800;
     }
 
-    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
+    .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 8px 0; }
     
     .item-linha-zebrado {
       display: flex;
       justify-content: space-between;
-      font-size: 0.75rem;
-      padding: 3px 6px;
+      font-size: 0.8rem;
+      padding: 4px 6px;
       border-radius: 4px;
     }
     .item-linha-zebrado:nth-child(odd) { background-color: #f8fafc; }
     .item-linha-zebrado:nth-child(even) { background-color: #ffffff; }
 
     .carrinho-box { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
-    .carrinho-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #cbd5e1; padding: 6px 0; font-size: 0.85rem; }
-
-    .stat-card { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
-    .stat-title { font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
-    .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
 
     .relatorio-sheet-box {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 18px;
-      color: #0f172a;
-      width: 100%;
-      box-sizing: border-box;
+      background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; color: #0f172a; width: 100%; box-sizing: border-box;
     }
     .relatorio-sheet-header {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      color: #ffffff;
-      padding: 14px 16px;
-      border-radius: 8px;
-      margin-bottom: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 3px solid #2563eb;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 14px 16px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #2563eb;
     }
-    .relatorio-sheet-header h3 { font-size: 0.95rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
     .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
     .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb; padding: 10px; border-radius: 6px; }
     .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 3px; }
     .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
     .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.82rem; }
     .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 0.8rem; }
-    .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; border-top: 1px solid #e2e8f0; }
+    .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; }
     .relatorio-tabela-planilha td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
-    .relatorio-tabela-planilha tr:nth-child(even) { background-color: #f8fafc; }
-
-    /* ESTILO PARA IMPRESSÃO PURA DO RECIBO */
-    @media print {
-      body * { visibility: hidden; }
-      #printable-recibo-salario, #printable-recibo-salario * { visibility: visible; }
-      #printable-recibo-salario { position: absolute; left: 0; top: 0; width: 100%; border: none; padding: 0; }
-      .no-print { display: none !important; }
-    }
   </style>
 </head>
 <body>
@@ -472,30 +443,37 @@
 
     <!-- TELA: COLABORADORES & RH -->
     <div id="view-colaboradores" class="view-content" style="display:none;">
-      <div class="card" style="border-left: 4px solid var(--accent);">
+      <!-- LISTA DE COLABORADORES NO TOPO -->
+      <div class="card">
         <div class="card-header">
-          <div class="card-title">👔 Cadastrar Colaborador (Com Admissão Retroativa)</div>
+          <div class="card-title">👔 Colaboradores Cadastrados</div>
           <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
         </div>
-        <form onsubmit="cadastrarColaborador(event)">
-          <div class="form-group"><label>Nome Completo</label><input type="text" id="colab-nome" placeholder="Ex: João da Silva" required></div>
-          <div class="form-group"><label>Cargo / Função</label><input type="text" id="colab-cargo" placeholder="Ex: Tratador / Coletor" required></div>
-          <div class="form-group"><label>Documento (CPF)</label><input type="text" id="colab-doc" placeholder="Ex: 000.000.000-00"></div>
-          <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="colab-tel" placeholder="Ex: (11) 99999-8888"></div>
-          <div class="form-group"><label>Chave PIX Principal</label><input type="text" id="colab-pix" placeholder="Ex: CPF, E-mail ou Telefone" required></div>
-          <div class="form-group"><label>Data de Admissão (Suporta Retroativa)</label><input type="date" id="colab-admissao" required></div>
-          <div class="form-group"><label>Salário Base Mensal (R$)</label><input type="number" step="0.01" id="colab-salario" placeholder="Ex: 1800.00" required></div>
-          <div class="form-group"><label>Dia Fixo de Vencimento (Ex: 5 ou 20)</label><input type="number" min="1" max="31" id="colab-vencimento" placeholder="Ex: 5" required></div>
-          <button type="submit" class="btn">➕ Salvar Colaborador</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Lista de Colaboradores & Vales / Fechamento</div>
         <table>
           <thead><tr><th>Colaborador</th><th>Salário / Venc.</th><th>Ações</th></tr></thead>
           <tbody id="lista-colaboradores"></tbody>
         </table>
+      </div>
+
+      <!-- FORMULÁRIO DE CADASTRO RECOLHIDO (EXPANSÍVEL) -->
+      <div class="card" style="border-left: 4px solid var(--accent);">
+        <div class="card-header" style="cursor: pointer; margin-bottom: 0; border-bottom: none; padding-bottom: 0;" onclick="toggleFormularioColaborador()">
+          <div class="card-title" id="titulo-toggle-colab">➕ Cadastrar Novo Colaborador (Clique para abrir)</div>
+          <span id="icone-toggle-colab" style="font-size: 1.1rem; font-weight: bold;">▼</span>
+        </div>
+        <div id="container-form-colaborador" style="display: none; margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+          <form onsubmit="cadastrarColaborador(event)">
+            <div class="form-group"><label>Nome Completo</label><input type="text" id="colab-nome" placeholder="Ex: João da Silva" required></div>
+            <div class="form-group"><label>Cargo / Função</label><input type="text" id="colab-cargo" placeholder="Ex: Tratador / Coletor" required></div>
+            <div class="form-group"><label>Documento (CPF)</label><input type="text" id="colab-doc" placeholder="Ex: 000.000.000-00"></div>
+            <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="colab-tel" placeholder="Ex: (11) 99999-8888"></div>
+            <div class="form-group"><label>Chave PIX Principal</label><input type="text" id="colab-pix" placeholder="Ex: CPF, E-mail ou Telefone" required></div>
+            <div class="form-group"><label>Data de Admissão (Suporta Retroativa)</label><input type="date" id="colab-admissao" required></div>
+            <div class="form-group"><label>Salário Base Mensal (R$)</label><input type="number" step="0.01" id="colab-salario" placeholder="Ex: 1800.00" required></div>
+            <div class="form-group"><label>Dia Fixo de Vencimento (Ex: 5 ou 20)</label><input type="number" min="1" max="31" id="colab-vencimento" placeholder="Ex: 5" required></div>
+            <button type="submit" class="btn">➕ Salvar Colaborador</button>
+          </form>
+        </div>
       </div>
     </div>
 
@@ -568,10 +546,10 @@
           <div class="card-title">🥚 Registrar Entrada de Produção</div>
           <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
         </div>
-        <div class="stat-card" style="background: #eff6ff; border-color: #bfdbfe; display: flex; justify-content: space-between; align-items: center;">
+        <div class="stat-card" style="background: #eff6ff; border-color: #bfdbfe; display: flex; justify-content: space-between; align-items: center; padding: 12px; border-radius: 8px; margin-bottom: 12px; border:1px solid #e2e8f0;">
           <div>
-            <div class="stat-title">Saldo Geral de Ovos em Estoque</div>
-            <div class="stat-value" id="estoque-geral-ovos" style="font-size: 1.8rem;">0 Ovos</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Saldo Geral de Ovos em Estoque</div>
+            <div id="estoque-geral-ovos" style="font-size: 1.8rem; font-weight: bold; color: var(--accent);">0 Ovos</div>
           </div>
           <button class="btn admin-only" type="button" style="width: auto; background: var(--warning); padding: 8px 12px; font-size: 0.8rem;" onclick="abrirModalBalanco()">⚖️ Atualizar Estoque</button>
         </div>
@@ -593,7 +571,6 @@
           <div class="form-group"><label>Preço Unitário (R$)</label><input type="number" step="0.01" id="prod-preco" placeholder="Ex: 12.00" required></div>
           <div class="form-group"><label>Quantidade de Ovos nesta Embalagem</label><input type="number" id="prod-ovos-unid" min="1" placeholder="Ex: 12" required></div>
           <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
-          <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
         </form>
       </div>
 
@@ -669,7 +646,7 @@
     </div>
   </main>
 
-  <!-- MODAL: GESTÃO DETALHADA DO COLABORADOR (VALES, EXTRAS, RECIBOS & HISTÓRICO) -->
+  <!-- MODAL: GESTÃO DETALHADA DO COLABORADOR (VALES, EXTRAS, CHECKBOXES, RECIBOS & HISTÓRICO) -->
   <div class="modal" id="modal-colaborador-detalhes">
     <div class="modal-content" style="max-width: 540px;">
       <div class="card-title" id="colab-modal-titulo" style="margin-bottom: 8px; color: var(--accent);">Gestão do Colaborador</div>
@@ -707,16 +684,7 @@
             <div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;">Valor (R$)</label><input type="number" step="0.01" id="vale-valor" placeholder="Ex: 250.00" required style="padding:8px; font-size:0.8rem;"></div>
           </div>
           <div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Motivo / Obs</label><input type="text" id="vale-motivo" placeholder="Ex: Adiantamento quinzenal" required style="padding:8px; font-size:0.8rem;"></div>
-          <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 6px;">
-            <div class="form-group" style="flex:1; margin-bottom:0;"><label style="font-size:0.7rem;">Anexo Pix (Opcional)</label><input type="file" id="vale-arquivo" accept="image/*,.pdf" style="background:#fff; font-size:0.75rem; padding:4px;"></div>
-            <div class="form-group" style="flex:1; margin-bottom:0;">
-              <label style="font-size:0.7rem;">Regra de Desconto</label>
-              <select id="vale-regra-desconto" style="padding:7px; font-size:0.75rem;">
-                <option value="mes_atual">Descontar no Mês Atual</option>
-                <option value="proximo_mes">Jogar para o Próximo Mês</option>
-              </select>
-            </div>
-          </div>
+          <div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Anexo Comprovante (Opcional)</label><input type="file" id="vale-arquivo" accept="image/*,.pdf" style="background:#fff; font-size:0.75rem; padding:4px;"></div>
           <button type="submit" class="btn btn-warning" style="width:100%; padding:8px; font-size:0.8rem;">Registrar Vale</button>
         </form>
       </div>
@@ -735,15 +703,30 @@
         </form>
       </div>
 
-      <div style="font-weight: 700; font-size: 0.8rem; margin-bottom: 4px;">📋 Lançamentos do Mês Selecionado</div>
-      <div id="colab-lista-movimentos-container" style="max-height: 140px; overflow-y: auto; margin-bottom: 10px;"></div>
+      <div style="font-weight: 700; font-size: 0.8rem; margin-bottom: 4px;">📋 Lançamentos & Vales do Mês (Marque os que deseja descontar no recibo)</div>
+      <div id="colab-lista-movimentos-container" style="max-height: 150px; overflow-y: auto; margin-bottom: 10px;"></div>
 
-      <div style="background: #eff6ff; border:1px solid #bfdbfe; padding: 10px; border-radius: 8px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <div style="font-size: 0.7rem; font-weight: bold; color: #1e40af; text-transform: uppercase;">Salário Líquido do Mês</div>
-          <div id="colab-modal-saldo-liquido" style="font-size: 1.1rem; font-weight: bold; color: #1e3a8a;">R$ 0,00</div>
+      <div style="background: #eff6ff; border:1px solid #bfdbfe; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <div style="flex:1; margin-bottom:0;" class="form-group">
+            <label style="color:#1e40af; font-size:0.7rem;">Data do Pagamento</label>
+            <input type="date" id="colab-data-pagamento" style="padding:8px; font-size:0.8rem;">
+          </div>
+          <div style="flex:1; margin-bottom:0;" class="form-group">
+            <label style="color:#1e40af; font-size:0.7rem;">Status do Recibo</label>
+            <select id="colab-status-pagamento" style="padding:8px; font-size:0.8rem;">
+              <option value="Pendente">🟡 Pendente</option>
+              <option value="Pago">🟢 Pago</option>
+            </select>
+          </div>
         </div>
-        <button class="btn btn-success" type="button" style="width:auto; padding:8px 12px; font-size:0.8rem;" onclick="gerarEArquivarReciboSalario()">🖨️ Gerar & Salvar Recibo</button>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size: 0.7rem; font-weight: bold; color: #1e40af; text-transform: uppercase;">Salário Líquido Calculado</div>
+            <div id="colab-modal-saldo-liquido" style="font-size: 1.1rem; font-weight: bold; color: #1e3a8a;">R$ 0,00</div>
+          </div>
+          <button class="btn btn-success" type="button" style="width:auto; padding:8px 12px; font-size:0.8rem;" onclick="gerarEArquivarReciboSalario()">🖨️ Gerar & Salvar Recibo</button>
+        </div>
       </div>
 
       <!-- HISTÓRICO DE RECIBOS ARQUIVADOS -->
@@ -756,7 +739,7 @@
     </div>
   </div>
 
-  <!-- MODAL: RECIBO DE PAGAMENTO / SALÁRIO (SEGURO E SEM TRAVAMENTOS) -->
+  <!-- MODAL: RECIBO DE PAGAMENTO / SALÁRIO (PADRÃO DE NOTA) -->
   <div class="modal" id="modal-recibo-salario">
     <div class="modal-content" style="max-width: 480px;">
       <div class="card-title no-print" style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
@@ -764,11 +747,11 @@
         <button class="btn-danger" type="button" onclick="fecharModalReciboSeguro()">✕ Fechar</button>
       </div>
       
-      <!-- Caixa do Recibo que será impressa perfeitamente -->
+      <!-- Caixa do Recibo com Layout Padronizado -->
       <div class="receipt-box" id="printable-recibo-salario"></div>
       
       <div style="display:flex; flex-direction:column; gap:8px;" class="no-print">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirReciboColaboradorDireto()">🖨️ Imprimir / Salvar PDF</button>
         <button class="btn" type="button" onclick="fecharModalReciboSeguro()" style="background:#64748b;">Voltar ao Sistema</button>
       </div>
     </div>
@@ -851,35 +834,6 @@
     </div>
   </div>
 
-  <!-- MODAL: EDITAR EMPRESA / CLIENTE NO SUPER ADMIN -->
-  <div class="modal" id="modal-editar-empresa">
-    <div class="modal-content" style="max-width: 460px;">
-      <div class="card-title" style="margin-bottom: 12px; color: var(--accent);">✏️ Editar Empresa / Granja</div>
-      <form onsubmit="salvarEdicaoEmpresa(event)">
-        <input type="hidden" id="edit-emp-id-original">
-        <div class="form-group"><label>Nome da Granja / Empresa</label><input type="text" id="edit-emp-nome" required></div>
-        <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="edit-emp-cnpj"></div>
-        <div class="form-group"><label>E-mail de Contato</label><input type="email" id="edit-emp-email"></div>
-        <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="edit-emp-tel"></div>
-        <div class="form-group"><label>Endereço Completo</label><input type="text" id="edit-emp-end"></div>
-        <div class="form-group">
-          <label>Plano de Assinatura</label>
-          <select id="edit-emp-plano" required>
-            <option value="mensal">Mensal (30 Dias)</option>
-            <option value="anual">Anual (365 Dias)</option>
-            <option value="vitalicio">Vitalício (Sem Expiração)</option>
-          </select>
-        </div>
-        <div class="form-group"><label>Valor do Plano (R$)</label><input type="number" step="0.01" id="edit-emp-valor" required></div>
-        <div class="form-group"><label>Data de Vencimento</label><input type="date" id="edit-emp-vencimento" required></div>
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-          <button type="submit" class="btn btn-success">Salvar Alterações</button>
-          <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-editar-empresa').style.display='none'">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- MODAL: REDEFINIR SENHA DO CLIENTE -->
   <div class="modal" id="modal-redefinir-senha-cli">
     <div class="modal-content" style="max-width: 380px;">
@@ -895,26 +849,6 @@
         <div style="display: flex; gap: 10px; margin-top: 15px;">
           <button type="submit" class="btn" style="background: var(--warning);">Salvar Senha</button>
           <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-redefinir-senha-cli').style.display='none'">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: REDEFINIR SENHA DE USUÁRIO/VENDEDOR -->
-  <div class="modal" id="modal-redefinir-senha-usuario">
-    <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha do Usuário</div>
-      <form onsubmit="salvarNovaSenhaUsuario(event)">
-        <div class="form-group">
-          <label>Nova Senha</label>
-          <div class="input-pass-wrapper">
-            <input type="password" id="nova-senha-usuario-input" placeholder="Digite a nova senha" required autocomplete="new-password">
-            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('nova-senha-usuario-input', this)">👁️</button>
-          </div>
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-          <button type="submit" class="btn" style="background: var(--warning);">Salvar Senha</button>
-          <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-redefinir-senha-usuario').style.display='none'">Cancelar</button>
         </div>
       </form>
     </div>
@@ -1062,6 +996,21 @@
       } else {
         input.type = 'password';
         btn.innerText = '👁️';
+      }
+    }
+
+    function toggleFormularioColaborador() {
+      const container = document.getElementById('container-form-colaborador');
+      const icone = document.getElementById('icone-toggle-colab');
+      const titulo = document.getElementById('titulo-toggle-colab');
+      if (container.style.display === 'none' || !container.style.display) {
+        container.style.display = 'block';
+        icone.innerText = '▲';
+        titulo.innerText = 'Fechar Formulário de Cadastro';
+      } else {
+        container.style.display = 'none';
+        icone.innerText = '▼';
+        titulo.innerText = '➕ Cadastrar Novo Colaborador (Clique para abrir)';
       }
     }
 
@@ -1338,7 +1287,7 @@
       if (el) el.innerText = (state.estoqueGeralOvos || 0).toLocaleString('pt-BR') + ' Ovos';
     }
 
-    // --- FUNÇÕES DE COLABORADORES & RH (COM HISTÓRICO DE RECIBOS) ---
+    // --- COLABORADORES & RH ---
     async function cadastrarColaborador(e) {
       e.preventDefault();
       if (!state.currentUser) return;
@@ -1358,6 +1307,7 @@
           status: "Ativo", criadoEm: new Date()
         });
         e.target.reset();
+        toggleFormularioColaborador();
         alert('Colaborador cadastrado com sucesso!');
       } catch (err) { alert('Erro ao cadastrar colaborador: ' + err.message); }
     }
@@ -1402,6 +1352,8 @@
       const agora = new Date();
       document.getElementById('colab-filtro-mes').value = agora.getMonth();
       document.getElementById('colab-filtro-ano').value = agora.getFullYear();
+      document.getElementById('colab-data-pagamento').value = agora.toISOString().split('T')[0];
+      document.getElementById('colab-status-pagamento').value = 'Pendente';
 
       document.getElementById('vale-data').value = agora.toISOString().split('T')[0];
       document.getElementById('vale-valor').value = '';
@@ -1443,13 +1395,7 @@
       const valesDoMes = vales.filter(v => {
         if (!v.data) return false;
         const d = new Date(v.data + 'T00:00:00');
-        let targetMes = d.getMonth();
-        let targetAno = d.getFullYear();
-        if ((v.regraDesconto || 'mes_atual') === 'proximo_mes') {
-          targetMes += 1;
-          if (targetMes > 11) { targetMes = 0; targetAno += 1; }
-        }
-        return targetMes === mesSel && targetAno === anoSel;
+        return d.getMonth() === mesSel && d.getFullYear() === anoSel;
       });
 
       const extrasDoMes = extras.filter(ex => {
@@ -1458,22 +1404,20 @@
         return d.getMonth() === mesSel && d.getFullYear() === anoSel;
       });
 
-      let totalVales = 0; valesDoMes.forEach(v => totalVales += (parseFloat(v.valor) || 0));
-      let totalExtras = 0; extrasDoMes.forEach(ex => totalExtras += (parseFloat(ex.valor) || 0));
-
-      const salarioLiquido = Math.max(0, (colab.salarioBase + totalExtras) - totalVales);
-      document.getElementById('colab-modal-saldo-liquido').innerText = "R$ " + salarioLiquido.toFixed(2);
-
       const container = document.getElementById('colab-lista-movimentos-container');
       let htmlMovs = '';
 
       valesDoMes.forEach(v => {
+        const marcado = v.incluirNoRecibo !== false ? 'checked' : '';
         htmlMovs += `
           <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:6px 8px; border-radius:6px; border:1px solid #fca5a5; margin-bottom:4px; font-size:0.78rem;">
-            <div>
-              <span style="color:var(--danger); font-weight:bold;">[VALE]</span> ${new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR')} — <strong>R$ ${parseFloat(v.valor).toFixed(2)}</strong><br>
-              <small style="color:#64748b;">${v.motivo} ${v.regraDesconto === 'proximo_mes' ? '(Adiado p/ este mês)' : ''}</small>
-              ${v.comprovanteUrl ? `<br><a href="${v.comprovanteUrl}" target="_blank" style="color:var(--accent); font-weight:bold; font-size:0.7rem;">📎 Ver Comprovante</a>` : ''}
+            <div style="display:flex; align-items:center; gap:6px; flex:1;">
+              <input type="checkbox" ${marcado} onchange="toggleIncluirValeRecibo('${v.id}', this.checked)" title="Marcar para descontar no recibo">
+              <div>
+                <span style="color:var(--danger); font-weight:bold;">[VALE]</span> ${new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR')} — <strong>R$ ${parseFloat(v.valor).toFixed(2)}</strong><br>
+                <small style="color:#64748b;">${v.motivo}</small>
+                ${v.comprovanteUrl ? `<br><a href="${v.comprovanteUrl}" target="_blank" style="color:var(--accent); font-weight:bold; font-size:0.7rem;">📎 Ver Comprovante</a>` : ''}
+              </div>
             </div>
             <button class="btn-danger" type="button" style="padding:2px 5px;" onclick="excluirValeColaborador('${v.id}')">✕</button>
           </div>
@@ -1481,12 +1425,16 @@
       });
 
       extrasDoMes.forEach(ex => {
+        const marcado = ex.incluirNoRecibo !== false ? 'checked' : '';
         htmlMovs += `
           <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:6px 8px; border-radius:6px; border:1px solid #99f6e4; margin-bottom:4px; font-size:0.78rem;">
-            <div>
-              <span style="color:var(--tech); font-weight:bold;">[EXTRA]</span> ${new Date(ex.data + 'T00:00:00').toLocaleDateString('pt-BR')} — <strong>+ R$ ${parseFloat(ex.valor).toFixed(2)}</strong><br>
-              <small style="color:#64748b;">${ex.descricao}</small>
-              ${ex.comprovanteUrl ? `<br><a href="${ex.comprovanteUrl}" target="_blank" style="color:var(--accent); font-weight:bold; font-size:0.7rem;">📎 Ver Comprovante</a>` : ''}
+            <div style="display:flex; align-items:center; gap:6px; flex:1;">
+              <input type="checkbox" ${marcado} onchange="toggleIncluirExtraRecibo('${ex.id}', this.checked)" title="Marcar para incluir no recibo">
+              <div>
+                <span style="color:var(--tech); font-weight:bold;">[EXTRA]</span> ${new Date(ex.data + 'T00:00:00').toLocaleDateString('pt-BR')} — <strong>+ R$ ${parseFloat(ex.valor).toFixed(2)}</strong><br>
+                <small style="color:#64748b;">${ex.descricao}</small>
+                ${ex.comprovanteUrl ? `<br><a href="${ex.comprovanteUrl}" target="_blank" style="color:var(--accent); font-weight:bold; font-size:0.7rem;">📎 Ver Comprovante</a>` : ''}
+              </div>
             </div>
             <button class="btn-danger" type="button" style="padding:2px 5px;" onclick="excluirExtraColaborador('${ex.id}')">✕</button>
           </div>
@@ -1494,7 +1442,28 @@
       });
 
       container.innerHTML = htmlMovs || '<div style="font-size:0.78rem; color:#64748b; text-align:center; padding:10px;">Nenhum lançamento neste mês.</div>';
+
+      // Calcular Salário Líquido apenas com os marcados
+      let totalValesSel = 0; valesDoMes.filter(v => v.incluirNoRecibo !== false).forEach(v => totalValesSel += (parseFloat(v.valor) || 0));
+      let totalExtrasSel = 0; extrasDoMes.filter(ex => ex.incluirNoRecibo !== false).forEach(ex => totalExtrasSel += (parseFloat(ex.valor) || 0));
+      const salarioLiquido = Math.max(0, (colab.salarioBase + totalExtrasSel) - totalValesSel);
+      document.getElementById('colab-modal-saldo-liquido').innerText = "R$ " + salarioLiquido.toFixed(2);
+
       renderHistoricoRecibosColaborador();
+    }
+
+    async function toggleIncluirValeRecibo(id, status) {
+      try {
+        await db.collection("vales_colaboradores").doc(id).update({ incluirNoRecibo: status });
+        atualizarContextoMesColaborador();
+      } catch (err) { alert('Erro: ' + err.message); }
+    }
+
+    async function toggleIncluirExtraRecibo(id, status) {
+      try {
+        await db.collection("extras_colaboradores").doc(id).update({ incluirNoRecibo: status });
+        atualizarContextoMesColaborador();
+      } catch (err) { alert('Erro: ' + err.message); }
     }
 
     function renderHistoricoRecibosColaborador() {
@@ -1509,12 +1478,24 @@
       container.innerHTML = recibosDoColab.map((r, idx) => `
         <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:6px 8px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:4px; font-size:0.78rem;">
           <div>
-            <strong>Versão ${recibosDoColab.length - idx}</strong> — R$ ${parseFloat(r.liquido).toFixed(2)}<br>
+            <strong>Versão ${recibosDoColab.length - idx}</strong> — R$ ${parseFloat(r.liquido).toFixed(2)} | <span style="color:${r.statusPagamento==='Pago'?'#065f46':'#991b1b'}; font-weight:bold;">${r.statusPagamento || 'Pendente'}</span><br>
             <small style="color:#64748b;">Gerado em: ${new Date(r.dataGeracao).toLocaleString('pt-BR')}</small>
           </div>
-          <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.7rem; background:var(--tech);" onclick="reimprimirReciboHistorico('${r.id}')">👁️ Ver Recibo</button>
+          <div style="display:flex; gap:4px;">
+            <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.7rem; background:var(--tech);" onclick="reimprimirReciboHistorico('${r.id}')">👁️ Ver</button>
+            <button class="btn-danger" type="button" style="padding:4px 6px; font-size:0.7rem;" onclick="excluirReciboHistorico('${r.id}')">🗑️</button>
+          </div>
         </div>
       `).join('') || '<div style="font-size:0.75rem; color:#64748b; text-align:center; padding:6px;">Nenhum recibo arquivado para este mês ainda.</div>';
+    }
+
+    async function excluirReciboHistorico(id) {
+      if (confirm('Tem certeza que deseja excluir este recibo do histórico?')) {
+        try {
+          await db.collection("recibos_historico").doc(id).delete();
+          alert('Recibo excluído com sucesso!');
+        } catch (err) { alert('Erro ao excluir recibo: ' + err.message); }
+      }
     }
 
     async function salvarValeColaborador(e) {
@@ -1523,27 +1504,26 @@
       const data = document.getElementById('vale-data').value;
       const valor = parseFloat(document.getElementById('vale-valor').value || 0);
       const motivo = document.getElementById('vale-motivo').value.trim();
-      const regraDesconto = document.getElementById('vale-regra-desconto').value;
       const fileInput = document.getElementById('vale-arquivo');
 
       if (fileInput.files && fileInput.files[0]) {
         const file = fileInput.files[0];
         const reader = new FileReader();
         reader.onload = async function(ev) {
-          await gravarValeFirestore(data, valor, motivo, regraDesconto, ev.target.result);
+          await gravarValeFirestore(data, valor, motivo, ev.target.result);
         };
         reader.readAsDataURL(file);
       } else {
-        await gravarValeFirestore(data, valor, motivo, regraDesconto, "");
+        await gravarValeFirestore(data, valor, motivo, "");
       }
     }
 
-    async function gravarValeFirestore(data, valor, motivo, regraDesconto, comprovanteUrl) {
+    async function gravarValeFirestore(data, valor, motivo, comprovanteUrl) {
       try {
         await db.collection("vales_colaboradores").add({
           empresaId: state.currentUser.empresaId,
           colaboradorId: colaboradorSelecionadoId,
-          data, valor, motivo, regraDesconto, comprovanteUrl, criadoEm: new Date()
+          data, valor, motivo, incluirNoRecibo: true, comprovanteUrl, criadoEm: new Date()
         });
         document.getElementById('vale-valor').value = '';
         document.getElementById('vale-motivo').value = '';
@@ -1587,7 +1567,7 @@
         await db.collection("extras_colaboradores").add({
           empresaId: state.currentUser.empresaId,
           colaboradorId: colaboradorSelecionadoId,
-          data, valor, descricao, comprovanteUrl, criadoEm: new Date()
+          data, valor, descricao, incluirNoRecibo: true, comprovanteUrl, criadoEm: new Date()
         });
         document.getElementById('extra-valor').value = '';
         document.getElementById('extra-descricao').value = '';
@@ -1613,6 +1593,8 @@
       const mesSel = parseInt(document.getElementById('colab-filtro-mes').value);
       const anoSel = parseInt(document.getElementById('colab-filtro-ano').value);
       const nomeMes = document.getElementById('colab-filtro-mes').options[mesSel].text;
+      const dataPagamento = document.getElementById('colab-data-pagamento').value;
+      const statusPagamento = document.getElementById('colab-status-pagamento').value;
 
       const vales = state.valesColaboradores.filter(v => v.colaboradorId === colaboradorSelecionadoId);
       const extras = state.extrasColaboradores.filter(ex => ex.colaboradorId === colaboradorSelecionadoId);
@@ -1620,17 +1602,13 @@
       const valesDoMes = vales.filter(v => {
         if (!v.data) return false;
         const d = new Date(v.data + 'T00:00:00');
-        let tm = d.getMonth(), ta = d.getFullYear();
-        if ((v.regraDesconto || 'mes_atual') === 'proximo_mes') {
-          tm += 1; if (tm > 11) { tm = 0; ta += 1; }
-        }
-        return tm === mesSel && ta === anoSel;
+        return d.getMonth() === mesSel && d.getFullYear() === anoSel && v.incluirNoRecibo !== false;
       });
 
       const extrasDoMes = extras.filter(ex => {
         if (!ex.data) return false;
         const d = new Date(ex.data + 'T00:00:00');
-        return d.getMonth() === mesSel && d.getFullYear() === anoSel;
+        return d.getMonth() === mesSel && d.getFullYear() === anoSel && ex.incluirNoRecibo !== false;
       });
 
       let totalVales = 0; valesDoMes.forEach(v => totalVales += (parseFloat(v.valor) || 0));
@@ -1650,6 +1628,8 @@
         vales: valesDoMes,
         extras: extrasDoMes,
         liquido,
+        dataPagamento,
+        statusPagamento,
         dataGeracao: new Date().toISOString(),
         empresaDados: emp
       };
@@ -1668,30 +1648,31 @@
       const emp = rec.empresaDados || state.empresa || {};
 
       document.getElementById('printable-recibo-salario').innerHTML = `
-        <div style="font-size:0.78rem; line-height:1.4;">
-          <div style="background:#0f172a; color:#fff; padding:6px 10px; border-radius:4px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-            <strong>RECIBO DE PAGAMENTO (${rec.nomeMes}/${rec.anoRef})</strong>
+        <div class="recibo-bloco-metade" style="border:none; padding:0; margin:0;">
+          <div class="recibo-sheet-header">
+            <strong>RECIBO DE SALÁRIO (${rec.nomeMes}/${rec.anoRef})</strong>
             <span>${emp.nome || 'HAPPY EGGS'}</span>
           </div>
-          <div style="background:#f8fafc; padding:6px 8px; border-radius:4px; margin-bottom:6px; border:1px solid #e2e8f0;">
+          <div style="font-size:0.75rem; margin-bottom:6px;">
             <div><strong>Empresa:</strong> ${emp.nome || 'N/I'} | <strong>CNPJ:</strong> ${emp.cnpj || 'N/I'}</div>
             <div><strong>Endereço:</strong> ${emp.end || 'N/I'} | <strong>Tel:</strong> ${emp.tel || 'N/I'}</div>
           </div>
-          <p><strong>Colaborador:</strong> ${colab.nome} | <strong>CPF:</strong> ${colab.doc || 'N/I'}</p>
-          <p><strong>Cargo:</strong> ${colab.cargo} | <strong>Chave PIX:</strong> ${colab.pix}</p>
+          <div style="font-size:0.78rem; background:#f8fafc; padding:6px; border-radius:6px; border:1px solid #e2e8f0; margin-bottom:8px;">
+            <div><strong>Colaborador:</strong> ${colab.nome} | <strong>CPF:</strong> ${colab.doc || 'N/I'}</div>
+            <div><strong>Cargo:</strong> ${colab.cargo} | <strong>PIX:</strong> ${colab.pix}</div>
+            <div><strong>Data Pagamento:</strong> ${rec.dataPagamento ? new Date(rec.dataPagamento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'} | <strong>Status:</strong> <span style="color:${rec.statusPagamento==='Pago'?'#065f46':'#991b1b'}; font-weight:bold;">${rec.statusPagamento || 'Pendente'}</span></div>
+          </div>
           <hr class="dashed-divider">
-          <div style="display:flex; justify-content:space-between;"><span>Salário Base:</span> <strong>R$ ${parseFloat(rec.salarioBase).toFixed(2)}</strong></div>
-          ${rec.extras && rec.extras.length > 0 ? '<div style="margin-top:2px; font-weight:bold; color:var(--tech);">Serviços Extras / Bônus:</div>' : ''}
-          ${(rec.extras || []).map(ex => `<div style="display:flex; justify-content:space-between; font-size:0.72rem; padding-left:8px; color:#334155;"><span>• ${ex.descricao} (${new Date(ex.data + 'T00:00:00').toLocaleDateString('pt-BR')}):</span> <strong>+ R$ ${parseFloat(ex.valor).toFixed(2)}</strong></div>`).join('')}
-          ${rec.vales && rec.vales.length > 0 ? '<div style="margin-top:2px; font-weight:bold; color:var(--danger);">Vales / Adiantamentos Descontados:</div>' : ''}
-          ${(rec.vales || []).map(v => `<div style="display:flex; justify-content:space-between; font-size:0.72rem; padding-left:8px; color:#991b1b;"><span>• ${v.motivo} (${new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR')}):</span> <strong>- R$ ${parseFloat(v.valor).toFixed(2)}</strong></div>`).join('')}
+          <div class="item-linha-zebrado"><span>Salário Base Mensal:</span> <strong>R$ ${parseFloat(rec.salarioBase).toFixed(2)}</strong></div>
+          ${(rec.extras || []).map(ex => `<div class="item-linha-zebrado" style="color:var(--tech);"><span>• Extra: ${ex.descricao}</span><span>+ R$ ${parseFloat(ex.valor).toFixed(2)}</span></div>`).join('')}
+          ${(rec.vales || []).map(v => `<div class="item-linha-zebrado" style="color:var(--danger);"><span>• Desconto Vale: ${v.motivo}</span><span>- R$ ${parseFloat(v.valor).toFixed(2)}</span></div>`).join('')}
           <hr class="dashed-divider">
-          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.95rem; color:var(--accent);">
+          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.95rem; color:var(--accent); padding:4px 0;">
             <span>VALOR LÍQUIDO PAGO:</span>
             <span>R$ ${parseFloat(rec.liquido).toFixed(2)}</span>
           </div>
-          <br><br>
-          <div style="text-align:center; border-top:1px solid #0f172a; padding-top:4px; width:80%; margin:15px auto 0 auto;">
+          <br>
+          <div style="text-align:center; border-top:1px solid #0f172a; padding-top:6px; width:80%; margin:20px auto 0 auto; font-size:0.75rem;">
             Assinatura do Colaborador
           </div>
         </div>
@@ -1705,10 +1686,17 @@
       exibirHtmlReciboModal(rec);
     }
 
+    function imprimirReciboColaboradorDireto() {
+      const conteudoHtml = document.getElementById('printable-recibo-salario').outerHTML;
+      document.getElementById('modal-recibo-salario').style.display = 'none';
+      abrirJanelaImpressaoOtimizada(conteudoHtml);
+    }
+
     function fecharModalReciboSeguro() {
       document.getElementById('modal-recibo-salario').style.display = 'none';
     }
 
+    // --- CONTROLE TÉCNICO & ZOOTECNIA ---
     async function cadastrarLoteTecnico(e) {
       e.preventDefault();
       if (!state.currentUser) return;
@@ -1945,9 +1933,6 @@
       const selectLoteMorte = document.getElementById('morte-lote-id');
       const selectLoteVacina = document.getElementById('vacina-lote-id');
       const tabelaLotes = document.getElementById('lista-lotes-tecnicos');
-      const tabelaHistorico = document.getElementById('lista-historico-postura');
-      const tabelaMortalidade = document.getElementById('lista-historico-mortalidade');
-      const tabelaVacinacao = document.getElementById('lista-historico-vacinacao');
       const kpiMediaMensal = document.getElementById('kpi-media-mensal');
 
       if (!tabelaLotes) return;
