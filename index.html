@@ -318,6 +318,7 @@
         <button class="grid-btn full-width" type="button" onclick="navToSub('pedidos')"><span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span></button>
         <button class="grid-btn" type="button" onclick="navToSub('clientes')"><span class="icon">👥</span><span class="label">CLIENTES</span></button>
         <button class="grid-btn" type="button" onclick="navToSub('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
+        <button class="grid-btn" type="button" onclick="navToSub('colaboradores')"><span class="icon">👔</span><span class="label">CONTROLE DE COLABORADORES</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navToSub('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navToSub('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
         <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">📈</span><span class="label">RELATÓRIO DE VENDAS (DIAS / MÊS)</span></button>
@@ -472,6 +473,35 @@
         <table>
           <thead><tr><th>Nome / Doc</th><th>Contato</th><th>Ação</th></tr></thead>
           <tbody id="lista-clientes"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TELA: COLABORADORES & RH -->
+    <div id="view-colaboradores" class="view-content" style="display:none;">
+      <div class="card" style="border-left: 4px solid var(--accent);">
+        <div class="card-header">
+          <div class="card-title">👔 Cadastrar Colaborador (Com Admissão Retroativa)</div>
+          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
+        </div>
+        <form onsubmit="cadastrarColaborador(event)">
+          <div class="form-group"><label>Nome Completo</label><input type="text" id="colab-nome" placeholder="Ex: João da Silva" required></div>
+          <div class="form-group"><label>Cargo / Função</label><input type="text" id="colab-cargo" placeholder="Ex: Tratador / Coletor" required></div>
+          <div class="form-group"><label>Documento (CPF)</label><input type="text" id="colab-doc" placeholder="Ex: 000.000.000-00"></div>
+          <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="colab-tel" placeholder="Ex: (11) 99999-8888"></div>
+          <div class="form-group"><label>Chave PIX Principal</label><input type="text" id="colab-pix" placeholder="Ex: CPF, E-mail ou Telefone" required></div>
+          <div class="form-group"><label>Data de Admissão (Suporta Retroativa)</label><input type="date" id="colab-admissao" required></div>
+          <div class="form-group"><label>Salário Base Mensal (R$)</label><input type="number" step="0.01" id="colab-salario" placeholder="Ex: 1800.00" required></div>
+          <div class="form-group"><label>Dia Fixo de Vencimento (Ex: 5 ou 20)</label><input type="number" min="1" max="31" id="colab-vencimento" placeholder="Ex: 5" required></div>
+          <button type="submit" class="btn">➕ Salvar Colaborador</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Lista de Colaboradores & Vales / Fechamento</div>
+        <table>
+          <thead><tr><th>Colaborador</th><th>Salário / Venc.</th><th>Ações</th></tr></thead>
+          <tbody id="lista-colaboradores"></tbody>
         </table>
       </div>
     </div>
@@ -645,6 +675,51 @@
       </div>
     </div>
   </main>
+
+  <!-- MODAL: GESTÃO DETALHADA DO COLABORADOR (VALES & PAGAMENTOS) -->
+  <div class="modal" id="modal-colaborador-detalhes">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="card-title" id="colab-modal-titulo" style="margin-bottom: 12px; color: var(--accent);">Gestão do Colaborador</div>
+      <div id="colab-modal-info" style="font-size: 0.82rem; margin-bottom: 12px; background: #f8fafc; padding: 10px; border-radius: 8px; border:1px solid #e2e8f0;"></div>
+
+      <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+        <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: var(--primary-dark);">➕ Lançar Vale / Adiantamento</div>
+        <form onsubmit="salvarValeColaborador(event)">
+          <input type="hidden" id="vale-colab-id">
+          <div class="form-group" style="margin-bottom:8px;"><label>Data do Vale (Retroativa ou Atual)</label><input type="date" id="vale-data" required></div>
+          <div class="form-group" style="margin-bottom:8px;"><label>Valor do Vale (R$)</label><input type="number" step="0.01" id="vale-valor" placeholder="Ex: 250.00" required></div>
+          <div class="form-group" style="margin-bottom:8px;"><label>Motivo / Observação</label><input type="text" id="vale-motivo" placeholder="Ex: Adiantamento quinzenal / Farmácia" required></div>
+          <div class="form-group" style="margin-bottom:8px;"><label>Anexar Comprovante (Imagem / PDF do Pix)</label><input type="file" id="vale-arquivo" accept="image/*,.pdf" style="background:#fff;"></div>
+          <button type="submit" class="btn btn-warning" style="width:100%;">Registrar Vale</button>
+        </form>
+      </div>
+
+      <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">📋 Vales Lançados / Histórico do Mês</div>
+      <div id="colab-lista-vales-container" style="max-height: 180px; overflow-y: auto; margin-bottom: 12px;"></div>
+
+      <div style="background: #eff6ff; border:1px solid #bfdbfe; padding: 12px; border-radius: 8px; margin-bottom: 15px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size: 0.75rem; font-weight: bold; color: #1e40af; text-transform: uppercase;">Salário Líquido do Mês</div>
+          <div id="colab-modal-saldo-liquido" style="font-size: 1.2rem; font-weight: bold; color: #1e3a8a;">R$ 0,00</div>
+        </div>
+        <button class="btn btn-success" type="button" style="width:auto; padding:8px 12px; font-size:0.8rem;" onclick="abrirModalReciboSalario()">🖨️ Recibo de Salário</button>
+      </div>
+
+      <button class="btn" type="button" style="background: #64748b;" onclick="document.getElementById('modal-colaborador-detalhes').style.display='none'">Fechar</button>
+    </div>
+  </div>
+
+  <!-- MODAL: RECIBO DE PAGAMENTO / SALÁRIO -->
+  <div class="modal" id="modal-recibo-salario">
+    <div class="modal-content" style="max-width: 480px;">
+      <div class="card-title" style="margin-bottom: 12px;">📄 Recibo de Pagamento de Salário</div>
+      <div class="receipt-box" id="printable-recibo-salario"></div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirReciboSalarioDireto()">🖨️ Imprimir / Salvar PDF</button>
+        <button class="btn" type="button" onclick="document.getElementById('modal-recibo-salario').style.display='none'" style="background:#64748b;">Fechar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL: FILTRO DO RELATÓRIO TÉCNICO -->
   <div class="modal" id="modal-relatorio-tecnico">
@@ -914,6 +989,7 @@
       empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "" },
       produtos: [], clientes: [], pedidos: [], producao: [], estoqueGeralOvos: 0,
       lotesTecnicos: [], historicoPosturaTecnica: [], historicoMortalidade: [], historicoVacinacao: [],
+      colaboradores: [], valesColaboradores: [],
       currentUser: null, pedidoAtual: null, listenersUnsubscribe: []
     };
 
@@ -922,6 +998,7 @@
     let empresaSelecionadaParaDetalhes = null;
     let pedidoSelecionadoModal = null;
     let usuarioSelecionadoId = null;
+    let colaboradorSelecionadoId = null;
 
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
@@ -1058,7 +1135,6 @@
         renderControleTecnico();
       });
 
-      // ORDENAÇÃO POR DATA (MAIS RECENTE PRIMEIRO) AQUI NO LISTENER
       const unsubPosturaTecnica = db.collection("producao_zootecnica").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.historicoPosturaTecnica = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
           .sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
@@ -1075,7 +1151,16 @@
         renderControleTecnico();
       });
 
-      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao);
+      const unsubColaboradores = db.collection("colaboradores").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.colaboradores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderColaboradores();
+      });
+      const unsubVales = db.collection("vales_colaboradores").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.valesColaboradores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (colaboradorSelecionadoId) abrirModalGerenciarColaborador(colaboradorSelecionadoId);
+      });
+
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao, unsubColaboradores, unsubVales);
     }
 
     function carregarEmpresaCampos() {
@@ -1185,12 +1270,217 @@
     }
 
     function render() {
-      renderClientes(); renderProdutos(); renderPedidos(); renderUsuarios(); renderDropdowns(); renderControleTecnico();
+      renderClientes(); renderProdutos(); renderPedidos(); renderUsuarios(); renderDropdowns(); renderControleTecnico(); renderColaboradores();
     }
 
     function renderEstoqueGeral() {
       const el = document.getElementById('estoque-geral-ovos');
       if (el) el.innerText = (state.estoqueGeralOvos || 0).toLocaleString('pt-BR') + ' Ovos';
+    }
+
+    // --- FUNÇÕES DE COLABORADORES & RH ---
+    async function cadastrarColaborador(e) {
+      e.preventDefault();
+      if (!state.currentUser) return;
+      const nome = document.getElementById('colab-nome').value.trim();
+      const cargo = document.getElementById('colab-cargo').value.trim();
+      const doc = document.getElementById('colab-doc').value.trim();
+      const tel = document.getElementById('colab-tel').value.trim();
+      const pix = document.getElementById('colab-pix').value.trim();
+      const dataAdmissao = document.getElementById('colab-admissao').value;
+      const salarioBase = parseFloat(document.getElementById('colab-salario').value || 0);
+      const diaVencimento = parseInt(document.getElementById('colab-vencimento').value || 5);
+
+      try {
+        await db.collection("colaboradores").add({
+          empresaId: state.currentUser.empresaId,
+          nome, cargo, doc, tel, pix, dataAdmissao, salarioBase, diaVencimento,
+          status: "Ativo", criadoEm: new Date()
+        });
+        e.target.reset();
+        alert('Colaborador cadastrado com sucesso!');
+      } catch (err) { alert('Erro ao cadastrar colaborador: ' + err.message); }
+    }
+
+    function renderColaboradores() {
+      const tbody = document.getElementById('lista-colaboradores');
+      if (!tbody) return;
+      tbody.innerHTML = state.colaboradores.map(c => `
+        <tr>
+          <td>
+            <strong>${c.nome}</strong><br>
+            <small style="color:var(--tech);">${c.cargo}</small> | <small>Adm: ${c.dataAdmissao || '---'}</small>
+          </td>
+          <td>
+            <strong>R$ ${parseFloat(c.salarioBase || 0).toFixed(2)}</strong><br>
+            <small style="color:#64748b;">Venc: Dia ${c.diaVencimento}</small>
+          </td>
+          <td>
+            <div style="display:flex; gap:4px; flex-wrap:wrap;">
+              <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.7rem; background:#2563eb;" onclick="abrirModalGerenciarColaborador('${c.id}')">💼 Vales / Salário</button>
+              <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 6px;" onclick="excluirColaborador('${c.id}')">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="3" style="text-align:center; color:#64748b;">Nenhum colaborador cadastrado.</td></tr>';
+    }
+
+    async function excluirColaborador(id) {
+      if (confirm('Tem certeza que deseja excluir este colaborador e seus registros?')) {
+        try {
+          await db.collection("colaboradores").doc(id).delete();
+          alert('Colaborador excluído!');
+        } catch (err) { alert('Erro ao excluir: ' + err.message); }
+      }
+    }
+
+    function abrirModalGerenciarColaborador(colabId) {
+      colaboradorSelecionadoId = colabId;
+      const colab = state.colaboradores.find(c => c.id === colabId);
+      if (!colab) return;
+
+      document.getElementById('vale-colab-id').value = colabId;
+      document.getElementById('vale-data').value = new Date().toISOString().split('T')[0];
+      document.getElementById('vale-valor').value = '';
+      document.getElementById('vale-motivo').value = '';
+      document.getElementById('vale-arquivo').value = '';
+
+      document.getElementById('colab-modal-titulo').innerText = "Gestão de Vales: " + colab.nome;
+      document.getElementById('colab-modal-info').innerHTML = `
+        <div><strong>Cargo:</strong> ${colab.cargo} | <strong>PIX:</strong> ${colab.pix}</div>
+        <div><strong>Salário Base:</strong> R$ ${parseFloat(colab.salarioBase).toFixed(2)} | <strong>Vencimento:</strong> Todo dia ${colab.diaVencimento}</div>
+      `;
+
+      renderValesColaboradorModal(colabId, colab.salarioBase);
+      document.getElementById('modal-colaborador-detalhes').style.display = 'flex';
+    }
+
+    function renderValesColaboradorModal(colabId, salarioBase) {
+      const container = document.getElementById('colab-lista-vales-container');
+      const lblLiquido = document.getElementById('colab-modal-saldo-liquido');
+      
+      const vales = state.valesColaboradores.filter(v => v.colaboradorId === colabId);
+      const agora = new Date();
+      const mesAtual = agora.getMonth();
+      const anoAtual = agora.getFullYear();
+
+      const valesMes = vales.filter(v => {
+        if (!v.data) return false;
+        const d = new Date(v.data + 'T00:00:00');
+        return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+      });
+
+      let totalValesMes = 0;
+      valesMes.forEach(v => totalValesMes += (parseFloat(v.valor) || 0));
+      const salarioLiquido = Math.max(0, salarioBase - totalValesMes);
+      lblLiquido.innerText = "R$ " + salarioLiquido.toFixed(2);
+
+      container.innerHTML = vales.length > 0 ? vales.map(v => `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:6px 8px; border-radius:6px; border:1px solid #e2e8f0; margin-bottom:4px; font-size:0.8rem;">
+          <div>
+            <strong>${v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</strong> — R$ ${parseFloat(v.valor).toFixed(2)}<br>
+            <small style="color:#64748b;">${v.motivo}</small>
+            ${v.comprovanteUrl ? `<br><a href="${v.comprovanteUrl}" target="_blank" style="color:var(--accent); font-weight:bold; font-size:0.75rem;">📎 Ver Comprovante Anexado</a>` : ''}
+          </div>
+          <button class="btn-danger" type="button" style="padding:3px 6px;" onclick="excluirValeColaborador('${v.id}')">✕</button>
+        </div>
+      `).join('') : '<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum vale registrado.</div>';
+    }
+
+    async function salvarValeColaborador(e) {
+      e.preventDefault();
+      if (!state.currentUser || !colaboradorSelecionadoId) return;
+      const colaboradorId = colaboradorSelecionadoId;
+      const data = document.getElementById('vale-data').value;
+      const valor = parseFloat(document.getElementById('vale-valor').value || 0);
+      const motivo = document.getElementById('vale-motivo').value.trim();
+      const fileInput = document.getElementById('vale-arquivo');
+
+      let comprovanteUrl = "";
+      if (fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = async function(uploadEvent) {
+          comprovanteUrl = uploadEvent.target.result; // Armazena em Base64 para exibir e persistir direto
+          await gravarValeNoFirestore(colaboradorId, data, valor, motivo, comprovanteUrl);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        await gravarValeNoFirestore(colaboradorId, data, valor, motivo, "");
+      }
+    }
+
+    async function gravarValeNoFirestore(colaboradorId, data, valor, motivo, comprovanteUrl) {
+      try {
+        await db.collection("vales_colaboradores").add({
+          empresaId: state.currentUser.empresaId,
+          colaboradorId, data, valor, motivo, comprovanteUrl, criadoEm: new Date()
+        });
+        document.getElementById('vale-valor').value = '';
+        document.getElementById('vale-motivo').value = '';
+        document.getElementById('vale-arquivo').value = '';
+        alert('Vale registrado com sucesso!');
+      } catch (err) { alert('Erro ao registrar vale: ' + err.message); }
+    }
+
+    async function excluirValeColaborador(valeId) {
+      if (confirm('Excluir este vale?')) {
+        try {
+          await db.collection("vales_colaboradores").doc(valeId).delete();
+        } catch (err) { alert('Erro ao excluir: ' + err.message); }
+      }
+    }
+
+    function abrirModalReciboSalario() {
+      const colab = state.colaboradores.find(c => c.id === colaboradorSelecionadoId);
+      if (!colab) return;
+
+      const vales = state.valesColaboradores.filter(v => v.colaboradorId === colaboradorSelecionadoId);
+      const agora = new Date();
+      const mesAtual = agora.getMonth();
+      const anoAtual = agora.getFullYear();
+
+      const valesMes = vales.filter(v => {
+        if (!v.data) return false;
+        const d = new Date(v.data + 'T00:00:00');
+        return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+      });
+
+      let totalVales = 0;
+      valesMes.forEach(v => totalVales += (parseFloat(v.valor) || 0));
+      const liquido = Math.max(0, colab.salarioBase - totalVales);
+      const emp = state.empresa || {};
+
+      document.getElementById('printable-recibo-salario').innerHTML = `
+        <div style="font-size:0.8rem; line-height:1.5;">
+          <div style="background:#0f172a; color:#fff; padding:6px 10px; border-radius:4px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <strong>RECIBO DE PAGAMENTO</strong>
+            <span>${emp.nome || 'HAPPY EGGS'}</span>
+          </div>
+          <p><strong>Colaborador:</strong> ${colab.nome}</p>
+          <p><strong>Cargo:</strong> ${colab.cargo} | <strong>CPF:</strong> ${colab.doc || 'N/I'}</p>
+          <p><strong>Chave PIX:</strong> ${colab.pix}</p>
+          <hr class="dashed-divider">
+          <div style="display:flex; justify-content:space-between;"><span>Salário Base:</span> <strong>R$ ${parseFloat(colab.salarioBase).toFixed(2)}</strong></div>
+          <div style="display:flex; justify-content:space-between; color:var(--danger);"><span>Total de Vales / Adiantamentos:</span> <strong>- R$ ${totalVales.toFixed(2)}</strong></div>
+          <hr class="dashed-divider">
+          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.95rem; color:var(--accent);">
+            <span>VALOR LÍQUIDO PAGO:</span>
+            <span>R$ ${liquido.toFixed(2)}</span>
+          </div>
+          <br><br>
+          <div style="text-align:center; border-top:1px solid #0f172a; padding-top:4px; width:80%; margin:20px auto 0 auto;">
+            Assinatura do Colaborador
+          </div>
+        </div>
+      `;
+      document.getElementById('modal-recibo-salario').style.display = 'flex';
+    }
+
+    function imprimirReciboSalarioDireto() {
+      const conteudoHtml = document.getElementById('printable-recibo-salario').outerHTML;
+      document.getElementById('modal-recibo-salario').style.display = 'none';
+      abrirJanelaImpressaoOtimizada(`<div class="recibo-bloco-metade">${conteudoHtml}</div>`);
     }
 
     async function cadastrarLoteTecnico(e) {
@@ -1222,7 +1512,6 @@
       }
     }
 
-    // --- FUNÇÕES DE PESAGEM DINÂMICA DAS AVES ---
     function gerarCamposPesagemAves() {
       const qtd = parseInt(document.getElementById('pesagem-qtd-aves').value || 0);
       const container = document.getElementById('container-pesagem-individual');
@@ -1277,7 +1566,6 @@
       const racaoKg = parseFloat(document.getElementById('postura-racao').value || 0);
       const obs = document.getElementById('postura-obs').value.trim();
 
-      // Coletar dados de pesagem
       const qtdAvesPesadas = parseInt(document.getElementById('pesagem-qtd-aves').value || 0);
       let pesosIndividuais = [];
       let pesoMedio = 0;
@@ -1475,7 +1763,6 @@
         }
       }
 
-      // GARANTE A ORDENAÇÃO POR DATA (MAIS RECENTE PRIMEIRO)
       posturaFiltrada.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
       mortalidadeFiltrada.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
       vacinasFiltradas.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
