@@ -204,33 +204,33 @@
 </head>
 <body>
 
-  <!-- CABEÇALHO -->
+  <!-- CABEÃALHO -->
   <header id="app-header" style="display:none;">
-    <div class="brand"><span id="header-title">🥚 HAPPY EGGS</span></div>
+    <div class="brand"><span id="header-title">ð¥ HAPPY EGGS</span></div>
     <div class="user-info">
-      <span id="user-display">👤 Admin</span>
+      <span id="user-display">ð¤ Admin</span>
       <button class="btn-logout" type="button" onclick="logout()">Sair</button>
     </div>
   </header>
 
-  <!-- ABAS FIXAS NO TOPO (FINANCEIRO vs CONTROLE TÉCNICO) -->
+  <!-- ABAS FIXAS NO TOPO (FINANCEIRO vs CONTROLE TÃCNICO) -->
   <nav class="top-nav-tabs" id="top-nav-container" style="display:none;">
-    <button class="top-tab-btn active" id="tab-btn-financeiro" type="button" onclick="mudarAbaTopo('financeiro')">💰 FINANCEIRO & VENDAS</button>
-    <button class="top-tab-btn tech-tab" id="tab-btn-tecnico" type="button" onclick="mudarAbaTopo('tecnico')">📊 CONTROLE TÉCNICO</button>
+    <button class="top-tab-btn active" id="tab-btn-financeiro" type="button" onclick="mudarAbaTopo('financeiro')">ð° FINANCEIRO & VENDAS</button>
+    <button class="top-tab-btn tech-tab" id="tab-btn-tecnico" type="button" onclick="mudarAbaTopo('tecnico')">ð CONTROLE TÃCNICO</button>
   </nav>
 
   <main>
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
-      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">GestÃ£o de Avicultura Multi-Empresas</p>
       <form onsubmit="autenticar(event)">
-        <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
+        <div class="form-group"><label>UsuÃ¡rio</label><input type="text" id="login-user" placeholder="Seu usuÃ¡rio" required autocomplete="username"></div>
         <div class="form-group">
           <label>Senha</label>
           <div class="input-pass-wrapper">
             <input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password">
-            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('login-pass', this)">👁️</button>
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('login-pass', this)">ðï¸</button>
           </div>
         </div>
         <button type="submit" class="btn" style="margin-top:10px;">Entrar no Sistema</button>
@@ -241,10 +241,10 @@
     <div id="view-superadmin" class="view-content" style="display:none;">
       <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border: none;">
         <div class="card-header" style="border-color: rgba(255,255,255,0.1); margin-bottom: 10px; padding-bottom: 8px;">
-          <div class="card-title" style="color: white;">👑 Dashboard Global SaaS</div>
+          <div class="card-title" style="color: white;">ð Dashboard Global SaaS</div>
           <div style="display: flex; gap: 6px; align-items: center;">
-            <button class="btn-warning" type="button" style="font-size: 0.7rem; padding: 5px 7px;" onclick="alternarPrivacidadeSuperAdmin()" id="btn-toggle-privacy">👁️ Ocultar</button>
-            <button class="btn-warning" type="button" style="font-size: 0.7rem; padding: 5px 7px; background: #2563eb;" onclick="abrirModalSegurancaSuperAdmin()">🔒 Senha</button>
+            <button class="btn-warning" type="button" style="font-size: 0.7rem; padding: 5px 7px;" onclick="alternarPrivacidadeSuperAdmin()" id="btn-toggle-privacy">ðï¸ Ocultar</button>
+            <button class="btn-warning" type="button" style="font-size: 0.7rem; padding: 5px 7px; background: #2563eb;" onclick="abrirModalSegurancaSuperAdmin()">ð Senha</button>
             <button class="btn btn-back" type="button" style="padding: 5px 8px; font-size: 0.7rem;" onclick="logout()">Sair</button>
           </div>
         </div>
@@ -261,52 +261,52 @@
       </div>
 
       <div class="grid-menu" style="margin-bottom: 15px;">
-        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('cadastro')"><span class="icon">➕</span><span class="label">Nova Granja</span></button>
-        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('empresas')"><span class="icon">🏢</span><span class="label">Listar / Editar Empresas</span></button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('cadastro')"><span class="icon">â</span><span class="label">Nova Granja</span></button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('empresas')"><span class="icon">ð¢</span><span class="label">Listar / Editar Empresas</span></button>
       </div>
 
       <div class="card" id="saas-card-cadastro" style="border-left: 4px solid var(--warning); display: block;">
         <div class="card-title" style="margin-bottom: 12px;">Cadastrar Nova Granja / Empresa Cliente</div>
         <form onsubmit="cadastrarEmpresaCliente(event)">
-          <div class="form-group"><label>Nome da Granja / Empresa</label><input type="text" id="saas-nome" placeholder="Ex: Avicultura São José" required></div>
-          <div class="form-group"><label>ID Único (Sem espaços, ex: sao_jose)</label><input type="text" id="saas-id" placeholder="sao_jose" required></div>
+          <div class="form-group"><label>Nome da Granja / Empresa</label><input type="text" id="saas-nome" placeholder="Ex: Avicultura SÃ£o JosÃ©" required></div>
+          <div class="form-group"><label>ID Ãnico (Sem espaÃ§os, ex: sao_jose)</label><input type="text" id="saas-id" placeholder="sao_jose" required></div>
           <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="saas-cnpj" placeholder="Ex: 00.000.000/0001-00"></div>
           <div class="form-group"><label>E-mail de Contato</label><input type="email" id="saas-email" placeholder="contato@saojose.com"></div>
           <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="saas-tel" placeholder="Ex: (11) 99999-8888"></div>
-          <div class="form-group"><label>Endereço Completo</label><input type="text" id="saas-end" placeholder="Rua, Nº, Bairro, Cidade/UF"></div>
+          <div class="form-group"><label>EndereÃ§o Completo</label><input type="text" id="saas-end" placeholder="Rua, NÂº, Bairro, Cidade/UF"></div>
           <div class="form-group">
             <label>Plano de Assinatura</label>
             <select id="saas-plano" onchange="atualizarComportamentoPlano()" required>
               <option value="mensal">Mensal (30 Dias)</option>
               <option value="anual">Anual (365 Dias)</option>
-              <option value="vitalicio">Vitalício (Sem Expiração)</option>
+              <option value="vitalicio">VitalÃ­cio (Sem ExpiraÃ§Ã£o)</option>
             </select>
           </div>
           <div class="form-group"><label>Valor do Plano (R$)</label><input type="number" step="0.01" id="saas-valor-plano" placeholder="Ex: 97.00" required></div>
           <div class="form-group" id="grupo-vencimento"><label>Data de Vencimento da Assinatura</label><input type="date" id="saas-vencimento"></div>
-          <div class="form-group"><label>Usuário Administrador da Granja</label><input type="text" id="saas-admin-user" placeholder="admin_saojose" required></div>
+          <div class="form-group"><label>UsuÃ¡rio Administrador da Granja</label><input type="text" id="saas-admin-user" placeholder="admin_saojose" required></div>
           <div class="form-group">
             <label>Senha Inicial</label>
             <div class="input-pass-wrapper">
               <input type="password" id="saas-admin-pass" placeholder="Senha de acesso" required>
-              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('saas-admin-pass', this)">👁️</button>
+              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('saas-admin-pass', this)">ðï¸</button>
             </div>
           </div>
-          <button type="submit" class="btn btn-success">➕ Cadastrar Empresa Cliente</button>
+          <button type="submit" class="btn btn-success">â Cadastrar Empresa Cliente</button>
         </form>
       </div>
 
       <div class="card" id="saas-card-empresas" style="display: none;">
         <div class="card-header">
           <div class="card-title">Empresas e Clientes Cadastrados</div>
-          <button class="btn btn-back" type="button" onclick="abrirSecaoSuperAdmin('cadastro')">➕ Voltar Cadastro</button>
+          <button class="btn btn-back" type="button" onclick="abrirSecaoSuperAdmin('cadastro')">â Voltar Cadastro</button>
         </div>
         <div class="form-group" style="margin-bottom: 12px;">
-          <input type="text" id="saas-busca-empresa" placeholder="🔎 Pesquisar cliente por nome, ID ou CNPJ..." oninput="renderEmpresasSaaS()">
+          <input type="text" id="saas-busca-empresa" placeholder="ð Pesquisar cliente por nome, ID ou CNPJ..." oninput="renderEmpresasSaaS()">
         </div>
-        <p style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">Clique sobre o nome da empresa para ver detalhes completos ou use o botão de editar (✏️):</p>
+        <p style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">Clique sobre o nome da empresa para ver detalhes completos ou use o botÃ£o de editar (âï¸):</p>
         <table>
-          <thead><tr><th>Empresa / Granja</th><th>Status</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Empresa / Granja</th><th>Status</th><th>AÃ§Ãµes</th></tr></thead>
           <tbody id="lista-empresas-saas"></tbody>
         </table>
       </div>
@@ -315,20 +315,19 @@
     <!-- ABA 1: FINANCEIRO & VENDAS (DASHBOARD) -->
     <div id="view-financeiro" class="view-content" style="display:none;">
       <div class="grid-menu">
-        <button class="grid-btn full-width" type="button" onclick="navToSub('pedidos')"><span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span></button>
-        <button class="grid-btn" type="button" onclick="navToSub('clientes')"><span class="icon">👥</span><span class="label">CLIENTES</span></button>
-        <button class="grid-btn" type="button" onclick="navToSub('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0284c7, #0369a1); border-color:#38bdf8;" onclick="navToSub('colaboradores')"><span class="icon">👔</span><span class="label">CONTROLE DE COLABORADORES & RH</span></button>
-        <button class="grid-btn admin-only" type="button" onclick="navToSub('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
-        <button class="grid-btn admin-only" type="button" onclick="navToSub('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">📈</span><span class="label">RELATÓRIO DE VENDAS (DIAS / MÊS)</span></button>
+        <button class="grid-btn full-width" type="button" onclick="navToSub('pedidos')"><span class="icon">ð</span><span class="label">NOVO PEDIDO / VENDAS</span></button>
+        <button class="grid-btn" type="button" onclick="navToSub('clientes')"><span class="icon">ð¥</span><span class="label">CLIENTES</span></button>
+        <button class="grid-btn" type="button" onclick="navToSub('produtos')"><span class="icon">ð¦</span><span class="label">ESTOQUE</span></button>
+        <button class="grid-btn admin-only" type="button" onclick="navToSub('usuarios')"><span class="icon">ð</span><span class="label">USUÃRIOS</span></button>
+        <button class="grid-btn admin-only" type="button" onclick="navToSub('empresa')"><span class="icon">âï¸</span><span class="label">EMPRESA</span></button>
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">ð</span><span class="label">RELATÃRIO DE VENDAS (DIAS / MÃS)</span></button>
       </div>
       <div class="card" style="margin-top: 15px;">
         <div class="card-header">
-          <div class="card-title">📋 Busca Rápida de Clientes</div>
-          <button class="btn btn-back" type="button" onclick="navToSub('clientes')">➕ Cadastrar</button>
+          <div class="card-title">ð Busca RÃ¡pida de Clientes</div>
+          <button class="btn btn-back" type="button" onclick="navToSub('clientes')">â Cadastrar</button>
         </div>
-        <div class="form-group" style="margin-bottom: 10px;"><input type="text" id="dash-busca-cliente" placeholder="🔎 Digite para buscar cliente..." oninput="filtrarClientesDashboard()"></div>
+        <div class="form-group" style="margin-bottom: 10px;"><input type="text" id="dash-busca-cliente" placeholder="ð Digite para buscar cliente..." oninput="filtrarClientesDashboard()"></div>
         <table>
           <thead><tr><th>Nome / Doc</th><th>Contato</th></tr></thead>
           <tbody id="lista-clientes-dash"></tbody>
@@ -336,155 +335,119 @@
       </div>
     </div>
 
-    <!-- TELA: CONTROLE DE COLABORADORES & RH -->
-    <div id="view-colaboradores" class="view-content" style="display:none;">
-      <!-- LISTA DE COLABORADORES NO TOPO -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">👔 Colaboradores Cadastrados</div>
-          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
-        </div>
-        <table>
-          <thead><tr><th>Colaborador</th><th>Salário Base</th><th>Ações</th></tr></thead>
-          <tbody id="lista-colaboradores"></tbody>
-        </table>
-      </div>
-
-      <!-- FORMULÁRIO DE CADASTRO RECOLHIDO -->
-      <div class="card" style="border-left: 4px solid var(--accent);">
-        <div class="card-header" style="cursor: pointer; margin-bottom: 0; border-bottom: none; padding-bottom: 0;" onclick="toggleFormularioColaborador()">
-          <div class="card-title" id="titulo-toggle-colab">➕ Cadastrar Novo Colaborador (Clique para abrir)</div>
-          <span id="icone-toggle-colab" style="font-size: 1.1rem; font-weight: bold;">▼</span>
-        </div>
-        <div id="container-form-colaborador" style="display: none; margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
-          <form onsubmit="cadastrarColaborador(event)">
-            <div class="form-group"><label>Nome Completo</label><input type="text" id="colab-nome" placeholder="Ex: João da Silva" required></div>
-            <div class="form-group"><label>Cargo / Função</label><input type="text" id="colab-cargo" placeholder="Ex: Coletor / Tratador" required></div>
-            <div class="form-group"><label>CPF / Documento</label><input type="text" id="colab-doc" placeholder="Ex: 000.000.000-00"></div>
-            <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="colab-tel" placeholder="Ex: (11) 99999-8888"></div>
-            <div class="form-group"><label>Chave PIX Principal</label><input type="text" id="colab-pix" placeholder="Ex: CPF, E-mail ou Telefone" required></div>
-            <div class="form-group"><label>Data de Admissão</label><input type="date" id="colab-admissao" required></div>
-            <div class="form-group"><label>Salário Base Mensal (R$)</label><input type="number" step="0.01" id="colab-salario" placeholder="Ex: 1800.00" required></div>
-            <div class="form-group"><label>Dia Fixo de Vencimento</label><input type="number" min="1" max="31" id="colab-vencimento" placeholder="Ex: 5" required></div>
-            <button type="submit" class="btn">➕ Salvar Colaborador</button>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- ABA 2: CONTROLE TÉCNICO & ZOOTECNIA -->
+    <!-- ABA 2: CONTROLE TÃCNICO & ZOOTECNIA -->
     <div id="view-tecnico" class="view-content" style="display:none;">
       
-      <!-- MENU GRID DA ABA TÉCNICA -->
+      <!-- MENU GRID DA ABA TÃCNICA -->
       <div class="grid-menu" id="tec-menu-grid">
-        <button class="grid-btn full-width tech-btn" type="button" onclick="abrirSecaoTecnica('lotes')"><span class="icon">🐔</span><span class="label">CADASTRO / ALOJAMENTO DE LOTE</span></button>
-        <button class="grid-btn" type="button" onclick="abrirSecaoTecnica('postura')"><span class="icon">🥚</span><span class="label">REGISTRO DIÁRIO DE POSTURA</span></button>
-        <button class="grid-btn" type="button" onclick="abrirSecaoTecnica('mortalidade')"><span class="icon">⚰️</span><span class="label">REGISTRO DE MORTALIDADE</span></button>
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #d97706, #b45309);" onclick="abrirSecaoTecnica('vacinacao')"><span class="icon">💉</span><span class="label">CONTROLE DE VACINAÇÃO</span></button>
+        <button class="grid-btn full-width tech-btn" type="button" onclick="abrirSecaoTecnica('lotes')"><span class="icon">ð</span><span class="label">CADASTRO / ALOJAMENTO DE LOTE</span></button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoTecnica('postura')"><span class="icon">ð¥</span><span class="label">REGISTRO DIÃRIO DE POSTURA</span></button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoTecnica('mortalidade')"><span class="icon">â°ï¸</span><span class="label">REGISTRO DE MORTALIDADE</span></button>
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #d97706, #b45309);" onclick="abrirSecaoTecnica('vacinacao')"><span class="icon">ð</span><span class="label">CONTROLE DE VACINAÃÃO</span></button>
       </div>
 
-      <!-- BOTÃO DE VOLTAR AO MENU TÉCNICO -->
+      <!-- BOTÃO DE VOLTAR AO MENU TÃCNICO -->
       <div id="tec-btn-voltar-container" style="display:none; margin-bottom: 12px;">
-        <button class="btn btn-back" type="button" onclick="voltarMenuTecnico()">◀️ Voltar ao Menu Técnico</button>
+        <button class="btn btn-back" type="button" onclick="voltarMenuTecnico()">âï¸ Voltar ao Menu TÃ©cnico</button>
       </div>
 
       <!-- 1. CADASTRO DE LOTES -->
       <div class="card tec-secao-form" id="tec-form-lotes" style="display: none; border-left: 4px solid var(--tech);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🐔 Cadastrar / Alojamento de Lote</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">ð Cadastrar / Alojamento de Lote</div>
         <form onsubmit="cadastrarLoteTecnico(event)">
-          <div class="form-group"><label>Nome / Identificação do Lote</label><input type="text" id="lote-nome" placeholder="Ex: Lote 01 - Galpão A" required></div>
+          <div class="form-group"><label>Nome / IdentificaÃ§Ã£o do Lote</label><input type="text" id="lote-nome" placeholder="Ex: Lote 01 - GalpÃ£o A" required></div>
           <div class="form-group"><label>Data de Alojamento</label><input type="date" id="lote-data-alojamento" required></div>
-          <div class="form-group"><label>Linhagem / Raça</label><input type="text" id="lote-linhagem" placeholder="Ex: Hy-Line Brown" required></div>
+          <div class="form-group"><label>Linhagem / RaÃ§a</label><input type="text" id="lote-linhagem" placeholder="Ex: Hy-Line Brown" required></div>
           <div class="form-group"><label>Quantidade Inicial de Aves</label><input type="number" id="lote-qtd-inicial" min="1" placeholder="Ex: 1000" required></div>
           <div class="form-group"><label>Idade Inicial na Chegada (Semanas)</label><input type="number" id="lote-idade-inicial" min="0" placeholder="Ex: 16" required></div>
-          <button type="submit" class="btn btn-tech">➕ Salvar Lote Técnico</button>
+          <button type="submit" class="btn btn-tech">â Salvar Lote TÃ©cnico</button>
         </form>
       </div>
 
-      <!-- 2. REGISTRO DIÁRIO DE POSTURA & PESAGEM -->
+      <!-- 2. REGISTRO DIÃRIO DE POSTURA & PESAGEM -->
       <div class="card tec-secao-form" id="tec-form-postura" style="display: none; border-left: 4px solid var(--tech);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🥚 Registo Diário de Postura & Pesagem</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">ð¥ Registo DiÃ¡rio de Postura & Pesagem</div>
         <form onsubmit="registrarPosturaDiaria(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="postura-lote-id" required></select></div>
           <div class="form-group"><label>Data da Coleta</label><input type="date" id="postura-data" required></div>
           <div class="form-group"><label>Ovos Colhidos no Dia (Unidades)</label><input type="number" id="postura-ovos-colhidos" min="0" placeholder="Ex: 750" required></div>
-          <div class="form-group"><label>Consumo de Ração no Dia (Kg - Opcional)</label><input type="number" step="0.1" id="postura-racao" placeholder="Ex: 110.5"></div>
-          <div class="form-group"><label>Temperatura Média / Obs Ambiência</label><input type="text" id="postura-obs" placeholder="Ex: Temp 24°C / Luz 16h"></div>
+          <div class="form-group"><label>Consumo de RaÃ§Ã£o no Dia (Kg - Opcional)</label><input type="number" step="0.1" id="postura-racao" placeholder="Ex: 110.5"></div>
+          <div class="form-group"><label>Temperatura MÃ©dia / Obs AmbiÃªncia</label><input type="text" id="postura-obs" placeholder="Ex: Temp 24Â°C / Luz 16h"></div>
           
-          <!-- SEÇÃO DE PESAGEM DAS AVES -->
+          <!-- SEÃÃO DE PESAGEM DAS AVES -->
           <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border);">
-          <div style="font-weight: 700; font-size: 0.9rem; color: var(--tech); margin-bottom: 8px;">⚖️ Pesagem de Amostra de Aves (Opcional)</div>
+          <div style="font-weight: 700; font-size: 0.9rem; color: var(--tech); margin-bottom: 8px;">âï¸ Pesagem de Amostra de Aves (Opcional)</div>
           <div class="form-group">
-            <label>Número de Aves a Pesar</label>
+            <label>NÃºmero de Aves a Pesar</label>
             <input type="number" id="pesagem-qtd-aves" min="0" value="0" placeholder="Ex: 3 ou 10" oninput="gerarCamposPesagemAves()">
           </div>
           <div id="container-pesagem-individual" style="margin-bottom: 10px;"></div>
           <div id="resultado-peso-medio" style="font-size: 0.85rem; font-weight: bold; color: var(--tech); margin-bottom: 12px; display: none;"></div>
 
-          <button type="submit" class="btn btn-success">✅ Registar Produção & Pesagem</button>
+          <button type="submit" class="btn btn-success">â Registar ProduÃ§Ã£o & Pesagem</button>
         </form>
       </div>
 
       <!-- 3. REGISTRO DE MORTALIDADE -->
       <div class="card tec-secao-form" id="tec-form-mortalidade" style="display: none; border-left: 4px solid var(--danger);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">⚰️ Registo de Mortalidade / Baixas</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">â°ï¸ Registo de Mortalidade / Baixas</div>
         <form onsubmit="registrarMortalidadeTecnica(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="morte-lote-id" required></select></div>
           <div class="form-group"><label>Data do Ocorrido</label><input type="date" id="morte-data" required></div>
           <div class="form-group"><label>Quantidade de Aves Mortas</label><input type="number" id="morte-qtd" min="1" placeholder="Ex: 1" required></div>
-          <div class="form-group"><label>Motivo / Observação</label><input type="text" id="morte-obs" placeholder="Ex: Doença, calor, etc."></div>
-          <button type="submit" class="btn btn-danger">⚠️ Registar Mortalidade</button>
+          <div class="form-group"><label>Motivo / ObservaÃ§Ã£o</label><input type="text" id="morte-obs" placeholder="Ex: DoenÃ§a, calor, etc."></div>
+          <button type="submit" class="btn btn-danger">â ï¸ Registar Mortalidade</button>
         </form>
       </div>
 
-      <!-- 4. CONTROLE DE VACINAÇÃO -->
+      <!-- 4. CONTROLE DE VACINAÃÃO -->
       <div class="card tec-secao-form" id="tec-form-vacinacao" style="display: none; border-left: 4px solid var(--warning);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--warning);">💉 Controle & Histórico de Vacinação</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--warning);">ð Controle & HistÃ³rico de VacinaÃ§Ã£o</div>
         <form onsubmit="registrarVacinacaoTecnica(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="vacina-lote-id" required></select></div>
           <div class="form-group"><label>Tipo / Nome da Vacina</label><input type="text" id="vacina-nome" placeholder="Ex: Newcastle / Gumboro" required></div>
           <div class="form-group"><label>Quantidade de Aves Vacinadas</label><input type="number" id="vacina-qtd-aves" min="1" placeholder="Ex: 1000" required></div>
-          <div class="form-group"><label>Data da Aplicação</label><input type="date" id="vacina-data" required></div>
-          <button type="submit" class="btn btn-warning" style="color:#fff;">💉 Registar Vacinação</button>
+          <div class="form-group"><label>Data da AplicaÃ§Ã£o</label><input type="date" id="vacina-data" required></div>
+          <button type="submit" class="btn btn-warning" style="color:#fff;">ð Registar VacinaÃ§Ã£o</button>
         </form>
       </div>
 
-      <!-- HISTÓRICO E INDICADORES TÉCNICOS -->
+      <!-- HISTÃRICO E INDICADORES TÃCNICOS -->
       <div class="card" id="tec-painel-historicos">
-        <div class="card-title">Indicadores Zootécnicos & Histórico Geral</div>
+        <div class="card-title">Indicadores ZootÃ©cnicos & HistÃ³rico Geral</div>
         <div style="margin-top: 10px; font-size: 0.85rem; background: #f8fafc; padding: 10px; border-radius: 8px; border:1px solid #e2e8f0; margin-bottom: 10px;">
-          <div>📊 <strong>Média de Postura do Mês Atual:</strong> <span id="kpi-media-mensal" style="color:var(--tech); font-weight:bold;">0%</span></div>
+          <div>ð <strong>MÃ©dia de Postura do MÃªs Atual:</strong> <span id="kpi-media-mensal" style="color:var(--tech); font-weight:bold;">0%</span></div>
         </div>
 
         <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Lotes Alojados Atualmente</div>
         <table>
-          <thead><tr><th>Lote / Linhagem</th><th>Aves Vivas</th><th>Idade Atual</th><th>Ação</th></tr></thead>
+          <thead><tr><th>Lote / Linhagem</th><th>Aves Vivas</th><th>Idade Atual</th><th>AÃ§Ã£o</th></tr></thead>
           <tbody id="lista-lotes-tecnicos"></tbody>
         </table>
 
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:15px;">Histórico de Postura & Pesagem</div>
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:15px;">HistÃ³rico de Postura & Pesagem</div>
         <table>
           <thead><tr><th>Data</th><th>Lote</th><th>Ovos</th><th>Taxa / Pesagem</th></tr></thead>
           <tbody id="lista-historico-postura"></tbody>
         </table>
 
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--danger); text-transform:uppercase; margin-top:15px;">Histórico de Mortalidade</div>
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--danger); text-transform:uppercase; margin-top:15px;">HistÃ³rico de Mortalidade</div>
         <table>
           <thead><tr><th>Data</th><th>Lote</th><th>Baixas</th><th>Motivo</th></tr></thead>
           <tbody id="lista-historico-mortalidade"></tbody>
         </table>
 
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--warning); text-transform:uppercase; margin-top:15px;">Histórico de Vacinação</div>
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--warning); text-transform:uppercase; margin-top:15px;">HistÃ³rico de VacinaÃ§Ã£o</div>
         <table>
           <thead><tr><th>Data</th><th>Lote</th><th>Vacina</th><th>Aves Vacinadas</th></tr></thead>
           <tbody id="lista-historico-vacinacao"></tbody>
         </table>
       </div>
 
-      <!-- BOTÕES DE RELATÓRIO GERAL E ZERAR DADOS -->
+      <!-- BOTÃES DE RELATÃRIO GERAL E ZERAR DADOS -->
       <div class="grid-menu" style="margin-top: 20px; margin-bottom: 20px;">
-        <button class="grid-btn full-width tech-action" type="button" onclick="abrirModalRelatorioTecnico()"><span class="icon">🖨️</span><span class="label">RELATÓRIO TÉCNICO GERAL (IMPRESSÃO)</span></button>
-        <button class="grid-btn full-width danger-action" type="button" onclick="abrirModalZerarDadosTecnicos()"><span class="icon">⚠️</span><span class="label">ZERAR DADOS DO CONTROLE TÉCNICO</span></button>
+        <button class="grid-btn full-width tech-action" type="button" onclick="abrirModalRelatorioTecnico()"><span class="icon">ð¨ï¸</span><span class="label">RELATÃRIO TÃCNICO GERAL (IMPRESSÃO)</span></button>
+        <button class="grid-btn full-width danger-action" type="button" onclick="abrirModalZerarDadosTecnicos()"><span class="icon">â ï¸</span><span class="label">ZERAR DADOS DO CONTROLE TÃCNICO</span></button>
       </div>
 
     </div>
@@ -494,20 +457,20 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title">Cadastrar Cliente</div>
-          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
+          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">ð  Voltar</button>
         </div>
         <form onsubmit="cadastrarCliente(event)">
-          <div class="form-group"><label>Nome / Razão Social</label><input type="text" id="cli-nome" required></div>
+          <div class="form-group"><label>Nome / RazÃ£o Social</label><input type="text" id="cli-nome" required></div>
           <div class="form-group"><label>Documento (CPF / RG / CNPJ)</label><input type="text" id="cli-doc" placeholder="Ex: 000.000.000-00"></div>
           <div class="form-group"><label>WhatsApp / Telefone</label><input type="tel" id="cli-tel" placeholder="Ex: 5511999998888" required></div>
-          <div class="form-group"><label>Endereço Completo</label><input type="text" id="cli-end" placeholder="Rua, Nº, Bairro, Cidade" required></div>
+          <div class="form-group"><label>EndereÃ§o Completo</label><input type="text" id="cli-end" placeholder="Rua, NÂº, Bairro, Cidade" required></div>
           <button type="submit" class="btn">Salvar Cliente na Nuvem</button>
         </form>
       </div>
       <div class="card">
         <div class="card-title">Clientes Cadastrados</div>
         <table>
-          <thead><tr><th>Nome / Doc</th><th>Contato</th><th>Ação</th></tr></thead>
+          <thead><tr><th>Nome / Doc</th><th>Contato</th><th>AÃ§Ã£o</th></tr></thead>
           <tbody id="lista-clientes"></tbody>
         </table>
       </div>
@@ -518,56 +481,56 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title">Novo Pedido</div>
-          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
+          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">ð  Voltar</button>
         </div>
         <form onsubmit="finalizarPedido(event)">
-          <div class="form-group"><label>🔎 Buscar Cliente</label><input type="text" id="ped-busca-cliente" placeholder="Filtrar por nome, doc ou fone..." oninput="filtrarClientesDropdown()"></div>
+          <div class="form-group"><label>ð Buscar Cliente</label><input type="text" id="ped-busca-cliente" placeholder="Filtrar por nome, doc ou fone..." oninput="filtrarClientesDropdown()"></div>
           <div class="form-group"><label>Selecione o Cliente</label><select id="ped-cliente" required></select></div>
           <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
           <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border:1px solid #e2e8f0;">
             <div class="form-group"><label>Selecione a Embalagem / Produto</label><select id="ped-produto"></select></div>
             <div style="display: flex; gap: 8px; align-items: flex-end;">
               <div class="form-group" style="flex: 1; margin-bottom: 0;"><label>Quantidade de Embalagens</label><input type="number" id="ped-qtd" min="1" value="1"></div>
-              <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">➕ Adicionar</button>
+              <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">â Adicionar</button>
             </div>
           </div>
           <div class="carrinho-box">
-            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛍 ITENS SELECIONADOS:</div>
+            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">ð ITENS SELECIONADOS:</div>
             <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
             <div style="font-size: 1rem; font-weight: bold; text-align: right; margin-top: 10px; color: var(--accent);">Total: R$ <span id="ped-total-valor">0.00</span></div>
           </div>
           <div class="form-group">
             <label>Forma de Pagamento</label>
             <select id="ped-forma-pagamento" required>
-              <option value="Pix">📱 Pix</option>
-              <option value="Cartão de Crédito/Débito">💳 Cartão de Crédito / Débito</option>
-              <option value="Transferência Bancária">🏦 Transferência Bancária</option>
-              <option value="Dinheiro">💵 Dinheiro</option>
+              <option value="Pix">ð± Pix</option>
+              <option value="CartÃ£o de CrÃ©dito/DÃ©bito">ð³ CartÃ£o de CrÃ©dito / DÃ©bito</option>
+              <option value="TransferÃªncia BancÃ¡ria">ð¦ TransferÃªncia BancÃ¡ria</option>
+              <option value="Dinheiro">ðµ Dinheiro</option>
             </select>
           </div>
           <div class="form-group"><label>Dados do Pagamento (Opcional)</label><input type="text" id="ped-dados-pagamento" placeholder="Ex: Chave Pix ou Banco"></div>
           <div class="form-group">
             <label>Status do Pagamento</label>
             <select id="ped-status" required>
-              <option value="Pago">🟢 Pago</option>
-              <option value="Pendente">🔴 Pendente (A Pagar)</option>
+              <option value="Pago">ð¢ Pago</option>
+              <option value="Pendente">ð´ Pendente (A Pagar)</option>
             </select>
           </div>
-          <div class="form-group"><label>Observações do Pedido (Sairá na Nota)</label><textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Deixar com a portaria"></textarea></div>
+          <div class="form-group"><label>ObservaÃ§Ãµes do Pedido (SairÃ¡ na Nota)</label><textarea id="ped-obs" rows="2" placeholder="Ex: Entregar atÃ© 14h / Deixar com a portaria"></textarea></div>
           <button type="submit" class="btn btn-success">Finalizar Pedido</button>
         </form>
       </div>
 
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-          <div class="card-title">Histórico de Pedidos Sequencial</div>
-          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">🖨️ Imprimir Recibos</button>
+          <div class="card-title">HistÃ³rico de Pedidos Sequencial</div>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">ð¨ï¸ Imprimir Recibos</button>
         </div>
         <table>
           <thead>
             <tr>
               <th style="width: 30px;"><input type="checkbox" id="check-todos-pedidos" onclick="alternarTodosPedidos(this)"></th>
-              <th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th>
+              <th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>AÃ§Ãµes</th>
             </tr>
           </thead>
           <tbody id="lista-pedidos"></tbody>
@@ -579,22 +542,22 @@
     <div id="view-produtos" class="view-content" style="display:none;">
       <div class="card" style="border-left: 4px solid var(--accent);">
         <div class="card-header">
-          <div class="card-title">🥚 Registrar Entrada de Produção</div>
-          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
+          <div class="card-title">ð¥ Registrar Entrada de ProduÃ§Ã£o</div>
+          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">ð  Voltar</button>
         </div>
         <div class="stat-card" style="background: #eff6ff; border-color: #bfdbfe; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <div class="stat-title">Saldo Geral de Ovos em Estoque</div>
             <div class="stat-value" id="estoque-geral-ovos" style="font-size: 1.8rem;">0 Ovos</div>
           </div>
-          <button class="btn admin-only" type="button" style="width: auto; background: var(--warning); padding: 8px 12px; font-size: 0.8rem;" onclick="abrirModalBalanco()">⚖️ Atualizar Estoque</button>
+          <button class="btn admin-only" type="button" style="width: auto; background: var(--warning); padding: 8px 12px; font-size: 0.8rem;" onclick="abrirModalBalanco()">âï¸ Atualizar Estoque</button>
         </div>
         <form onsubmit="registrarEntradaProducao(event)">
           <div class="form-group"><label>Quantidade Coletada/Produzida (Ovos Individuais)</label><input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 5000" required></div>
-          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Direto para o Estoque Geral</button>
+          <button type="submit" class="btn" style="background:var(--accent);">â LanÃ§ar Direto para o Estoque Geral</button>
         </form>
         <div style="margin-top: 15px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Coletas de Hoje</div>
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">HistÃ³rico de Coletas de Hoje</div>
           <table><thead><tr><th>Hora</th><th>Unidades</th></tr></thead><tbody id="lista-producao-hoje"></tbody></table>
         </div>
       </div>
@@ -603,26 +566,26 @@
         <div class="card-header"><div class="card-title" id="form-prod-title">Cadastrar Novo Produto / Embalagem</div></div>
         <form id="form-produto" onsubmit="salvarProduto(event)">
           <input type="hidden" id="prod-id-edit" value="">
-          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / CAIXA 360 OVOS" required></div>
-          <div class="form-group"><label>Preço Unitário (R$)</label><input type="number" step="0.01" id="prod-preco" placeholder="Ex: 12.00" required></div>
+          <div class="form-group"><label>DescriÃ§Ã£o do Item</label><input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / CAIXA 360 OVOS" required></div>
+          <div class="form-group"><label>PreÃ§o UnitÃ¡rio (R$)</label><input type="number" step="0.01" id="prod-preco" placeholder="Ex: 12.00" required></div>
           <div class="form-group"><label>Quantidade de Ovos nesta Embalagem</label><input type="number" id="prod-ovos-unid" min="1" placeholder="Ex: 12" required></div>
           <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
-          <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
+          <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar EdiÃ§Ã£o</button>
         </form>
       </div>
 
       <div class="card">
-        <div class="card-title">Produtos / Apresentações Disponíveis</div>
-        <table><thead><tr><th>Descrição</th><th>Preço</th><th>Ovos/Emb</th><th>Ações</th></tr></thead><tbody id="lista-produtos"></tbody></table>
+        <div class="card-title">Produtos / ApresentaÃ§Ãµes DisponÃ­veis</div>
+        <table><thead><tr><th>DescriÃ§Ã£o</th><th>PreÃ§o</th><th>Ovos/Emb</th><th>AÃ§Ãµes</th></tr></thead><tbody id="lista-produtos"></tbody></table>
       </div>
     </div>
 
-    <!-- TELA: GESTÃO DE USUÁRIOS -->
+    <!-- TELA: GESTÃO DE USUÃRIOS -->
     <div id="view-usuarios" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">Adicionar Usuário</div>
-          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
+          <div class="card-title">Adicionar UsuÃ¡rio</div>
+          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">ð  Voltar</button>
         </div>
         <form onsubmit="cadastrarUsuario(event)">
           <div class="form-group"><label>Login / Nome</label><input type="text" id="usr-login" required autocomplete="username"></div>
@@ -630,22 +593,22 @@
             <label>Senha de Acesso</label>
             <div class="input-pass-wrapper">
               <input type="password" id="usr-pass" required autocomplete="new-password">
-              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('usr-pass', this)">👁️</button>
+              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('usr-pass', this)">ðï¸</button>
             </div>
           </div>
           <div class="form-group">
-            <label>Nível de Permissão</label>
+            <label>NÃ­vel de PermissÃ£o</label>
             <select id="usr-role">
               <option value="vendedor">Vendedor (Apenas Vendas/Clientes)</option>
               <option value="admin">Administrador (Acesso Total)</option>
             </select>
           </div>
-          <button type="submit" class="btn">Cadastrar Usuário</button>
+          <button type="submit" class="btn">Cadastrar UsuÃ¡rio</button>
         </form>
       </div>
       <div class="card">
-        <div class="card-title">Usuários do Sistema</div>
-        <table><thead><tr><th>Usuário</th><th>Permissão</th><th>Ação</th></tr></thead><tbody id="lista-usuarios"></tbody></table>
+        <div class="card-title">UsuÃ¡rios do Sistema</div>
+        <table><thead><tr><th>UsuÃ¡rio</th><th>PermissÃ£o</th><th>AÃ§Ã£o</th></tr></thead><tbody id="lista-usuarios"></tbody></table>
       </div>
     </div>
 
@@ -653,15 +616,15 @@
     <div id="view-empresa" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">🔒 Alterar Minha Senha</div>
-          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
+          <div class="card-title">ð Alterar Minha Senha</div>
+          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">ð  Voltar</button>
         </div>
         <form onsubmit="alterarMinhaSenha(event)">
           <div class="form-group">
             <label>Nova Senha</label>
             <div class="input-pass-wrapper">
               <input type="password" id="minha-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password">
-              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('minha-nova-senha', this)">👁️</button>
+              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('minha-nova-senha', this)">ðï¸</button>
             </div>
           </div>
           <button type="submit" class="btn" style="background:var(--warning);">Atualizar Minha Senha</button>
@@ -669,141 +632,30 @@
       </div>
 
       <div class="card">
-        <div class="card-title">Dados da Empresa (Rodapé da Nota e Recibos RH)</div>
+        <div class="card-title">Dados da Empresa (RodapÃ© da Nota)</div>
         <form onsubmit="salvarEmpresa(event)">
           <div class="form-group"><label>Nome Fantasia</label><input type="text" id="emp-nome" required></div>
           <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="emp-cnpj" required></div>
           <div class="form-group"><label>Telefone / WhatsApp Comercial</label><input type="text" id="emp-tel" placeholder="Ex: (11) 99999-8888" required></div>
-          <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
+          <div class="form-group"><label>EndereÃ§o Completo</label><input type="text" id="emp-end" placeholder="Rua, NÂº, Bairro, Cidade/UF" required></div>
           <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @happyeggs"></div>
-          <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
+          <div class="form-group"><label>Chave Pix Oficial PadrÃ£o</label><input type="text" id="emp-pix" required></div>
           <button type="submit" class="btn btn-success">Salvar Dados da Empresa</button>
         </form>
       </div>
     </div>
   </main>
 
-  <!-- MODAL: GESTÃO DETALHADA DO COLABORADOR (VALES, EXTRAS, CHECKBOXES, RECIBOS & HISTÓRICO) -->
-  <div class="modal" id="modal-colaborador-detalhes">
-    <div class="modal-content" style="max-width: 540px;">
-      <div class="card-title" id="colab-modal-titulo" style="margin-bottom: 8px; color: var(--accent);">Gestão do Colaborador</div>
-      <div id="colab-modal-info" style="font-size: 0.8rem; margin-bottom: 12px; background: #f8fafc; padding: 8px; border-radius: 8px; border:1px solid #e2e8f0;"></div>
-
-      <!-- SELETOR DE MÊS DE REFERÊNCIA E ANO -->
-      <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 10px; border-radius: 8px; margin-bottom: 12px; display: flex; gap: 8px; align-items: center;">
-        <div style="flex: 1; margin-bottom:0;" class="form-group">
-          <label style="color: #1e40af; font-size: 0.75rem;">📅 Mês de Referência do Pagamento</label>
-          <select id="colab-filtro-mes" onchange="atualizarContextoMesColaborador()">
-            <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
-            <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
-            <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
-            <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
-          </select>
-        </div>
-        <div style="width: 110px; margin-bottom:0;" class="form-group">
-          <label style="color: #1e40af; font-size: 0.75rem;">Ano</label>
-          <input type="number" id="colab-filtro-ano" value="2026" oninput="atualizarContextoMesColaborador()">
-        </div>
-      </div>
-
-      <!-- ABAS INTERNAS: LANÇAR VALE / LANÇAR EXTRA -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
-        <button class="btn" type="button" style="padding: 8px; font-size: 0.75rem; background: #334155;" onclick="alternarAbaGestaoColab('vales')">💸 Lançar Vales</button>
-        <button class="btn" type="button" style="padding: 8px; font-size: 0.75rem; background: #0d9488;" onclick="alternarAbaGestaoColab('extras')">⭐ Serviços Extras</button>
-      </div>
-
-      <!-- FORMULÁRIO DE VALES (LANÇAMENTO INDEPENDENTE) -->
-      <div id="form-box-vales" style="background: #f1f5f9; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
-        <div style="font-weight: 700; font-size: 0.8rem; margin-bottom: 6px; color: var(--primary-dark);">➕ Novo Vale / Adiantamento</div>
-        <form onsubmit="salvarValeColaborador(event)">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
-            <div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;">Data do Vale</label><input type="date" id="vale-data" required style="padding:8px; font-size:0.8rem;"></div>
-            <div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;">Valor (R$)</label><input type="number" step="0.01" id="vale-valor" placeholder="Ex: 250.00" required style="padding:8px; font-size:0.8rem;"></div>
-          </div>
-          <div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Motivo / Obs</label><input type="text" id="vale-motivo" placeholder="Ex: Adiantamento quinzenal" required style="padding:8px; font-size:0.8rem;"></div>
-          <div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Anexo Comprovante (Opcional)</label><input type="file" id="vale-arquivo" accept="image/*,.pdf" style="background:#fff; font-size:0.75rem; padding:4px;"></div>
-          <button type="submit" class="btn btn-warning" style="width:100%; padding:8px; font-size:0.8rem;">Registrar e Arquivar Vale</button>
-        </form>
-      </div>
-
-      <!-- FORMULÁRIO DE SERVIÇOS EXTRAS -->
-      <div id="form-box-extras" style="background: #f1f5f9; padding: 10px; border-radius: 8px; margin-bottom: 12px; display: none;">
-        <div style="font-weight: 700; font-size: 0.8rem; margin-bottom: 6px; color: var(--tech);">⭐ Novo Serviço Extra / Bônus</div>
-        <form onsubmit="salvarExtraColaborador(event)">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
-            <div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;">Data do Serviço</label><input type="date" id="extra-data" required style="padding:8px; font-size:0.8rem;"></div>
-            <div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;">Valor (R$)</label><input type="number" step="0.01" id="extra-valor" placeholder="Ex: 150.00" required style="padding:8px; font-size:0.8rem;"></div>
-          </div>
-          <div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Descrição do Serviço Prestado</label><input type="text" id="extra-descricao" placeholder="Ex: Limpeza extra de galpão / Manutenção" required style="padding:8px; font-size:0.8rem;"></div>
-          <div class="form-group" style="margin-bottom:6px;"><label style="font-size:0.7rem;">Anexo Comprovante (Opcional)</label><input type="file" id="extra-arquivo" accept="image/*,.pdf" style="background:#fff; font-size:0.75rem; padding:4px;"></div>
-          <button type="submit" class="btn btn-tech" style="width:100%; padding:8px; font-size:0.8rem;">Registrar e Arquivar Serviço Extra</button>
-        </form>
-      </div>
-
-      <div style="font-weight: 700; font-size: 0.8rem; margin-bottom: 4px;">📋 Lançamentos do Mês (Marque com [x] para descontar/incluir no recibo)</div>
-      <div id="colab-lista-movimentos-container" style="max-height: 150px; overflow-y: auto; margin-bottom: 10px;"></div>
-
-      <div style="background: #eff6ff; border:1px solid #bfdbfe; padding: 10px; border-radius: 8px; margin-bottom: 12px;">
-        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-          <div style="flex:1; margin-bottom:0;" class="form-group">
-            <label style="color:#1e40af; font-size:0.7rem;">Data Efetiva do Pagamento</label>
-            <input type="date" id="colab-data-pagamento" style="padding:8px; font-size:0.8rem;">
-          </div>
-          <div style="flex:1; margin-bottom:0;" class="form-group">
-            <label style="color:#1e40af; font-size:0.7rem;">Status do Pagamento</label>
-            <select id="colab-status-pagamento" style="padding:8px; font-size:0.8rem;">
-              <option value="Pendente">🟡 Pendente</option>
-              <option value="Pago">🟢 Pago</option>
-            </select>
-          </div>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <div style="font-size: 0.7rem; font-weight: bold; color: #1e40af; text-transform: uppercase;">Salário Líquido Calculado</div>
-            <div id="colab-modal-saldo-liquido" style="font-size: 1.1rem; font-weight: bold; color: #1e3a8a;">R$ 0,00</div>
-          </div>
-          <button class="btn btn-success" type="button" style="width:auto; padding:8px 12px; font-size:0.8rem;" onclick="gerarEArquivarReciboSalario()">🖨️ Gerar & Salvar Recibo</button>
-        </div>
-      </div>
-
-      <!-- HISTÓRICO DE RECIBOS ARQUIVADOS -->
-      <div style="border-top: 1px solid #e2e8f0; padding-top: 10px; margin-top: 10px;">
-        <div style="font-weight: 700; font-size: 0.8rem; margin-bottom: 6px; color: var(--primary-dark);">📜 Histórico de Recibos Emitidos</div>
-        <div id="colab-historico-recibos-container" style="max-height: 120px; overflow-y: auto;"></div>
-      </div>
-
-      <button class="btn" type="button" style="background: #64748b; margin-top: 12px;" onclick="document.getElementById('modal-colaborador-detalhes').style.display='none'">Fechar</button>
-    </div>
-  </div>
-
-  <!-- MODAL: RECIBO DE PAGAMENTO / SALÁRIO (PADRÃO NOTA) -->
-  <div class="modal" id="modal-recibo-salario">
-    <div class="modal-content" style="max-width: 480px;">
-      <div class="card-title no-print" style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
-        <span>📄 Recibo de Pagamento de Salário</span>
-        <button class="btn-danger" type="button" onclick="fecharModalReciboSeguro()">✕ Fechar</button>
-      </div>
-      
-      <!-- CAIXA DE RECIBO COM LAYOUT PADRONIZADO -->
-      <div class="receipt-box" id="printable-recibo-salario"></div>
-      
-      <div style="display:flex; flex-direction:column; gap:8px;" class="no-print">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirReciboColaboradorDireto()">🖨️ Imprimir / Salvar PDF</button>
-        <button class="btn" type="button" onclick="fecharModalReciboSeguro()" style="background:#64748b;">Voltar ao Sistema</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: FILTRO DO RELATÓRIO TÉCNICO -->
+  <!-- MODAL: FILTRO DO RELATÃRIO TÃCNICO -->
   <div class="modal" id="modal-relatorio-tecnico">
     <div class="modal-content" style="max-width: 520px;">
-      <div class="card-title" style="margin-bottom:12px;">📊 Relatório Geral Técnico (Zootecnia)</div>
+      <div class="card-title" style="margin-bottom:12px;">ð RelatÃ³rio Geral TÃ©cnico (Zootecnia)</div>
       <div class="form-group">
-        <label>Período do Relatório</label>
+        <label>PerÃ­odo do RelatÃ³rio</label>
         <select id="tec-filtro-periodo" onchange="atualizarFiltroRelatorioTecnico()">
-          <option value="mes">Este Mês Atual</option>
+          <option value="mes">Este MÃªs Atual</option>
           <option value="ano">Este Ano Atual</option>
-          <option value="tudo">Desde o Início (Todos os Registos)</option>
+          <option value="tudo">Desde o InÃ­cio (Todos os Registos)</option>
           <option value="personalizado">Personalizado (Intervalo de Datas)</option>
         </select>
       </div>
@@ -815,18 +667,18 @@
 
       <div id="area-relatorio-tec-impressao" class="relatorio-sheet-box">
         <div class="relatorio-sheet-header">
-          <h3>Relatório Técnico da Granja</h3>
+          <h3>RelatÃ³rio TÃ©cnico da Granja</h3>
           <span style="font-size: 0.75rem; font-weight: 600; opacity: 0.9;" id="tec-relatorio-emissao"></span>
         </div>
         <div class="relatorio-kpi-grid">
-          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Média Taxa Postura</div><div class="relatorio-kpi-val" id="tec-kpi-taxa" style="color: #0d9488;">0%</div></div>
+          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">MÃ©dia Taxa Postura</div><div class="relatorio-kpi-val" id="tec-kpi-taxa" style="color: #0d9488;">0%</div></div>
           <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Total Ovos Coletados</div><div class="relatorio-kpi-val" id="tec-kpi-ovos">0</div></div>
         </div>
         <div class="relatorio-section-box">
           <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Mortalidade e Baixas</div>
           <div id="tec-resumo-baixas" style="line-height: 1.4; color: #1e293b; margin-bottom: 8px;"></div>
           
-          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; border-top: 1px dashed #cbd5e1; padding-top: 6px;">Histórico de Vacinações no Período</div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; border-top: 1px dashed #cbd5e1; padding-top: 6px;">HistÃ³rico de VacinaÃ§Ãµes no PerÃ­odo</div>
           <div id="tec-resumo-vacinas-lista" style="line-height: 1.4; color: #1e293b;"></div>
         </div>
         <div>
@@ -839,18 +691,18 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:15px;">
-        <button class="btn" type="button" style="background:var(--tech);" onclick="imprimirRelatorioTecnicoDireto()">🖨️ Imprimir / Salvar Relatório</button>
+        <button class="btn" type="button" style="background:var(--tech);" onclick="imprimirRelatorioTecnicoDireto()">ð¨ï¸ Imprimir / Salvar RelatÃ³rio</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-relatorio-tecnico').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: ZERAR DADOS TÉCNICOS -->
+  <!-- MODAL: ZERAR DADOS TÃCNICOS -->
   <div class="modal" id="modal-zerar-tecnico">
     <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">⚠️ Zerar Dados Técnicos</div>
+      <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">â ï¸ Zerar Dados TÃ©cnicos</div>
       <p style="font-size:0.85rem; color:#475569; margin-bottom: 15px;">
-        Esta ação apagará <strong>todos</strong> os lotes, registos de postura, mortalidade e vacinação cadastrados no controle técnico. Deseja continuar?
+        Esta aÃ§Ã£o apagarÃ¡ <strong>todos</strong> os lotes, registos de postura, mortalidade e vacinaÃ§Ã£o cadastrados no controle tÃ©cnico. Deseja continuar?
       </p>
       <div style="display: flex; gap: 10px;">
         <button type="button" class="btn btn-danger" onclick="executarZerarDadosTecnicos()">Sim, Zerar Tudo</button>
@@ -865,7 +717,7 @@
       <div class="card-title" id="detalhe-titulo-modal" style="margin-bottom: 12px; font-size: 1.1rem; color: var(--accent);">Detalhes da Granja</div>
       <div id="detalhe-corpo-modal" style="font-size: 0.85rem; line-height: 1.5; color: #334155; margin-bottom: 15px;"></div>
       <div style="display: flex; flex-direction: column; gap: 8px;">
-        <button class="btn" type="button" style="background: var(--warning);" onclick="abrirModalRedefinirSenhaDoDetalhe()">🔑 Alterar Senha do Administrador</button>
+        <button class="btn" type="button" style="background: var(--warning);" onclick="abrirModalRedefinirSenhaDoDetalhe()">ð Alterar Senha do Administrador</button>
         <button class="btn" type="button" style="background: #64748b;" onclick="document.getElementById('modal-detalhes-empresa').style.display='none'">Fechar</button>
       </div>
     </div>
@@ -874,26 +726,26 @@
   <!-- MODAL: EDITAR EMPRESA / CLIENTE NO SUPER ADMIN -->
   <div class="modal" id="modal-editar-empresa">
     <div class="modal-content" style="max-width: 460px;">
-      <div class="card-title" style="margin-bottom: 12px; color: var(--accent);">✏️ Editar Empresa / Granja</div>
+      <div class="card-title" style="margin-bottom: 12px; color: var(--accent);">âï¸ Editar Empresa / Granja</div>
       <form onsubmit="salvarEdicaoEmpresa(event)">
         <input type="hidden" id="edit-emp-id-original">
         <div class="form-group"><label>Nome da Granja / Empresa</label><input type="text" id="edit-emp-nome" required></div>
         <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="edit-emp-cnpj"></div>
         <div class="form-group"><label>E-mail de Contato</label><input type="email" id="edit-emp-email"></div>
         <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="edit-emp-tel"></div>
-        <div class="form-group"><label>Endereço Completo</label><input type="text" id="edit-emp-end"></div>
+        <div class="form-group"><label>EndereÃ§o Completo</label><input type="text" id="edit-emp-end"></div>
         <div class="form-group">
           <label>Plano de Assinatura</label>
           <select id="edit-emp-plano" required>
             <option value="mensal">Mensal (30 Dias)</option>
             <option value="anual">Anual (365 Dias)</option>
-            <option value="vitalicio">Vitalício (Sem Expiração)</option>
+            <option value="vitalicio">VitalÃ­cio (Sem ExpiraÃ§Ã£o)</option>
           </select>
         </div>
         <div class="form-group"><label>Valor do Plano (R$)</label><input type="number" step="0.01" id="edit-emp-valor" required></div>
         <div class="form-group"><label>Data de Vencimento</label><input type="date" id="edit-emp-vencimento" required></div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
-          <button type="submit" class="btn btn-success">Salvar Alterações</button>
+          <button type="submit" class="btn btn-success">Salvar AlteraÃ§Ãµes</button>
           <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-editar-empresa').style.display='none'">Cancelar</button>
         </div>
       </form>
@@ -903,13 +755,13 @@
   <!-- MODAL: REDEFINIR SENHA DO CLIENTE -->
   <div class="modal" id="modal-redefinir-senha-cli">
     <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha de Acesso</div>
+      <div class="card-title" style="margin-bottom: 12px;">ð Alterar Senha de Acesso</div>
       <form onsubmit="salvarNovaSenhaClienteAdmin(event)">
         <div class="form-group">
           <label>Nova Senha para o Administrador</label>
           <div class="input-pass-wrapper">
             <input type="password" id="nova-senha-cli-input" placeholder="Digite a nova senha" required autocomplete="new-password">
-            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('nova-senha-cli-input', this)">👁️</button>
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('nova-senha-cli-input', this)">ðï¸</button>
           </div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -920,16 +772,16 @@
     </div>
   </div>
 
-  <!-- MODAL: REDEFINIR SENHA DE USUÁRIO/VENDEDOR -->
+  <!-- MODAL: REDEFINIR SENHA DE USUÃRIO/VENDEDOR -->
   <div class="modal" id="modal-redefinir-senha-usuario">
     <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha do Usuário</div>
+      <div class="card-title" style="margin-bottom: 12px;">ð Alterar Senha do UsuÃ¡rio</div>
       <form onsubmit="salvarNovaSenhaUsuario(event)">
         <div class="form-group">
           <label>Nova Senha</label>
           <div class="input-pass-wrapper">
             <input type="password" id="nova-senha-usuario-input" placeholder="Digite a nova senha" required autocomplete="new-password">
-            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('nova-senha-usuario-input', this)">👁️</button>
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('nova-senha-usuario-input', this)">ðï¸</button>
           </div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -946,7 +798,7 @@
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       <div class="receipt-box" id="printable-receipt"></div>
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirReciboUnico()">🖨️ Imprimir / Salvar PDF</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirReciboUnico()">ð¨ï¸ Imprimir / Salvar PDF</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:2px;">Fechar Nota</button>
       </div>
     </div>
@@ -955,7 +807,7 @@
   <!-- MODAL: ALTERAR SENHA DO SUPER ADMIN -->
   <div class="modal" id="modal-seguranca-superadmin">
     <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px;">🔐 Alterar Senha de Super Admin</div>
+      <div class="card-title" style="margin-bottom: 12px;">ð Alterar Senha de Super Admin</div>
       <form onsubmit="salvarNovaSenhaSuperAdmin(event)">
         <div class="form-group">
           <label>Selecione qual Super Admin deseja alterar</label>
@@ -968,7 +820,7 @@
           <label>Nova Senha</label>
           <div class="input-pass-wrapper">
             <input type="password" id="super-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password">
-            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('super-nova-senha', this)">👁️</button>
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('super-nova-senha', this)">ðï¸</button>
           </div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -979,16 +831,16 @@
     </div>
   </div>
 
-  <!-- MODAL: RELATÓRIO DE VENDAS -->
+  <!-- MODAL: RELATÃRIO DE VENDAS -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 520px;">
-      <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
+      <div class="card-title" style="margin-bottom:12px;">ð RelatÃ³rio de Vendas e Faturamento</div>
       <div class="form-group">
-        <label>Filtrar Período</label>
+        <label>Filtrar PerÃ­odo</label>
         <select id="filtro-periodo" onchange="atualizarFiltroRelatorio()">
           <option value="hoje">Hoje</option>
-          <option value="semana">Últimos 7 Dias (Semana)</option>
-          <option value="mes">Este Mês Atual</option>
+          <option value="semana">Ãltimos 7 Dias (Semana)</option>
+          <option value="mes">Este MÃªs Atual</option>
           <option value="personalizado">Personalizado (Intervalo de Datas)</option>
         </select>
       </div>
@@ -1000,19 +852,19 @@
 
       <div id="area-relatorio-impressao" class="relatorio-sheet-box">
         <div class="relatorio-sheet-header">
-          <h3>Relatório de Vendas</h3>
+          <h3>RelatÃ³rio de Vendas</h3>
           <span style="font-size: 0.75rem; font-weight: 600; opacity: 0.9;" id="relatorio-data-emissao"></span>
         </div>
         <div class="relatorio-kpi-grid">
           <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Total Faturado</div><div class="relatorio-kpi-val" id="resumo-total-periodo" style="color: #2563eb;">R$ 0,00</div></div>
-          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Nº de Pedidos</div><div class="relatorio-kpi-val" id="resumo-qtd-pedidos">0</div></div>
+          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">NÂº de Pedidos</div><div class="relatorio-kpi-val" id="resumo-qtd-pedidos">0</div></div>
         </div>
         <div class="relatorio-section-box">
           <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Recebimento por Forma de Pagamento</div>
           <div id="resumo-detalhe-formas" style="line-height: 1.4; color: #1e293b;"></div>
         </div>
         <div>
-          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Vendas Listadas no Período</div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Vendas Listadas no PerÃ­odo</div>
           <table class="relatorio-tabela-planilha">
             <thead><tr><th># Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
             <tbody id="resumo-tabela-periodo"></tbody>
@@ -1021,22 +873,22 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorioDireto()">🖨️ Imprimir / Salvar Relatório</button>
-        <button class="btn" type="button" style="background:#475569;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorioDireto()">ð¨ï¸ Imprimir / Salvar RelatÃ³rio</button>
+        <button class="btn" type="button" style="background:#475569;" onclick="exportarRelatorioExcel()">ð Exportar Excel</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: BALANÇO DE ESTOQUE -->
+  <!-- MODAL: BALANÃO DE ESTOQUE -->
   <div class="modal" id="modal-balanco">
     <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px;">⚖️ Balanço Manual de Estoque</div>
+      <div class="card-title" style="margin-bottom: 12px;">âï¸ BalanÃ§o Manual de Estoque</div>
       <form onsubmit="salvarBalancoEstoque(event)">
         <div class="form-group"><label>Novo Saldo Real de Ovos</label><input type="number" id="balanco-nova-qtd" min="0" placeholder="Ex: 12500" required></div>
-        <div class="form-group"><label>Motivo / Observação do Ajuste</label><input type="text" id="balanco-motivo" placeholder="Ex: Contagem física" required></div>
+        <div class="form-group"><label>Motivo / ObservaÃ§Ã£o do Ajuste</label><input type="text" id="balanco-motivo" placeholder="Ex: Contagem fÃ­sica" required></div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
-          <button type="submit" class="btn" style="background: var(--warning);">Salvar Balanço</button>
+          <button type="submit" class="btn" style="background: var(--warning);">Salvar BalanÃ§o</button>
           <button type="button" class="btn" style="background: #64748b;" onclick="fecharModalBalanco()">Cancelar</button>
         </div>
       </form>
@@ -1062,7 +914,6 @@
       empresa: { nome: "HappyEggs", cnpj: "", tel: "", end: "", social: "", pix: "" },
       produtos: [], clientes: [], pedidos: [], producao: [], estoqueGeralOvos: 0,
       lotesTecnicos: [], historicoPosturaTecnica: [], historicoMortalidade: [], historicoVacinacao: [],
-      colaboradores: [], valesColaboradores: [], extrasColaboradores: [], recibosHistorico: [],
       currentUser: null, pedidoAtual: null, listenersUnsubscribe: []
     };
 
@@ -1071,32 +922,16 @@
     let empresaSelecionadaParaDetalhes = null;
     let pedidoSelecionadoModal = null;
     let usuarioSelecionadoId = null;
-    let colaboradorSelecionadoId = null;
 
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
       if (!input) return;
       if (input.type === 'password') {
         input.type = 'text';
-        btn.innerText = '🙈';
+        btn.innerText = 'ð';
       } else {
         input.type = 'password';
-        btn.innerText = '👁️';
-      }
-    }
-
-    function toggleFormularioColaborador() {
-      const container = document.getElementById('container-form-colaborador');
-      const icone = document.getElementById('icone-toggle-colab');
-      const titulo = document.getElementById('titulo-toggle-colab');
-      if (container.style.display === 'none' || !container.style.display) {
-        container.style.display = 'block';
-        icone.innerText = '▲';
-        titulo.innerText = 'Fechar Formulário de Cadastro';
-      } else {
-        container.style.display = 'none';
-        icone.innerText = '▼';
-        titulo.innerText = '➕ Cadastrar Novo Colaborador (Clique para abrir)';
+        btn.innerText = 'ðï¸';
       }
     }
 
@@ -1114,7 +949,7 @@
         if (!hasSuperAdmin2) {
           await db.collection("usuarios").add({ login: "superadmin2", pass: "rancho123*", role: "superadmin" });
         }
-      } catch (err) { console.error("Erro na inicialização:", err); }
+      } catch (err) { console.error("Erro na inicializaÃ§Ã£o:", err); }
     }
 
     function initSuperAdminListener() {
@@ -1135,12 +970,12 @@
       
       document.getElementById('global-granjas-ativas').innerText = granjasAtivas;
       const fatEl = document.getElementById('global-faturamento');
-      fatEl.innerText = superAdminPrivacidadeOculto ? "R$ ••••••" : "R$ " + faturamentoPlanos.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+      fatEl.innerText = superAdminPrivacidadeOculto ? "R$ â¢â¢â¢â¢â¢â¢" : "R$ " + faturamentoPlanos.toLocaleString('pt-BR', {minimumFractionDigits: 2});
     }
 
     function alternarPrivacidadeSuperAdmin() {
       superAdminPrivacidadeOculto = !superAdminPrivacidadeOculto;
-      document.getElementById('btn-toggle-privacy').innerText = superAdminPrivacidadeOculto ? "👁️‍🗨️ Revelar" : "👁️ Ocultar";
+      document.getElementById('btn-toggle-privacy').innerText = superAdminPrivacidadeOculto ? "ðï¸âð¨ï¸ Revelar" : "ðï¸ Ocultar";
       calcularDashboardGlobal();
       renderEmpresasSaaS();
     }
@@ -1223,6 +1058,7 @@
         renderControleTecnico();
       });
 
+      // ORDENAÃÃO POR DATA (MAIS RECENTE PRIMEIRO) AQUI NO LISTENER
       const unsubPosturaTecnica = db.collection("producao_zootecnica").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.historicoPosturaTecnica = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
           .sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
@@ -1239,24 +1075,7 @@
         renderControleTecnico();
       });
 
-      const unsubColaboradores = db.collection("colaboradores").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.colaboradores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        renderColaboradores();
-      });
-      const unsubVales = db.collection("vales_colaboradores").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.valesColaboradores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (colaboradorSelecionadoId) atualizarContextoMesColaborador();
-      });
-      const unsubExtras = db.collection("extras_colaboradores").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.extrasColaboradores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (colaboradorSelecionadoId) atualizarContextoMesColaborador();
-      });
-      const unsubRecibosHist = db.collection("recibos_historico").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.recibosHistorico = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if (colaboradorSelecionadoId) renderHistoricoRecibosColaborador();
-      });
-
-      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao, unsubColaboradores, unsubVales, unsubExtras, unsubRecibosHist);
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao);
     }
 
     function carregarEmpresaCampos() {
@@ -1276,15 +1095,15 @@
 
       try {
         const snapshot = await db.collection("usuarios").where("login", "==", u).get();
-        if (snapshot.empty) { alert('Usuário ou senha incorretos!'); return; }
+        if (snapshot.empty) { alert('UsuÃ¡rio ou senha incorretos!'); return; }
         const found = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-        if (found.pass !== p) { alert('Usuário ou senha incorretos!'); return; }
+        if (found.pass !== p) { alert('UsuÃ¡rio ou senha incorretos!'); return; }
 
         if (found.role === "superadmin") {
           state.currentUser = { login: found.login, role: "superadmin" };
           document.getElementById('view-login').style.display = 'none';
           document.getElementById('app-header').style.display = 'flex';
-          document.getElementById('user-display').innerText = "👑 SUPER ADMIN (" + found.login.toUpperCase() + ")";
+          document.getElementById('user-display').innerText = "ð SUPER ADMIN (" + found.login.toUpperCase() + ")";
           document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
           navTo('superadmin');
           initSuperAdminListener();
@@ -1293,13 +1112,13 @@
 
         const empresaId = found.empresaId || "empresa_demo";
         const empDoc = await db.collection("empresas").doc(empresaId).get();
-        if (empDoc.exists && empDoc.data().status !== "Ativo") { alert("A conta da sua empresa está bloqueada."); return; }
+        if (empDoc.exists && empDoc.data().status !== "Ativo") { alert("A conta da sua empresa estÃ¡ bloqueada."); return; }
 
         state.currentUser = found;
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('app-header').style.display = 'flex';
         document.getElementById('top-nav-container').style.display = 'flex';
-        document.getElementById('user-display').innerText = "👤 " + found.login.toUpperCase();
+        document.getElementById('user-display').innerText = "ð¤ " + found.login.toUpperCase();
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
         initListeners();
         mudarAbaTopo('financeiro');
@@ -1337,6 +1156,7 @@
       document.getElementById('tec-menu-grid').style.display = 'none';
       document.getElementById('tec-painel-historicos').style.display = 'none';
       document.getElementById('tec-btn-voltar-container').style.display = 'block';
+
       document.querySelectorAll('.tec-secao-form').forEach(el => el.style.display = 'none');
       const alvo = document.getElementById('tec-form-' + secao);
       if (alvo) alvo.style.display = 'block';
@@ -1365,7 +1185,7 @@
     }
 
     function render() {
-      renderClientes(); renderProdutos(); renderPedidos(); renderUsuarios(); renderDropdowns(); renderControleTecnico(); renderColaboradores();
+      renderClientes(); renderProdutos(); renderPedidos(); renderUsuarios(); renderDropdowns(); renderControleTecnico();
     }
 
     function renderEstoqueGeral() {
@@ -1373,418 +1193,6 @@
       if (el) el.innerText = (state.estoqueGeralOvos || 0).toLocaleString('pt-BR') + ' Ovos';
     }
 
-    // --- COLABORADORES & RH ---
-    async function cadastrarColaborador(e) {
-      e.preventDefault();
-      if (!state.currentUser) return;
-      const nome = document.getElementById('colab-nome').value.trim();
-      const cargo = document.getElementById('colab-cargo').value.trim();
-      const doc = document.getElementById('colab-doc').value.trim();
-      const tel = document.getElementById('colab-tel').value.trim();
-      const pix = document.getElementById('colab-pix').value.trim();
-      const dataAdmissao = document.getElementById('colab-admissao').value;
-      const salarioBase = parseFloat(document.getElementById('colab-salario').value || 0);
-      const diaVencimento = parseInt(document.getElementById('colab-vencimento').value || 5);
-
-      try {
-        await db.collection("colaboradores").add({
-          empresaId: state.currentUser.empresaId,
-          nome, cargo, doc, tel, pix, dataAdmissao, salarioBase, diaVencimento,
-          status: "Ativo", criadoEm: new Date()
-        });
-        e.target.reset();
-        toggleFormularioColaborador();
-        alert('Colaborador cadastrado com sucesso!');
-      } catch (err) { alert('Erro ao cadastrar colaborador: ' + err.message); }
-    }
-
-    function renderColaboradores() {
-      const tbody = document.getElementById('lista-colaboradores');
-      if (!tbody) return;
-      tbody.innerHTML = state.colaboradores.map(c => `
-        <tr>
-          <td>
-            <strong>${c.nome}</strong><br>
-            <small style="color:var(--tech);">${c.cargo}</small> | <small>Adm: ${c.dataAdmissao || '---'}</small>
-          </td>
-          <td>
-            <strong>R$ ${parseFloat(c.salarioBase || 0).toFixed(2)}</strong><br>
-            <small style="color:#64748b;">Venc: Dia ${c.diaVencimento}</small>
-          </td>
-          <td>
-            <div style="display:flex; gap:4px; flex-wrap:wrap;">
-              <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.7rem; background:#2563eb;" onclick="abrirModalGerenciarColaborador('${c.id}')">💼 Gestão / Recibos</button>
-              <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 6px;" onclick="excluirColaborador('${c.id}')">🗑️</button>
-            </div>
-          </td>
-        </tr>
-      `).join('') || '<tr><td colspan="3" style="text-align:center; color:#64748b;">Nenhum colaborador cadastrado.</td></tr>';
-    }
-
-    async function excluirColaborador(id) {
-      if (confirm('Tem certeza que deseja excluir este colaborador e seus registros?')) {
-        try {
-          await db.collection("colaboradores").doc(id).delete();
-          alert('Colaborador excluído!');
-        } catch (err) { alert('Erro ao excluir: ' + err.message); }
-      }
-    }
-
-    function abrirModalGerenciarColaborador(colabId) {
-      colaboradorSelecionadoId = colabId;
-      const colab = state.colaboradores.find(c => c.id === colabId);
-      if (!colab) return;
-
-      const agora = new Date();
-      document.getElementById('colab-filtro-mes').value = agora.getMonth();
-      document.getElementById('colab-filtro-ano').value = agora.getFullYear();
-      document.getElementById('colab-data-pagamento').value = agora.toISOString().split('T')[0];
-      document.getElementById('colab-status-pagamento').value = 'Pendente';
-
-      document.getElementById('vale-data').value = agora.toISOString().split('T')[0];
-      document.getElementById('vale-valor').value = '';
-      document.getElementById('vale-motivo').value = '';
-      document.getElementById('vale-arquivo').value = '';
-
-      document.getElementById('extra-data').value = agora.toISOString().split('T')[0];
-      document.getElementById('extra-valor').value = '';
-      document.getElementById('extra-descricao').value = '';
-      document.getElementById('extra-arquivo').value = '';
-
-      document.getElementById('colab-modal-titulo').innerText = "Gestão de RH: " + colab.nome;
-      document.getElementById('colab-modal-info').innerHTML = `
-        <div><strong>Cargo:</strong> ${colab.cargo} | <strong>PIX:</strong> ${colab.pix}</div>
-        <div><strong>Salário Base:</strong> R$ ${parseFloat(colab.salarioBase).toFixed(2)} | <strong>Vencimento:</strong> Todo dia ${colab.diaVencimento}</div>
-      `;
-
-      alternarAbaGestaoColab('vales');
-      atualizarContextoMesColaborador();
-      document.getElementById('modal-colaborador-detalhes').style.display = 'flex';
-    }
-
-    function alternarAbaGestaoColab(aba) {
-      document.getElementById('form-box-vales').style.display = (aba === 'vales') ? 'block' : 'none';
-      document.getElementById('form-box-extras').style.display = (aba === 'extras') ? 'block' : 'none';
-    }
-
-    function atualizarContextoMesColaborador() {
-      if (!colaboradorSelecionadoId) return;
-      const colab = state.colaboradores.find(c => c.id === colaboradorSelecionadoId);
-      if (!colab) return;
-
-      const mesSel = parseInt(document.getElementById('colab-filtro-mes').value);
-      const anoSel = parseInt(document.getElementById('colab-filtro-ano').value);
-
-      const vales = state.valesColaboradores.filter(v => v.colaboradorId === colaboradorSelecionadoId);
-      const extras = state.extrasColaboradores.filter(ex => ex.colaboradorId === colaboradorSelecionadoId);
-
-      const valesDoMes = vales.filter(v => {
-        if (!v.data) return false;
-        const d = new Date(v.data + 'T00:00:00');
-        return d.getMonth() === mesSel && d.getFullYear() === anoSel;
-      });
-
-      const extrasDoMes = extras.filter(ex => {
-        if (!ex.data) return false;
-        const d = new Date(ex.data + 'T00:00:00');
-        return d.getMonth() === mesSel && d.getFullYear() === anoSel;
-      });
-
-      const container = document.getElementById('colab-lista-movimentos-container');
-      let htmlMovs = '';
-
-      valesDoMes.forEach(v => {
-        const marcado = v.incluirNoRecibo !== false ? 'checked' : '';
-        htmlMovs += `
-          <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:6px 8px; border-radius:6px; border:1px solid #fca5a5; margin-bottom:4px; font-size:0.78rem;">
-            <div style="display:flex; align-items:center; gap:6px; flex:1;">
-              <input type="checkbox" ${marcado} onchange="toggleIncluirValeRecibo('${v.id}', this.checked)" title="Marcar para descontar no recibo">
-              <div>
-                <span style="color:var(--danger); font-weight:bold;">[VALE]</span> ${new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR')} — <strong>R$ ${parseFloat(v.valor).toFixed(2)}</strong><br>
-                <small style="color:#64748b;">${v.motivo}</small>
-                ${v.comprovanteUrl ? `<br><a href="${v.comprovanteUrl}" target="_blank" style="color:var(--accent); font-weight:bold; font-size:0.7rem;">📎 Ver Comprovante</a>` : ''}
-              </div>
-            </div>
-            <button class="btn-danger" type="button" style="padding:2px 5px;" onclick="excluirValeColaborador('${v.id}')">✕</button>
-          </div>
-        `;
-      });
-
-      extrasDoMes.forEach(ex => {
-        const marcado = ex.incluirNoRecibo !== false ? 'checked' : '';
-        htmlMovs += `
-          <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:6px 8px; border-radius:6px; border:1px solid #99f6e4; margin-bottom:4px; font-size:0.78rem;">
-            <div style="display:flex; align-items:center; gap:6px; flex:1;">
-              <input type="checkbox" ${marcado} onchange="toggleIncluirExtraRecibo('${ex.id}', this.checked)" title="Marcar para incluir no recibo">
-              <div>
-                <span style="color:var(--tech); font-weight:bold;">[EXTRA]</span> ${new Date(ex.data + 'T00:00:00').toLocaleDateString('pt-BR')} — <strong>+ R$ ${parseFloat(ex.valor).toFixed(2)}</strong><br>
-                <small style="color:#64748b;">${ex.descricao}</small>
-                ${ex.comprovanteUrl ? `<br><a href="${ex.comprovanteUrl}" target="_blank" style="color:var(--accent); font-weight:bold; font-size:0.7rem;">📎 Ver Comprovante</a>` : ''}
-              </div>
-            </div>
-            <button class="btn-danger" type="button" style="padding:2px 5px;" onclick="excluirExtraColaborador('${ex.id}')">✕</button>
-          </div>
-        `;
-      });
-
-      container.innerHTML = htmlMovs || '<div style="font-size:0.78rem; color:#64748b; text-align:center; padding:10px;">Nenhum lançamento neste mês.</div>';
-
-      let totalValesSel = 0; valesDoMes.filter(v => v.incluirNoRecibo !== false).forEach(v => totalValesSel += (parseFloat(v.valor) || 0));
-      let totalExtrasSel = 0; extrasDoMes.filter(ex => ex.incluirNoRecibo !== false).forEach(ex => totalExtrasSel += (parseFloat(ex.valor) || 0));
-      const salarioLiquido = Math.max(0, (colab.salarioBase + totalExtrasSel) - totalValesSel);
-      document.getElementById('colab-modal-saldo-liquido').innerText = "R$ " + salarioLiquido.toFixed(2);
-
-      renderHistoricoRecibosColaborador();
-    }
-
-    async function toggleIncluirValeRecibo(id, status) {
-      try {
-        await db.collection("vales_colaboradores").doc(id).update({ incluirNoRecibo: status });
-        atualizarContextoMesColaborador();
-      } catch (err) { alert('Erro: ' + err.message); }
-    }
-
-    async function toggleIncluirExtraRecibo(id, status) {
-      try {
-        await db.collection("extras_colaboradores").doc(id).update({ incluirNoRecibo: status });
-        atualizarContextoMesColaborador();
-      } catch (err) { alert('Erro: ' + err.message); }
-    }
-
-    function renderHistoricoRecibosColaborador() {
-      const container = document.getElementById('colab-historico-recibos-container');
-      if (!container || !colaboradorSelecionadoId) return;
-
-      const mesSel = parseInt(document.getElementById('colab-filtro-mes').value);
-      const anoSel = parseInt(document.getElementById('colab-filtro-ano').value);
-
-      const recibosDoColab = state.recibosHistorico.filter(r => r.colaboradorId === colaboradorSelecionadoId && r.mesRef === mesSel && r.anoRef === anoSel);
-
-      container.innerHTML = recibosDoColab.map((r, idx) => `
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:6px 8px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:4px; font-size:0.78rem;">
-          <div>
-            <strong>Versão ${recibosDoColab.length - idx}</strong> — R$ ${parseFloat(r.liquido).toFixed(2)} | <span style="color:${r.statusPagamento==='Pago'?'#065f46':'#991b1b'}; font-weight:bold;">${r.statusPagamento || 'Pendente'}</span><br>
-            <small style="color:#64748b;">Ref: ${r.nomeMes}/${r.anoRef} | Pago em: ${r.dataPagamento ? new Date(r.dataPagamento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</small>
-          </div>
-          <div style="display:flex; gap:4px;">
-            <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.7rem; background:var(--tech);" onclick="reimprimirReciboHistorico('${r.id}')">👁️ Ver</button>
-            <button class="btn-danger" type="button" style="padding:4px 6px; font-size:0.7rem;" onclick="excluirReciboHistorico('${r.id}')">🗑️</button>
-          </div>
-        </div>
-      `).join('') || '<div style="font-size:0.75rem; color:#64748b; text-align:center; padding:6px;">Nenhum recibo arquivado para este mês ainda.</div>';
-    }
-
-    async function excluirReciboHistorico(id) {
-      if (confirm('Tem certeza que deseja excluir este recibo do histórico?')) {
-        try {
-          await db.collection("recibos_historico").doc(id).delete();
-          alert('Recibo excluído com sucesso!');
-        } catch (err) { alert('Erro ao excluir recibo: ' + err.message); }
-      }
-    }
-
-    async function salvarValeColaborador(e) {
-      e.preventDefault();
-      if (!state.currentUser || !colaboradorSelecionadoId) return;
-      const data = document.getElementById('vale-data').value;
-      const valor = parseFloat(document.getElementById('vale-valor').value || 0);
-      const motivo = document.getElementById('vale-motivo').value.trim();
-      const fileInput = document.getElementById('vale-arquivo');
-
-      if (fileInput.files && fileInput.files[0]) {
-        const file = fileInput.files[0];
-        const reader = new FileReader();
-        reader.onload = async function(ev) {
-          await gravarValeFirestore(data, valor, motivo, ev.target.result);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        await gravarValeFirestore(data, valor, motivo, "");
-      }
-    }
-
-    async function gravarValeFirestore(data, valor, motivo, comprovanteUrl) {
-      try {
-        await db.collection("vales_colaboradores").add({
-          empresaId: state.currentUser.empresaId,
-          colaboradorId: colaboradorSelecionadoId,
-          data, valor, motivo, incluirNoRecibo: true, comprovanteUrl, criadoEm: new Date()
-        });
-        document.getElementById('vale-valor').value = '';
-        document.getElementById('vale-motivo').value = '';
-        document.getElementById('vale-arquivo').value = '';
-        atualizarContextoMesColaborador();
-        alert('Vale registrado com sucesso!');
-      } catch (err) { alert('Erro ao registrar vale: ' + err.message); }
-    }
-
-    async function excluirValeColaborador(id) {
-      if (confirm('Excluir este vale?')) {
-        try {
-          await db.collection("vales_colaboradores").doc(id).delete();
-          atualizarContextoMesColaborador();
-        } catch (err) { alert('Erro: ' + err.message); }
-      }
-    }
-
-    async function salvarExtraColaborador(e) {
-      e.preventDefault();
-      if (!state.currentUser || !colaboradorSelecionadoId) return;
-      const data = document.getElementById('extra-data').value;
-      const valor = parseFloat(document.getElementById('extra-valor').value || 0);
-      const descricao = document.getElementById('extra-descricao').value.trim();
-      const fileInput = document.getElementById('extra-arquivo');
-
-      if (fileInput.files && fileInput.files[0]) {
-        const file = fileInput.files[0];
-        const reader = new FileReader();
-        reader.onload = async function(ev) {
-          await gravarExtraFirestore(data, valor, descricao, ev.target.result);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        await gravarExtraFirestore(data, valor, descricao, "");
-      }
-    }
-
-    async function gravarExtraFirestore(data, valor, descricao, comprovanteUrl) {
-      try {
-        await db.collection("extras_colaboradores").add({
-          empresaId: state.currentUser.empresaId,
-          colaboradorId: colaboradorSelecionadoId,
-          data, valor, descricao, incluirNoRecibo: true, comprovanteUrl, criadoEm: new Date()
-        });
-        document.getElementById('extra-valor').value = '';
-        document.getElementById('extra-descricao').value = '';
-        document.getElementById('extra-arquivo').value = '';
-        atualizarContextoMesColaborador();
-        alert('Serviço extra registrado com sucesso!');
-      } catch (err) { alert('Erro: ' + err.message); }
-    }
-
-    async function excluirExtraColaborador(id) {
-      if (confirm('Excluir este serviço extra?')) {
-        try {
-          await db.collection("extras_colaboradores").doc(id).delete();
-          atualizarContextoMesColaborador();
-        } catch (err) { alert('Erro: ' + err.message); }
-      }
-    }
-
-    async function gerarEArquivarReciboSalario() {
-      const colab = state.colaboradores.find(c => c.id === colaboradorSelecionadoId);
-      if (!colab) return;
-
-      const mesSel = parseInt(document.getElementById('colab-filtro-mes').value);
-      const anoSel = parseInt(document.getElementById('colab-filtro-ano').value);
-      const nomeMes = document.getElementById('colab-filtro-mes').options[mesSel].text;
-      const dataPagamento = document.getElementById('colab-data-pagamento').value;
-      const statusPagamento = document.getElementById('colab-status-pagamento').value;
-
-      const vales = state.valesColaboradores.filter(v => v.colaboradorId === colaboradorSelecionadoId);
-      const extras = state.extrasColaboradores.filter(ex => ex.colaboradorId === colaboradorSelecionadoId);
-
-      const valesDoMes = vales.filter(v => {
-        if (!v.data) return false;
-        const d = new Date(v.data + 'T00:00:00');
-        return d.getMonth() === mesSel && d.getFullYear() === anoSel && v.incluirNoRecibo !== false;
-      });
-
-      const extrasDoMes = extras.filter(ex => {
-        if (!ex.data) return false;
-        const d = new Date(ex.data + 'T00:00:00');
-        return d.getMonth() === mesSel && d.getFullYear() === anoSel && ex.incluirNoRecibo !== false;
-      });
-
-      let totalVales = 0; valesDoMes.forEach(v => totalVales += (parseFloat(v.valor) || 0));
-      let totalExtras = 0; extrasDoMes.forEach(ex => totalExtras += (parseFloat(ex.valor) || 0));
-      const liquido = Math.max(0, (colab.salarioBase + totalExtras) - totalVales);
-      
-      const emp = state.empresa || {};
-
-      const reciboObj = {
-        empresaId: state.currentUser.empresaId,
-        colaboradorId: colaboradorSelecionadoId,
-        colaboradorNome: colab.nome,
-        mesRef: mesSel,
-        anoRef: anoSel,
-        nomeMes,
-        salarioBase: colab.salarioBase,
-        vales: valesDoMes,
-        extras: extrasDoMes,
-        liquido,
-        dataPagamento,
-        statusPagamento,
-        dataGeracao: new Date().toISOString(),
-        empresaDados: emp
-      };
-
-      try {
-        await db.collection("recibos_historico").add(reciboObj);
-      } catch (err) {
-        console.error("Erro ao arquivar recibo:", err);
-      }
-
-      exibirHtmlReciboModal(reciboObj);
-    }
-
-    function exibirHtmlReciboModal(rec) {
-      const colab = state.colaboradores.find(c => c.id === rec.colaboradorId) || { nome: rec.colaboradorNome, doc: '---', cargo: '---', pix: '---' };
-      const emp = rec.empresaDados || state.empresa || {};
-
-      document.getElementById('printable-recibo-salario').innerHTML = `
-        <div class="recibo-bloco-metade" style="border:none; padding:0; margin:0;">
-          <div class="recibo-sheet-header">
-            <strong>RECIBO DE PAGAMENTO DE SALÁRIO</strong>
-            <span>${emp.nome || 'HAPPY EGGS'}</span>
-          </div>
-          <div style="font-size:0.75rem; margin-bottom:6px;">
-            <div><strong>Empresa:</strong> ${emp.nome || 'N/I'} | <strong>CNPJ:</strong> ${emp.cnpj || 'N/I'}</div>
-            <div><strong>Endereço:</strong> ${emp.end || 'N/I'} | <strong>Tel:</strong> ${emp.tel || 'N/I'}</div>
-          </div>
-          <div style="font-size:0.78rem; background:#eff6ff; padding:6px; border-radius:6px; border:1px solid #bfdbfe; margin-bottom:8px;">
-            <div><strong>📅 MÊS DE REFERÊNCIA:</strong> <span style="color:#1e40af; font-weight:800; font-size:0.85rem;">${rec.nomeMes.toUpperCase()} / ${rec.anoRef}</span></div>
-            <div><strong>🗓️ Data do Pagamento:</strong> ${rec.dataPagamento ? new Date(rec.dataPagamento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'} | <strong>Status:</strong> <span style="color:${rec.statusPagamento==='Pago'?'#065f46':'#991b1b'}; font-weight:bold;">${rec.statusPagamento || 'Pendente'}</span></div>
-          </div>
-          <div style="font-size:0.78rem; background:#f8fafc; padding:6px; border-radius:6px; border:1px solid #e2e8f0; margin-bottom:8px;">
-            <div><strong>Colaborador:</strong> ${colab.nome} | <strong>CPF:</strong> ${colab.doc || 'N/I'}</div>
-            <div><strong>Cargo:</strong> ${colab.cargo} | <strong>PIX:</strong> ${colab.pix}</div>
-          </div>
-          <hr class="dashed-divider">
-          <div class="item-linha-zebrado"><span>Salário Base Mensal:</span> <strong>R$ ${parseFloat(rec.salarioBase).toFixed(2)}</strong></div>
-          ${(rec.extras || []).map(ex => `<div class="item-linha-zebrado" style="color:var(--tech);"><span>• Extra: ${ex.descricao}</span><span>+ R$ ${parseFloat(ex.valor).toFixed(2)}</span></div>`).join('')}
-          ${(rec.vales || []).map(v => `<div class="item-linha-zebrado" style="color:var(--danger);"><span>• Desconto Vale: ${v.motivo}</span><span>- R$ ${parseFloat(v.valor).toFixed(2)}</span></div>`).join('')}
-          <hr class="dashed-divider">
-          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.95rem; color:var(--accent); padding:4px 0;">
-            <span>VALOR LÍQUIDO PAGO:</span>
-            <span>R$ ${parseFloat(rec.liquido).toFixed(2)}</span>
-          </div>
-          <br>
-          <div style="text-align:center; border-top:1px solid #0f172a; padding-top:6px; width:80%; margin:20px auto 0 auto; font-size:0.75rem;">
-            Assinatura do Colaborador
-          </div>
-        </div>
-      `;
-      document.getElementById('modal-recibo-salario').style.display = 'flex';
-    }
-
-    function reimprimirReciboHistorico(reciboId) {
-      const rec = state.recibosHistorico.find(r => r.id === reciboId);
-      if (!rec) return alert('Recibo não encontrado no histórico.');
-      exibirHtmlReciboModal(rec);
-    }
-
-    function imprimirReciboColaboradorDireto() {
-      const conteudoHtml = document.getElementById('printable-recibo-salario').outerHTML;
-      document.getElementById('modal-recibo-salario').style.display = 'none';
-      abrirJanelaImpressaoOtimizada(conteudoHtml);
-    }
-
-    function fecharModalReciboSeguro() {
-      document.getElementById('modal-recibo-salario').style.display = 'none';
-    }
-
-    // --- CONTROLE TÉCNICO & ZOOTECNIA ---
     async function cadastrarLoteTecnico(e) {
       e.preventDefault();
       if (!state.currentUser) return;
@@ -1800,20 +1208,21 @@
           nome, dataAlojamento, linhagem, qtdInicial, qtdAtual: qtdInicial, idadeInicialSemanas, criadoEm: new Date()
         });
         e.target.reset();
-        alert('Lote técnico cadastrado com sucesso!');
+        alert('Lote tÃ©cnico cadastrado com sucesso!');
         voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
 
     async function excluirLoteTecnico(id) {
-      if (confirm("Tem certeza que deseja excluir este lote técnico?")) {
+      if (confirm("Tem certeza que deseja excluir este lote tÃ©cnico?")) {
         try {
           await db.collection("lotes_tecnicos").doc(id).delete();
-          alert('Lote excluído!');
+          alert('Lote excluÃ­do!');
         } catch (err) { alert('Erro: ' + err.message); }
       }
     }
 
+    // --- FUNÃÃES DE PESAGEM DINÃMICA DAS AVES ---
     function gerarCamposPesagemAves() {
       const qtd = parseInt(document.getElementById('pesagem-qtd-aves').value || 0);
       const container = document.getElementById('container-pesagem-individual');
@@ -1841,17 +1250,21 @@
       const resDiv = document.getElementById('resultado-peso-medio');
       if (inputs.length === 0) return;
 
-      let soma = 0; let count = 0;
+      let soma = 0;
+      let count = 0;
       inputs.forEach(input => {
         const val = parseFloat(input.value);
-        if (!isNaN(val) && val > 0) { soma += val; count++; }
+        if (!isNaN(val) && val > 0) {
+          soma += val;
+          count++;
+        }
       });
 
       if (count > 0) {
         const media = (soma / count).toFixed(3);
-        resDiv.innerText = `📊 Peso Médio Calculado: ${media} kg (${count} aves pesadas)`;
+        resDiv.innerText = `ð Peso MÃ©dio Calculado: ${media} kg (${count} aves pesadas)`;
       } else {
-        resDiv.innerText = `📊 Insira os pesos para calcular a média.`;
+        resDiv.innerText = `ð Insira os pesos para calcular a mÃ©dia.`;
       }
     }
 
@@ -1864,21 +1277,30 @@
       const racaoKg = parseFloat(document.getElementById('postura-racao').value || 0);
       const obs = document.getElementById('postura-obs').value.trim();
 
+      // Coletar dados de pesagem
       const qtdAvesPesadas = parseInt(document.getElementById('pesagem-qtd-aves').value || 0);
-      let pesosIndividuais = []; let pesoMedio = 0;
+      let pesosIndividuais = [];
+      let pesoMedio = 0;
 
       if (qtdAvesPesadas > 0) {
         const inputs = document.querySelectorAll('.input-peso-ave');
-        let soma = 0; let validos = 0;
+        let soma = 0;
+        let validos = 0;
         inputs.forEach(inp => {
           const p = parseFloat(inp.value);
-          if (!isNaN(p) && p > 0) { pesosIndividuais.push(p); soma += p; validos++; }
+          if (!isNaN(p) && p > 0) {
+            pesosIndividuais.push(p);
+            soma += p;
+            validos++;
+          }
         });
-        if (validos > 0) pesoMedio = parseFloat((soma / validos).toFixed(3));
+        if (validos > 0) {
+          pesoMedio = parseFloat((soma / validos).toFixed(3));
+        }
       }
 
       const lote = state.lotesTecnicos.find(l => l.id === loteId);
-      if (!lote) return alert('Selecione um lote válido.');
+      if (!lote) return alert('Selecione um lote vÃ¡lido.');
 
       const avesAtivas = lote.qtdAtual || lote.qtdInicial;
       const taxaPostura = avesAtivas > 0 ? ((ovosColhidos / avesAtivas) * 100).toFixed(1) : 0;
@@ -1886,15 +1308,25 @@
       try {
         await db.collection("producao_zootecnica").add({
           empresaId: state.currentUser.empresaId,
-          loteId, loteNome: lote.nome, data, ovosColhidos, racaoKg, obs, taxaPostura: parseFloat(taxaPostura),
-          pesagem: { qtdAvesPesadas, pesosIndividuais, pesoMedio },
+          loteId, 
+          loteNome: lote.nome, 
+          data, 
+          ovosColhidos, 
+          racaoKg, 
+          obs, 
+          taxaPostura: parseFloat(taxaPostura),
+          pesagem: {
+            qtdAvesPesadas,
+            pesosIndividuais,
+            pesoMedio
+          },
           criadoEm: new Date()
         });
 
         e.target.reset();
         document.getElementById('container-pesagem-individual').innerHTML = '';
         document.getElementById('resultado-peso-medio').style.display = 'none';
-        alert(`Registo efetuado com sucesso! Taxa de Postura: ${taxaPostura}%`);
+        alert(`Registo efetuado com sucesso! Taxa de Postura: ${taxaPostura}% ${pesoMedio > 0 ? '| Peso MÃ©dio: ' + pesoMedio + 'kg' : ''}`);
         voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
@@ -1908,17 +1340,20 @@
       const motivo = document.getElementById('morte-obs').value.trim();
 
       const lote = state.lotesTecnicos.find(l => l.id === loteId);
-      if (!lote) return alert('Selecione um lote válido.');
+      if (!lote) return alert('Selecione um lote vÃ¡lido.');
 
       const novaQtdAtual = Math.max(0, (lote.qtdAtual || lote.qtdInicial) - qtdMortas);
 
       try {
         await db.collection("mortalidade_tecnica").add({
-          empresaId: state.currentUser.empresaId, loteId, loteNome: lote.nome, data, qtdMortas, motivo, criadoEm: new Date()
+          empresaId: state.currentUser.empresaId,
+          loteId, loteNome: lote.nome, data, qtdMortas, motivo, criadoEm: new Date()
         });
+
         await db.collection("lotes_tecnicos").doc(loteId).update({ qtdAtual: novaQtdAtual });
+
         e.target.reset();
-        alert('Mortalidade registada com sucesso!');
+        alert('Mortalidade registada com sucesso e abatida do lote!');
         voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
@@ -1932,14 +1367,16 @@
       const data = document.getElementById('vacina-data').value;
 
       const lote = state.lotesTecnicos.find(l => l.id === loteId);
-      if (!lote) return alert('Selecione um lote válido.');
+      if (!lote) return alert('Selecione um lote vÃ¡lido.');
 
       try {
         await db.collection("vacinacao_tecnica").add({
-          empresaId: state.currentUser.empresaId, loteId, loteNome: lote.nome, vacinaNome, qtdAves, data, criadoEm: new Date()
+          empresaId: state.currentUser.empresaId,
+          loteId, loteNome: lote.nome, vacinaNome, qtdAves, data, criadoEm: new Date()
         });
+
         e.target.reset();
-        alert('Vacinação registada com sucesso!');
+        alert('VacinaÃ§Ã£o registada com sucesso no histÃ³rico sanitÃ¡rio!');
         voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
@@ -1955,17 +1392,20 @@
         const batchP = db.batch();
         const lotesSnap = await db.collection("lotes_tecnicos").where("empresaId", "==", empresaId).get();
         lotesSnap.docs.forEach(doc => batchP.delete(doc.ref));
+
         const postSnap = await db.collection("producao_zootecnica").where("empresaId", "==", empresaId).get();
         postSnap.docs.forEach(doc => batchP.delete(doc.ref));
+
         const mortSnap = await db.collection("mortalidade_tecnica").where("empresaId", "==", empresaId).get();
         mortSnap.docs.forEach(doc => batchP.delete(doc.ref));
+
         const vacSnap = await db.collection("vacinacao_tecnica").where("empresaId", "==", empresaId).get();
         vacSnap.docs.forEach(doc => batchP.delete(doc.ref));
 
         await batchP.commit();
         document.getElementById('modal-zerar-tecnico').style.display = 'none';
-        alert('Dados técnicos zerados com sucesso!');
-      } catch (err) { alert('Erro: ' + err.message); }
+        alert('Todos os dados do controle tÃ©cnico foram zerados com sucesso!');
+      } catch (err) { alert('Erro ao zerar dados: ' + err.message); }
     }
 
     function abrirModalRelatorioTecnico() {
@@ -1983,7 +1423,7 @@
     function renderizarDadosRelatorioTecnico() {
       const tipo = document.getElementById('tec-filtro-periodo').value;
       const agora = new Date();
-      document.getElementById('tec-relatorio-emissao').innerText = "Emitido em: " + agora.toLocaleDateString('pt-BR');
+      document.getElementById('tec-relatorio-emissao').innerText = "Emitido em: " + agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
       let posturaFiltrada = state.historicoPosturaTecnica;
       let mortalidadeFiltrada = state.historicoMortalidade;
@@ -1995,7 +1435,50 @@
           const d = new Date(h.data + 'T00:00:00');
           return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
         });
+        mortalidadeFiltrada = state.historicoMortalidade.filter(m => {
+          if (!m.data) return false;
+          const d = new Date(m.data + 'T00:00:00');
+          return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+        });
+        vacinasFiltradas = state.historicoVacinacao.filter(v => {
+          if (!v.data) return false;
+          const d = new Date(v.data + 'T00:00:00');
+          return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+        });
+      } else if (tipo === 'ano') {
+        posturaFiltrada = state.historicoPosturaTecnica.filter(h => {
+          if (!h.data) return false;
+          const d = new Date(h.data + 'T00:00:00');
+          return d.getFullYear() === agora.getFullYear();
+        });
+        mortalidadeFiltrada = state.historicoMortalidade.filter(m => {
+          if (!m.data) return false;
+          const d = new Date(m.data + 'T00:00:00');
+          return d.getFullYear() === agora.getFullYear();
+        });
+        vacinasFiltradas = state.historicoVacinacao.filter(v => {
+          if (!v.data) return false;
+          const d = new Date(v.data + 'T00:00:00');
+          return d.getFullYear() === agora.getFullYear();
+        });
+      } else if (tipo === 'personalizado') {
+        const dataInicio = document.getElementById('tec-data-inicio').value;
+        const dataFim = document.getElementById('tec-data-fim').value;
+        if (dataInicio && dataFim) {
+          const ini = new Date(dataInicio + 'T00:00:00');
+          const fim = new Date(dataFim + 'T23:59:59');
+          posturaFiltrada = state.historicoPosturaTecnica.filter(h => { const d = new Date(h.data + 'T00:00:00'); return d >= ini && d <= fim; });
+          mortalidadeFiltrada = state.historicoMortalidade.filter(m => { const d = new Date(m.data + 'T00:00:00'); return d >= ini && d <= fim; });
+          vacinasFiltradas = state.historicoVacinacao.filter(v => { const d = new Date(v.data + 'T00:00:00'); return d >= ini && d <= fim; });
+        } else {
+          posturaFiltrada = []; mortalidadeFiltrada = []; vacinasFiltradas = [];
+        }
       }
+
+      // GARANTE A ORDENAÃÃO POR DATA (MAIS RECENTE PRIMEIRO)
+      posturaFiltrada.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+      mortalidadeFiltrada.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+      vacinasFiltradas.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
 
       let somaTaxas = 0; let totalOvosPeriodo = 0;
       posturaFiltrada.forEach(p => { somaTaxas += (p.taxaPostura || 0); totalOvosPeriodo += (p.ovosColhidos || 0); });
@@ -2005,9 +1488,18 @@
       document.getElementById('tec-kpi-ovos').innerText = totalOvosPeriodo.toLocaleString('pt-BR') + ' ovos';
 
       const totalMortes = mortalidadeFiltrada.reduce((acc, m) => acc + (m.qtdMortas || 0), 0);
-      document.getElementById('tec-resumo-baixas').innerHTML = `• Total de Baixas: <strong>${totalMortes} aves</strong>`;
-      document.getElementById('tec-resumo-vacinas-lista').innerHTML = vacinasFiltradas.length > 0 ? vacinasFiltradas.map(v => `• ${v.vacinaNome} (${v.qtdAves} aves)`).join('<br>') : 'Nenhuma vacina.';
-      document.getElementById('tec-resumo-tabela-lotes').innerHTML = state.lotesTecnicos.map(l => `<tr><td><strong>${l.nome}</strong></td><td>${l.qtdAtual || l.qtdInicial} aves</td><td>${l.dataAlojamento || '---'}</td></tr>`).join('');
+      document.getElementById('tec-resumo-baixas').innerHTML = `â¢ Total de Baixas / Mortalidade no perÃ­odo: <strong>${totalMortes} aves</strong>`;
+
+      const listaVacinasHtml = vacinasFiltradas.length > 0 ? vacinasFiltradas.map(v => {
+        const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
+        return `â¢ [${dataFmt}] Lote: <strong>${v.loteNome || 'Lote'}</strong> â Vacina: <strong>${v.vacinaNome}</strong> (${v.qtdAves} doses/aves)`;
+      }).join('<br>') : '<span style="color:#64748b;">Nenhum registo de vacinaÃ§Ã£o neste perÃ­odo.</span>';
+
+      document.getElementById('tec-resumo-vacinas-lista').innerHTML = listaVacinasHtml;
+
+      document.getElementById('tec-resumo-tabela-lotes').innerHTML = state.lotesTecnicos.map(l => `
+        <tr><td><strong>${l.nome}</strong><br><small>${l.linhagem}</small></td><td>${l.qtdAtual || l.qtdInicial} aves</td><td>${l.dataAlojamento || '---'}</td></tr>
+      `).join('') || '<tr><td colspan="3" style="text-align:center;">Nenhum lote.</td></tr>';
     }
 
     function imprimirRelatorioTecnicoDireto() {
@@ -2021,26 +1513,95 @@
       const selectLoteMorte = document.getElementById('morte-lote-id');
       const selectLoteVacina = document.getElementById('vacina-lote-id');
       const tabelaLotes = document.getElementById('lista-lotes-tecnicos');
+      const tabelaHistorico = document.getElementById('lista-historico-postura');
+      const tabelaMortalidade = document.getElementById('lista-historico-mortalidade');
+      const tabelaVacinacao = document.getElementById('lista-historico-vacinacao');
       const kpiMediaMensal = document.getElementById('kpi-media-mensal');
 
       if (!tabelaLotes) return;
-      const optionsLotes = state.lotesTecnicos.map(l => `<option value="${l.id}">${l.nome} (${l.linhagem} - ${l.qtdAtual || l.qtdInicial} aves)</option>`).join('') || '<option value="">Cadastre um lote</option>';
+
+      const optionsLotes = state.lotesTecnicos.map(l => `<option value="${l.id}">${l.nome} (${l.linhagem} - ${l.qtdAtual || l.qtdInicial} aves)</option>`).join('') || '<option value="">Cadastre um lote primeiro</option>';
       if (selectLotePostura) selectLotePostura.innerHTML = optionsLotes;
       if (selectLoteMorte) selectLoteMorte.innerHTML = optionsLotes;
       if (selectLoteVacina) selectLoteVacina.innerHTML = optionsLotes;
 
-      tabelaLotes.innerHTML = state.lotesTecnicos.map(l => `<tr><td><strong>${l.nome}</strong></td><td>${l.qtdAtual || l.qtdInicial} aves</td><td>-</td><td><button class="btn-danger" type="button" onclick="excluirLoteTecnico('${l.id}')">🗑️</button></td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;">Nenhum lote.</td></tr>';
-      if (kpiMediaMensal) kpiMediaMensal.innerText = "0%";
+      tabelaLotes.innerHTML = state.lotesTecnicos.map(l => {
+        let semanasAtuais = l.idadeInicialSemanas || 0;
+        if (l.dataAlojamento) {
+          const diffDias = Math.floor((new Date() - new Date(l.dataAlojamento)) / (1000 * 60 * 60 * 24));
+          semanasAtuais += Math.floor(diffDias / 7);
+        }
+        return `
+          <tr>
+            <td><strong>${l.nome}</strong><br><small style="color:#64748b;">${l.linhagem}</small></td>
+            <td>${l.qtdAtual || l.qtdInicial} aves</td>
+            <td>${semanasAtuais} semanas</td>
+            <td><button class="btn-danger" type="button" onclick="excluirLoteTecnico('${l.id}')">ðï¸</button></td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum lote alojado.</td></tr>';
+
+      const agora = new Date();
+      const mesAtual = agora.getMonth();
+      const anoAtual = agora.getFullYear();
+
+      const registrosMes = state.historicoPosturaTecnica.filter(h => {
+        if (!h.data) return false;
+        const d = new Date(h.data + 'T00:00:00');
+        return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+      });
+
+      let somaTaxas = 0;
+      registrosMes.forEach(r => somaTaxas += (r.taxaPostura || 0));
+      const mediaMes = registrosMes.length > 0 ? (somaTaxas / registrosMes.length).toFixed(1) : 0;
+      if (kpiMediaMensal) kpiMediaMensal.innerText = mediaMes + '%';
+
+      if (tabelaHistorico) {
+        tabelaHistorico.innerHTML = state.historicoPosturaTecnica.slice(0, 15).map(h => `
+          <tr>
+            <td>${h.data ? new Date(h.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
+            <td>${h.loteNome || 'Lote'}</td>
+            <td>${h.ovosColhidos} ovos</td>
+            <td>
+              <span class="badge badge-ativo">${h.taxaPostura || 0}%</span>
+              ${h.pesagem && h.pesagem.pesoMedio ? `<br><small style="color:var(--tech);">âï¸ MÃ©dia: ${h.pesagem.pesoMedio}kg</small>` : ''}
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo.</td></tr>';
+      }
+
+      if (tabelaMortalidade) {
+        tabelaMortalidade.innerHTML = state.historicoMortalidade.slice(0, 15).map(m => `
+          <tr>
+            <td>${m.data ? new Date(m.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
+            <td>${m.loteNome || 'Lote'}</td>
+            <td><span class="badge badge-pendente">-${m.qtdMortas} aves</span></td>
+            <td>${m.motivo || 'Sem obs'}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo de mortalidade.</td></tr>';
+      }
+
+      if (tabelaVacinacao) {
+        tabelaVacinacao.innerHTML = state.historicoVacinacao.slice(0, 15).map(v => `
+          <tr>
+            <td>${v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
+            <td>${v.loteNome || 'Lote'}</td>
+            <td><strong>${v.vacinaNome}</strong></td>
+            <td>${v.qtdAves} aves</td>
+          </tr>
+        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo de vacinaÃ§Ã£o.</td></tr>';
+      }
     }
 
     function atualizarComportamentoPlano() {
       const plano = document.getElementById('saas-plano').value;
       const grupoVenc = document.getElementById('grupo-vencimento');
       const inputVenc = document.getElementById('saas-vencimento');
+      const inputValor = document.getElementById('saas-valor-plano');
       const hoje = new Date();
-      if (plano === 'mensal') { hoje.setDate(hoje.getDate() + 30); grupoVenc.style.display = 'block'; inputVenc.value = hoje.toISOString().split('T')[0]; }
-      else if (plano === 'anual') { hoje.setFullYear(hoje.getFullYear() + 1); grupoVenc.style.display = 'block'; inputVenc.value = hoje.toISOString().split('T')[0]; }
-      else { grupoVenc.style.display = 'none'; inputVenc.value = '2099-12-31'; }
+      if (plano === 'mensal') { hoje.setDate(hoje.getDate() + 30); grupoVenc.style.display = 'block'; inputVenc.value = hoje.toISOString().split('T')[0]; if(!inputValor.value) inputValor.value='97.00'; }
+      else if (plano === 'anual') { hoje.setFullYear(hoje.getFullYear() + 1); grupoVenc.style.display = 'block'; inputVenc.value = hoje.toISOString().split('T')[0]; if(!inputValor.value) inputValor.value='997.00'; }
+      else { grupoVenc.style.display = 'none'; inputVenc.value = '2099-12-31'; if(!inputValor.value) inputValor.value='1997.00'; }
     }
 
     async function cadastrarEmpresaCliente(e) {
@@ -2060,34 +1621,126 @@
       try {
         await db.collection("empresas").doc(idEmpresa).set({ nome, cnpj, email, tel, end, plano, valorPlano, vencimento, status: "Ativo", criadoEm: new Date() });
         await db.collection("config").doc(idEmpresa).set({ nome, cnpj, tel, end, social: "", pix: "" });
-        await db.collection("usuarios").add({ empresaId: idEmpresa, login: adminUser, pass: adminPass, role: "admin" });
-        alert("Empresa cadastrada com sucesso!");
+        
+        const queryUser = await db.collection("usuarios").where("empresaId", "==", idEmpresa).where("login", "==", adminUser).get();
+        if (queryUser.empty) {
+          await db.collection("usuarios").add({ empresaId: idEmpresa, login: adminUser, pass: adminPass, role: "admin" });
+        } else {
+          await queryUser.docs[0].ref.update({ pass: adminPass, role: "admin" });
+        }
+
+        alert("Empresa " + nome + " cadastrada com sucesso!");
         e.target.reset();
+        atualizarComportamentoPlano();
       } catch (err) { alert("Erro: " + err.message); }
     }
 
     function renderEmpresasSaaS() {
       const tbody = document.getElementById('lista-empresas-saas');
       if (!tbody) return;
-      tbody.innerHTML = state.empresasSaaS.map(emp => `
-        <tr>
-          <td><strong style="cursor:pointer; color:var(--accent);" onclick="abrirDetalhesEmpresa('${emp.id}')">${emp.nome}</strong><br><small>${emp.id}</small></td>
-          <td><span class="badge badge-ativo">${emp.status || 'Ativo'}</span></td>
-          <td><button class="btn-danger" type="button" onclick="excluirEmpresaSaaS('${emp.id}')">🗑️</button></td>
-        </tr>
-      `).join('');
+      const termoBusca = (document.getElementById('saas-busca-empresa')?.value || '').toLowerCase();
+      
+      const filtradas = state.empresasSaaS.filter(emp => {
+        const nome = (emp.nome || '').toLowerCase();
+        const id = (emp.id || '').toLowerCase();
+        const cnpj = (emp.cnpj || '').toLowerCase();
+        return nome.includes(termoBusca) || id.includes(termoBusca) || cnpj.includes(termoBusca);
+      });
+
+      tbody.innerHTML = filtradas.map(emp => {
+        const isAtivo = emp.status === 'Ativo';
+        return `
+          <tr>
+            <td>
+              <strong style="cursor: pointer; color: var(--accent); font-size: 0.95rem;" onclick="abrirDetalhesEmpresa('${emp.id}')">ð¢ ${emp.nome}</strong><br>
+              <small style="color:#64748b;">ID: ${emp.id} | CNPJ: ${emp.cnpj || 'N/I'}</small><br>
+              <small style="color:#2563eb; font-weight:bold;">Plano: ${emp.plano || 'mensal'} (Venc: ${emp.vencimento || '---'})</small>
+            </td>
+            <td><span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}">${emp.status || 'Ativo'}</span></td>
+            <td>
+              <button class="btn" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%; margin-bottom:4px; background:#2563eb;" onclick="abrirModalEditarEmpresa('${emp.id}')">âï¸ Editar</button>
+              <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%; margin-bottom:4px;" onclick="alternarStatusEmpresa('${emp.id}', '${emp.status || 'Ativo'}')">${isAtivo ? 'Bloquear' : 'Ativar'}</button>
+              <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%;" onclick="excluirEmpresaSaaS('${emp.id}')">ðï¸ Apagar</button>
+            </td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="3" style="text-align:center; color:#64748b;">Nenhuma empresa encontrada.</td></tr>';
     }
 
-    function abrirDetalhesEmpresa(empId) {
-      const emp = state.empresasSaaS.find(e => e.id === empId);
+    function abrirModalEditarEmpresa(empresaId) {
+      const emp = state.empresasSaaS.find(e => e.id === empresaId);
+      if (!emp) return;
+
+      document.getElementById('edit-emp-id-original').value = emp.id;
+      document.getElementById('edit-emp-nome').value = emp.nome || '';
+      document.getElementById('edit-emp-cnpj').value = emp.cnpj || '';
+      document.getElementById('edit-emp-email').value = emp.email || '';
+      document.getElementById('edit-emp-tel').value = emp.tel || '';
+      document.getElementById('edit-emp-end').value = emp.end || '';
+      document.getElementById('edit-emp-plano').value = emp.plano || 'mensal';
+      document.getElementById('edit-emp-valor').value = emp.valorPlano || 0;
+      document.getElementById('edit-emp-vencimento').value = emp.vencimento || '';
+
+      document.getElementById('modal-editar-empresa').style.display = 'flex';
+    }
+
+    async function salvarEdicaoEmpresa(e) {
+      e.preventDefault();
+      const idOriginal = document.getElementById('edit-emp-id-original').value;
+      const nome = document.getElementById('edit-emp-nome').value.trim();
+      const cnpj = document.getElementById('edit-emp-cnpj').value.trim();
+      const email = document.getElementById('edit-emp-email').value.trim();
+      const tel = document.getElementById('edit-emp-tel').value.trim();
+      const end = document.getElementById('edit-emp-end').value.trim();
+      const plano = document.getElementById('edit-emp-plano').value;
+      const valorPlano = parseFloat(document.getElementById('edit-emp-valor').value || 0);
+      const vencimento = document.getElementById('edit-emp-vencimento').value;
+
+      try {
+        await db.collection("empresas").doc(idOriginal).update({
+          nome, cnpj, email, tel, end, plano, valorPlano, vencimento
+        });
+        await db.collection("config").doc(idOriginal).set({ nome, cnpj, tel, end }, { merge: true });
+
+        alert('Dados da empresa atualizados com sucesso!');
+        document.getElementById('modal-editar-empresa').style.display = 'none';
+      } catch (err) {
+        alert('Erro ao atualizar empresa: ' + err.message);
+      }
+    }
+
+    function abrirDetalhesEmpresa(empresaId) {
+      const emp = state.empresasSaaS.find(e => e.id === empresaId);
       if (!emp) return;
       empresaSelecionadaParaDetalhes = emp;
-      document.getElementById('detalhe-titulo-modal').innerText = emp.nome;
-      document.getElementById('detalhe-corpo-modal').innerHTML = `ID: ${emp.id}<br>CNPJ: ${emp.cnpj || '---'}`;
+
+      const usuariosDaEmpresa = state.todosUsuariosSaaS.filter(u => u.empresaId === empresaId);
+      const valorPlanoFmt = "R$ " + parseFloat(emp.valorPlano || 0).toFixed(2);
+
+      let htmlUsuarios = usuariosDaEmpresa.map(u => `<div>ð¤ <strong>${u.login}</strong> (${u.role}) â Senha: <code>${superAdminPrivacidadeOculto ? 'â¢â¢â¢â¢â¢â¢' : u.pass}</code></div>`).join('') || 'Nenhum usuÃ¡rio cadastrado.';
+
+      const htmlConteudo = `
+        <p style="margin-bottom:6px;"><strong>Nome Fantasia:</strong> ${emp.nome}</p>
+        <p style="margin-bottom:6px;"><strong>ID do Sistema:</strong> ${emp.id}</p>
+        <p style="margin-bottom:6px;"><strong>CNPJ / CPF:</strong> ${emp.cnpj || 'NÃ£o informado'}</p>
+        <p style="margin-bottom:6px;"><strong>E-mail:</strong> ${emp.email || 'NÃ£o informado'}</p>
+        <p style="margin-bottom:6px;"><strong>Telefone:</strong> ${emp.tel || 'NÃ£o informado'}</p>
+        <p style="margin-bottom:6px;"><strong>EndereÃ§o:</strong> ${emp.end || 'NÃ£o informado'}</p>
+        <p style="margin-bottom:6px;"><strong>Plano:</strong> ${emp.plano || '---'} (${valorPlanoFmt})</p>
+        <p style="margin-bottom:10px;"><strong>Vencimento:</strong> ${emp.vencimento || '---'}</p>
+        <hr style="border:none; border-top:1px solid #e2e8f0; margin:10px 0;">
+        <div style="font-weight:bold; margin-bottom:4px; color:#0f172a;">Acessos e Credenciais:</div>
+        ${htmlUsuarios}
+      `;
+
+      document.getElementById('detalhe-titulo-modal').innerText = "Granja: " + emp.nome;
+      document.getElementById('detalhe-corpo-modal').innerHTML = htmlConteudo;
       document.getElementById('modal-detalhes-empresa').style.display = 'flex';
     }
 
     function abrirModalRedefinirSenhaDoDetalhe() {
+      if (!empresaSelecionadaParaDetalhes) return;
+      document.getElementById('nova-senha-cli-input').value = '';
       document.getElementById('modal-detalhes-empresa').style.display = 'none';
       document.getElementById('modal-redefinir-senha-cli').style.display = 'flex';
     }
@@ -2096,17 +1749,32 @@
       e.preventDefault();
       const novaSenha = document.getElementById('nova-senha-cli-input').value.trim();
       if (!novaSenha || !empresaSelecionadaParaDetalhes) return;
+
       try {
-        const uList = state.todosUsuariosSaaS.filter(u => u.empresaId === empresaSelecionadaParaDetalhes.id);
-        if (uList.length > 0) await db.collection("usuarios").doc(uList[0].id).update({ pass: novaSenha });
-        alert('Senha alterada!');
+        const empresaId = empresaSelecionadaParaDetalhes.id;
+        const usuariosDaEmpresa = state.todosUsuariosSaaS.filter(u => u.empresaId === empresaId);
+        
+        if (usuariosDaEmpresa.length > 0) {
+          await db.collection("usuarios").doc(usuariosDaEmpresa[0].id).update({ pass: novaSenha });
+        } else {
+          await db.collection("usuarios").add({ empresaId: empresaId, login: "admin_" + empresaId, pass: novaSenha, role: "admin" });
+        }
+
+        alert('Senha atualizada com sucesso!');
         document.getElementById('modal-redefinir-senha-cli').style.display = 'none';
-      } catch (err) { alert('Erro: ' + err.message); }
+      } catch (err) { alert('Erro ao alterar senha: ' + err.message); }
+    }
+
+    async function alternarStatusEmpresa(id, statusAtual) {
+      await db.collection("empresas").doc(id).update({ status: statusAtual === 'Ativo' ? 'Bloqueado' : 'Ativo' });
     }
 
     async function excluirEmpresaSaaS(id) {
-      if (confirm("Excluir empresa?")) {
-        await db.collection("empresas").doc(id).delete();
+      if (confirm("Tem certeza que deseja excluir a empresa " + id + "?")) {
+        try {
+          await db.collection("empresas").doc(id).delete();
+          alert('Empresa excluÃ­da com sucesso!');
+        } catch (err) { alert('Erro: ' + err.message); }
       }
     }
 
@@ -2114,43 +1782,137 @@
       e.preventDefault();
       const novaSenha = document.getElementById('minha-nova-senha').value.trim();
       if (!novaSenha) return;
-      const snap = await db.collection("usuarios").where("login", "==", state.currentUser.login).get();
-      if (!snap.empty) await snap.docs[0].ref.update({ pass: novaSenha });
-      alert('Senha alterada! Faça login novamente.');
-      logout();
+      if (!state.currentUser || !state.currentUser.login) {
+        alert('SessÃ£o expirada. FaÃ§a login novamente.');
+        logout();
+        return;
+      }
+
+      try {
+        const snap = await db.collection("usuarios").where("login", "==", state.currentUser.login).get();
+        if (!snap.empty) {
+          await snap.docs[0].ref.update({ pass: novaSenha });
+        }
+        alert('Senha alterada com sucesso! FaÃ§a login novamente com a nova senha.');
+        logout();
+      } catch (err) {
+        alert('Erro ao alterar senha: ' + err.message);
+      }
     }
 
     function renderClientes() {
       const tbody = document.getElementById('lista-clientes');
       if (!tbody) return;
-      tbody.innerHTML = state.clientes.map(c => `<tr><td><strong>${c.nome}</strong></td><td>${c.tel}</td><td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">Excluir</button></td></tr>`).join('');
+      tbody.innerHTML = state.clientes.map(c => `
+        <tr>
+          <td><strong>${c.nome}</strong><br><small style="color:#64748b;">${c.doc || 'Sem Doc'}</small></td>
+          <td>${c.tel}<br><small style="color:#64748b;">${c.end || ''}</small></td>
+          <td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">Excluir</button></td>
+        </tr>
+      `).join('');
     }
 
     async function excluirCliente(id) {
-      await db.collection("clientes").doc(id).delete();
+      if (window.confirm('Tem certeza que deseja excluir este cliente?')) {
+        try {
+          await db.collection("clientes").doc(id).delete();
+          alert('Cliente excluÃ­do com sucesso!');
+        } catch (err) {
+          alert('Erro ao excluir cliente: ' + err.message);
+        }
+      }
     }
 
     function filtrarClientesDashboard() {
       const termo = (document.getElementById('dash-busca-cliente')?.value || '').toLowerCase();
       const tbody = document.getElementById('lista-clientes-dash');
       if (!tbody) return;
-      tbody.innerHTML = state.clientes.filter(c => c.nome.toLowerCase().includes(termo)).map(c => `<tr><td>${c.nome}</td><td>${c.tel}</td></tr>`).join('');
+      const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(termo));
+      tbody.innerHTML = filtrados.slice(0, 10).map(c => `<tr><td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td><td>ð ${c.tel}</td></tr>`).join('');
     }
 
     function renderProdutos() {
       const tbody = document.getElementById('lista-produtos');
       if (!tbody) return;
-      tbody.innerHTML = state.produtos.map(p => `<tr><td>${p.nome}</td><td>R$ ${parseFloat(p.preco).toFixed(2)}</td><td>${p.ovosUnid} ovos</td><td><button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑</button></td></tr>`).join('');
+      tbody.innerHTML = state.produtos.map(p => `
+        <tr><td><strong>${p.nome}</strong></td><td>R$ ${parseFloat(p.preco).toFixed(2)}</td><td>${p.ovosUnid} ovos</td><td><button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">ð</button></td></tr>
+      `).join('');
     }
 
     async function excluirProduto(id) {
-      await db.collection("produtos").doc(id).delete();
+      if (confirm('Tem certeza que deseja excluir este produto?')) {
+        try {
+          await db.collection("produtos").doc(id).delete();
+          alert('Produto excluÃ­do com sucesso!');
+        } catch (err) { alert('Erro ao excluir produto: ' + err.message); }
+      }
     }
 
     function renderPedidos() {
       const tbody = document.getElementById('lista-pedidos');
       if (!tbody) return;
-      tbody.innerHTML = state.pedidos.map(p => `<tr><td><input type="checkbox" class="check-pedido" value="${p.id}"></td><td>#${p.numeroPedido}</td><td>${p.clienteNome}</td><td>R$ ${p.total.toFixed(2)}</td><td><span class="badge ${p.status==='Pago'?'badge-pago':'badge-pendente'}">${p.status}</span></td><td><button class="btn" type="button" style="padding:4px;" onclick="abrirModalNota('${p.id}')">Recibo</button></td></tr>`).join('');
+      tbody.innerHTML = state.pedidos.map(p => {
+        const isPago = p.status === 'Pago';
+        const isFinalizado = p.status === 'Finalizado';
+        
+        let badgeClass = 'badge-pendente';
+        let badgeLabel = 'ð´ Pendente';
+        if (isFinalizado) { badgeClass = 'badge-finalizado'; badgeLabel = 'ð¦ Finalizado'; }
+        else if (isPago) { badgeClass = 'badge-pago'; badgeLabel = 'ð¢ Pago'; }
+
+        return `
+          <tr>
+            <td><input type="checkbox" class="check-pedido" data-id="${p.id}" value="${p.id}"></td>
+            <td><strong>#${p.numeroPedido || '---'}</strong></td>
+            <td>${p.clienteNome || 'Cliente'}</td>
+            <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
+            <td><span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">${badgeLabel}</span></td>
+            <td>
+              <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                <button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#2563eb;" onclick="abrirModalNota('${p.id}')">ð Recibo</button>
+                ${!isFinalizado ? `<button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#10b981;" onclick="marcarComoFinalizado('${p.id}')">âï¸ Finalizar</button>` : ''}
+                <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 6px;" onclick="cancelarExcluirPedido('${p.id}')">â Cancelar</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function cancelarExcluirPedido(id) {
+      if (!confirm("Deseja realmente cancelar e excluir este pedido? As quantidades de ovos dos produtos serÃ£o devolvidas para o estoque.")) return;
+      
+      const ped = state.pedidos.find(p => p.id === id);
+      if (!ped) return;
+
+      try {
+        const empresaId = state.currentUser.empresaId;
+        const refEstoque = db.collection("estoque_geral").doc(empresaId);
+        
+        let totalOvosDevolucao = 0;
+        if (ped.itens && Array.isArray(ped.itens)) {
+          ped.itens.forEach(item => {
+            const prodRef = state.produtos.find(p => p.id === item.produtoId);
+            const qtdOvosPorUnidade = prodRef ? (prodRef.ovosUnid || 0) : (item.totalOvos ? item.totalOvos / item.qtd : 0);
+            totalOvosDevolucao += (item.qtd || 0) * qtdOvosPorUnidade;
+          });
+        }
+
+        const docEstoque = await refEstoque.get();
+        let saldoAtual = docEstoque.exists ? (docEstoque.data().qtdOvos || 0) : 0;
+        await refEstoque.set({ qtdOvos: saldoAtual + totalOvosDevolucao }, { merge: true });
+
+        await db.collection("pedidos").doc(id).delete();
+        alert("Pedido cancelado e excluÃ­do com sucesso! Estoque atualizado.");
+      } catch (err) {
+        alert("Erro ao cancelar pedido: " + err.message);
+      }
+    }
+
+    async function marcarComoFinalizado(id) {
+      if (confirm("Marcar este pedido como Finalizado / Entregue?")) {
+        await db.collection("pedidos").doc(id).update({ status: 'Finalizado' });
+      }
     }
 
     function alternarTodosPedidos(master) {
@@ -2159,68 +1921,291 @@
 
     function preVisualizarRecibosSelecionados() {
       const checkboxes = document.querySelectorAll('.check-pedido:checked');
-      const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.value)));
-      if (!selecionados.length) return alert('Selecione pedidos.');
-      let html = '';
-      selecionados.forEach(id => {
-        const p = state.pedidos.find(x => x.id === id);
-        if (p) html += construirHtmlReciboMetade(p, state.empresa);
+      const selecionados = Array.from(new Set(Array.from(checkboxes).map(cb => cb.getAttribute('data-id') || cb.value)));
+      if (selecionados.length === 0) { alert('Selecione pelo menos um pedido!'); return; }
+      
+      const emp = state.empresa || {};
+      let htmlPaginas = '';
+      
+      selecionados.forEach((id, index) => {
+        const ped = state.pedidos.find(p => p.id === id);
+        if (ped) {
+          htmlPaginas += construirHtmlReciboMetade(ped, emp);
+        }
       });
-      abrirJanelaImpressaoOtimizada(html);
+
+      abrirJanelaImpressaoOtimizada(htmlPaginas);
     }
 
     function construirHtmlReciboMetade(ped, emp) {
+      const itens = ped.itens || [];
+      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
+      const cnpjEmpresa = emp.cnpj || 'N/I';
+      const telEmpresa = emp.tel || 'N/I';
+      const endEmpresa = emp.end || 'N/I';
+
       return `
         <div class="recibo-bloco-metade">
           <div>
-            <div class="recibo-sheet-header"><strong>PEDIDO #${ped.numeroPedido}</strong><span>${emp.nome || 'HAPPY EGGS'}</span></div>
-            <div style="font-size:0.75rem;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+            <div class="recibo-sheet-header">
+              <h3 style="font-size:0.75rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+              <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
+            </div>
+            <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
+            <div style="font-size:0.7rem; margin-bottom:2px;"><strong>EndereÃ§o:</strong> ${ped.clienteEnd || 'NÃ£o informado'}</div>
             <hr class="dashed-divider">
-            ${(ped.itens || []).map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x ${i.nome}</span><span>R$ ${i.subtotal.toFixed(2)}</span></div>`).join('')}
+            <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
+            <div>
+              ${itens.map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
+            </div>
           </div>
           <div>
             <hr class="dashed-divider">
-            <div style="display:flex; justify-content:space-between; font-weight:bold;"><span>TOTAL:</span><span>R$ ${ped.total.toFixed(2)}</span></div>
-            <div style="text-align:center; font-size:0.65rem; color:#64748b; margin-top:4px;">${emp.nome} | CNPJ: ${emp.cnpj || '---'}</div>
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
+              <span>TOTAL:</span>
+              <span style="color:#2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
+            </div>
+            <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
+              <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
+            </div>
           </div>
         </div>
       `;
     }
 
-    function abrirJanelaImpressaoOtimizada(html) {
-      const w = window.open('', '_blank');
-      if (!w) return alert('Permita pop-ups.');
-      w.document.write(`<!DOCTYPE html><html><head><title>Imprimir</title><style>@page{size:A4;margin:5mm;} *{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif;} body{padding:5px;}</style></head><body>${html}<script>setTimeout(()=>window.print(),300);<\/script></body></html>`);
-      w.document.close();
+    function imprimirReciboUnico() {
+      if (!pedidoSelecionadoModal) return;
+      const ped = pedidoSelecionadoModal;
+      const emp = state.empresa || {};
+      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
+      const cnpjEmpresa = emp.cnpj || 'N/I';
+      const telEmpresa = emp.tel || 'N/I';
+      const endEmpresa = emp.end || 'N/I';
+
+      let htmlBloco = `
+        <div class="recibo-bloco-metade">
+          <div>
+            <div class="recibo-sheet-header">
+              <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+              <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
+            </div>
+            <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+            <div style="font-size:0.7rem; margin-bottom:2px;"><strong>EndereÃ§o:</strong> ${ped.clienteEnd || 'NÃ£o informado'}</div>
+            <hr class="dashed-divider">
+            <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
+            <div>
+              ${(ped.itens || []).map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
+            </div>
+          </div>
+          <div>
+            <hr class="dashed-divider">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
+              <span>TOTAL:</span>
+              <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
+            </div>
+            <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
+              <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('modal-nota').style.display = 'none';
+      abrirJanelaImpressaoOtimizada(htmlBloco);
+    }
+
+    function imprimirRelatorioDireto() {
+      const conteudoHtml = document.getElementById('area-relatorio-impressao').outerHTML;
+      document.getElementById('modal-resumo').style.display = 'none';
+      abrirJanelaImpressaoOtimizada(conteudoHtml);
+    }
+
+    function abrirJanelaImpressaoOtimizada(htmlConteudo) {
+      const ua = navigator.userAgent;
+      const isMobileChrome = /CriOS/.test(ua) || (/Android/.test(ua) && /Chrome/.test(ua));
+
+      if (isMobileChrome) {
+        const novaJanela = window.open('', '_blank');
+        if (novaJanela) {
+          novaJanela.document.write(`
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+              <meta charset="UTF-8">
+              <title>Recibo / ImpressÃ£o</title>
+              <style>
+                @page { size: A4; margin: 5mm; }
+                * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+                body { background: #ffffff !important; color: #0f172a; padding: 5px; }
+                .recibo-bloco-metade { 
+                  width: 100%; 
+                  background: #ffffff; 
+                  border: 1px dashed #94a3b8; 
+                  border-radius: 6px; 
+                  padding: 8px; 
+                  margin-bottom: 12px; 
+                  page-break-inside: avoid !important; 
+                  break-inside: avoid !important; 
+                }
+                .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 6px 10px; border-radius: 4px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+                .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
+                .item-linha-zebrado { display: flex; justify-content: space-between; font-size: 0.75rem; padding: 4px 6px; }
+                .item-linha-zebrado:nth-child(odd) { background-color: #f8fafc; }
+                .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; width: 100%; page-break-inside: avoid !important; break-inside: avoid !important; }
+                .relatorio-sheet-header { background: #0f172a; color: #ffffff; padding: 12px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+                .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+                .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; }
+                .relatorio-kpi-label { font-size: 0.7rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
+                .relatorio-kpi-val { font-size: 1.2rem; font-weight: 800; color: #0f172a; }
+                .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-size: 0.85rem; }
+                .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+                .relatorio-tabela-planilha th { background: #f1f5f9; color: #1e293b; font-weight: 800; padding: 6px; border-bottom: 2px solid #cbd5e1; }
+                .relatorio-tabela-planilha td { padding: 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+              </style>
+            </head>
+            <body>
+              ${htmlConteudo}
+              <script>
+                setTimeout(() => { window.print(); }, 350);
+              <\/script>
+            </body>
+            </html>
+          `);
+          novaJanela.document.close();
+        } else {
+          alert("Por favor, permita que o navegador abra pop-ups para gerar o recibo.");
+        }
+        return;
+      }
+
+      let iframe = document.getElementById('iframe-impressao-direta');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'iframe-impressao-direta';
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = '0px';
+        document.body.appendChild(iframe);
+      }
+
+      const docHtml = `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>ImpressÃ£o</title>
+          <style>
+            @page { size: A4; margin: 4mm; }
+            * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+            html, body { background: #ffffff !important; color: #0f172a; width: 100%; height: 100%; padding: 0; margin: 0; }
+            
+            .recibo-bloco-metade { width: 100%; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; display: flex; flex-direction: column; justify-content: space-between; page-break-inside: avoid; break-inside: avoid; }
+            .recibo-sheet-header { background: #0f172a; color: #ffffff; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+            .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 4px 0; }
+            
+            .item-linha-zebrado { display: flex; justify-content: space-between; font-size: 0.72rem; padding: 3px 6px; border-radius: 4px; }
+            .item-linha-zebrado:nth-child(odd) { background-color: #f8fafc; }
+            .item-linha-zebrado:nth-child(even) { background-color: #ffffff; }
+
+            .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; color: #0f172a; width: 100%; }
+            .relatorio-sheet-header { background: #0f172a; color: #ffffff; padding: 10px; border-radius: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+            .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; }
+            .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
+            .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
+            .relatorio-section-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; margin-bottom: 10px; font-size: 0.8rem; }
+            .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+            .relatorio-tabela-planilha th { background: #f1f5f9; color: #1e293b; font-weight: 800; padding: 6px; border-bottom: 2px solid #cbd5e1; }
+            .relatorio-tabela-planilha td { padding: 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+            .relatorio-tabela-planilha tr:nth-child(even) { background-color: #f8fafc; }
+          </style>
+        </head>
+        <body>
+          ${htmlConteudo}
+        </body>
+        </html>
+      `;
+
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(docHtml);
+      doc.close();
+
+      setTimeout(() => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      }, 150);
     }
 
     async function cadastrarUsuario(e) {
       e.preventDefault();
-      await db.collection("usuarios").add({ empresaId: state.currentUser.empresaId, login: document.getElementById('usr-login').value.trim(), pass: document.getElementById('usr-pass').value.trim(), role: document.getElementById('usr-role').value });
-      e.target.reset(); alert('Usuário cadastrado!');
+      const login = document.getElementById('usr-login').value.trim().toLowerCase();
+      const pass = document.getElementById('usr-pass').value.trim();
+      const role = document.getElementById('usr-role').value;
+      try {
+        await db.collection("usuarios").add({ empresaId: state.currentUser.empresaId, login, pass, role });
+        e.target.reset();
+        alert('UsuÃ¡rio cadastrado com sucesso!');
+      } catch (err) { alert('Erro ao cadastrar usuÃ¡rio: ' + err.message); }
     }
 
     function renderUsuarios() {
       const tbody = document.getElementById('lista-usuarios');
       if (!tbody) return;
-      tbody.innerHTML = state.usuarios.map(u => `<tr><td>${u.login}</td><td>${u.role}</td><td><button class="btn-danger" type="button" onclick="excluirUsuario('${u.id}')">Excluir</button></td></tr>`).join('');
+      tbody.innerHTML = state.usuarios.map(u => `
+        <tr>
+          <td><strong>${u.login}</strong></td>
+          <td>${u.role}</td>
+          <td>
+            <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 6px; margin-right:4px;" onclick="abrirModalAlterarSenhaUsuario('${u.id}')">ð Senha</button>
+            <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 6px;" onclick="excluirUsuario('${u.id}')">ðï¸ Excluir</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function abrirModalAlterarSenhaUsuario(id) {
+      usuarioSelecionadoId = id;
+      document.getElementById('nova-senha-usuario-input').value = '';
+      document.getElementById('modal-redefinir-senha-usuario').style.display = 'flex';
+    }
+
+    async function salvarNovaSenhaUsuario(e) {
+      e.preventDefault();
+      const novaSenha = document.getElementById('nova-senha-usuario-input').value.trim();
+      if (!novaSenha || !usuarioSelecionadoId) return;
+      try {
+        await db.collection("usuarios").doc(usuarioSelecionadoId).update({ pass: novaSenha });
+        alert('Senha alterada com sucesso!');
+        document.getElementById('modal-redefinir-senha-usuario').style.display = 'none';
+      } catch (err) { alert('Erro ao alterar senha: ' + err.message); }
     }
 
     async function excluirUsuario(id) {
-      await db.collection("usuarios").doc(id).delete();
+      if (confirm('Tem certeza que deseja excluir este usuÃ¡rio?')) {
+        try {
+          await db.collection("usuarios").doc(id).delete();
+          alert('UsuÃ¡rio excluÃ­do com sucesso!');
+        } catch (err) { alert('Erro ao excluir usuÃ¡rio: ' + err.message); }
+      }
     }
 
     function renderDropdowns() {
       filtrarClientesDropdown();
       const prodSelect = document.getElementById('ped-produto');
-      if (prodSelect) prodSelect.innerHTML = state.produtos.map(p => `<option value="${p.id}">${p.nome} - R$ ${p.preco.toFixed(2)}</option>`).join('');
+      if (prodSelect) prodSelect.innerHTML = state.produtos.map(p => '<option value="' + p.id + '">' + p.nome + ' - R$ ' + parseFloat(p.preco).toFixed(2) + ' (' + p.ovosUnid + ' ovos)</option>').join('');
     }
 
     function filtrarClientesDropdown() {
       const termo = (document.getElementById('ped-busca-cliente')?.value || '').toLowerCase();
       const cliSelect = document.getElementById('ped-cliente');
       if (!cliSelect) return;
-      cliSelect.innerHTML = state.clientes.filter(c => c.nome.toLowerCase().includes(termo)).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+      const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(termo));
+      cliSelect.innerHTML = filtrados.length ? filtrados.map(c => '<option value="' + c.id + '">' + c.nome + ' (' + c.tel + ')</option>').join('') : '<option value="">Nenhum cliente</option>';
     }
 
     async function cadastrarCliente(e) {
@@ -2239,52 +2224,81 @@
       const prodId = document.getElementById('ped-produto').value;
       const qtd = parseInt(document.getElementById('ped-qtd').value || 1);
       const prod = state.produtos.find(p => p.id === prodId);
-      if (!prod) return;
-      carrinhoTemp.push({ produtoId: prod.id, nome: prod.nome, preco: prod.preco, qtd, subtotal: qtd * prod.preco });
+      if (!prod || qtd <= 0) return;
+      carrinhoTemp.push({ produtoId: prod.id, nome: prod.nome, preco: prod.preco, qtd, totalOvos: qtd * prod.ovosUnid, subtotal: qtd * prod.preco });
       renderCarrinho();
     }
 
     function renderCarrinho() {
       const lista = document.getElementById('itens-pedido-lista');
       const totalSpan = document.getElementById('ped-total-valor');
-      if (!carrinhoTemp.length) { lista.innerHTML = 'Nenhum produto.'; totalSpan.innerText = "0.00"; return; }
+      if (!carrinhoTemp.length) { lista.innerHTML = '<div style="text-align:center; padding:10px;">Nenhum produto.</div>'; totalSpan.innerText = "0.00"; return; }
       let totalGeral = 0;
-      lista.innerHTML = carrinhoTemp.map((i, idx) => { totalGeral += i.subtotal; return `<div>${i.qtd}x ${i.nome} - R$ ${i.subtotal.toFixed(2)} <button type="button" onclick="carrinhoTemp.splice(${idx},1);renderCarrinho()">✕</button></div>`; }).join('');
+      lista.innerHTML = carrinhoTemp.map((i, idx) => {
+        totalGeral += i.subtotal;
+        return '<div class="carrinho-item"><div><strong>' + i.qtd + 'x ' + i.nome + '</strong></div><div>R$ ' + i.subtotal.toFixed(2) + ' <button type="button" class="btn-danger" onclick="carrinhoTemp.splice(' + idx + ',1);renderCarrinho()">â</button></div></div>';
+      }).join('');
       totalSpan.innerText = totalGeral.toFixed(2);
     }
 
     async function finalizarPedido(e) {
       e.preventDefault();
-      if (!carrinhoTemp.length) return alert('Adicione produtos.');
+      if (!carrinhoTemp.length) return alert('Adicione produtos!');
       const cliente = state.clientes.find(c => c.id === document.getElementById('ped-cliente').value);
+      if (!cliente) return alert('Selecione um cliente!');
       const proximoNumero = state.pedidos.reduce((max, p) => Math.max(max, p.numeroPedido || 0), 0) + 1;
-      const total = carrinhoTemp.reduce((acc, i) => acc + i.subtotal, 0);
+      const totalPedido = carrinhoTemp.reduce((acc, i) => acc + i.subtotal, 0);
 
-      const novo = {
+      const novoPedido = {
         empresaId: state.currentUser.empresaId, numeroPedido: proximoNumero, clienteId: cliente.id,
-        clienteNome: cliente.nome, clienteEnd: cliente.end || '', itens: carrinhoTemp, total,
-        formaPgto: document.getElementById('ped-forma-pagamento').value, status: document.getElementById('ped-status').value, dataCriacao: new Date()
+        clienteNome: cliente.nome, clienteEnd: cliente.end || '', clienteTel: cliente.tel || '',
+        itens: carrinhoTemp, total: totalPedido, formaPgto: document.getElementById('ped-forma-pagamento').value,
+        status: document.getElementById('ped-status').value, dataCriacao: new Date()
       };
-      await db.collection("pedidos").add(novo);
+
+      const docRef = await db.collection("pedidos").add(novoPedido);
+      novoPedido.id = docRef.id;
       carrinhoTemp = []; renderCarrinho(); e.target.reset();
-      alert('Pedido finalizado!');
+      abrirModalNota(novoPedido);
+    }
+
+    async function alternarStatusPedido(id, statusAtual) {
+      const novoStatus = statusAtual === 'Pago' ? 'Pendente' : 'Pago';
+      await db.collection("pedidos").doc(id).update({ status: novoStatus });
     }
 
     async function registrarEntradaProducao(e) {
       e.preventDefault();
       const qtd = parseInt(document.getElementById('prod-ent-qtd').value || 0);
       if (qtd <= 0) return;
-      const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
-      const docSnap = await refEstoque.get();
-      let atual = docSnap.exists ? (docSnap.data().qtdOvos || 0) : 0;
-      await refEstoque.set({ qtdOvos: atual + qtd }, { merge: true });
-      e.target.reset(); alert('Estoque atualizado!');
+
+      const empresaId = state.currentUser.empresaId;
+      const refEstoque = db.collection("estoque_geral").doc(empresaId);
+
+      try {
+        const docSnap = await refEstoque.get();
+        let atual = docSnap.exists ? (docSnap.data().qtdOvos || 0) : 0;
+        let novoSaldo = atual + qtd;
+
+        await refEstoque.set({ qtdOvos: novoSaldo }, { merge: true });
+        await db.collection("producao").add({ empresaId: empresaId, qtdOvos: qtd, dataHora: new Date() });
+
+        e.target.reset();
+        alert('ProduÃ§Ã£o registrada e estoque atualizado com sucesso!');
+      } catch (err) { alert("Erro ao atualizar o estoque."); }
     }
 
-    function renderProducaoHoje() {}
+    function renderProducaoHoje() {
+      const tbody = document.getElementById('lista-producao-hoje');
+      if (!tbody) return;
+      const hoje = new Date().toDateString();
+      tbody.innerHTML = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje).map(p => '<tr><td>' + new Date(p.dataHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '</td><td>+ ' + p.qtdOvos + ' ovos</td></tr>').join('');
+    }
 
     function abrirModalBalanco() {
+      if (!state.currentUser || state.currentUser.role !== 'admin') { alert('Acesso restrito.'); return; }
       document.getElementById('balanco-nova-qtd').value = state.estoqueGeralOvos || 0;
+      document.getElementById('balanco-motivo').value = '';
       document.getElementById('modal-balanco').style.display = 'flex';
     }
 
@@ -2295,49 +2309,133 @@
     async function salvarBalancoEstoque(e) {
       e.preventDefault();
       const novaQtd = parseInt(document.getElementById('balanco-nova-qtd').value);
-      await db.collection("estoque_geral").doc(state.currentUser.empresaId).set({ qtdOvos: novaQtd }, { merge: true });
-      fecharModalBalanco(); alert('Balanço salvo!');
+      const motivo = document.getElementById('balanco-motivo').value.trim();
+      if (isNaN(novaQtd) || novaQtd < 0) return alert('Quantidade invÃ¡lida.');
+
+      try {
+        const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
+        await refEstoque.set({ qtdOvos: novaQtd, ultimoAjusteEm: new Date(), ajustadoPor: state.currentUser.login, motivoAjuste: motivo }, { merge: true });
+        alert('Estoque atualizado com sucesso!');
+        fecharModalBalanco();
+      } catch (err) { alert('Erro ao salvar.'); }
     }
 
     async function salvarEmpresa(e) {
       e.preventDefault();
       const dados = { nome: document.getElementById('emp-nome').value.trim(), cnpj: document.getElementById('emp-cnpj').value.trim(), tel: document.getElementById('emp-tel').value.trim(), end: document.getElementById('emp-end').value.trim(), social: document.getElementById('emp-social').value.trim(), pix: document.getElementById('emp-pix').value.trim() };
       await db.collection("config").doc(state.currentUser.empresaId).set(dados, { merge: true });
-      state.empresa = dados; alert('Dados da empresa salvos!');
+      state.empresa = dados; alert('Dados salvos!');
     }
 
-    function abrirModalNota(id) {
-      const ped = state.pedidos.find(p => p.id === id);
+    function abrirModalNota(pedidoOuId) {
+      const ped = typeof pedidoOuId === 'string' ? state.pedidos.find(p => p.id === pedidoOuId) : pedidoOuId;
       if (!ped) return;
       pedidoSelecionadoModal = ped;
-      document.getElementById('printable-receipt').innerHTML = construirHtmlReciboMetade(ped, state.empresa);
+      const emp = state.empresa || {};
+      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
+      const cnpjEmpresa = emp.cnpj || 'N/I';
+      const telEmpresa = emp.tel || 'N/I';
+      const endEmpresa = emp.end || 'N/I';
+
+      document.getElementById('printable-receipt').innerHTML = `
+        <div>
+          <div class="recibo-sheet-header">
+            <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
+            <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
+          </div>
+          <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
+          <div style="font-size:0.7rem; margin-bottom:2px;"><strong>EndereÃ§o:</strong> ${ped.clienteEnd || 'NÃ£o informado'}</div>
+          <hr class="dashed-divider">
+          <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
+          <div>
+            ${(ped.itens || []).map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
+          </div>
+          <hr class="dashed-divider">
+          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
+            <span>TOTAL:</span>
+            <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
+          </div>
+          <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+          <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
+            <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
+          </div>
+        </div>
+      `;
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
-    function imprimirReciboUnico() {
-      if (!pedidoSelecionadoModal) return;
-      document.getElementById('modal-nota').style.display = 'none';
-      abrirJanelaImpressaoOtimizada(construirHtmlReciboMetade(pedidoSelecionadoModal, state.empresa));
-    }
-
     function exportarRelatorioExcel() {
-      let csv = "Pedido;Data;Cliente;Total;Status
-";
-      state.pedidos.forEach(p => { csv += `#${p.numeroPedido};${p.dataCriacao.toLocaleDateString()};"${p.clienteNome}";R$ ${p.total.toFixed(2)};${p.status}
-`; });
-      const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'vendas.csv'; a.click();
+      let csv = "Pedido;Data;Cliente;Total;Status\n";
+      state.pedidos.forEach(p => {
+        csv += "#" + (p.numeroPedido || '') + ";" + p.dataCriacao.toLocaleDateString('pt-BR') + ";\"" + (p.clienteNome || '') + "\";R$ " + (p.total || 0).toFixed(2).replace('.', ',') + ";" + (p.status || '') + "\n";
+      });
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'relatorio_vendas.csv';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
 
     function abrirResumoVendas() {
+      document.getElementById('filtro-periodo').value = 'hoje';
+      atualizarFiltroRelatorio();
       document.getElementById('modal-resumo').style.display = 'flex';
     }
 
-    function atualizarFiltroRelatorio() {}
-    function renderizarDadosRelatorio() {}
-    function imprimirRelatorioDireto() {
-      document.getElementById('modal-resumo').style.display = 'none';
-      abrirJanelaImpressaoOtimizada(document.getElementById('area-relatorio-impressao').outerHTML);
+    function atualizarFiltroRelatorio() {
+      const tipo = document.getElementById('filtro-periodo').value;
+      document.getElementById('container-datas-personalizadas').style.display = (tipo === 'personalizado') ? 'grid' : 'none';
+      renderizarDadosRelatorio();
+    }
+
+    function renderizarDadosRelatorio() {
+      const tipo = document.getElementById('filtro-periodo').value;
+      const agora = new Date();
+      let pedidosFiltrados = state.pedidos;
+      document.getElementById('relatorio-data-emissao').innerText = "Emitido em: " + agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+      if (tipo === 'hoje') {
+        pedidosFiltrados = state.pedidos.filter(p => {
+          const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+          return d.toDateString() === agora.toDateString();
+        });
+      } else if (tipo === 'semana') {
+        const limite = new Date(); limite.setDate(agora.getDate() - 7); limite.setHours(0,0,0,0);
+        pedidosFiltrados = state.pedidos.filter(p => {
+          const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+          return d >= limite;
+        });
+      } else if (tipo === 'mes') {
+        pedidosFiltrados = state.pedidos.filter(p => {
+          const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+          return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+        });
+      } else if (tipo === 'personalizado') {
+        const dataInicio = document.getElementById('data-inicio').value;
+        const dataFim = document.getElementById('data-fim').value;
+        if (dataInicio && dataFim) {
+          const ini = new Date(dataInicio + 'T00:00:00');
+          const fim = new Date(dataFim + 'T23:59:59');
+          pedidosFiltrados = state.pedidos.filter(p => {
+            const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+            return d >= ini && d <= fim;
+          });
+        } else {
+          pedidosFiltrados = [];
+        }
+      }
+
+      const totalPeriodo = pedidosFiltrados.reduce((acc, p) => acc + (parseFloat(p.total) || 0), 0);
+      document.getElementById('resumo-total-periodo').innerText = "R$ " + totalPeriodo.toFixed(2);
+      document.getElementById('resumo-qtd-pedidos').innerText = pedidosFiltrados.length;
+
+      const formas = {};
+      pedidosFiltrados.forEach(p => { const pgto = p.formaPgto || 'Outros'; formas[pgto] = (formas[pgto] || 0) + (parseFloat(p.total) || 0); });
+      document.getElementById('resumo-detalhe-formas').innerHTML = Object.keys(formas).map(f => "â¢ " + f + ": <strong>R$ " + formas[f].toFixed(2) + "</strong>").join('<br>') || 'Nenhum registro no perÃ­odo.';
+
+      document.getElementById('resumo-tabela-periodo').innerHTML = pedidosFiltrados.length > 0 ? pedidosFiltrados.map(p => `
+        <tr><td>#${p.numeroPedido || '---'}</td><td>${new Date(p.dataCriacao).toLocaleDateString('pt-BR')}</td><td>${p.clienteNome || 'Cliente'}</td><td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td><td>${p.status || 'Pendente'}</td></tr>
+      `).join('') : '<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhum pedido encontrado neste perÃ­odo.</td></tr>';
     }
 
     initApp();
