@@ -106,7 +106,7 @@
     .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; cursor: pointer; display: inline-block; }
     .badge-pago { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
     .badge-pendente { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-    .badge-finalizado { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+    .badge-descontado { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
     .badge-ativo { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
     .badge-bloqueado { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
@@ -448,10 +448,16 @@
     <!-- ABA 3: GESTÃO DE EQUIPE & RH -->
     <div id="view-rh" class="view-content" style="display:none;">
       
-      <!-- BOTÃO DE AÇÃO RÁPIDA SUPERIOR PARA CADASTRAR COLABORADOR -->
-      <div style="margin-bottom: 14px;">
+      <!-- BOTÕES DE AÇÃO RÁPIDA SUPERIOR (CADASTRAR COLABORADOR & REGISTRAR VALE) -->
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;">
         <button class="btn btn-rh" type="button" id="btn-toggle-form-rh" onclick="toggleFormCadColaborador()" style="padding: 14px; font-size: 0.95rem; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);">
           ➕ CADASTRAR NOVO COLABORADOR
+        </button>
+        <button class="btn btn-warning" type="button" id="btn-toggle-form-vale" onclick="toggleFormRegVale()" style="padding: 14px; font-size: 0.95rem; color:#fff; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25);">
+          💸 REGISTRAR VALE / ADIANTAMENTO
+        </button>
+        <button class="btn btn-rh" type="button" id="btn-toggle-form-recibo" onclick="toggleFormGerarRecibo()" style="padding: 14px; font-size: 0.95rem; background: #0f172a; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25);">
+          📄 GERAR RECIBO DE PAGAMENTO & FECHAMENTO
         </button>
       </div>
 
@@ -466,14 +472,17 @@
           <div class="form-group"><label>CPF ou Documento de Identificação</label><input type="text" id="rh-colab-doc" placeholder="Ex: 000.000.000-00"></div>
           <div class="form-group"><label>Cargo / Função na Granja</label><input type="text" id="rh-colab-cargo" placeholder="Ex: Auxiliar de Avicultura / Tratorista" required></div>
           <div class="form-group"><label>Data de Entrada / Admissão</label><input type="date" id="rh-colab-admissao" required></div>
-          <div class="form-group"><label>Salário Base Mensal (R$)</label><input type="number" step="0.01" id="rh-colab-salario" placeholder="Ex: 2000.00" required></div>
+          <div class="form-group"><label>Salário Base Mensal Padrão (R$)</label><input type="number" step="0.01" id="rh-colab-salario" placeholder="Ex: 2000.00" required></div>
           <button type="submit" class="btn btn-rh">💾 Salvar Cadastramento</button>
         </form>
       </div>
 
-      <!-- CADASTRO DE VALES / ADIANTAMENTOS INDEPENDENTES -->
-      <div class="card" style="border-left: 4px solid var(--warning);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--warning);">💸 Registrar Vale / Adiantamento (Histórico)</div>
+      <!-- FORMULÁRIO DE REGISTRO DE VALES / ADIANTAMENTOS -->
+      <div class="card" id="rh-card-reg-vale" style="display:none; border-left: 4px solid var(--warning);">
+        <div class="card-header">
+          <div class="card-title" style="color: var(--warning);">💸 Registrar Vale / Adiantamento (Histórico)</div>
+          <button class="btn btn-back" type="button" onclick="toggleFormRegVale()">✖️ Cancelar</button>
+        </div>
         <form onsubmit="lancarValeHistorico(event)">
           <div class="form-group"><label>Selecione o Colaborador</label><select id="rh-vale-colab" required></select></div>
           <div class="form-group"><label>Mês de Referência do Vale</label><input type="month" id="rh-vale-mes" required></div>
@@ -484,17 +493,23 @@
         </form>
       </div>
 
-      <!-- ABA CENTRAL: GERAR RECIBO DE PAGAMENTO & FECHAMENTO -->
-      <div class="card" style="border-left: 4px solid var(--rh);">
+      <!-- FORMULÁRIO CENTRAL: GERAR RECIBO DE PAGAMENTO & FECHAMENTO -->
+      <div class="card" id="rh-card-gerar-recibo" style="display:none; border-left: 4px solid var(--rh);">
         <div class="card-header">
           <div class="card-title" style="color: var(--rh);">📄 Gerar Recibo de Pagamento & Fechamento</div>
+          <button class="btn btn-back" type="button" onclick="toggleFormGerarRecibo()">✖️ Cancelar</button>
         </div>
         <div class="form-group"><label>Selecione o Colaborador</label><select id="rh-recibo-colab" onchange="atualizarInterfaceGerarRecibo()" required></select></div>
         <div class="form-group"><label>Mês de Referência do Salário</label><input type="month" id="rh-recibo-mes" onchange="atualizarInterfaceGerarRecibo()" required></div>
         
         <div id="container-detalhes-recibo" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:12px; display:none;">
-          <div style="font-size:0.8rem; font-weight:bold; color:#0f172a; margin-bottom:8px;">🛠️ Ajustes e Vales para este Mês:</div>
-          
+          <div class="form-group" style="margin-bottom:10px;">
+            <label>Salário Mensal para este Pagamento (R$)</label>
+            <input type="number" step="0.01" id="rh-recibo-salario-mensal" placeholder="0.00">
+            <small style="color:var(--text-muted); font-size:0.72rem;">Você pode digitar o valor desejado para este mês.</small>
+          </div>
+
+          <div style="font-size:0.8rem; font-weight:bold; color:#0f172a; margin-bottom:8px;">💸 Vales Disponíveis para Descontar:</div>
           <div id="lista-vales-checkbox-container" style="margin-bottom:10px;">
             <!-- Os checkboxes dos vales cadastrados aparecerão aqui dinamicamente -->
           </div>
@@ -512,10 +527,10 @@
         <button type="button" class="btn btn-rh" onclick="gerarReciboPagamentoOficial()">🖨️ Gerar e Visualizar Recibo Oficial</button>
       </div>
 
-      <!-- PAINEL DE CONTROLE DE STATUS DOS COLABORADORES -->
+      <!-- PAINEL DE CONTROLE DE STATUS DOS COLABORADORES & HISTÓRICO DE VALES -->
       <div class="card">
         <div class="card-header">
-          <div class="card-title">📋 Histórico de Pagamentos da Equipe</div>
+          <div class="card-title">📋 Histórico de Pagamentos & Vales da Equipe</div>
         </div>
         <div class="form-group" style="margin-bottom: 12px;">
           <label>Mês para Consulta</label>
@@ -524,6 +539,12 @@
         <table>
           <thead><tr><th>Colaborador</th><th>Admissão</th><th>Status & Salário Líquido</th><th>Ações</th></tr></thead>
           <tbody id="lista-colaboradores-rh"></tbody>
+        </table>
+
+        <div style="font-size:0.8rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:20px; margin-bottom:8px;">Histórico Geral de Vales / Adiantamentos</div>
+        <table>
+          <thead><tr><th>Data / Mês</th><th>Colaborador</th><th>Valor</th><th>Status / Obs</th><th>Ação</th></tr></thead>
+          <tbody id="lista-vales-historico-geral"></tbody>
         </table>
       </div>
 
@@ -1256,10 +1277,34 @@
       const btn = document.getElementById('btn-toggle-form-rh');
       if (card.style.display === 'none') {
         card.style.display = 'block';
-        btn.innerText = '✖️ Ocultar Formulário';
+        btn.innerText = '✖️ Ocultar Cadastro de Colaborador';
       } else {
         card.style.display = 'none';
         btn.innerText = '➕ CADASTRAR NOVO COLABORADOR';
+      }
+    }
+
+    function toggleFormRegVale() {
+      const card = document.getElementById('rh-card-reg-vale');
+      const btn = document.getElementById('btn-toggle-form-vale');
+      if (card.style.display === 'none') {
+        card.style.display = 'block';
+        btn.innerText = '✖️ Ocultar Registro de Vales';
+      } else {
+        card.style.display = 'none';
+        btn.innerText = '💸 REGISTRAR VALE / ADIANTAMENTO';
+      }
+    }
+
+    function toggleFormGerarRecibo() {
+      const card = document.getElementById('rh-card-gerar-recibo');
+      const btn = document.getElementById('btn-toggle-form-recibo');
+      if (card.style.display === 'none') {
+        card.style.display = 'block';
+        btn.innerText = '✖️ Ocultar Geração de Recibo';
+      } else {
+        card.style.display = 'none';
+        btn.innerText = '📄 GERAR RECIBO DE PAGAMENTO & FECHAMENTO';
       }
     }
 
@@ -1297,11 +1342,21 @@
       try {
         await db.collection("vales_historico").add({
           empresaId: state.currentUser.empresaId,
-          colaboradorId, mesReferencia, valor, obs, data, criadoEm: new Date()
+          colaboradorId, mesReferencia, valor, obs, data, status: 'Pendente', criadoEm: new Date()
         });
         e.target.reset();
         alert('Vale registrado no histórico com sucesso!');
+        toggleFormRegVale();
       } catch (err) { alert('Erro ao registrar vale: ' + err.message); }
+    }
+
+    async function excluirValeHistorico(valeId) {
+      if (confirm("Deseja realmente excluir este registro de vale?")) {
+        try {
+          await db.collection("vales_historico").doc(valeId).delete();
+          alert("Vale excluído com sucesso!");
+        } catch (err) { alert("Erro ao excluir vale: " + err.message); }
+      }
     }
 
     function atualizarInterfaceGerarRecibo() {
@@ -1309,6 +1364,7 @@
       const mesRef = document.getElementById('rh-recibo-mes').value;
       const container = document.getElementById('container-detalhes-recibo');
       const containerCheckboxes = document.getElementById('lista-vales-checkbox-container');
+      const inputSalarioMensal = document.getElementById('rh-recibo-salario-mensal');
 
       if (!colabId || !mesRef) {
         container.style.display = 'none';
@@ -1316,23 +1372,29 @@
       }
 
       container.style.display = 'block';
-      const valesDoMes = state.valesHistorico.filter(v => v.colaboradorId === colabId && v.mesReferencia === mesRef);
+      const colab = state.colaboradores.find(c => c.id === colabId);
+      if (colab && inputSalarioMensal && !inputSalarioMensal.value) {
+        inputSalarioMensal.value = (colab.salarioBase || 0).toFixed(2);
+      }
 
-      if (valesDoMes.length > 0) {
-        containerCheckboxes.innerHTML = '<div style="font-size:0.75rem; color:#64748b; margin-bottom:4px;">Selecione quais vales deseja descontar neste recibo:</div>' +
-          valesDoMes.map(v => {
-            const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
-            return `
-              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; background:#fff; padding:6px; border-radius:6px; border:1px solid #e2e8f0;">
-                <input type="checkbox" class="chk-vale-recibo" value="${v.id}" data-valor="${v.valor}" style="width:18px; height:18px;" checked>
-                <label style="font-size:0.8rem; margin-bottom:0; color:#0f172a; cursor:pointer;">
-                  [${dataFmt}] <strong>${v.obs}</strong> — R$ ${v.valor.toFixed(2)}
-                </label>
-              </div>
-            `;
-          }).join('');
+      // Buscar vales pendentes ou daquele mês
+      const valesDisponiveis = state.valesHistorico.filter(v => v.colaboradorId === colabId && (v.status === 'Pendente' || v.mesReferencia === mesRef));
+
+      if (valesDisponiveis.length > 0) {
+        containerCheckboxes.innerHTML = valesDisponiveis.map(v => {
+          const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
+          const isJaDescontado = v.status === 'Descontado';
+          return `
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; background:#fff; padding:6px; border-radius:6px; border:1px solid #e2e8f0;">
+              <input type="checkbox" class="chk-vale-recibo" value="${v.id}" data-valor="${v.valor}" style="width:18px; height:18px;" ${isJaDescontado ? 'checked disabled' : ''}>
+              <label style="font-size:0.8rem; margin-bottom:0; color:#0f172a; cursor:pointer;">
+                [${dataFmt}] <strong>${v.obs}</strong> — R$ ${v.valor.toFixed(2)} ${isJaDescontado ? '(Já Descontado)' : ''}
+              </label>
+            </div>
+          `;
+        }).join('');
       } else {
-        containerCheckboxes.innerHTML = '<div style="font-size:0.75rem; color:#64748b; padding:4px 0;">Nenhum vale registrado para este colaborador no mês de referência selecionado.</div>';
+        containerCheckboxes.innerHTML = '<div style="font-size:0.75rem; color:#64748b; padding:4px 0;">Nenhum vale pendente registrado para este colaborador.</div>';
       }
     }
 
@@ -1354,6 +1416,7 @@
       const selectColab = document.getElementById('rh-vale-colab');
       const selectReciboColab = document.getElementById('rh-recibo-colab');
       const tbody = document.getElementById('lista-colaboradores-rh');
+      const tbodyValesGeral = document.getElementById('lista-vales-historico-geral');
       const mesFiltroInput = document.getElementById('rh-filtro-mes');
       const mesReciboInput = document.getElementById('rh-recibo-mes');
       
@@ -1393,13 +1456,38 @@
           </tr>
         `;
       }).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b; padding:15px;">Nenhum colaborador cadastrado no sistema.</td></tr>';
+
+      if (tbodyValesGeral) {
+        tbodyValesGeral.innerHTML = state.valesHistorico.map(v => {
+          const colab = state.colaboradores.find(c => c.id === v.colaboradorId);
+          const nomeColab = colab ? colab.nome : 'Desconhecido';
+          const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
+          const isDescontado = v.status === 'Descontado';
+
+          return `
+            <tr>
+              <td>${dataFmt}<br><small style="color:#64748b;">Ref: ${v.mesReferencia || '---'}</small></td>
+              <td><strong>${nomeColab}</strong></td>
+              <td>R$ ${(v.valor || 0).toFixed(2)}</td>
+              <td>
+                <span class="badge ${isDescontado ? 'badge-descontado' : 'badge-pendente'}">${isDescontado ? 'blue' : ''} ${v.status || 'Pendente'}</span><br>
+                <small style="color:#64748b;">${v.obs}</small>
+              </td>
+              <td>
+                <button class="btn-danger" type="button" onclick="excluirValeHistorico('${v.id}')">🗑️</button>
+              </td>
+            </tr>
+          `;
+        }).join('') || '<tr><td colspan="5" style="text-align:center; color:#64748b; padding:10px;">Nenhum vale registrado no histórico.</td></tr>';
+      }
     }
 
     function selecionarParaRecibo(colabId, mesRef) {
       document.getElementById('rh-recibo-colab').value = colabId;
       document.getElementById('rh-recibo-mes').value = mesRef;
+      toggleFormGerarRecibo();
       atualizarInterfaceGerarRecibo();
-      window.scrollTo({ top: 300, behavior: 'smooth' });
+      window.scrollTo({ top: 100, behavior: 'smooth' });
     }
 
     async function gerarReciboPagamentoOficial() {
@@ -1416,25 +1504,29 @@
       const telEmpresa = emp.tel || 'Não informado';
       const endEmpresa = emp.end || 'Não informado';
 
+      // Capturar salário mensal digitado manualmente
+      const salarioMensalDigitado = parseFloat(document.getElementById('rh-recibo-salario-mensal').value || colab.salarioBase || 0);
+
       // Capturar vales marcados para desconto
-      const checkboxesVales = document.querySelectorAll('.chk-vale-recibo:checked');
+      const checkboxesVales = document.querySelectorAll('.chk-vale-recibo:checked:not(:disabled)');
       let totalValesDescontados = 0;
       let valesSelecionadosDetalhes = [];
 
-      checkboxesVales.forEach(chk => {
+      for (const chk of checkboxesVales) {
         const valeId = chk.value;
         const valeObj = state.valesHistorico.find(v => v.id === valeId);
         if (valeObj) {
           totalValesDescontados += (valeObj.valor || 0);
           valesSelecionadosDetalhes.push(valeObj);
+          // Marcar o vale no Firestore como Descontado
+          await db.collection("vales_historico").doc(valeId).update({ status: 'Descontado' });
         }
-      });
+      }
 
       const extraVal = parseFloat(document.getElementById('rh-recibo-extra-val').value || 0);
       const extraObs = document.getElementById('rh-recibo-extra-obs').value.trim();
 
-      const salarioBase = colab.salarioBase || 0;
-      const salarioLiquido = salarioBase + extraVal - totalValesDescontados;
+      const salarioLiquido = salarioMensalDigitado + extraVal - totalValesDescontados;
 
       const [ano, mes] = mesRef.split('-');
       const mesAnoFormatado = `${mes}/${ano}`;
@@ -1480,8 +1572,8 @@
             
             <hr class="dashed-divider">
             <div style="font-size:0.72rem; display:flex; justify-content:space-between; margin-bottom:3px; background:#f1f5f9; padding:4px; border-radius:4px;">
-              <span><strong>Salário Base Contratual:</strong></span>
-              <span><strong>R$ ${salarioBase.toFixed(2)}</strong></span>
+              <span><strong>Salário Mensal Pago:</strong></span>
+              <span><strong>R$ ${salarioMensalDigitado.toFixed(2)}</strong></span>
             </div>
 
             <hr class="dashed-divider">
