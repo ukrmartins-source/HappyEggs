@@ -445,10 +445,10 @@
       </div>
     </div>
 
-    <!-- ABA 3: GESTÃO DE EQUIPE & RH (NOVA IMPLEMENTAÇÃO COMPLETA) -->
+    <!-- ABA 3: GESTÃO DE EQUIPE & RH -->
     <div id="view-rh" class="view-content" style="display:none;">
       
-      <!-- BOTÃO DE AÇÃO RÁPIDA SUPERIOR -->
+      <!-- BOTÃO DE AÇÃO RÁPIDA SUPERIOR PARA CADASTRAR COLABORADOR -->
       <div style="margin-bottom: 14px;">
         <button class="btn btn-rh" type="button" id="btn-toggle-form-rh" onclick="toggleFormCadColaborador()" style="padding: 14px; font-size: 0.95rem; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);">
           ➕ CADASTRAR NOVO COLABORADOR
@@ -471,42 +471,54 @@
         </form>
       </div>
 
-      <!-- FORMULÁRIO DE ADIANTAMENTOS E SERVIÇOS EXTRAS -->
-      <div class="card" style="border-left: 4px solid var(--accent);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--accent);">📝 Lançar Adiantamento / Serviço Extra</div>
-        <form onsubmit="lancarItemRH(event)">
-          <div class="form-group"><label>Selecione o Colaborador</label><select id="rh-lanc-colab" required></select></div>
-          <div class="form-group"><label>Mês de Referência do Pagamento</label><input type="month" id="rh-lanc-mes-ref" required></div>
-          <div class="form-group">
-            <label>Tipo de Lançamento</label>
-            <select id="rh-lanc-tipo" onchange="alternarOpcaoDescontoRH()" required>
-              <option value="adiantamento">🔴 Adiantamento / Vale (Para Desconto)</option>
-              <option value="extra">🟢 Serviço Extra / Bônus (Acréscimo no Salário)</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Valor (R$)</label><input type="number" step="0.01" id="rh-lanc-valor" placeholder="Ex: 150.00" required></div>
-          <div class="form-group"><label>Descrição / Motivo</label><input type="text" id="rh-lanc-obs" placeholder="Ex: Vale combustível / Limpeza de cercas extra" required></div>
-          <div class="form-group"><label>Data da Ocorrência / Pagamento do Vale</label><input type="date" id="rh-lanc-data" required></div>
-          
-          <!-- CHECKBOX DE DESCONTO -->
-          <div class="form-group" id="group-chk-desconto" style="background:#f1f5f9; padding:10px; border-radius:8px; border:1px solid #cbd5e1; display:flex; align-items:center; gap:8px;">
-            <input type="checkbox" id="rh-lanc-descontar" checked style="width:20px; height:20px;">
-            <label for="rh-lanc-descontar" style="margin-bottom:0; font-size:0.85rem; color:#0f172a; cursor:pointer;">
-              <strong>Descontar este vale no recibo deste mês?</strong>
-            </label>
-          </div>
-
-          <button type="submit" class="btn btn-success" style="margin-top:10px;">✅ Registrar Lançamento</button>
+      <!-- CADASTRO DE VALES / ADIANTAMENTOS INDEPENDENTES -->
+      <div class="card" style="border-left: 4px solid var(--warning);">
+        <div class="card-title" style="margin-bottom: 12px; color: var(--warning);">💸 Registrar Vale / Adiantamento (Histórico)</div>
+        <form onsubmit="lancarValeHistorico(event)">
+          <div class="form-group"><label>Selecione o Colaborador</label><select id="rh-vale-colab" required></select></div>
+          <div class="form-group"><label>Mês de Referência do Vale</label><input type="month" id="rh-vale-mes" required></div>
+          <div class="form-group"><label>Valor do Vale (R$)</label><input type="number" step="0.01" id="rh-vale-valor" placeholder="Ex: 150.00" required></div>
+          <div class="form-group"><label>Descrição / Motivo</label><input type="text" id="rh-vale-obs" placeholder="Ex: Vale combustível / Adiantamento quinzenal" required></div>
+          <div class="form-group"><label>Data do Empréstimo / Vale</label><input type="date" id="rh-vale-data" required></div>
+          <button type="submit" class="btn btn-warning" style="color:#fff;">💾 Registrar Vale no Histórico</button>
         </form>
       </div>
 
-      <!-- PAINEL DE FECHAMENTO E RECIBOS DOS COLABORADORES -->
+      <!-- ABA CENTRAL: GERAR RECIBO DE PAGAMENTO & FECHAMENTO -->
+      <div class="card" style="border-left: 4px solid var(--rh);">
+        <div class="card-header">
+          <div class="card-title" style="color: var(--rh);">📄 Gerar Recibo de Pagamento & Fechamento</div>
+        </div>
+        <div class="form-group"><label>Selecione o Colaborador</label><select id="rh-recibo-colab" onchange="atualizarInterfaceGerarRecibo()" required></select></div>
+        <div class="form-group"><label>Mês de Referência do Salário</label><input type="month" id="rh-recibo-mes" onchange="atualizarInterfaceGerarRecibo()" required></div>
+        
+        <div id="container-detalhes-recibo" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:12px; display:none;">
+          <div style="font-size:0.8rem; font-weight:bold; color:#0f172a; margin-bottom:8px;">🛠️ Ajustes e Vales para este Mês:</div>
+          
+          <div id="lista-vales-checkbox-container" style="margin-bottom:10px;">
+            <!-- Os checkboxes dos vales cadastrados aparecerão aqui dinamicamente -->
+          </div>
+
+          <div class="form-group" style="margin-bottom:8px;">
+            <label>Valor de Serviço Extra / Bônus (R$)</label>
+            <input type="number" step="0.01" id="rh-recibo-extra-val" placeholder="0.00" value="0.00">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Descrição do Serviço Extra</label>
+            <input type="text" id="rh-recibo-extra-obs" placeholder="Ex: Limpeza extra de cercas">
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-rh" onclick="gerarReciboPagamentoOficial()">🖨️ Gerar e Visualizar Recibo Oficial</button>
+      </div>
+
+      <!-- PAINEL DE CONTROLE DE STATUS DOS COLABORADORES -->
       <div class="card">
         <div class="card-header">
-          <div class="card-title">📋 Colaboradores & Fechamento da Folha</div>
+          <div class="card-title">📋 Histórico de Pagamentos da Equipe</div>
         </div>
         <div class="form-group" style="margin-bottom: 12px;">
-          <label>Mês de Referência para Recibo / Fechamento</label>
+          <label>Mês para Consulta</label>
           <input type="month" id="rh-filtro-mes" onchange="renderRhPainel()">
         </div>
         <table>
@@ -982,7 +994,7 @@
       empresa: { nome: "Granja UK", cnpj: "", tel: "", end: "", social: "", pix: "" },
       produtos: [], clientes: [], pedidos: [], producao: [], estoqueGeralOvos: 0,
       lotesTecnicos: [], historicoPosturaTecnica: [], historicoMortalidade: [], historicoVacinacao: [],
-      colaboradores: [], lancamentosRh: [], statusPagamentosRh: [],
+      colaboradores: [], valesHistorico: [], statusPagamentosRh: [],
       currentUser: null, pedidoAtual: null, listenersUnsubscribe: []
     };
 
@@ -1148,8 +1160,8 @@
         state.colaboradores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderRhPainel();
       });
-      const unsubLancamentosRH = db.collection("lancamentos_rh").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.lancamentosRh = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const unsubVales = db.collection("vales_historico").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.valesHistorico = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderRhPainel();
       });
       const unsubStatusPagRh = db.collection("status_pagamentos_rh").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
@@ -1157,7 +1169,7 @@
         renderRhPainel();
       });
 
-      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao, unsubColaboradores, unsubLancamentosRH, unsubStatusPagRh);
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao, unsubColaboradores, unsubVales, unsubStatusPagRh);
     }
 
     function carregarEmpresaCampos() {
@@ -1251,16 +1263,6 @@
       }
     }
 
-    function alternarOpcaoDescontoRH() {
-      const tipo = document.getElementById('rh-lanc-tipo').value;
-      const chkContainer = document.getElementById('group-chk-desconto');
-      if (tipo === 'adiantamento') {
-        chkContainer.style.display = 'flex';
-      } else {
-        chkContainer.style.display = 'none';
-      }
-    }
-
     async function cadastrarColaboradorRH(e) {
       e.preventDefault();
       if (!state.currentUser) return;
@@ -1281,28 +1283,57 @@
       } catch (err) { alert('Erro ao cadastrar colaborador: ' + err.message); }
     }
 
-    async function lancarItemRH(e) {
+    async function lancarValeHistorico(e) {
       e.preventDefault();
       if (!state.currentUser) return;
-      const colaboradorId = document.getElementById('rh-lanc-colab').value;
-      const mesReferencia = document.getElementById('rh-lanc-mes-ref').value;
-      const tipo = document.getElementById('rh-lanc-tipo').value;
-      const valor = parseFloat(document.getElementById('rh-lanc-valor').value || 0);
-      const obs = document.getElementById('rh-lanc-obs').value.trim();
-      const data = document.getElementById('rh-lanc-data').value;
-      const descontar = tipo === 'adiantamento' ? document.getElementById('rh-lanc-descontar').checked : false;
+      const colaboradorId = document.getElementById('rh-vale-colab').value;
+      const mesReferencia = document.getElementById('rh-vale-mes').value;
+      const valor = parseFloat(document.getElementById('rh-vale-valor').value || 0);
+      const obs = document.getElementById('rh-vale-obs').value.trim();
+      const data = document.getElementById('rh-vale-data').value;
 
       if (!colaboradorId) return alert('Selecione um colaborador.');
 
       try {
-        await db.collection("lancamentos_rh").add({
+        await db.collection("vales_historico").add({
           empresaId: state.currentUser.empresaId,
-          colaboradorId, mesReferencia, tipo, valor, obs, data, descontar, criadoEm: new Date()
+          colaboradorId, mesReferencia, valor, obs, data, criadoEm: new Date()
         });
         e.target.reset();
-        document.getElementById('rh-lanc-descontar').checked = true;
-        alert('Lançamento registrado com sucesso!');
-      } catch (err) { alert('Erro ao registrar lançamento: ' + err.message); }
+        alert('Vale registrado no histórico com sucesso!');
+      } catch (err) { alert('Erro ao registrar vale: ' + err.message); }
+    }
+
+    function atualizarInterfaceGerarRecibo() {
+      const colabId = document.getElementById('rh-recibo-colab').value;
+      const mesRef = document.getElementById('rh-recibo-mes').value;
+      const container = document.getElementById('container-detalhes-recibo');
+      const containerCheckboxes = document.getElementById('lista-vales-checkbox-container');
+
+      if (!colabId || !mesRef) {
+        container.style.display = 'none';
+        return;
+      }
+
+      container.style.display = 'block';
+      const valesDoMes = state.valesHistorico.filter(v => v.colaboradorId === colabId && v.mesReferencia === mesRef);
+
+      if (valesDoMes.length > 0) {
+        containerCheckboxes.innerHTML = '<div style="font-size:0.75rem; color:#64748b; margin-bottom:4px;">Selecione quais vales deseja descontar neste recibo:</div>' +
+          valesDoMes.map(v => {
+            const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
+            return `
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; background:#fff; padding:6px; border-radius:6px; border:1px solid #e2e8f0;">
+                <input type="checkbox" class="chk-vale-recibo" value="${v.id}" data-valor="${v.valor}" style="width:18px; height:18px;" checked>
+                <label style="font-size:0.8rem; margin-bottom:0; color:#0f172a; cursor:pointer;">
+                  [${dataFmt}] <strong>${v.obs}</strong> — R$ ${v.valor.toFixed(2)}
+                </label>
+              </div>
+            `;
+          }).join('');
+      } else {
+        containerCheckboxes.innerHTML = '<div style="font-size:0.75rem; color:#64748b; padding:4px 0;">Nenhum vale registrado para este colaborador no mês de referência selecionado.</div>';
+      }
     }
 
     async function alternarStatusPagamentoRH(colabId, mesRef, statusAtual) {
@@ -1320,36 +1351,26 @@
     }
 
     function renderRhPainel() {
-      const selectColab = document.getElementById('rh-lanc-colab');
+      const selectColab = document.getElementById('rh-vale-colab');
+      const selectReciboColab = document.getElementById('rh-recibo-colab');
       const tbody = document.getElementById('lista-colaboradores-rh');
       const mesFiltroInput = document.getElementById('rh-filtro-mes');
+      const mesReciboInput = document.getElementById('rh-recibo-mes');
       
       if (!tbody) return;
 
       const mesFiltro = mesFiltroInput && mesFiltroInput.value ? mesFiltroInput.value : new Date().toISOString().slice(0, 7);
       if (mesFiltroInput && !mesFiltroInput.value) mesFiltroInput.value = mesFiltro;
+      if (mesReciboInput && !mesReciboInput.value) mesReciboInput.value = mesFiltro;
 
-      if (selectColab) {
-        selectColab.innerHTML = state.colaboradores.map(c => `<option value="${c.id}">${c.nome} (${c.cargo})</option>`).join('') || '<option value="">Nenhum colaborador cadastrado</option>';
+      const optionsColabHtml = state.colaboradores.map(c => `<option value="${c.id}">${c.nome} (${c.cargo})</option>`).join('') || '<option value="">Nenhum colaborador cadastrado</option>';
+
+      if (selectColab) selectColab.innerHTML = optionsColabHtml;
+      if (selectReciboColab && selectReciboColab.options.length <= 1) {
+        selectReciboColab.innerHTML = '<option value="">Selecione...</option>' + optionsColabHtml;
       }
 
       tbody.innerHTML = state.colaboradores.map(c => {
-        const lancamentos = state.lancamentosRh.filter(l => l.colaboradorId === c.id && l.mesReferencia === mesFiltro);
-        
-        let totalValesDescontados = 0;
-        let totalValesNaoDescontados = 0;
-        let totalExtras = 0;
-
-        lancamentos.forEach(l => {
-          if (l.tipo === 'adiantamento') {
-            if (l.descontar) totalValesDescontados += (l.valor || 0);
-            else totalValesNaoDescontados += (l.valor || 0);
-          }
-          if (l.tipo === 'extra') totalExtras += (l.valor || 0);
-        });
-
-        const salarioLiquido = (c.salarioBase || 0) + totalExtras - totalValesDescontados;
-        
         const statusObj = state.statusPagamentosRh.find(s => s.colaboradorId === c.id && s.mesReferencia === mesFiltro);
         const statusPag = statusObj ? statusObj.status : 'Pendente';
         const isPago = statusPag === 'Pago';
@@ -1358,25 +1379,34 @@
           <tr>
             <td>
               <strong>${c.nome}</strong><br>
-              <small style="color:#64748b;">${c.cargo} | Doc: ${c.doc || 'N/I'}</small>
+              <small style="color:#64748b;">${c.cargo} | Salário Base: R$ ${(c.salarioBase || 0).toFixed(2)}</small>
             </td>
             <td>${c.admissao ? new Date(c.admissao + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
             <td>
               <span class="badge ${isPago ? 'badge-pago' : 'badge-pendente'}" onclick="alternarStatusPagamentoRH('${c.id}', '${mesFiltro}', '${statusPag}')">
                 ${isPago ? '🟢 Pago' : '🔴 Pendente'}
-              </span><br>
-              <strong style="font-size:0.95rem; color:#0f172a;">Líquido: R$ ${salarioLiquido.toFixed(2)}</strong><br>
-              <small style="color:#64748b;">Base: R$ ${(c.salarioBase || 0).toFixed(2)} | Extras: +R$ ${totalExtras.toFixed(2)} | Vales Descontados: -R$ ${totalValesDescontados.toFixed(2)}</small>
+              </span>
             </td>
             <td>
-              <button class="btn btn-rh" type="button" style="width:auto; padding:5px 8px; font-size:0.75rem;" onclick="abrirReciboRH('${c.id}', '${mesFiltro}')">📄 Ver Recibo</button>
+              <button class="btn btn-rh" type="button" style="width:auto; padding:5px 8px; font-size:0.75rem;" onclick="selecionarParaRecibo('${c.id}', '${mesFiltro}')">📄 Gerar Recibo</button>
             </td>
           </tr>
         `;
       }).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b; padding:15px;">Nenhum colaborador cadastrado no sistema.</td></tr>';
     }
 
-    function abrirReciboRH(colabId, mesRef) {
+    function selecionarParaRecibo(colabId, mesRef) {
+      document.getElementById('rh-recibo-colab').value = colabId;
+      document.getElementById('rh-recibo-mes').value = mesRef;
+      atualizarInterfaceGerarRecibo();
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+
+    async function gerarReciboPagamentoOficial() {
+      const colabId = document.getElementById('rh-recibo-colab').value;
+      const mesRef = document.getElementById('rh-recibo-mes').value;
+      if (!colabId || !mesRef) return alert('Selecione o colaborador e o mês de referência.');
+
       const colab = state.colaboradores.find(c => c.id === colabId);
       if (!colab) return;
 
@@ -1386,43 +1416,47 @@
       const telEmpresa = emp.tel || 'Não informado';
       const endEmpresa = emp.end || 'Não informado';
 
-      const lancamentos = state.lancamentosRh.filter(l => l.colaboradorId === colabId && l.mesReferencia === mesRef);
-      const statusObj = state.statusPagamentosRh.find(s => s.colaboradorId === colabId && s.mesReferencia === mesRef);
-      const statusPag = statusObj ? statusObj.status : 'Pendente';
-
+      // Capturar vales marcados para desconto
+      const checkboxesVales = document.querySelectorAll('.chk-vale-recibo:checked');
       let totalValesDescontados = 0;
-      let totalExtras = 0;
+      let valesSelecionadosDetalhes = [];
 
-      let itensHtml = '';
-      if (lancamentos.length > 0) {
-        itensHtml = lancamentos.map(l => {
-          const isVale = l.tipo === 'adiantamento';
-          let sinal = isVale ? '- R$' : '+ R$';
-          let obsTag = '';
+      checkboxesVales.forEach(chk => {
+        const valeId = chk.value;
+        const valeObj = state.valesHistorico.find(v => v.id === valeId);
+        if (valeObj) {
+          totalValesDescontados += (valeObj.valor || 0);
+          valesSelecionadosDetalhes.push(valeObj);
+        }
+      });
 
-          if (isVale) {
-            if (l.descontar) {
-              totalValesDescontados += l.valor;
-              obsTag = ' <small style="color:#ef4444;">(Descontado)</small>';
-            } else {
-              sinal = 'R$';
-              obsTag = ' <small style="color:#64748b;">(Informativo - Não descontado)</small>';
-            }
-          } else {
-            totalExtras += l.valor;
-            obsTag = ' <small style="color:#10b981;">(Serviço Extra)</small>';
-          }
+      const extraVal = parseFloat(document.getElementById('rh-recibo-extra-val').value || 0);
+      const extraObs = document.getElementById('rh-recibo-extra-obs').value.trim();
 
-          const dataFmt = l.data ? new Date(l.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
-          return `<div class="item-linha-zebrado"><span>[${dataFmt}] ${l.obs}${obsTag}</span><span><strong>${sinal} ${l.valor.toFixed(2)}</strong></span></div>`;
-        }).join('');
-      } else {
-        itensHtml = '<div style="font-size:0.75rem; color:#64748b; padding:4px 0;">Nenhum adiantamento ou serviço extra registrado neste mês.</div>';
-      }
+      const salarioBase = colab.salarioBase || 0;
+      const salarioLiquido = salarioBase + extraVal - totalValesDescontados;
 
-      const salarioLiquido = (colab.salarioBase || 0) + totalExtras - totalValesDescontados;
       const [ano, mes] = mesRef.split('-');
       const mesAnoFormatado = `${mes}/${ano}`;
+
+      // Atualizar status automático para Pago ao gerar o recibo oficial
+      const keyDoc = `${colabId}_${mesRef}`;
+      try {
+        await db.collection("status_pagamentos_rh").doc(keyDoc).set({
+          empresaId: state.currentUser.empresaId,
+          colaboradorId: colabId,
+          mesReferencia: mesRef,
+          status: 'Pago',
+          dataAtualizacao: new Date()
+        }, { merge: true });
+      } catch (err) { console.error(err); }
+
+      let itensValesHtml = valesSelecionadosDetalhes.map(v => {
+        const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
+        return `<div class="item-linha-zebrado"><span>[${dataFmt}] ${v.obs} (Vale Descontado)</span><span><strong>- R$ ${v.valor.toFixed(2)}</strong></span></div>`;
+      }).join('') || '<div style="font-size:0.75rem; color:#64748b; padding:4px 0;">Nenhum vale descontado neste recibo.</div>';
+
+      let itemExtraHtml = extraVal > 0 ? `<div class="item-linha-zebrado"><span>Serviço Extra: ${extraObs || 'Bônus / Extra'}</span><span><strong>+ R$ ${extraVal.toFixed(2)}</strong></span></div>` : '';
 
       const htmlBloco = `
         <div class="recibo-bloco-metade">
@@ -1447,12 +1481,13 @@
             <hr class="dashed-divider">
             <div style="font-size:0.72rem; display:flex; justify-content:space-between; margin-bottom:3px; background:#f1f5f9; padding:4px; border-radius:4px;">
               <span><strong>Salário Base Contratual:</strong></span>
-              <span><strong>R$ ${(colab.salarioBase || 0).toFixed(2)}</strong></span>
+              <span><strong>R$ ${salarioBase.toFixed(2)}</strong></span>
             </div>
 
             <hr class="dashed-divider">
-            <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:3px;">DETALHAMENTO DE VALES & SERVIÇOS EXTRAS</div>
-            ${itensHtml}
+            <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:3px;">VALES & SERVIÇOS EXTRAS APLICADOS</div>
+            ${itensValesHtml}
+            ${itemExtraHtml}
           </div>
 
           <div>
@@ -1463,7 +1498,7 @@
             </div>
 
             <div style="font-size:0.7rem; color:#475569; margin-bottom:15px;">
-              <strong>STATUS DO PAGAMENTO:</strong> <span class="${statusPag === 'Pago' ? 'badge-pago' : 'badge-pendente'}" style="padding:2px 6px;">${statusPag.toUpperCase()}</span>
+              <strong>STATUS:</strong> <span class="badge-pago" style="padding:2px 6px;">PAGO</span>
             </div>
 
             <div style="display:flex; justify-content:space-between; gap:20px; margin-top:25px; text-align:center; font-size:0.65rem; color:#334155;">
@@ -1480,6 +1515,7 @@
 
       document.getElementById('printable-receipt-rh').innerHTML = htmlBloco;
       document.getElementById('modal-recibo-rh').style.display = 'flex';
+      renderRhPainel();
     }
 
     function imprimirReciboRHDireto() {
