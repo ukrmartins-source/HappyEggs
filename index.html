@@ -204,33 +204,33 @@
 </head>
 <body>
 
-  <!-- CABEÃALHO -->
+  <!-- CABEÇALHO -->
   <header id="app-header" style="display:none;">
-    <div class="brand"><span id="header-title">ð¥ HAPPY EGGS</span></div>
+    <div class="brand"><span id="header-title">🐣 HAPPY EGGS</span></div>
     <div class="user-info">
-      <span id="user-display">ð¤ Admin</span>
+      <span id="user-display">👤 Admin</span>
       <button class="btn-logout" type="button" onclick="logout()">Sair</button>
     </div>
   </header>
 
-  <!-- ABAS FIXAS NO TOPO (FINANCEIRO vs CONTROLE TÃCNICO) -->
+  <!-- ABAS FIXAS NO TOPO (FINANCEIRO vs CONTROLE TÉCNICO) -->
   <nav class="top-nav-tabs" id="top-nav-container" style="display:none;">
-    <button class="top-tab-btn active" id="tab-btn-financeiro" type="button" onclick="mudarAbaTopo('financeiro')">ð° FINANCEIRO & VENDAS</button>
-    <button class="top-tab-btn tech-tab" id="tab-btn-tecnico" type="button" onclick="mudarAbaTopo('tecnico')">ð CONTROLE TÃCNICO</button>
+    <button class="top-tab-btn active" id="tab-btn-financeiro" type="button" onclick="mudarAbaTopo('financeiro')">💰 FINANCEIRO & VENDAS</button>
+    <button class="top-tab-btn tech-tab" id="tab-btn-tecnico" type="button" onclick="mudarAbaTopo('tecnico')">📊 CONTROLE TÉCNICO</button>
   </nav>
 
   <main>
     <!-- TELA DE LOGIN -->
     <div id="view-login" class="login-card">
       <h2>HAPPY EGGS</h2>
-      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">GestÃ£o de Avicultura Multi-Empresas</p>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom: 25px;">Gestão de Avicultura Multi-Empresas</p>
       <form onsubmit="autenticar(event)">
-        <div class="form-group"><label>UsuÃ¡rio</label><input type="text" id="login-user" placeholder="Seu usuÃ¡rio" required autocomplete="username"></div>
+        <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu usuário" required autocomplete="username"></div>
         <div class="form-group">
           <label>Senha</label>
           <div class="input-pass-wrapper">
             <input type="password" id="login-pass" placeholder="Sua senha" required autocomplete="current-password">
-            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('login-pass', this)">ðï¸</button>
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('login-pass', this)">👁️</button>
           </div>
         </div>
         <button type="submit" class="btn" style="margin-top:10px;">Entrar no Sistema</button>
@@ -241,10 +241,10 @@
     <div id="view-superadmin" class="view-content" style="display:none;">
       <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border: none;">
         <div class="card-header" style="border-color: rgba(255,255,255,0.1); margin-bottom: 10px; padding-bottom: 8px;">
-          <div class="card-title" style="color: white;">ð Dashboard Global SaaS</div>
+          <div class="card-title" style="color: white;">👑 Dashboard Global SaaS</div>
           <div style="display: flex; gap: 6px; align-items: center;">
-            <button class="btn-warning" type="button" style="font-size: 0.7rem; padding: 5px 7px;" onclick="alternarPrivacidadeSuperAdmin()" id="btn-toggle-privacy">ðï¸ Ocultar</button>
-            <button class="btn-warning" type="button" style="font-size: 0.7rem; padding: 5px 7px; background: #2563eb;" onclick="abrirModalSegurancaSuperAdmin()">ð Senha</button>
+            <button class="btn-warning" type="button" style="font-size: 0.7rem; padding: 5px 7px;" onclick="alternarPrivacidadeSuperAdmin()" id="btn-toggle-privacy">👁️ Ocultar</button>
+            <button class="btn-warning" type="button" style="font-size: 0.7rem; padding: 5px 7px; background: #2563eb;" onclick="abrirModalSegurancaSuperAdmin()">🔒 Senha</button>
             <button class="btn btn-back" type="button" style="padding: 5px 8px; font-size: 0.7rem;" onclick="logout()">Sair</button>
           </div>
         </div>
@@ -261,52 +261,52 @@
       </div>
 
       <div class="grid-menu" style="margin-bottom: 15px;">
-        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('cadastro')"><span class="icon">â</span><span class="label">Nova Granja</span></button>
-        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('empresas')"><span class="icon">ð¢</span><span class="label">Listar / Editar Empresas</span></button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('cadastro')"><span class="icon">➕</span><span class="label">Nova Granja</span></button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoSuperAdmin('empresas')"><span class="icon">🏢</span><span class="label">Listar / Editar Empresas</span></button>
       </div>
 
       <div class="card" id="saas-card-cadastro" style="border-left: 4px solid var(--warning); display: block;">
         <div class="card-title" style="margin-bottom: 12px;">Cadastrar Nova Granja / Empresa Cliente</div>
         <form onsubmit="cadastrarEmpresaCliente(event)">
-          <div class="form-group"><label>Nome da Granja / Empresa</label><input type="text" id="saas-nome" placeholder="Ex: Avicultura SÃ£o JosÃ©" required></div>
-          <div class="form-group"><label>ID Ãnico (Sem espaÃ§os, ex: sao_jose)</label><input type="text" id="saas-id" placeholder="sao_jose" required></div>
+          <div class="form-group"><label>Nome da Granja / Empresa</label><input type="text" id="saas-nome" placeholder="Ex: Avicultura São José" required></div>
+          <div class="form-group"><label>ID Único (Sem espaços, ex: sao_jose)</label><input type="text" id="saas-id" placeholder="sao_jose" required></div>
           <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="saas-cnpj" placeholder="Ex: 00.000.000/0001-00"></div>
           <div class="form-group"><label>E-mail de Contato</label><input type="email" id="saas-email" placeholder="contato@saojose.com"></div>
           <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="saas-tel" placeholder="Ex: (11) 99999-8888"></div>
-          <div class="form-group"><label>EndereÃ§o Completo</label><input type="text" id="saas-end" placeholder="Rua, NÂº, Bairro, Cidade/UF"></div>
+          <div class="form-group"><label>Endereço Completo</label><input type="text" id="saas-end" placeholder="Rua, Nº, Bairro, Cidade/UF"></div>
           <div class="form-group">
             <label>Plano de Assinatura</label>
             <select id="saas-plano" onchange="atualizarComportamentoPlano()" required>
               <option value="mensal">Mensal (30 Dias)</option>
               <option value="anual">Anual (365 Dias)</option>
-              <option value="vitalicio">VitalÃ­cio (Sem ExpiraÃ§Ã£o)</option>
+              <option value="vitalicio">Vitalício (Sem Expiração)</option>
             </select>
           </div>
           <div class="form-group"><label>Valor do Plano (R$)</label><input type="number" step="0.01" id="saas-valor-plano" placeholder="Ex: 97.00" required></div>
           <div class="form-group" id="grupo-vencimento"><label>Data de Vencimento da Assinatura</label><input type="date" id="saas-vencimento"></div>
-          <div class="form-group"><label>UsuÃ¡rio Administrador da Granja</label><input type="text" id="saas-admin-user" placeholder="admin_saojose" required></div>
+          <div class="form-group"><label>Usuário Administrador da Granja</label><input type="text" id="saas-admin-user" placeholder="admin_saojose" required></div>
           <div class="form-group">
             <label>Senha Inicial</label>
             <div class="input-pass-wrapper">
               <input type="password" id="saas-admin-pass" placeholder="Senha de acesso" required>
-              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('saas-admin-pass', this)">ðï¸</button>
+              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('saas-admin-pass', this)">👁️</button>
             </div>
           </div>
-          <button type="submit" class="btn btn-success">â Cadastrar Empresa Cliente</button>
+          <button type="submit" class="btn btn-success">➕ Cadastrar Empresa Cliente</button>
         </form>
       </div>
 
       <div class="card" id="saas-card-empresas" style="display: none;">
         <div class="card-header">
           <div class="card-title">Empresas e Clientes Cadastrados</div>
-          <button class="btn btn-back" type="button" onclick="abrirSecaoSuperAdmin('cadastro')">â Voltar Cadastro</button>
+          <button class="btn btn-back" type="button" onclick="abrirSecaoSuperAdmin('cadastro')">➕ Voltar Cadastro</button>
         </div>
         <div class="form-group" style="margin-bottom: 12px;">
-          <input type="text" id="saas-busca-empresa" placeholder="ð Pesquisar cliente por nome, ID ou CNPJ..." oninput="renderEmpresasSaaS()">
+          <input type="text" id="saas-busca-empresa" placeholder="🔍 Pesquisar cliente por nome, ID ou CNPJ..." oninput="renderEmpresasSaaS()">
         </div>
-        <p style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">Clique sobre o nome da empresa para ver detalhes completos ou use o botÃ£o de editar (âï¸):</p>
+        <p style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">Clique sobre o nome da empresa para ver detalhes completos ou use o botão de editar (✏️):</p>
         <table>
-          <thead><tr><th>Empresa / Granja</th><th>Status</th><th>AÃ§Ãµes</th></tr></thead>
+          <thead><tr><th>Empresa / Granja</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody id="lista-empresas-saas"></tbody>
         </table>
       </div>
@@ -315,19 +315,19 @@
     <!-- ABA 1: FINANCEIRO & VENDAS (DASHBOARD) -->
     <div id="view-financeiro" class="view-content" style="display:none;">
       <div class="grid-menu">
-        <button class="grid-btn full-width" type="button" onclick="navToSub('pedidos')"><span class="icon">ð</span><span class="label">NOVO PEDIDO / VENDAS</span></button>
-        <button class="grid-btn" type="button" onclick="navToSub('clientes')"><span class="icon">ð¥</span><span class="label">CLIENTES</span></button>
-        <button class="grid-btn" type="button" onclick="navToSub('produtos')"><span class="icon">ð¦</span><span class="label">ESTOQUE</span></button>
-        <button class="grid-btn admin-only" type="button" onclick="navToSub('usuarios')"><span class="icon">ð</span><span class="label">USUÃRIOS</span></button>
-        <button class="grid-btn admin-only" type="button" onclick="navToSub('empresa')"><span class="icon">âï¸</span><span class="label">EMPRESA</span></button>
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">ð</span><span class="label">RELATÃRIO DE VENDAS (DIAS / MÃS)</span></button>
+        <button class="grid-btn full-width" type="button" onclick="navToSub('pedidos')"><span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span></button>
+        <button class="grid-btn" type="button" onclick="navToSub('clientes')"><span class="icon">👥</span><span class="label">CLIENTES</span></button>
+        <button class="grid-btn" type="button" onclick="navToSub('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
+        <button class="grid-btn admin-only" type="button" onclick="navToSub('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
+        <button class="grid-btn admin-only" type="button" onclick="navToSub('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">📈</span><span class="label">RELATÓRIO DE VENDAS (DIAS / MÊS)</span></button>
       </div>
       <div class="card" style="margin-top: 15px;">
         <div class="card-header">
-          <div class="card-title">ð Busca RÃ¡pida de Clientes</div>
-          <button class="btn btn-back" type="button" onclick="navToSub('clientes')">â Cadastrar</button>
+          <div class="card-title">📋 Busca Rápida de Clientes</div>
+          <button class="btn btn-back" type="button" onclick="navToSub('clientes')">➕ Cadastrar</button>
         </div>
-        <div class="form-group" style="margin-bottom: 10px;"><input type="text" id="dash-busca-cliente" placeholder="ð Digite para buscar cliente..." oninput="filtrarClientesDashboard()"></div>
+        <div class="form-group" style="margin-bottom: 10px;"><input type="text" id="dash-busca-cliente" placeholder="🔍 Digite para buscar cliente..." oninput="filtrarClientesDashboard()"></div>
         <table>
           <thead><tr><th>Nome / Doc</th><th>Contato</th></tr></thead>
           <tbody id="lista-clientes-dash"></tbody>
@@ -335,119 +335,119 @@
       </div>
     </div>
 
-    <!-- ABA 2: CONTROLE TÃCNICO & ZOOTECNIA -->
+    <!-- ABA 2: CONTROLE TÉCNICO & ZOOTECNIA -->
     <div id="view-tecnico" class="view-content" style="display:none;">
       
-      <!-- MENU GRID DA ABA TÃCNICA -->
+      <!-- MENU GRID DA ABA TÉCNICA -->
       <div class="grid-menu" id="tec-menu-grid">
-        <button class="grid-btn full-width tech-btn" type="button" onclick="abrirSecaoTecnica('lotes')"><span class="icon">ð</span><span class="label">CADASTRO / ALOJAMENTO DE LOTE</span></button>
-        <button class="grid-btn" type="button" onclick="abrirSecaoTecnica('postura')"><span class="icon">ð¥</span><span class="label">REGISTRO DIÃRIO DE POSTURA</span></button>
-        <button class="grid-btn" type="button" onclick="abrirSecaoTecnica('mortalidade')"><span class="icon">â°ï¸</span><span class="label">REGISTRO DE MORTALIDADE</span></button>
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #d97706, #b45309);" onclick="abrirSecaoTecnica('vacinacao')"><span class="icon">ð</span><span class="label">CONTROLE DE VACINAÃÃO</span></button>
+        <button class="grid-btn full-width tech-btn" type="button" onclick="abrirSecaoTecnica('lotes')"><span class="icon">🐔</span><span class="label">CADASTRO / ALOJAMENTO DE LOTE</span></button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoTecnica('postura')"><span class="icon">🥚</span><span class="label">REGISTRO DIÁRIO DE POSTURA</span></button>
+        <button class="grid-btn" type="button" onclick="abrirSecaoTecnica('mortalidade')"><span class="icon">⚰️</span><span class="label">REGISTRO DE MORTALIDADE</span></button>
+        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #d97706, #b45309);" onclick="abrirSecaoTecnica('vacinacao')"><span class="icon">💉</span><span class="label">CONTROLE DE VACINAÇÃO</span></button>
       </div>
 
-      <!-- BOTÃO DE VOLTAR AO MENU TÃCNICO -->
+      <!-- BOTÃO DE VOLTAR AO MENU TÉCNICO -->
       <div id="tec-btn-voltar-container" style="display:none; margin-bottom: 12px;">
-        <button class="btn btn-back" type="button" onclick="voltarMenuTecnico()">âï¸ Voltar ao Menu TÃ©cnico</button>
+        <button class="btn btn-back" type="button" onclick="voltarMenuTecnico()">◀️ Voltar ao Menu Técnico</button>
       </div>
 
       <!-- 1. CADASTRO DE LOTES -->
       <div class="card tec-secao-form" id="tec-form-lotes" style="display: none; border-left: 4px solid var(--tech);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">ð Cadastrar / Alojamento de Lote</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🐔 Cadastrar / Alojamento de Lote</div>
         <form onsubmit="cadastrarLoteTecnico(event)">
-          <div class="form-group"><label>Nome / IdentificaÃ§Ã£o do Lote</label><input type="text" id="lote-nome" placeholder="Ex: Lote 01 - GalpÃ£o A" required></div>
+          <div class="form-group"><label>Nome / Identificação do Lote</label><input type="text" id="lote-nome" placeholder="Ex: Lote 01 - Galpão A" required></div>
           <div class="form-group"><label>Data de Alojamento</label><input type="date" id="lote-data-alojamento" required></div>
-          <div class="form-group"><label>Linhagem / RaÃ§a</label><input type="text" id="lote-linhagem" placeholder="Ex: Hy-Line Brown" required></div>
+          <div class="form-group"><label>Linhagem / Raça</label><input type="text" id="lote-linhagem" placeholder="Ex: Hy-Line Brown" required></div>
           <div class="form-group"><label>Quantidade Inicial de Aves</label><input type="number" id="lote-qtd-inicial" min="1" placeholder="Ex: 1000" required></div>
           <div class="form-group"><label>Idade Inicial na Chegada (Semanas)</label><input type="number" id="lote-idade-inicial" min="0" placeholder="Ex: 16" required></div>
-          <button type="submit" class="btn btn-tech">â Salvar Lote TÃ©cnico</button>
+          <button type="submit" class="btn btn-tech">➕ Salvar Lote Técnico</button>
         </form>
       </div>
 
-      <!-- 2. REGISTRO DIÃRIO DE POSTURA & PESAGEM -->
+      <!-- 2. REGISTRO DIÁRIO DE POSTURA & PESAGEM -->
       <div class="card tec-secao-form" id="tec-form-postura" style="display: none; border-left: 4px solid var(--tech);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">ð¥ Registo DiÃ¡rio de Postura & Pesagem</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🥚 Registo Diário de Postura & Pesagem</div>
         <form onsubmit="registrarPosturaDiaria(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="postura-lote-id" required></select></div>
           <div class="form-group"><label>Data da Coleta</label><input type="date" id="postura-data" required></div>
           <div class="form-group"><label>Ovos Colhidos no Dia (Unidades)</label><input type="number" id="postura-ovos-colhidos" min="0" placeholder="Ex: 750" required></div>
-          <div class="form-group"><label>Consumo de RaÃ§Ã£o no Dia (Kg - Opcional)</label><input type="number" step="0.1" id="postura-racao" placeholder="Ex: 110.5"></div>
-          <div class="form-group"><label>Temperatura MÃ©dia / Obs AmbiÃªncia</label><input type="text" id="postura-obs" placeholder="Ex: Temp 24Â°C / Luz 16h"></div>
+          <div class="form-group"><label>Consumo de Ração no Dia (Kg - Opcional)</label><input type="number" step="0.1" id="postura-racao" placeholder="Ex: 110.5"></div>
+          <div class="form-group"><label>Temperatura Média / Obs Ambiência</label><input type="text" id="postura-obs" placeholder="Ex: Temp 24°C / Luz 16h"></div>
           
-          <!-- SEÃÃO DE PESAGEM DAS AVES -->
+          <!-- SEÇÃO DE PESAGEM DAS AVES -->
           <hr style="margin: 15px 0; border: none; border-top: 1px solid var(--border);">
-          <div style="font-weight: 700; font-size: 0.9rem; color: var(--tech); margin-bottom: 8px;">âï¸ Pesagem de Amostra de Aves (Opcional)</div>
+          <div style="font-weight: 700; font-size: 0.9rem; color: var(--tech); margin-bottom: 8px;">⚖️ Pesagem de Amostra de Aves (Opcional)</div>
           <div class="form-group">
-            <label>NÃºmero de Aves a Pesar</label>
+            <label>Número de Aves a Pesar</label>
             <input type="number" id="pesagem-qtd-aves" min="0" value="0" placeholder="Ex: 3 ou 10" oninput="gerarCamposPesagemAves()">
           </div>
           <div id="container-pesagem-individual" style="margin-bottom: 10px;"></div>
           <div id="resultado-peso-medio" style="font-size: 0.85rem; font-weight: bold; color: var(--tech); margin-bottom: 12px; display: none;"></div>
 
-          <button type="submit" class="btn btn-success">â Registar ProduÃ§Ã£o & Pesagem</button>
+          <button type="submit" class="btn btn-success">✅ Registar Produção & Pesagem</button>
         </form>
       </div>
 
       <!-- 3. REGISTRO DE MORTALIDADE -->
       <div class="card tec-secao-form" id="tec-form-mortalidade" style="display: none; border-left: 4px solid var(--danger);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">â°ï¸ Registo de Mortalidade / Baixas</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">⚰️ Registo de Mortalidade / Baixas</div>
         <form onsubmit="registrarMortalidadeTecnica(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="morte-lote-id" required></select></div>
           <div class="form-group"><label>Data do Ocorrido</label><input type="date" id="morte-data" required></div>
           <div class="form-group"><label>Quantidade de Aves Mortas</label><input type="number" id="morte-qtd" min="1" placeholder="Ex: 1" required></div>
-          <div class="form-group"><label>Motivo / ObservaÃ§Ã£o</label><input type="text" id="morte-obs" placeholder="Ex: DoenÃ§a, calor, etc."></div>
-          <button type="submit" class="btn btn-danger">â ï¸ Registar Mortalidade</button>
+          <div class="form-group"><label>Motivo / Observação</label><input type="text" id="morte-obs" placeholder="Ex: Doença, calor, etc."></div>
+          <button type="submit" class="btn btn-danger">⚠️ Registar Mortalidade</button>
         </form>
       </div>
 
-      <!-- 4. CONTROLE DE VACINAÃÃO -->
+      <!-- 4. CONTROLE DE VACINAÇÃO -->
       <div class="card tec-secao-form" id="tec-form-vacinacao" style="display: none; border-left: 4px solid var(--warning);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--warning);">ð Controle & HistÃ³rico de VacinaÃ§Ã£o</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--warning);">💉 Controle & Histórico de Vacinação</div>
         <form onsubmit="registrarVacinacaoTecnica(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="vacina-lote-id" required></select></div>
           <div class="form-group"><label>Tipo / Nome da Vacina</label><input type="text" id="vacina-nome" placeholder="Ex: Newcastle / Gumboro" required></div>
           <div class="form-group"><label>Quantidade de Aves Vacinadas</label><input type="number" id="vacina-qtd-aves" min="1" placeholder="Ex: 1000" required></div>
-          <div class="form-group"><label>Data da AplicaÃ§Ã£o</label><input type="date" id="vacina-data" required></div>
-          <button type="submit" class="btn btn-warning" style="color:#fff;">ð Registar VacinaÃ§Ã£o</button>
+          <div class="form-group"><label>Data da Aplicação</label><input type="date" id="vacina-data" required></div>
+          <button type="submit" class="btn btn-warning" style="color:#fff;">💉 Registar Vacinação</button>
         </form>
       </div>
 
-      <!-- HISTÃRICO E INDICADORES TÃCNICOS -->
+      <!-- HISTÓRICO E INDICADORES TÉCNICOS -->
       <div class="card" id="tec-painel-historicos">
-        <div class="card-title">Indicadores ZootÃ©cnicos & HistÃ³rico Geral</div>
+        <div class="card-title">Indicadores Zootécnicos & Histórico Geral</div>
         <div style="margin-top: 10px; font-size: 0.85rem; background: #f8fafc; padding: 10px; border-radius: 8px; border:1px solid #e2e8f0; margin-bottom: 10px;">
-          <div>ð <strong>MÃ©dia de Postura do MÃªs Atual:</strong> <span id="kpi-media-mensal" style="color:var(--tech); font-weight:bold;">0%</span></div>
+          <div>📊 <strong>Média de Postura do Mês Atual:</strong> <span id="kpi-media-mensal" style="color:var(--tech); font-weight:bold;">0%</span></div>
         </div>
 
         <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Lotes Alojados Atualmente</div>
         <table>
-          <thead><tr><th>Lote / Linhagem</th><th>Aves Vivas</th><th>Idade Atual</th><th>AÃ§Ã£o</th></tr></thead>
+          <thead><tr><th>Lote / Linhagem</th><th>Aves Vivas</th><th>Idade Atual</th><th>Ação</th></tr></thead>
           <tbody id="lista-lotes-tecnicos"></tbody>
         </table>
 
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:15px;">HistÃ³rico de Postura & Pesagem</div>
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:15px;">Histórico de Postura & Pesagem</div>
         <table>
           <thead><tr><th>Data</th><th>Lote</th><th>Ovos</th><th>Taxa / Pesagem</th></tr></thead>
           <tbody id="lista-historico-postura"></tbody>
         </table>
 
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--danger); text-transform:uppercase; margin-top:15px;">HistÃ³rico de Mortalidade</div>
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--danger); text-transform:uppercase; margin-top:15px;">Histórico de Mortalidade</div>
         <table>
           <thead><tr><th>Data</th><th>Lote</th><th>Baixas</th><th>Motivo</th></tr></thead>
           <tbody id="lista-historico-mortalidade"></tbody>
         </table>
 
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--warning); text-transform:uppercase; margin-top:15px;">HistÃ³rico de VacinaÃ§Ã£o</div>
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--warning); text-transform:uppercase; margin-top:15px;">Histórico de Vacinação</div>
         <table>
           <thead><tr><th>Data</th><th>Lote</th><th>Vacina</th><th>Aves Vacinadas</th></tr></thead>
           <tbody id="lista-historico-vacinacao"></tbody>
         </table>
       </div>
 
-      <!-- BOTÃES DE RELATÃRIO GERAL E ZERAR DADOS -->
+      <!-- BOTÕES DE RELATÓRIO GERAL E ZERAR DADOS -->
       <div class="grid-menu" style="margin-top: 20px; margin-bottom: 20px;">
-        <button class="grid-btn full-width tech-action" type="button" onclick="abrirModalRelatorioTecnico()"><span class="icon">ð¨ï¸</span><span class="label">RELATÃRIO TÃCNICO GERAL (IMPRESSÃO)</span></button>
-        <button class="grid-btn full-width danger-action" type="button" onclick="abrirModalZerarDadosTecnicos()"><span class="icon">â ï¸</span><span class="label">ZERAR DADOS DO CONTROLE TÃCNICO</span></button>
+        <button class="grid-btn full-width tech-action" type="button" onclick="abrirModalRelatorioTecnico()"><span class="icon">🖨️</span><span class="label">RELATÓRIO TÉCNICO GERAL (IMPRESSÃO)</span></button>
+        <button class="grid-btn full-width danger-action" type="button" onclick="abrirModalZerarDadosTecnicos()"><span class="icon">⚠️</span><span class="label">ZERAR DADOS DO CONTROLE TÉCNICO</span></button>
       </div>
 
     </div>
@@ -457,20 +457,20 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title">Cadastrar Cliente</div>
-          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">ð  Voltar</button>
+          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
         </div>
         <form onsubmit="cadastrarCliente(event)">
-          <div class="form-group"><label>Nome / RazÃ£o Social</label><input type="text" id="cli-nome" required></div>
+          <div class="form-group"><label>Nome / Razão Social</label><input type="text" id="cli-nome" required></div>
           <div class="form-group"><label>Documento (CPF / RG / CNPJ)</label><input type="text" id="cli-doc" placeholder="Ex: 000.000.000-00"></div>
           <div class="form-group"><label>WhatsApp / Telefone</label><input type="tel" id="cli-tel" placeholder="Ex: 5511999998888" required></div>
-          <div class="form-group"><label>EndereÃ§o Completo</label><input type="text" id="cli-end" placeholder="Rua, NÂº, Bairro, Cidade" required></div>
+          <div class="form-group"><label>Endereço Completo</label><input type="text" id="cli-end" placeholder="Rua, Nº, Bairro, Cidade" required></div>
           <button type="submit" class="btn">Salvar Cliente na Nuvem</button>
         </form>
       </div>
       <div class="card">
         <div class="card-title">Clientes Cadastrados</div>
         <table>
-          <thead><tr><th>Nome / Doc</th><th>Contato</th><th>AÃ§Ã£o</th></tr></thead>
+          <thead><tr><th>Nome / Doc</th><th>Contato</th><th>Ação</th></tr></thead>
           <tbody id="lista-clientes"></tbody>
         </table>
       </div>
@@ -481,56 +481,56 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title">Novo Pedido</div>
-          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">ð  Voltar</button>
+          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
         </div>
         <form onsubmit="finalizarPedido(event)">
-          <div class="form-group"><label>ð Buscar Cliente</label><input type="text" id="ped-busca-cliente" placeholder="Filtrar por nome, doc ou fone..." oninput="filtrarClientesDropdown()"></div>
+          <div class="form-group"><label>🔍 Buscar Cliente</label><input type="text" id="ped-busca-cliente" placeholder="Filtrar por nome, doc ou fone..." oninput="filtrarClientesDropdown()"></div>
           <div class="form-group"><label>Selecione o Cliente</label><select id="ped-cliente" required></select></div>
           <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
           <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border:1px solid #e2e8f0;">
             <div class="form-group"><label>Selecione a Embalagem / Produto</label><select id="ped-produto"></select></div>
             <div style="display: flex; gap: 8px; align-items: flex-end;">
               <div class="form-group" style="flex: 1; margin-bottom: 0;"><label>Quantidade de Embalagens</label><input type="number" id="ped-qtd" min="1" value="1"></div>
-              <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">â Adicionar</button>
+              <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">➕ Adicionar</button>
             </div>
           </div>
           <div class="carrinho-box">
-            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">ð ITENS SELECIONADOS:</div>
+            <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛒 ITENS SELECIONADOS:</div>
             <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
             <div style="font-size: 1rem; font-weight: bold; text-align: right; margin-top: 10px; color: var(--accent);">Total: R$ <span id="ped-total-valor">0.00</span></div>
           </div>
           <div class="form-group">
             <label>Forma de Pagamento</label>
             <select id="ped-forma-pagamento" required>
-              <option value="Pix">ð± Pix</option>
-              <option value="CartÃ£o de CrÃ©dito/DÃ©bito">ð³ CartÃ£o de CrÃ©dito / DÃ©bito</option>
-              <option value="TransferÃªncia BancÃ¡ria">ð¦ TransferÃªncia BancÃ¡ria</option>
-              <option value="Dinheiro">ðµ Dinheiro</option>
+              <option value="Pix">📱 Pix</option>
+              <option value="Cartão de Crédito/Débito">💳 Cartão de Crédito / Débito</option>
+              <option value="Transferência Bancária">🏦 Transferência Bancária</option>
+              <option value="Dinheiro">💵 Dinheiro</option>
             </select>
           </div>
           <div class="form-group"><label>Dados do Pagamento (Opcional)</label><input type="text" id="ped-dados-pagamento" placeholder="Ex: Chave Pix ou Banco"></div>
           <div class="form-group">
             <label>Status do Pagamento</label>
             <select id="ped-status" required>
-              <option value="Pago">ð¢ Pago</option>
-              <option value="Pendente">ð´ Pendente (A Pagar)</option>
+              <option value="Pago">🟢 Pago</option>
+              <option value="Pendente">🔴 Pendente (A Pagar)</option>
             </select>
           </div>
-          <div class="form-group"><label>ObservaÃ§Ãµes do Pedido (SairÃ¡ na Nota)</label><textarea id="ped-obs" rows="2" placeholder="Ex: Entregar atÃ© 14h / Deixar com a portaria"></textarea></div>
+          <div class="form-group"><label>Observações do Pedido (Sairá na Nota)</label><textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Deixar com a portaria"></textarea></div>
           <button type="submit" class="btn btn-success">Finalizar Pedido</button>
         </form>
       </div>
 
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-          <div class="card-title">HistÃ³rico de Pedidos Sequencial</div>
-          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">ð¨ï¸ Imprimir Recibos</button>
+          <div class="card-title">Histórico de Pedidos Sequencial</div>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">🖨️ Imprimir Recibos</button>
         </div>
         <table>
           <thead>
             <tr>
               <th style="width: 30px;"><input type="checkbox" id="check-todos-pedidos" onclick="alternarTodosPedidos(this)"></th>
-              <th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>AÃ§Ãµes</th>
+              <th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th>
             </tr>
           </thead>
           <tbody id="lista-pedidos"></tbody>
@@ -542,22 +542,22 @@
     <div id="view-produtos" class="view-content" style="display:none;">
       <div class="card" style="border-left: 4px solid var(--accent);">
         <div class="card-header">
-          <div class="card-title">ð¥ Registrar Entrada de ProduÃ§Ã£o</div>
-          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">ð  Voltar</button>
+          <div class="card-title">🥚 Registrar Entrada de Produção</div>
+          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
         </div>
         <div class="stat-card" style="background: #eff6ff; border-color: #bfdbfe; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <div class="stat-title">Saldo Geral de Ovos em Estoque</div>
             <div class="stat-value" id="estoque-geral-ovos" style="font-size: 1.8rem;">0 Ovos</div>
           </div>
-          <button class="btn admin-only" type="button" style="width: auto; background: var(--warning); padding: 8px 12px; font-size: 0.8rem;" onclick="abrirModalBalanco()">âï¸ Atualizar Estoque</button>
+          <button class="btn admin-only" type="button" style="width: auto; background: var(--warning); padding: 8px 12px; font-size: 0.8rem;" onclick="abrirModalBalanco()">⚖️ Atualizar Estoque</button>
         </div>
         <form onsubmit="registrarEntradaProducao(event)">
           <div class="form-group"><label>Quantidade Coletada/Produzida (Ovos Individuais)</label><input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 5000" required></div>
-          <button type="submit" class="btn" style="background:var(--accent);">â LanÃ§ar Direto para o Estoque Geral</button>
+          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Direto para o Estoque Geral</button>
         </form>
         <div style="margin-top: 15px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">HistÃ³rico de Coletas de Hoje</div>
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Coletas de Hoje</div>
           <table><thead><tr><th>Hora</th><th>Unidades</th></tr></thead><tbody id="lista-producao-hoje"></tbody></table>
         </div>
       </div>
@@ -566,26 +566,26 @@
         <div class="card-header"><div class="card-title" id="form-prod-title">Cadastrar Novo Produto / Embalagem</div></div>
         <form id="form-produto" onsubmit="salvarProduto(event)">
           <input type="hidden" id="prod-id-edit" value="">
-          <div class="form-group"><label>DescriÃ§Ã£o do Item</label><input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / CAIXA 360 OVOS" required></div>
-          <div class="form-group"><label>PreÃ§o UnitÃ¡rio (R$)</label><input type="number" step="0.01" id="prod-preco" placeholder="Ex: 12.00" required></div>
+          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / CAIXA 360 OVOS" required></div>
+          <div class="form-group"><label>Preço Unitário (R$)</label><input type="number" step="0.01" id="prod-preco" placeholder="Ex: 12.00" required></div>
           <div class="form-group"><label>Quantidade de Ovos nesta Embalagem</label><input type="number" id="prod-ovos-unid" min="1" placeholder="Ex: 12" required></div>
           <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
-          <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar EdiÃ§Ã£o</button>
+          <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
         </form>
       </div>
 
       <div class="card">
-        <div class="card-title">Produtos / ApresentaÃ§Ãµes DisponÃ­veis</div>
-        <table><thead><tr><th>DescriÃ§Ã£o</th><th>PreÃ§o</th><th>Ovos/Emb</th><th>AÃ§Ãµes</th></tr></thead><tbody id="lista-produtos"></tbody></table>
+        <div class="card-title">Produtos / Apresentações Disponíveis</div>
+        <table><thead><tr><th>Descrição</th><th>Preço</th><th>Ovos/Emb</th><th>Ações</th></tr></thead><tbody id="lista-produtos"></tbody></table>
       </div>
     </div>
 
-    <!-- TELA: GESTÃO DE USUÃRIOS -->
+    <!-- TELA: GESTÃO DE USUÁRIOS -->
     <div id="view-usuarios" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">Adicionar UsuÃ¡rio</div>
-          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">ð  Voltar</button>
+          <div class="card-title">Adicionar Usuário</div>
+          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
         </div>
         <form onsubmit="cadastrarUsuario(event)">
           <div class="form-group"><label>Login / Nome</label><input type="text" id="usr-login" required autocomplete="username"></div>
@@ -593,22 +593,22 @@
             <label>Senha de Acesso</label>
             <div class="input-pass-wrapper">
               <input type="password" id="usr-pass" required autocomplete="new-password">
-              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('usr-pass', this)">ðï¸</button>
+              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('usr-pass', this)">👁️</button>
             </div>
           </div>
           <div class="form-group">
-            <label>NÃ­vel de PermissÃ£o</label>
+            <label>Nível de Permissão</label>
             <select id="usr-role">
               <option value="vendedor">Vendedor (Apenas Vendas/Clientes)</option>
               <option value="admin">Administrador (Acesso Total)</option>
             </select>
           </div>
-          <button type="submit" class="btn">Cadastrar UsuÃ¡rio</button>
+          <button type="submit" class="btn">Cadastrar Usuário</button>
         </form>
       </div>
       <div class="card">
-        <div class="card-title">UsuÃ¡rios do Sistema</div>
-        <table><thead><tr><th>UsuÃ¡rio</th><th>PermissÃ£o</th><th>AÃ§Ã£o</th></tr></thead><tbody id="lista-usuarios"></tbody></table>
+        <div class="card-title">Usuários do Sistema</div>
+        <table><thead><tr><th>Usuário</th><th>Permissão</th><th>Ação</th></tr></thead><tbody id="lista-usuarios"></tbody></table>
       </div>
     </div>
 
@@ -616,15 +616,15 @@
     <div id="view-empresa" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">ð Alterar Minha Senha</div>
-          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">ð  Voltar</button>
+          <div class="card-title">🔒 Alterar Minha Senha</div>
+          <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
         </div>
         <form onsubmit="alterarMinhaSenha(event)">
           <div class="form-group">
             <label>Nova Senha</label>
             <div class="input-pass-wrapper">
               <input type="password" id="minha-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password">
-              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('minha-nova-senha', this)">ðï¸</button>
+              <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('minha-nova-senha', this)">👁️</button>
             </div>
           </div>
           <button type="submit" class="btn" style="background:var(--warning);">Atualizar Minha Senha</button>
@@ -632,30 +632,30 @@
       </div>
 
       <div class="card">
-        <div class="card-title">Dados da Empresa (RodapÃ© da Nota)</div>
+        <div class="card-title">Dados da Empresa (Rodapé da Nota)</div>
         <form onsubmit="salvarEmpresa(event)">
           <div class="form-group"><label>Nome Fantasia</label><input type="text" id="emp-nome" required></div>
           <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="emp-cnpj" required></div>
           <div class="form-group"><label>Telefone / WhatsApp Comercial</label><input type="text" id="emp-tel" placeholder="Ex: (11) 99999-8888" required></div>
-          <div class="form-group"><label>EndereÃ§o Completo</label><input type="text" id="emp-end" placeholder="Rua, NÂº, Bairro, Cidade/UF" required></div>
+          <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
           <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @happyeggs"></div>
-          <div class="form-group"><label>Chave Pix Oficial PadrÃ£o</label><input type="text" id="emp-pix" required></div>
+          <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
           <button type="submit" class="btn btn-success">Salvar Dados da Empresa</button>
         </form>
       </div>
     </div>
   </main>
 
-  <!-- MODAL: FILTRO DO RELATÃRIO TÃCNICO -->
+  <!-- MODAL: FILTRO DO RELATÓRIO TÉCNICO -->
   <div class="modal" id="modal-relatorio-tecnico">
     <div class="modal-content" style="max-width: 520px;">
-      <div class="card-title" style="margin-bottom:12px;">ð RelatÃ³rio Geral TÃ©cnico (Zootecnia)</div>
+      <div class="card-title" style="margin-bottom:12px;">📊 Relatório Geral Técnico (Zootecnia)</div>
       <div class="form-group">
-        <label>PerÃ­odo do RelatÃ³rio</label>
+        <label>Período do Relatório</label>
         <select id="tec-filtro-periodo" onchange="atualizarFiltroRelatorioTecnico()">
-          <option value="mes">Este MÃªs Atual</option>
+          <option value="mes">Este Mês Atual</option>
           <option value="ano">Este Ano Atual</option>
-          <option value="tudo">Desde o InÃ­cio (Todos os Registos)</option>
+          <option value="tudo">Desde o Início (Todos os Registos)</option>
           <option value="personalizado">Personalizado (Intervalo de Datas)</option>
         </select>
       </div>
@@ -667,18 +667,18 @@
 
       <div id="area-relatorio-tec-impressao" class="relatorio-sheet-box">
         <div class="relatorio-sheet-header">
-          <h3>RelatÃ³rio TÃ©cnico da Granja</h3>
+          <h3>Relatório Técnico da Granja</h3>
           <span style="font-size: 0.75rem; font-weight: 600; opacity: 0.9;" id="tec-relatorio-emissao"></span>
         </div>
         <div class="relatorio-kpi-grid">
-          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">MÃ©dia Taxa Postura</div><div class="relatorio-kpi-val" id="tec-kpi-taxa" style="color: #0d9488;">0%</div></div>
+          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Média Taxa Postura</div><div class="relatorio-kpi-val" id="tec-kpi-taxa" style="color: #0d9488;">0%</div></div>
           <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Total Ovos Coletados</div><div class="relatorio-kpi-val" id="tec-kpi-ovos">0</div></div>
         </div>
         <div class="relatorio-section-box">
           <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Mortalidade e Baixas</div>
           <div id="tec-resumo-baixas" style="line-height: 1.4; color: #1e293b; margin-bottom: 8px;"></div>
           
-          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; border-top: 1px dashed #cbd5e1; padding-top: 6px;">HistÃ³rico de VacinaÃ§Ãµes no PerÃ­odo</div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; border-top: 1px dashed #cbd5e1; padding-top: 6px;">Histórico de Vacinações no Período</div>
           <div id="tec-resumo-vacinas-lista" style="line-height: 1.4; color: #1e293b;"></div>
         </div>
         <div>
@@ -691,18 +691,18 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:15px;">
-        <button class="btn" type="button" style="background:var(--tech);" onclick="imprimirRelatorioTecnicoDireto()">ð¨ï¸ Imprimir / Salvar RelatÃ³rio</button>
+        <button class="btn" type="button" style="background:var(--tech);" onclick="imprimirRelatorioTecnicoDireto()">🖨️ Imprimir / Salvar Relatório</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-relatorio-tecnico').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: ZERAR DADOS TÃCNICOS -->
+  <!-- MODAL: ZERAR DADOS TÉCNICOS -->
   <div class="modal" id="modal-zerar-tecnico">
     <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">â ï¸ Zerar Dados TÃ©cnicos</div>
+      <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">⚠️ Zerar Dados Técnicos</div>
       <p style="font-size:0.85rem; color:#475569; margin-bottom: 15px;">
-        Esta aÃ§Ã£o apagarÃ¡ <strong>todos</strong> os lotes, registos de postura, mortalidade e vacinaÃ§Ã£o cadastrados no controle tÃ©cnico. Deseja continuar?
+        Esta ação apagará <strong>todos</strong> os lotes, registos de postura, mortalidade e vacinação cadastrados no controle técnico. Deseja continuar?
       </p>
       <div style="display: flex; gap: 10px;">
         <button type="button" class="btn btn-danger" onclick="executarZerarDadosTecnicos()">Sim, Zerar Tudo</button>
@@ -717,7 +717,7 @@
       <div class="card-title" id="detalhe-titulo-modal" style="margin-bottom: 12px; font-size: 1.1rem; color: var(--accent);">Detalhes da Granja</div>
       <div id="detalhe-corpo-modal" style="font-size: 0.85rem; line-height: 1.5; color: #334155; margin-bottom: 15px;"></div>
       <div style="display: flex; flex-direction: column; gap: 8px;">
-        <button class="btn" type="button" style="background: var(--warning);" onclick="abrirModalRedefinirSenhaDoDetalhe()">ð Alterar Senha do Administrador</button>
+        <button class="btn" type="button" style="background: var(--warning);" onclick="abrirModalRedefinirSenhaDoDetalhe()">🔑 Alterar Senha do Administrador</button>
         <button class="btn" type="button" style="background: #64748b;" onclick="document.getElementById('modal-detalhes-empresa').style.display='none'">Fechar</button>
       </div>
     </div>
@@ -726,26 +726,26 @@
   <!-- MODAL: EDITAR EMPRESA / CLIENTE NO SUPER ADMIN -->
   <div class="modal" id="modal-editar-empresa">
     <div class="modal-content" style="max-width: 460px;">
-      <div class="card-title" style="margin-bottom: 12px; color: var(--accent);">âï¸ Editar Empresa / Granja</div>
+      <div class="card-title" style="margin-bottom: 12px; color: var(--accent);">✏️ Editar Empresa / Granja</div>
       <form onsubmit="salvarEdicaoEmpresa(event)">
         <input type="hidden" id="edit-emp-id-original">
         <div class="form-group"><label>Nome da Granja / Empresa</label><input type="text" id="edit-emp-nome" required></div>
         <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="edit-emp-cnpj"></div>
         <div class="form-group"><label>E-mail de Contato</label><input type="email" id="edit-emp-email"></div>
         <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="edit-emp-tel"></div>
-        <div class="form-group"><label>EndereÃ§o Completo</label><input type="text" id="edit-emp-end"></div>
+        <div class="form-group"><label>Endereço Completo</label><input type="text" id="edit-emp-end"></div>
         <div class="form-group">
           <label>Plano de Assinatura</label>
           <select id="edit-emp-plano" required>
             <option value="mensal">Mensal (30 Dias)</option>
             <option value="anual">Anual (365 Dias)</option>
-            <option value="vitalicio">VitalÃ­cio (Sem ExpiraÃ§Ã£o)</option>
+            <option value="vitalicio">Vitalício (Sem Expiração)</option>
           </select>
         </div>
         <div class="form-group"><label>Valor do Plano (R$)</label><input type="number" step="0.01" id="edit-emp-valor" required></div>
         <div class="form-group"><label>Data de Vencimento</label><input type="date" id="edit-emp-vencimento" required></div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
-          <button type="submit" class="btn btn-success">Salvar AlteraÃ§Ãµes</button>
+          <button type="submit" class="btn btn-success">Salvar Alterações</button>
           <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-editar-empresa').style.display='none'">Cancelar</button>
         </div>
       </form>
@@ -755,13 +755,13 @@
   <!-- MODAL: REDEFINIR SENHA DO CLIENTE -->
   <div class="modal" id="modal-redefinir-senha-cli">
     <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px;">ð Alterar Senha de Acesso</div>
+      <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha de Acesso</div>
       <form onsubmit="salvarNovaSenhaClienteAdmin(event)">
         <div class="form-group">
           <label>Nova Senha para o Administrador</label>
           <div class="input-pass-wrapper">
             <input type="password" id="nova-senha-cli-input" placeholder="Digite a nova senha" required autocomplete="new-password">
-            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('nova-senha-cli-input', this)">ðï¸</button>
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('nova-senha-cli-input', this)">👁️</button>
           </div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -772,16 +772,16 @@
     </div>
   </div>
 
-  <!-- MODAL: REDEFINIR SENHA DE USUÃRIO/VENDEDOR -->
+  <!-- MODAL: REDEFINIR SENHA DE USUÁRIO/VENDEDOR -->
   <div class="modal" id="modal-redefinir-senha-usuario">
     <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px;">ð Alterar Senha do UsuÃ¡rio</div>
+      <div class="card-title" style="margin-bottom: 12px;">🔑 Alterar Senha do Usuário</div>
       <form onsubmit="salvarNovaSenhaUsuario(event)">
         <div class="form-group">
           <label>Nova Senha</label>
           <div class="input-pass-wrapper">
             <input type="password" id="nova-senha-usuario-input" placeholder="Digite a nova senha" required autocomplete="new-password">
-            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('nova-senha-usuario-input', this)">ðï¸</button>
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('nova-senha-usuario-input', this)">👁️</button>
           </div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -798,7 +798,7 @@
       <div class="card-title" style="margin-bottom:12px; font-weight:800; font-size:1.1rem;">Comprovante do Pedido</div>
       <div class="receipt-box" id="printable-receipt"></div>
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirReciboUnico()">ð¨ï¸ Imprimir / Salvar PDF</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirReciboUnico()">🖨️ Imprimir / Salvar PDF</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-nota').style.display='none'" style="background:#64748b; margin-top:2px;">Fechar Nota</button>
       </div>
     </div>
@@ -807,7 +807,7 @@
   <!-- MODAL: ALTERAR SENHA DO SUPER ADMIN -->
   <div class="modal" id="modal-seguranca-superadmin">
     <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px;">ð Alterar Senha de Super Admin</div>
+      <div class="card-title" style="margin-bottom: 12px;">🔐 Alterar Senha de Super Admin</div>
       <form onsubmit="salvarNovaSenhaSuperAdmin(event)">
         <div class="form-group">
           <label>Selecione qual Super Admin deseja alterar</label>
@@ -820,7 +820,7 @@
           <label>Nova Senha</label>
           <div class="input-pass-wrapper">
             <input type="password" id="super-nova-senha" placeholder="Digite a nova senha" required autocomplete="new-password">
-            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('super-nova-senha', this)">ðï¸</button>
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('super-nova-senha', this)">👁️</button>
           </div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
@@ -831,16 +831,16 @@
     </div>
   </div>
 
-  <!-- MODAL: RELATÃRIO DE VENDAS -->
+  <!-- MODAL: RELATÓRIO DE VENDAS -->
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 520px;">
-      <div class="card-title" style="margin-bottom:12px;">ð RelatÃ³rio de Vendas e Faturamento</div>
+      <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
       <div class="form-group">
-        <label>Filtrar PerÃ­odo</label>
+        <label>Filtrar Período</label>
         <select id="filtro-periodo" onchange="atualizarFiltroRelatorio()">
           <option value="hoje">Hoje</option>
-          <option value="semana">Ãltimos 7 Dias (Semana)</option>
-          <option value="mes">Este MÃªs Atual</option>
+          <option value="semana">Últimos 7 Dias (Semana)</option>
+          <option value="mes">Este Mês Atual</option>
           <option value="personalizado">Personalizado (Intervalo de Datas)</option>
         </select>
       </div>
@@ -852,19 +852,19 @@
 
       <div id="area-relatorio-impressao" class="relatorio-sheet-box">
         <div class="relatorio-sheet-header">
-          <h3>RelatÃ³rio de Vendas</h3>
+          <h3>Relatório de Vendas</h3>
           <span style="font-size: 0.75rem; font-weight: 600; opacity: 0.9;" id="relatorio-data-emissao"></span>
         </div>
         <div class="relatorio-kpi-grid">
           <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Total Faturado</div><div class="relatorio-kpi-val" id="resumo-total-periodo" style="color: #2563eb;">R$ 0,00</div></div>
-          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">NÂº de Pedidos</div><div class="relatorio-kpi-val" id="resumo-qtd-pedidos">0</div></div>
+          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Nº de Pedidos</div><div class="relatorio-kpi-val" id="resumo-qtd-pedidos">0</div></div>
         </div>
         <div class="relatorio-section-box">
           <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Recebimento por Forma de Pagamento</div>
           <div id="resumo-detalhe-formas" style="line-height: 1.4; color: #1e293b;"></div>
         </div>
         <div>
-          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Vendas Listadas no PerÃ­odo</div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Vendas Listadas no Período</div>
           <table class="relatorio-tabela-planilha">
             <thead><tr><th># Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
             <tbody id="resumo-tabela-periodo"></tbody>
@@ -873,22 +873,22 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 1fr; gap:8px; margin-top:15px;">
-        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorioDireto()">ð¨ï¸ Imprimir / Salvar RelatÃ³rio</button>
-        <button class="btn" type="button" style="background:#475569;" onclick="exportarRelatorioExcel()">ð Exportar Excel</button>
+        <button class="btn" type="button" style="background:#2563eb;" onclick="imprimirRelatorioDireto()">🖨️ Imprimir / Salvar Relatório</button>
+        <button class="btn" type="button" style="background:#475569;" onclick="exportarRelatorioExcel()">📊 Exportar Excel</button>
         <button class="btn" type="button" onclick="document.getElementById('modal-resumo').style.display='none'" style="background:#64748b;">Fechar</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: BALANÃO DE ESTOQUE -->
+  <!-- MODAL: BALANÇO DE ESTOQUE -->
   <div class="modal" id="modal-balanco">
     <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px;">âï¸ BalanÃ§o Manual de Estoque</div>
+      <div class="card-title" style="margin-bottom: 12px;">⚖️ Balanço Manual de Estoque</div>
       <form onsubmit="salvarBalancoEstoque(event)">
         <div class="form-group"><label>Novo Saldo Real de Ovos</label><input type="number" id="balanco-nova-qtd" min="0" placeholder="Ex: 12500" required></div>
-        <div class="form-group"><label>Motivo / ObservaÃ§Ã£o do Ajuste</label><input type="text" id="balanco-motivo" placeholder="Ex: Contagem fÃ­sica" required></div>
+        <div class="form-group"><label>Motivo / Observação do Ajuste</label><input type="text" id="balanco-motivo" placeholder="Ex: Contagem física" required></div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
-          <button type="submit" class="btn" style="background: var(--warning);">Salvar BalanÃ§o</button>
+          <button type="submit" class="btn" style="background: var(--warning);">Salvar Balanço</button>
           <button type="button" class="btn" style="background: #64748b;" onclick="fecharModalBalanco()">Cancelar</button>
         </div>
       </form>
@@ -928,10 +928,10 @@
       if (!input) return;
       if (input.type === 'password') {
         input.type = 'text';
-        btn.innerText = 'ð';
+        btn.innerText = '🙈';
       } else {
         input.type = 'password';
-        btn.innerText = 'ðï¸';
+        btn.innerText = '👁️';
       }
     }
 
@@ -949,7 +949,7 @@
         if (!hasSuperAdmin2) {
           await db.collection("usuarios").add({ login: "superadmin2", pass: "rancho123*", role: "superadmin" });
         }
-      } catch (err) { console.error("Erro na inicializaÃ§Ã£o:", err); }
+      } catch (err) { console.error("Erro na inicialização:", err); }
     }
 
     function initSuperAdminListener() {
@@ -970,12 +970,12 @@
       
       document.getElementById('global-granjas-ativas').innerText = granjasAtivas;
       const fatEl = document.getElementById('global-faturamento');
-      fatEl.innerText = superAdminPrivacidadeOculto ? "R$ â¢â¢â¢â¢â¢â¢" : "R$ " + faturamentoPlanos.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+      fatEl.innerText = superAdminPrivacidadeOculto ? "R$ ••••••" : "R$ " + faturamentoPlanos.toLocaleString('pt-BR', {minimumFractionDigits: 2});
     }
 
     function alternarPrivacidadeSuperAdmin() {
       superAdminPrivacidadeOculto = !superAdminPrivacidadeOculto;
-      document.getElementById('btn-toggle-privacy').innerText = superAdminPrivacidadeOculto ? "ðï¸âð¨ï¸ Revelar" : "ðï¸ Ocultar";
+      document.getElementById('btn-toggle-privacy').innerText = superAdminPrivacidadeOculto ? "👁️‍🗨️ Revelar" : "👁️ Ocultar";
       calcularDashboardGlobal();
       renderEmpresasSaaS();
     }
@@ -1058,7 +1058,6 @@
         renderControleTecnico();
       });
 
-      // ORDENAÃÃO POR DATA (MAIS RECENTE PRIMEIRO) AQUI NO LISTENER
       const unsubPosturaTecnica = db.collection("producao_zootecnica").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.historicoPosturaTecnica = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
           .sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
@@ -1095,15 +1094,15 @@
 
       try {
         const snapshot = await db.collection("usuarios").where("login", "==", u).get();
-        if (snapshot.empty) { alert('UsuÃ¡rio ou senha incorretos!'); return; }
+        if (snapshot.empty) { alert('Usuário ou senha incorretos!'); return; }
         const found = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-        if (found.pass !== p) { alert('UsuÃ¡rio ou senha incorretos!'); return; }
+        if (found.pass !== p) { alert('Usuário ou senha incorretos!'); return; }
 
         if (found.role === "superadmin") {
           state.currentUser = { login: found.login, role: "superadmin" };
           document.getElementById('view-login').style.display = 'none';
           document.getElementById('app-header').style.display = 'flex';
-          document.getElementById('user-display').innerText = "ð SUPER ADMIN (" + found.login.toUpperCase() + ")";
+          document.getElementById('user-display').innerText = "👑 SUPER ADMIN (" + found.login.toUpperCase() + ")";
           document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
           navTo('superadmin');
           initSuperAdminListener();
@@ -1112,13 +1111,13 @@
 
         const empresaId = found.empresaId || "empresa_demo";
         const empDoc = await db.collection("empresas").doc(empresaId).get();
-        if (empDoc.exists && empDoc.data().status !== "Ativo") { alert("A conta da sua empresa estÃ¡ bloqueada."); return; }
+        if (empDoc.exists && empDoc.data().status !== "Ativo") { alert("A conta da sua empresa está bloqueada."); return; }
 
         state.currentUser = found;
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('app-header').style.display = 'flex';
         document.getElementById('top-nav-container').style.display = 'flex';
-        document.getElementById('user-display').innerText = "ð¤ " + found.login.toUpperCase();
+        document.getElementById('user-display').innerText = "👤 " + found.login.toUpperCase();
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
         initListeners();
         mudarAbaTopo('financeiro');
@@ -1208,21 +1207,20 @@
           nome, dataAlojamento, linhagem, qtdInicial, qtdAtual: qtdInicial, idadeInicialSemanas, criadoEm: new Date()
         });
         e.target.reset();
-        alert('Lote tÃ©cnico cadastrado com sucesso!');
+        alert('Lote técnico cadastrado com sucesso!');
         voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
 
     async function excluirLoteTecnico(id) {
-      if (confirm("Tem certeza que deseja excluir este lote tÃ©cnico?")) {
+      if (confirm("Tem certeza que deseja excluir este lote técnico?")) {
         try {
           await db.collection("lotes_tecnicos").doc(id).delete();
-          alert('Lote excluÃ­do!');
+          alert('Lote excluído!');
         } catch (err) { alert('Erro: ' + err.message); }
       }
     }
 
-    // --- FUNÃÃES DE PESAGEM DINÃMICA DAS AVES ---
     function gerarCamposPesagemAves() {
       const qtd = parseInt(document.getElementById('pesagem-qtd-aves').value || 0);
       const container = document.getElementById('container-pesagem-individual');
@@ -1262,9 +1260,9 @@
 
       if (count > 0) {
         const media = (soma / count).toFixed(3);
-        resDiv.innerText = `ð Peso MÃ©dio Calculado: ${media} kg (${count} aves pesadas)`;
+        resDiv.innerText = `📊 Peso Médio Calculado: ${media} kg (${count} aves pesadas)`;
       } else {
-        resDiv.innerText = `ð Insira os pesos para calcular a mÃ©dia.`;
+        resDiv.innerText = `📊 Insira os pesos para calcular a média.`;
       }
     }
 
@@ -1277,7 +1275,6 @@
       const racaoKg = parseFloat(document.getElementById('postura-racao').value || 0);
       const obs = document.getElementById('postura-obs').value.trim();
 
-      // Coletar dados de pesagem
       const qtdAvesPesadas = parseInt(document.getElementById('pesagem-qtd-aves').value || 0);
       let pesosIndividuais = [];
       let pesoMedio = 0;
@@ -1300,7 +1297,7 @@
       }
 
       const lote = state.lotesTecnicos.find(l => l.id === loteId);
-      if (!lote) return alert('Selecione um lote vÃ¡lido.');
+      if (!lote) return alert('Selecione um lote válido.');
 
       const avesAtivas = lote.qtdAtual || lote.qtdInicial;
       const taxaPostura = avesAtivas > 0 ? ((ovosColhidos / avesAtivas) * 100).toFixed(1) : 0;
@@ -1326,7 +1323,7 @@
         e.target.reset();
         document.getElementById('container-pesagem-individual').innerHTML = '';
         document.getElementById('resultado-peso-medio').style.display = 'none';
-        alert(`Registo efetuado com sucesso! Taxa de Postura: ${taxaPostura}% ${pesoMedio > 0 ? '| Peso MÃ©dio: ' + pesoMedio + 'kg' : ''}`);
+        alert(`Registo efetuado com sucesso! Taxa de Postura: ${taxaPostura}% ${pesoMedio > 0 ? '| Peso Médio: ' + pesoMedio + 'kg' : ''}`);
         voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
@@ -1340,7 +1337,7 @@
       const motivo = document.getElementById('morte-obs').value.trim();
 
       const lote = state.lotesTecnicos.find(l => l.id === loteId);
-      if (!lote) return alert('Selecione um lote vÃ¡lido.');
+      if (!lote) return alert('Selecione um lote válido.');
 
       const novaQtdAtual = Math.max(0, (lote.qtdAtual || lote.qtdInicial) - qtdMortas);
 
@@ -1367,7 +1364,7 @@
       const data = document.getElementById('vacina-data').value;
 
       const lote = state.lotesTecnicos.find(l => l.id === loteId);
-      if (!lote) return alert('Selecione um lote vÃ¡lido.');
+      if (!lote) return alert('Selecione um lote válido.');
 
       try {
         await db.collection("vacinacao_tecnica").add({
@@ -1376,7 +1373,7 @@
         });
 
         e.target.reset();
-        alert('VacinaÃ§Ã£o registada com sucesso no histÃ³rico sanitÃ¡rio!');
+        alert('Vacinação registada com sucesso no histórico sanitário!');
         voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
@@ -1404,7 +1401,7 @@
 
         await batchP.commit();
         document.getElementById('modal-zerar-tecnico').style.display = 'none';
-        alert('Todos os dados do controle tÃ©cnico foram zerados com sucesso!');
+        alert('Todos os dados do controle técnico foram zerados com sucesso!');
       } catch (err) { alert('Erro ao zerar dados: ' + err.message); }
     }
 
@@ -1475,7 +1472,6 @@
         }
       }
 
-      // GARANTE A ORDENAÃÃO POR DATA (MAIS RECENTE PRIMEIRO)
       posturaFiltrada.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
       mortalidadeFiltrada.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
       vacinasFiltradas.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
@@ -1488,12 +1484,12 @@
       document.getElementById('tec-kpi-ovos').innerText = totalOvosPeriodo.toLocaleString('pt-BR') + ' ovos';
 
       const totalMortes = mortalidadeFiltrada.reduce((acc, m) => acc + (m.qtdMortas || 0), 0);
-      document.getElementById('tec-resumo-baixas').innerHTML = `â¢ Total de Baixas / Mortalidade no perÃ­odo: <strong>${totalMortes} aves</strong>`;
+      document.getElementById('tec-resumo-baixas').innerHTML = `• Total de Baixas / Mortalidade no período: <strong>${totalMortes} aves</strong>`;
 
       const listaVacinasHtml = vacinasFiltradas.length > 0 ? vacinasFiltradas.map(v => {
         const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
-        return `â¢ [${dataFmt}] Lote: <strong>${v.loteNome || 'Lote'}</strong> â Vacina: <strong>${v.vacinaNome}</strong> (${v.qtdAves} doses/aves)`;
-      }).join('<br>') : '<span style="color:#64748b;">Nenhum registo de vacinaÃ§Ã£o neste perÃ­odo.</span>';
+        return `• [${dataFmt}] Lote: <strong>${v.loteNome || 'Lote'}</strong> — Vacina: <strong>${v.vacinaNome}</strong> (${v.qtdAves} doses/aves)`;
+      }).join('<br>') : '<span style="color:#64748b;">Nenhum registo de vacinação neste período.</span>';
 
       document.getElementById('tec-resumo-vacinas-lista').innerHTML = listaVacinasHtml;
 
@@ -1536,7 +1532,7 @@
             <td><strong>${l.nome}</strong><br><small style="color:#64748b;">${l.linhagem}</small></td>
             <td>${l.qtdAtual || l.qtdInicial} aves</td>
             <td>${semanasAtuais} semanas</td>
-            <td><button class="btn-danger" type="button" onclick="excluirLoteTecnico('${l.id}')">ðï¸</button></td>
+            <td><button class="btn-danger" type="button" onclick="excluirLoteTecnico('${l.id}')">🗑️</button></td>
           </tr>
         `;
       }).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum lote alojado.</td></tr>';
@@ -1564,7 +1560,7 @@
             <td>${h.ovosColhidos} ovos</td>
             <td>
               <span class="badge badge-ativo">${h.taxaPostura || 0}%</span>
-              ${h.pesagem && h.pesagem.pesoMedio ? `<br><small style="color:var(--tech);">âï¸ MÃ©dia: ${h.pesagem.pesoMedio}kg</small>` : ''}
+              ${h.pesagem && h.pesagem.pesoMedio ? `<br><small style="color:var(--tech);">⚖️ Média: ${h.pesagem.pesoMedio}kg</small>` : ''}
             </td>
           </tr>
         `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo.</td></tr>';
@@ -1589,7 +1585,7 @@
             <td><strong>${v.vacinaNome}</strong></td>
             <td>${v.qtdAves} aves</td>
           </tr>
-        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo de vacinaÃ§Ã£o.</td></tr>';
+        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo de vacinação.</td></tr>';
       }
     }
 
@@ -1652,15 +1648,15 @@
         return `
           <tr>
             <td>
-              <strong style="cursor: pointer; color: var(--accent); font-size: 0.95rem;" onclick="abrirDetalhesEmpresa('${emp.id}')">ð¢ ${emp.nome}</strong><br>
+              <strong style="cursor: pointer; color: var(--accent); font-size: 0.95rem;" onclick="abrirDetalhesEmpresa('${emp.id}')">🏢 ${emp.nome}</strong><br>
               <small style="color:#64748b;">ID: ${emp.id} | CNPJ: ${emp.cnpj || 'N/I'}</small><br>
               <small style="color:#2563eb; font-weight:bold;">Plano: ${emp.plano || 'mensal'} (Venc: ${emp.vencimento || '---'})</small>
             </td>
             <td><span class="badge ${isAtivo ? 'badge-ativo' : 'badge-bloqueado'}">${emp.status || 'Ativo'}</span></td>
             <td>
-              <button class="btn" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%; margin-bottom:4px; background:#2563eb;" onclick="abrirModalEditarEmpresa('${emp.id}')">âï¸ Editar</button>
+              <button class="btn" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%; margin-bottom:4px; background:#2563eb;" onclick="abrirModalEditarEmpresa('${emp.id}')">✏️ Editar</button>
               <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%; margin-bottom:4px;" onclick="alternarStatusEmpresa('${emp.id}', '${emp.status || 'Ativo'}')">${isAtivo ? 'Bloquear' : 'Ativar'}</button>
-              <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%;" onclick="excluirEmpresaSaaS('${emp.id}')">ðï¸ Apagar</button>
+              <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 8px; display:block; width:100%;" onclick="excluirEmpresaSaaS('${emp.id}')">🗑️ Apagar</button>
             </td>
           </tr>
         `;
@@ -1717,15 +1713,15 @@
       const usuariosDaEmpresa = state.todosUsuariosSaaS.filter(u => u.empresaId === empresaId);
       const valorPlanoFmt = "R$ " + parseFloat(emp.valorPlano || 0).toFixed(2);
 
-      let htmlUsuarios = usuariosDaEmpresa.map(u => `<div>ð¤ <strong>${u.login}</strong> (${u.role}) â Senha: <code>${superAdminPrivacidadeOculto ? 'â¢â¢â¢â¢â¢â¢' : u.pass}</code></div>`).join('') || 'Nenhum usuÃ¡rio cadastrado.';
+      let htmlUsuarios = usuariosDaEmpresa.map(u => `<div>👤 <strong>${u.login}</strong> (${u.role}) — Senha: <code>${superAdminPrivacidadeOculto ? '••••••' : u.pass}</code></div>`).join('') || 'Nenhum usuário cadastrado.';
 
       const htmlConteudo = `
         <p style="margin-bottom:6px;"><strong>Nome Fantasia:</strong> ${emp.nome}</p>
         <p style="margin-bottom:6px;"><strong>ID do Sistema:</strong> ${emp.id}</p>
-        <p style="margin-bottom:6px;"><strong>CNPJ / CPF:</strong> ${emp.cnpj || 'NÃ£o informado'}</p>
-        <p style="margin-bottom:6px;"><strong>E-mail:</strong> ${emp.email || 'NÃ£o informado'}</p>
-        <p style="margin-bottom:6px;"><strong>Telefone:</strong> ${emp.tel || 'NÃ£o informado'}</p>
-        <p style="margin-bottom:6px;"><strong>EndereÃ§o:</strong> ${emp.end || 'NÃ£o informado'}</p>
+        <p style="margin-bottom:6px;"><strong>CNPJ / CPF:</strong> ${emp.cnpj || 'Não informado'}</p>
+        <p style="margin-bottom:6px;"><strong>E-mail:</strong> ${emp.email || 'Não informado'}</p>
+        <p style="margin-bottom:6px;"><strong>Telefone:</strong> ${emp.tel || 'Não informado'}</p>
+        <p style="margin-bottom:6px;"><strong>Endereço:</strong> ${emp.end || 'Não informado'}</p>
         <p style="margin-bottom:6px;"><strong>Plano:</strong> ${emp.plano || '---'} (${valorPlanoFmt})</p>
         <p style="margin-bottom:10px;"><strong>Vencimento:</strong> ${emp.vencimento || '---'}</p>
         <hr style="border:none; border-top:1px solid #e2e8f0; margin:10px 0;">
@@ -1773,7 +1769,7 @@
       if (confirm("Tem certeza que deseja excluir a empresa " + id + "?")) {
         try {
           await db.collection("empresas").doc(id).delete();
-          alert('Empresa excluÃ­da com sucesso!');
+          alert('Empresa excluída com sucesso!');
         } catch (err) { alert('Erro: ' + err.message); }
       }
     }
@@ -1783,7 +1779,7 @@
       const novaSenha = document.getElementById('minha-nova-senha').value.trim();
       if (!novaSenha) return;
       if (!state.currentUser || !state.currentUser.login) {
-        alert('SessÃ£o expirada. FaÃ§a login novamente.');
+        alert('Sessão expirada. Faça login novamente.');
         logout();
         return;
       }
@@ -1793,7 +1789,7 @@
         if (!snap.empty) {
           await snap.docs[0].ref.update({ pass: novaSenha });
         }
-        alert('Senha alterada com sucesso! FaÃ§a login novamente com a nova senha.');
+        alert('Senha alterada com sucesso! Faça login novamente com a nova senha.');
         logout();
       } catch (err) {
         alert('Erro ao alterar senha: ' + err.message);
@@ -1816,7 +1812,7 @@
       if (window.confirm('Tem certeza que deseja excluir este cliente?')) {
         try {
           await db.collection("clientes").doc(id).delete();
-          alert('Cliente excluÃ­do com sucesso!');
+          alert('Cliente excluído com sucesso!');
         } catch (err) {
           alert('Erro ao excluir cliente: ' + err.message);
         }
@@ -1828,22 +1824,35 @@
       const tbody = document.getElementById('lista-clientes-dash');
       if (!tbody) return;
       const filtrados = state.clientes.filter(c => c.nome.toLowerCase().includes(termo));
-      tbody.innerHTML = filtrados.slice(0, 10).map(c => `<tr><td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td><td>ð ${c.tel}</td></tr>`).join('');
+      tbody.innerHTML = filtrados.slice(0, 10).map(c => `<tr><td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td><td>📞 ${c.tel}</td></tr>`).join('');
     }
 
     function renderProdutos() {
       const tbody = document.getElementById('lista-produtos');
       if (!tbody) return;
       tbody.innerHTML = state.produtos.map(p => `
-        <tr><td><strong>${p.nome}</strong></td><td>R$ ${parseFloat(p.preco).toFixed(2)}</td><td>${p.ovosUnid} ovos</td><td><button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">ð</button></td></tr>
+        <tr><td><strong>${p.nome}</strong></td><td>R$ ${parseFloat(p.preco).toFixed(2)}</td><td>${p.ovosUnid} ovos</td><td><button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑️</button></td></tr>
       `).join('');
+    }
+
+    function limparFormProduto() {
+      const form = document.getElementById('form-produto');
+      if (form) form.reset();
+      const idEdit = document.getElementById('prod-id-edit');
+      if (idEdit) idEdit.value = '';
+      const btnCancelar = document.getElementById('btn-cancelar-edit');
+      if (btnCancelar) btnCancelar.style.display = 'none';
+      const btnSalvar = document.getElementById('btn-salvar-prod');
+      if (btnSalvar) btnSalvar.innerText = 'Salvar Produto na Nuvem';
+      const formTitle = document.getElementById('form-prod-title');
+      if (formTitle) formTitle.innerText = 'Cadastrar Novo Produto / Embalagem';
     }
 
     async function excluirProduto(id) {
       if (confirm('Tem certeza que deseja excluir este produto?')) {
         try {
           await db.collection("produtos").doc(id).delete();
-          alert('Produto excluÃ­do com sucesso!');
+          alert('Produto excluído com sucesso!');
         } catch (err) { alert('Erro ao excluir produto: ' + err.message); }
       }
     }
@@ -1856,9 +1865,9 @@
         const isFinalizado = p.status === 'Finalizado';
         
         let badgeClass = 'badge-pendente';
-        let badgeLabel = 'ð´ Pendente';
-        if (isFinalizado) { badgeClass = 'badge-finalizado'; badgeLabel = 'ð¦ Finalizado'; }
-        else if (isPago) { badgeClass = 'badge-pago'; badgeLabel = 'ð¢ Pago'; }
+        let badgeLabel = '🔴 Pendente';
+        if (isFinalizado) { badgeClass = 'badge-finalizado'; badgeLabel = '🟦 Finalizado'; }
+        else if (isPago) { badgeClass = 'badge-pago'; badgeLabel = '🟢 Pago'; }
 
         return `
           <tr>
@@ -1869,9 +1878,9 @@
             <td><span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">${badgeLabel}</span></td>
             <td>
               <div style="display:flex; gap:4px; flex-wrap:wrap;">
-                <button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#2563eb;" onclick="abrirModalNota('${p.id}')">ð Recibo</button>
-                ${!isFinalizado ? `<button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#10b981;" onclick="marcarComoFinalizado('${p.id}')">âï¸ Finalizar</button>` : ''}
-                <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 6px;" onclick="cancelarExcluirPedido('${p.id}')">â Cancelar</button>
+                <button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#2563eb;" onclick="abrirModalNota('${p.id}')">📄 Recibo</button>
+                ${!isFinalizado ? `<button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#10b981;" onclick="marcarComoFinalizado('${p.id}')">✔️ Finalizar</button>` : ''}
+                <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 6px;" onclick="cancelarExcluirPedido('${p.id}')">❌ Cancelar</button>
               </div>
             </td>
           </tr>
@@ -1880,7 +1889,7 @@
     }
 
     async function cancelarExcluirPedido(id) {
-      if (!confirm("Deseja realmente cancelar e excluir este pedido? As quantidades de ovos dos produtos serÃ£o devolvidas para o estoque.")) return;
+      if (!confirm("Deseja realmente cancelar e excluir este pedido? As quantidades de ovos dos produtos serão devolvidas para o estoque.")) return;
       
       const ped = state.pedidos.find(p => p.id === id);
       if (!ped) return;
@@ -1903,7 +1912,7 @@
         await refEstoque.set({ qtdOvos: saldoAtual + totalOvosDevolucao }, { merge: true });
 
         await db.collection("pedidos").doc(id).delete();
-        alert("Pedido cancelado e excluÃ­do com sucesso! Estoque atualizado.");
+        alert("Pedido cancelado e excluído com sucesso! Estoque atualizado.");
       } catch (err) {
         alert("Erro ao cancelar pedido: " + err.message);
       }
@@ -1952,7 +1961,7 @@
               <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
             </div>
             <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
-            <div style="font-size:0.7rem; margin-bottom:2px;"><strong>EndereÃ§o:</strong> ${ped.clienteEnd || 'NÃ£o informado'}</div>
+            <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
             <hr class="dashed-divider">
             <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
             <div>
@@ -1991,7 +2000,7 @@
               <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
             </div>
             <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-            <div style="font-size:0.7rem; margin-bottom:2px;"><strong>EndereÃ§o:</strong> ${ped.clienteEnd || 'NÃ£o informado'}</div>
+            <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
             <hr class="dashed-divider">
             <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
             <div>
@@ -2033,7 +2042,7 @@
             <html lang="pt-BR">
             <head>
               <meta charset="UTF-8">
-              <title>Recibo / ImpressÃ£o</title>
+              <title>Recibo / Impressão</title>
               <style>
                 @page { size: A4; margin: 5mm; }
                 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -2097,7 +2106,7 @@
         <html lang="pt-BR">
         <head>
           <meta charset="UTF-8">
-          <title>ImpressÃ£o</title>
+          <title>Impressão</title>
           <style>
             @page { size: A4; margin: 4mm; }
             * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -2149,8 +2158,8 @@
       try {
         await db.collection("usuarios").add({ empresaId: state.currentUser.empresaId, login, pass, role });
         e.target.reset();
-        alert('UsuÃ¡rio cadastrado com sucesso!');
-      } catch (err) { alert('Erro ao cadastrar usuÃ¡rio: ' + err.message); }
+        alert('Usuário cadastrado com sucesso!');
+      } catch (err) { alert('Erro ao cadastrar usuário: ' + err.message); }
     }
 
     function renderUsuarios() {
@@ -2161,8 +2170,8 @@
           <td><strong>${u.login}</strong></td>
           <td>${u.role}</td>
           <td>
-            <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 6px; margin-right:4px;" onclick="abrirModalAlterarSenhaUsuario('${u.id}')">ð Senha</button>
-            <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 6px;" onclick="excluirUsuario('${u.id}')">ðï¸ Excluir</button>
+            <button class="btn-warning" type="button" style="font-size:0.7rem; padding:4px 6px; margin-right:4px;" onclick="abrirModalAlterarSenhaUsuario('${u.id}')">🔑 Senha</button>
+            <button class="btn-danger" type="button" style="font-size:0.7rem; padding:4px 6px;" onclick="excluirUsuario('${u.id}')">🗑️ Excluir</button>
           </td>
         </tr>
       `).join('');
@@ -2186,11 +2195,11 @@
     }
 
     async function excluirUsuario(id) {
-      if (confirm('Tem certeza que deseja excluir este usuÃ¡rio?')) {
+      if (confirm('Tem certeza que deseja excluir este usuário?')) {
         try {
           await db.collection("usuarios").doc(id).delete();
-          alert('UsuÃ¡rio excluÃ­do com sucesso!');
-        } catch (err) { alert('Erro ao excluir usuÃ¡rio: ' + err.message); }
+          alert('Usuário excluído com sucesso!');
+        } catch (err) { alert('Erro ao excluir usuário: ' + err.message); }
       }
     }
 
@@ -2236,7 +2245,7 @@
       let totalGeral = 0;
       lista.innerHTML = carrinhoTemp.map((i, idx) => {
         totalGeral += i.subtotal;
-        return '<div class="carrinho-item"><div><strong>' + i.qtd + 'x ' + i.nome + '</strong></div><div>R$ ' + i.subtotal.toFixed(2) + ' <button type="button" class="btn-danger" onclick="carrinhoTemp.splice(' + idx + ',1);renderCarrinho()">â</button></div></div>';
+        return '<div class="carrinho-item"><div><strong>' + i.qtd + 'x ' + i.nome + '</strong></div><div>R$ ' + i.subtotal.toFixed(2) + ' <button type="button" class="btn-danger" onclick="carrinhoTemp.splice(' + idx + ',1);renderCarrinho()">✕</button></div></div>';
       }).join('');
       totalSpan.innerText = totalGeral.toFixed(2);
     }
@@ -2284,7 +2293,7 @@
         await db.collection("producao").add({ empresaId: empresaId, qtdOvos: qtd, dataHora: new Date() });
 
         e.target.reset();
-        alert('ProduÃ§Ã£o registrada e estoque atualizado com sucesso!');
+        alert('Produção registrada e estoque atualizado com sucesso!');
       } catch (err) { alert("Erro ao atualizar o estoque."); }
     }
 
@@ -2310,7 +2319,7 @@
       e.preventDefault();
       const novaQtd = parseInt(document.getElementById('balanco-nova-qtd').value);
       const motivo = document.getElementById('balanco-motivo').value.trim();
-      if (isNaN(novaQtd) || novaQtd < 0) return alert('Quantidade invÃ¡lida.');
+      if (isNaN(novaQtd) || novaQtd < 0) return alert('Quantidade inválida.');
 
       try {
         const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
@@ -2344,7 +2353,7 @@
             <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
           </div>
           <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-          <div style="font-size:0.7rem; margin-bottom:2px;"><strong>EndereÃ§o:</strong> ${ped.clienteEnd || 'NÃ£o informado'}</div>
+          <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
           <hr class="dashed-divider">
           <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
           <div>
@@ -2431,11 +2440,11 @@
 
       const formas = {};
       pedidosFiltrados.forEach(p => { const pgto = p.formaPgto || 'Outros'; formas[pgto] = (formas[pgto] || 0) + (parseFloat(p.total) || 0); });
-      document.getElementById('resumo-detalhe-formas').innerHTML = Object.keys(formas).map(f => "â¢ " + f + ": <strong>R$ " + formas[f].toFixed(2) + "</strong>").join('<br>') || 'Nenhum registro no perÃ­odo.';
+      document.getElementById('resumo-detalhe-formas').innerHTML = Object.keys(formas).map(f => "• " + f + ": <strong>R$ " + formas[f].toFixed(2) + "</strong>").join('<br>') || 'Nenhum registro no período.';
 
       document.getElementById('resumo-tabela-periodo').innerHTML = pedidosFiltrados.length > 0 ? pedidosFiltrados.map(p => `
         <tr><td>#${p.numeroPedido || '---'}</td><td>${new Date(p.dataCriacao).toLocaleDateString('pt-BR')}</td><td>${p.clienteNome || 'Cliente'}</td><td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td><td>${p.status || 'Pendente'}</td></tr>
-      `).join('') : '<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhum pedido encontrado neste perÃ­odo.</td></tr>';
+      `).join('') : '<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhum pedido encontrado neste período.</td></tr>';
     }
 
     initApp();
