@@ -1531,7 +1531,8 @@
               <td>R$ ${(r.salarioLiquido || 0).toFixed(2)}</td>
               <td><span class="badge badge-pago">Pago</span></td>
               <td>
-                <div style="display:flex; gap:4px;">
+                <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                  <button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#0d9488;" onclick="imprimirReciboDoHistorico('${r.id}')">📄 Imprimir</button>
                   <button class="btn" type="button" style="width:auto; padding:4px 6px; font-size:0.7rem; background:#2563eb;" onclick="editarReciboHistorico('${r.id}')">✏️ Editar</button>
                   <button class="btn-danger" type="button" style="padding:4px 6px; font-size:0.7rem;" onclick="excluirReciboHistorico('${r.id}')">🗑️ Excluir</button>
                 </div>
@@ -1613,6 +1614,89 @@
       }
     }
 
+    function montarHtmlBlocoReciboRH(rec, colab, emp) {
+      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
+      const cnpjEmpresa = emp.cnpj || 'Não informado';
+      const telEmpresa = emp.tel || 'Não informado';
+      const endEmpresa = emp.end || 'Não informado';
+
+      const [ano, mes] = (rec.mesReferencia || '2026-10').split('-');
+      const mesAnoFormatado = `${mes}/${ano}`;
+
+      const valesSelecionadosDetalhes = (rec.valesIds || []).map(vId => state.valesHistorico.find(v => v.id === vId)).filter(Boolean);
+
+      let itensValesHtml = valesSelecionadosDetalhes.map(v => {
+        const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
+        return `<div class="item-linha-zebrado"><span>[${dataFmt}] ${v.obs} (Vale Descontado)</span><span><strong>- R$ ${v.valor.toFixed(2)}</strong></span></div>`;
+      }).join('') || '<div style="font-size:0.75rem; color:#64748b; padding:4px 0;">Nenhum vale descontado neste recibo.</div>';
+
+      let itemExtraHtml = (rec.extraVal || 0) > 0 ? `<div class="item-linha-zebrado"><span>Serviço Extra: ${rec.extraObs || 'Bônus / Extra'}</span><span><strong>+ R$ ${parseFloat(rec.extraVal).toFixed(2)}</strong></span></div>` : '';
+
+      return `
+        <div class="recibo-bloco-metade">
+          <div>
+            <div class="recibo-sheet-header">
+              <h3 style="font-size:0.8rem; font-weight:800;">RECIBO DE PAGAMENTO DE SALÁRIO</h3>
+              <span style="font-size:0.72rem; font-weight:700;">REF: ${mesAnoFormatado}</span>
+            </div>
+            
+            <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:6px 8px; margin-bottom:8px; font-size:0.7rem; color:#334155;">
+              <div><strong>EMPREGADOR:</strong> ${nomeEmpresa}</div>
+              <div><strong>CNPJ / CPF:</strong> ${cnpjEmpresa} | <strong>TEL:</strong> ${telEmpresa}</div>
+              <div><strong>ENDEREÇO:</strong> ${endEmpresa}</div>
+            </div>
+
+            <div style="font-size:0.72rem; margin-bottom:2px;"><strong>COLABORADOR:</strong> ${colab.nome}</div>
+            <div style="font-size:0.72rem; margin-bottom:2px;"><strong>CPF / DOC:</strong> ${colab.doc || 'Não informado'} | <strong>CARGO:</strong> ${colab.cargo}</div>
+            <div style="font-size:0.72rem; margin-bottom:4px;"><strong>DATA ADMISSÃO:</strong> ${colab.admissao ? new Date(colab.admissao + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</div>
+            
+            <hr class="dashed-divider">
+            <div style="font-size:0.72rem; display:flex; justify-content:space-between; margin-bottom:3px; background:#f1f5f9; padding:4px; border-radius:4px;">
+              <span><strong>Salário Mensal Pago:</strong></span>
+              <span><strong>R$ ${parseFloat(rec.salarioMensal || 0).toFixed(2)}</strong></span>
+            </div>
+
+            <hr class="dashed-divider">
+            <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:3px;">VALES & SERVIÇOS EXTRAS APLICADOS</div>
+            ${itensValesHtml}
+            ${itemExtraHtml}
+          </div>
+
+          <div>
+            <hr class="dashed-divider">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#e0e7ff; padding:8px; border-radius:6px; margin-bottom:6px;">
+              <span style="font-weight:800; font-size:0.85rem; color:#3730a3;">VALOR LÍQUIDO A RECEBER:</span>
+              <span style="font-weight:800; font-size:1.1rem; color:#4338ca;">R$ ${parseFloat(rec.salarioLiquido || 0).toFixed(2)}</span>
+            </div>
+
+            <div style="font-size:0.7rem; color:#475569; margin-bottom:15px;">
+              <strong>STATUS:</strong> <span class="badge-pago" style="padding:2px 6px;">PAGO</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; gap:20px; margin-top:25px; text-align:center; font-size:0.65rem; color:#334155;">
+              <div style="flex:1; border-top:1px solid #0f172a; padding-top:4px;">
+                <strong>${nomeEmpresa}</strong><br>Assinatura do Empregador
+              </div>
+              <div style="flex:1; border-top:1px solid #0f172a; padding-top:4px;">
+                <strong>${colab.nome}</strong><br>Assinatura do Colaborador
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function imprimirReciboDoHistorico(reciboId) {
+      const rec = state.recibosHistorico.find(r => r.id === reciboId);
+      if (!rec) return;
+      const colab = state.colaboradores.find(c => c.id === rec.colaboradorId);
+      if (!colab) return alert('Colaborador não encontrado.');
+
+      const emp = state.empresa || {};
+      const htmlBloco = montarHtmlBlocoReciboRH(rec, colab, emp);
+      abrirJanelaImpressaoOtimizada(htmlBloco);
+    }
+
     async function gerarReciboPagamentoOficial() {
       const colabId = document.getElementById('rh-recibo-colab').value;
       const mesRef = document.getElementById('rh-recibo-mes').value;
@@ -1623,16 +1707,10 @@
       if (!colab) return;
 
       const emp = state.empresa || {};
-      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
-      const cnpjEmpresa = emp.cnpj || 'Não informado';
-      const telEmpresa = emp.tel || 'Não informado';
-      const endEmpresa = emp.end || 'Não informado';
-
       const salarioMensalDigitado = parseFloat(document.getElementById('rh-recibo-salario-mensal').value || colab.salarioBase || 0);
 
       const checkboxesVales = document.querySelectorAll('.chk-vale-recibo:checked');
       let totalValesDescontados = 0;
-      let valesSelecionadosDetalhes = [];
       let valesIds = [];
 
       for (const chk of checkboxesVales) {
@@ -1640,7 +1718,6 @@
         const valeObj = state.valesHistorico.find(v => v.id === valeId);
         if (valeObj) {
           totalValesDescontados += (valeObj.valor || 0);
-          valesSelecionadosDetalhes.push(valeObj);
           valesIds.push(valeId);
           await db.collection("vales_historico").doc(valeId).update({ status: 'Descontado' });
         }
@@ -1650,9 +1727,6 @@
       const extraObs = document.getElementById('rh-recibo-extra-obs').value.trim();
 
       const salarioLiquido = salarioMensalDigitado + extraVal - totalValesDescontados;
-
-      const [ano, mes] = mesRef.split('-');
-      const mesAnoFormatado = `${mes}/${ano}`;
 
       const keyDoc = `${colabId}_${mesRef}`;
       try {
@@ -1683,65 +1757,14 @@
         }
       } catch (err) { console.error(err); }
 
-      let itensValesHtml = valesSelecionadosDetalhes.map(v => {
-        const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
-        return `<div class="item-linha-zebrado"><span>[${dataFmt}] ${v.obs} (Vale Descontado)</span><span><strong>- R$ ${v.valor.toFixed(2)}</strong></span></div>`;
-      }).join('') || '<div style="font-size:0.75rem; color:#64748b; padding:4px 0;">Nenhum vale descontado neste recibo.</div>';
-
-      let itemExtraHtml = extraVal > 0 ? `<div class="item-linha-zebrado"><span>Serviço Extra: ${extraObs || 'Bônus / Extra'}</span><span><strong>+ R$ ${extraVal.toFixed(2)}</strong></span></div>` : '';
-
-      const htmlBloco = `
-        <div class="recibo-bloco-metade">
-          <div>
-            <div class="recibo-sheet-header">
-              <h3 style="font-size:0.8rem; font-weight:800;">RECIBO DE PAGAMENTO DE SALÁRIO</h3>
-              <span style="font-size:0.72rem; font-weight:700;">REF: ${mesAnoFormatado}</span>
-            </div>
-            
-            <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:6px 8px; margin-bottom:8px; font-size:0.7rem; color:#334155;">
-              <div><strong>EMPREGADOR:</strong> ${nomeEmpresa}</div>
-              <div><strong>CNPJ / CPF:</strong> ${cnpjEmpresa} | <strong>TEL:</strong> ${telEmpresa}</div>
-              <div><strong>ENDEREÇO:</strong> ${endEmpresa}</div>
-            </div>
-
-            <div style="font-size:0.72rem; margin-bottom:2px;"><strong>COLABORADOR:</strong> ${colab.nome}</div>
-            <div style="font-size:0.72rem; margin-bottom:2px;"><strong>CPF / DOC:</strong> ${colab.doc || 'Não informado'} | <strong>CARGO:</strong> ${colab.cargo}</div>
-            <div style="font-size:0.72rem; margin-bottom:4px;"><strong>DATA ADMISSÃO:</strong> ${colab.admissao ? new Date(colab.admissao + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</div>
-            
-            <hr class="dashed-divider">
-            <div style="font-size:0.72rem; display:flex; justify-content:space-between; margin-bottom:3px; background:#f1f5f9; padding:4px; border-radius:4px;">
-              <span><strong>Salário Mensal Pago:</strong></span>
-              <span><strong>R$ ${salarioMensalDigitado.toFixed(2)}</strong></span>
-            </div>
-
-            <hr class="dashed-divider">
-            <div style="font-size:0.65rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:3px;">VALES & SERVIÇOS EXTRAS APLICADOS</div>
-            ${itensValesHtml}
-            ${itemExtraHtml}
-          </div>
-
-          <div>
-            <hr class="dashed-divider">
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#e0e7ff; padding:8px; border-radius:6px; margin-bottom:6px;">
-              <span style="font-weight:800; font-size:0.85rem; color:#3730a3;">VALOR LÍQUIDO A RECEBER:</span>
-              <span style="font-weight:800; font-size:1.1rem; color:#4338ca;">R$ ${salarioLiquido.toFixed(2)}</span>
-            </div>
-
-            <div style="font-size:0.7rem; color:#475569; margin-bottom:15px;">
-              <strong>STATUS:</strong> <span class="badge-pago" style="padding:2px 6px;">PAGO</span>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; gap:20px; margin-top:25px; text-align:center; font-size:0.65rem; color:#334155;">
-              <div style="flex:1; border-top:1px solid #0f172a; padding-top:4px;">
-                <strong>${nomeEmpresa}</strong><br>Assinatura do Empregador
-              </div>
-              <div style="flex:1; border-top:1px solid #0f172a; padding-top:4px;">
-                <strong>${colab.nome}</strong><br>Assinatura do Colaborador
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
+      const htmlBloco = montarHtmlBlocoReciboRH({
+        mesReferencia: mesRef,
+        salarioMensal: salarioMensalDigitado,
+        valesIds,
+        extraVal,
+        extraObs,
+        salarioLiquido
+      }, colab, emp);
 
       document.getElementById('printable-receipt-rh').innerHTML = htmlBloco;
       document.getElementById('modal-recibo-rh').style.display = 'flex';
