@@ -448,10 +448,13 @@
     <!-- ABA 3: GESTÃO DE EQUIPE & RH -->
     <div id="view-rh" class="view-content" style="display:none;">
       
-      <!-- BOTÕES DE AÇÃO RÁPIDA SUPERIOR (CADASTRAR COLABORADOR & REGISTRAR VALE) -->
+      <!-- BOTÕES DE AÇÃO RÁPIDA SUPERIOR -->
       <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;">
         <button class="btn btn-rh" type="button" id="btn-toggle-form-rh" onclick="toggleFormCadColaborador()" style="padding: 14px; font-size: 0.95rem; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);">
           ➕ CADASTRAR NOVO COLABORADOR
+        </button>
+        <button class="btn btn-rh" type="button" id="btn-toggle-lista-colab" onclick="toggleListaColaboradores()" style="padding: 14px; font-size: 0.95rem; background: #475569; box-shadow: 0 4px 10px rgba(71, 85, 105, 0.25);">
+          👥 GERENCIAR / EXCLUIR COLABORADORES
         </button>
         <button class="btn btn-warning" type="button" id="btn-toggle-form-vale" onclick="toggleFormRegVale()" style="padding: 14px; font-size: 0.95rem; color:#fff; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25);">
           💸 REGISTRAR VALE / ADIANTAMENTO
@@ -459,6 +462,18 @@
         <button class="btn btn-rh" type="button" id="btn-toggle-form-recibo" onclick="toggleFormGerarRecibo()" style="padding: 14px; font-size: 0.95rem; background: #0f172a; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25);">
           📄 GERAR RECIBO DE PAGAMENTO & FECHAMENTO
         </button>
+      </div>
+
+      <!-- PAINEL DE GESTÃO / EXCLUSÃO DE COLABORADORES (DEDICADO) -->
+      <div class="card" id="rh-card-lista-colab" style="display:none; border-left: 4px solid #475569;">
+        <div class="card-header">
+          <div class="card-title" style="color: #475569;">👥 Lista de Colaboradores (Gerenciar & Excluir)</div>
+          <button class="btn btn-back" type="button" onclick="toggleListaColaboradores()">✖️ Fechar</button>
+        </div>
+        <table>
+          <thead><tr><th>Colaborador</th><th>Cargo / Salário</th><th>Ação</th></tr></thead>
+          <tbody id="lista-gerenciar-colaboradores"></tbody>
+        </table>
       </div>
 
       <!-- FORMULÁRIO DE CADASTRO DE COLABORADOR -->
@@ -1297,6 +1312,18 @@
       }
     }
 
+    function toggleListaColaboradores() {
+      const card = document.getElementById('rh-card-lista-colab');
+      const btn = document.getElementById('btn-toggle-lista-colab');
+      if (card.style.display === 'none') {
+        card.style.display = 'block';
+        btn.innerText = '✖️ Ocultar Lista de Colaboradores';
+      } else {
+        card.style.display = 'none';
+        btn.innerText = '👥 GERENCIAR / EXCLUIR COLABORADORES';
+      }
+    }
+
     function toggleFormRegVale() {
       const card = document.getElementById('rh-card-reg-vale');
       const btn = document.getElementById('btn-toggle-form-vale');
@@ -1340,6 +1367,15 @@
         toggleFormCadColaborador();
         renderRhPainel();
       } catch (err) { alert('Erro ao cadastrar colaborador: ' + err.message); }
+    }
+
+    async function excluirColaboradorRH(colabId) {
+      if (confirm("Deseja realmente excluir este colaborador?")) {
+        try {
+          await db.collection("colaboradores").doc(colabId).delete();
+          alert("Colaborador excluído com sucesso!");
+        } catch (err) { alert("Erro ao excluir colaborador: " + err.message); }
+      }
     }
 
     async function lancarValeHistorico(e) {
@@ -1391,7 +1427,6 @@
         inputSalarioMensal.value = (colab.salarioBase || 0).toFixed(2);
       }
 
-      // Buscar vales pendentes ou daquele colaborador mostrando a data explicitamente (ex: 22/07)
       const valesDisponiveis = state.valesHistorico.filter(v => v.colaboradorId === colabId && (v.status === 'Pendente' || valesIdsSelecionadosPreviamente.includes(v.id)));
 
       if (valesDisponiveis.length > 0) {
@@ -1429,6 +1464,7 @@
     function renderRhPainel() {
       const selectsColab = document.querySelectorAll('.select-colab-dinamico');
       const tbody = document.getElementById('lista-colaboradores-rh');
+      const tbodyGerenciarColab = document.getElementById('lista-gerenciar-colaboradores');
       const tbodyValesGeral = document.getElementById('lista-vales-historico-geral');
       const tbodyRecibosGeral = document.getElementById('lista-recibos-historico-geral');
       const mesFiltroInput = document.getElementById('rh-filtro-mes');
@@ -1447,6 +1483,18 @@
         sel.innerHTML = '<option value="">Selecione o colaborador...</option>' + optionsColabHtml;
         if (valAtual) sel.value = valAtual;
       });
+
+      if (tbodyGerenciarColab) {
+        tbodyGerenciarColab.innerHTML = state.colaboradores.map(c => `
+          <tr>
+            <td><strong>${c.nome}</strong><br><small style="color:#64748b;">${c.cargo}</small></td>
+            <td>R$ ${(c.salarioBase || 0).toFixed(2)}</td>
+            <td>
+              <button class="btn-danger" type="button" onclick="excluirColaboradorRH('${c.id}')">🗑️ Excluir</button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="3" style="text-align:center; color:#64748b; padding:15px;">Nenhum colaborador cadastrado.</td></tr>';
+      }
 
       tbody.innerHTML = state.colaboradores.map(c => {
         const statusObj = state.statusPagamentosRh.find(s => s.colaboradorId === c.id && s.mesReferencia === mesFiltro);
@@ -1555,7 +1603,6 @@
         try {
           const rec = state.recibosHistorico.find(r => r.id === reciboId);
           if (rec && rec.valesIds) {
-            // Reverter status dos vales para Pendente
             for (const vId of rec.valesIds) {
               await db.collection("vales_historico").doc(vId).update({ status: 'Pendente' });
             }
@@ -3010,4 +3057,3 @@
   </script>
 </body>
 </html>
-
