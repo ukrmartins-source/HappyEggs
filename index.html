@@ -1199,13 +1199,23 @@
         renderControleTecnico();
       });
 
-      // LISTENERS DO MÓDULO DE RH & COLABORADORES
+      // LISTENERS DO MÓDULO DE RH & COLABORADORES (COM ORDENAÇÃO CORRETA E CRONOLÓGICA)
       const unsubColaboradores = db.collection("colaboradores").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.colaboradores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        state.colaboradores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
         renderRhPainel();
       });
       const unsubVales = db.collection("vales_historico").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.valesHistorico = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        state.valesHistorico = snapshot.docs.map(doc => {
+          const d = doc.data();
+          let dataParsed = d.criadoEm ? (typeof d.criadoEm.toDate === 'function' ? d.criadoEm.toDate() : new Date(d.criadoEm)) : new Date();
+          return { id: doc.id, ...d, _parsedDate: dataParsed };
+        }).sort((a, b) => {
+          // Ordenação por data/mês decrescente (mais recente primeiro)
+          const compData = (b.data || '').localeCompare(a.data || '');
+          if (compData !== 0) return compData;
+          return b._parsedDate - a._parsedDate;
+        });
         renderRhPainel();
       });
       const unsubStatusPagRh = db.collection("status_pagamentos_rh").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
@@ -1213,8 +1223,16 @@
         renderRhPainel();
       });
       const unsubRecibosRh = db.collection("recibos_historico").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.recibosHistorico = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-          .sort((a, b) => new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0));
+        state.recibosHistorico = snapshot.docs.map(doc => {
+          const d = doc.data();
+          let dataParsed = d.criadoEm ? (typeof d.criadoEm.toDate === 'function' ? d.criadoEm.toDate() : new Date(d.criadoEm)) : new Date();
+          return { id: doc.id, ...d, _parsedDate: dataParsed };
+        }).sort((a, b) => {
+          // Ordenação por mês de referência e data de criação decrescente (mais recente primeiro)
+          const compMes = (b.mesReferencia || '').localeCompare(a.mesReferencia || '');
+          if (compMes !== 0) return compMes;
+          return b._parsedDate - a._parsedDate;
+        });
         renderRhPainel();
       });
 
