@@ -562,7 +562,7 @@
           <input type="month" id="rh-filtro-mes" onchange="renderRhPainel()">
         </div>
         <table>
-          <thead><tr><th>Colaborador</th><th>Admissão</th><th>Status & Salário Líquido</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Colaborador</th><th>Admissão</th><th>Status & Salário Líquido</th></tr></thead>
           <tbody id="lista-colaboradores-rh"></tbody>
         </table>
 
@@ -626,7 +626,7 @@
             <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛒 ITENS SELECIONADOS:</div>
             <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
             
-            <!-- CAMPO DE DESCONTO IMPLEMENTADO -->
+            <!-- CAMPO DE DESCONTO -->
             <div style="margin-top: 12px; border-top: 1px dashed #cbd5e1; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
               <div style="flex: 1; font-size: 0.85rem; font-weight: 700; color: #b45309;">🏷️ Desconto Aplicado (R$):</div>
               <input type="number" step="0.01" id="ped-desconto-val" min="0" value="0.00" oninput="renderCarrinho()" style="width: 120px; padding: 6px; text-align: right; font-weight: bold; color: #b45309;">
@@ -1342,7 +1342,6 @@
         document.getElementById('top-nav-container').style.display = 'flex';
         document.getElementById('user-display').innerText = "👤 " + found.login.toUpperCase() + " (" + found.role.toUpperCase() + ")";
         
-        // APLICANDO RESTRIÇÕES DE PERMISSÃO (Vendedor / Técnico / Admin)
         const isAdmin = found.role === 'admin';
         const isVendedor = found.role === 'vendedor';
         const isTecnico = found.role === 'tecnico';
@@ -1586,6 +1585,7 @@
         `).join('') || '<tr><td colspan="3" style="text-align:center; color:#64748b; padding:15px;">Nenhum colaborador cadastrado.</td></tr>';
       }
 
+      // TABELA DE COLABORADORES ATUALIZADA (Botão "Gerar Recibo" individual removido daqui para evitar duplicação)
       tbody.innerHTML = state.colaboradores.map(c => {
         const statusObj = state.statusPagamentosRh.find(s => s.colaboradorId === c.id && s.mesReferencia === mesFiltro);
         const statusPag = statusObj ? statusObj.status : 'Pendente';
@@ -1603,12 +1603,9 @@
                 ${isPago ? '🟢 Pago' : '🔴 Pendente'}
               </span>
             </td>
-            <td>
-              <button class="btn btn-rh" type="button" style="width:auto; padding:5px 8px; font-size:0.75rem;" onclick="selecionarParaRecibo('${c.id}', '${mesFiltro}')">📄 Gerar Recibo</button>
-            </td>
           </tr>
         `;
-      }).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b; padding:15px;">Nenhum colaborador cadastrado no sistema.</td></tr>';
+      }).join('') || '<tr><td colspan="3" style="text-align:center; color:#64748b; padding:15px;">Nenhum colaborador cadastrado no sistema.</td></tr>';
 
       if (tbodyRecibosGeral) {
         tbodyRecibosGeral.innerHTML = state.recibosHistorico.map(r => {
@@ -1655,15 +1652,6 @@
           `;
         }).join('') || '<tr><td colspan="5" style="text-align:center; color:#64748b; padding:10px;">Nenhum vale registrado no histórico.</td></tr>';
       }
-    }
-
-    function selecionarParaRecibo(colabId, mesRef) {
-      document.getElementById('rh-recibo-colab').value = colabId;
-      document.getElementById('rh-recibo-mes').value = mesRef;
-      document.getElementById('rh-recibo-id-edicao').value = '';
-      toggleFormGerarRecibo();
-      atualizarInterfaceGerarRecibo();
-      window.scrollTo({ top: 100, behavior: 'smooth' });
     }
 
     function editarReciboHistorico(reciboId) {
@@ -3031,7 +3019,6 @@
       const descontoVal = parseFloat(document.getElementById('ped-desconto-val').value || 0);
       const totalPedido = Math.max(0, subtotalPedido - descontoVal);
 
-      // Calcula o total de ovos consumidos neste pedido com base nas embalagens
       let totalOvosConsumidos = 0;
       carrinhoTemp.forEach(item => {
         const prodRef = state.produtos.find(p => p.id === item.produtoId);
@@ -3043,7 +3030,6 @@
       const refEstoque = db.collection("estoque_geral").doc(empresaId);
 
       try {
-        // 1. Verifica se há saldo suficiente no estoque geral
         const docEstoque = await refEstoque.get();
         let saldoAtual = docEstoque.exists ? (docEstoque.data().qtdOvos || 0) : 0;
 
@@ -3051,10 +3037,8 @@
           return alert(`Estoque insuficiente! Você tem ${saldoAtual} ovos no estoque geral, mas este pedido exige ${totalOvosConsumidos} ovos.`);
         }
 
-        // 2. Realiza a baixa imediata no estoque geral
         await refEstoque.set({ qtdOvos: saldoAtual - totalOvosConsumidos }, { merge: true });
 
-        // 3. Salva o pedido na nuvem
         const novoPedido = {
           empresaId: empresaId, 
           numeroPedido: proximoNumero, 
