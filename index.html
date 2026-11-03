@@ -223,8 +223,8 @@
   <!-- ABAS FIXAS NO TOPO (FINANCEIRO vs TÉCNICO vs RH) -->
   <nav class="top-nav-tabs" id="top-nav-container" style="display:none;">
     <button class="top-tab-btn active" id="tab-btn-financeiro" type="button" onclick="mudarAbaTopo('financeiro')">💰 VENDAS</button>
-    <button class="top-tab-btn tech-tab" id="tab-btn-tecnico" type="button" onclick="mudarAbaTopo('tecnico')">📊 ZOOTECNIA</button>
-    <button class="top-tab-btn rh-tab" id="tab-btn-rh" type="button" onclick="mudarAbaTopo('rh')">👥 EQUIPE & RH</button>
+    <button class="top-tab-btn tech-tab admin-or-tech" id="tab-btn-tecnico" type="button" onclick="mudarAbaTopo('tecnico')">📊 ZOOTECNIA</button>
+    <button class="top-tab-btn rh-tab admin-only" id="tab-btn-rh" type="button" onclick="mudarAbaTopo('rh')">👥 EQUIPE & RH</button>
   </nav>
 
   <main>
@@ -324,10 +324,10 @@
       <div class="grid-menu">
         <button class="grid-btn full-width" type="button" onclick="navToSub('pedidos')"><span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span></button>
         <button class="grid-btn" type="button" onclick="navToSub('clientes')"><span class="icon">👥</span><span class="label">CLIENTES</span></button>
-        <button class="grid-btn" type="button" onclick="navToSub('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
+        <button class="grid-btn admin-only" type="button" onclick="navToSub('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navToSub('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navToSub('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">📈</span><span class="label">RELATÓRIO DE VENDAS</span></button>
+        <button class="grid-btn full-width admin-only" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">📈</span><span class="label">RELATÓRIO DE VENDAS</span></button>
       </div>
       <div class="card" style="margin-top: 15px;">
         <div class="card-header">
@@ -432,23 +432,30 @@
           <tbody id="lista-lotes-tecnicos"></tbody>
         </table>
 
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:15px;">Histórico de Postura Diária Consolidada & Coletas</div>
-        <table>
-          <thead><tr><th>Data</th><th>Lote / Turno</th><th>Ovos</th><th>Taxa Diária</th></tr></thead>
-          <tbody id="lista-historico-postura"></tbody>
-        </table>
+        <!-- MENU COLAPSÁVEL DE HISTÓRICOS TÉCNICOS PARA EVITAR TELA LONGA -->
+        <div style="margin-top: 15px;">
+          <button class="btn" type="button" style="background:#0d9488; font-size:0.8rem; padding:10px;" onclick="toggleHistoricosZootecnia()" id="btn-toggle-hist-tec">📂 Ver / Ocultar Históricos Detalhados (Postura, Mortalidade, Vacinas)</button>
+        </div>
 
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--danger); text-transform:uppercase; margin-top:15px;">Histórico de Mortalidade</div>
-        <table>
-          <thead><tr><th>Data</th><th>Lote</th><th>Baixas</th><th>Motivo</th></tr></thead>
-          <tbody id="lista-historico-mortalidade"></tbody>
-        </table>
+        <div id="container-historicos-detalhados" style="display:none; margin-top:10px;">
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Histórico de Postura Diária Consolidada & Coletas</div>
+          <table>
+            <thead><tr><th>Data</th><th>Lote / Turno</th><th>Ovos</th><th>Taxa Diária</th></tr></thead>
+            <tbody id="lista-historico-postura"></tbody>
+          </table>
 
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--warning); text-transform:uppercase; margin-top:15px;">Histórico de Vacinação</div>
-        <table>
-          <thead><tr><th>Data</th><th>Lote</th><th>Vacina</th><th>Aves Vacinadas</th></tr></thead>
-          <tbody id="lista-historico-vacinacao"></tbody>
-        </table>
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--danger); text-transform:uppercase; margin-top:15px;">Histórico de Mortalidade</div>
+          <table>
+            <thead><tr><th>Data</th><th>Lote</th><th>Baixas</th><th>Motivo</th></tr></thead>
+            <tbody id="lista-historico-mortalidade"></tbody>
+          </table>
+
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--warning); text-transform:uppercase; margin-top:15px;">Histórico de Vacinação</div>
+          <table>
+            <thead><tr><th>Data</th><th>Lote</th><th>Vacina</th><th>Aves Vacinadas</th></tr></thead>
+            <tbody id="lista-historico-vacinacao"></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="grid-menu" style="margin-top: 20px; margin-bottom: 20px;">
@@ -618,7 +625,14 @@
           <div class="carrinho-box">
             <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛒 ITENS SELECIONADOS:</div>
             <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
-            <div style="font-size: 1rem; font-weight: bold; text-align: right; margin-top: 10px; color: var(--accent);">Total: R$ <span id="ped-total-valor">0.00</span></div>
+            
+            <!-- CAMPO DE DESCONTO IMPLEMENTADO -->
+            <div style="margin-top: 12px; border-top: 1px dashed #cbd5e1; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+              <div style="flex: 1; font-size: 0.85rem; font-weight: 700; color: #b45309;">🏷️ Desconto Aplicado (R$):</div>
+              <input type="number" step="0.01" id="ped-desconto-val" min="0" value="0.00" oninput="renderCarrinho()" style="width: 120px; padding: 6px; text-align: right; font-weight: bold; color: #b45309;">
+            </div>
+
+            <div style="font-size: 1rem; font-weight: bold; text-align: right; margin-top: 10px; color: var(--accent);">Total Final: R$ <span id="ped-total-valor">0.00</span></div>
           </div>
           <div class="form-group">
             <label>Forma de Pagamento</label>
@@ -637,7 +651,7 @@
               <option value="Pendente">🔴 Pendente (A Pagar)</option>
             </select>
           </div>
-          <div class="form-group"><label>Observações do Pedido (Sairá na Nota)</label><textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Deixar com a portaria"></textarea></div>
+          <div class="form-group"><label>Observações do Pedido (Sairá na Nota)</label><textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Ovos menores (desconto aplicado)"></textarea></div>
           <button type="submit" class="btn btn-success">Finalizar Pedido</button>
         </form>
       </div>
@@ -721,6 +735,7 @@
             <label>Nível de Permissão</label>
             <select id="usr-role">
               <option value="vendedor">Vendedor (Apenas Vendas/Clientes)</option>
+              <option value="tecnico">Técnico (Apenas Zootecnia)</option>
               <option value="admin">Administrador (Acesso Total)</option>
             </select>
           </div>
@@ -1311,6 +1326,7 @@
           document.getElementById('app-header').style.display = 'flex';
           document.getElementById('user-display').innerText = "👑 SUPER ADMIN (" + found.login.toUpperCase() + ")";
           document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
+          document.querySelectorAll('.admin-or-tech').forEach(el => el.style.display = 'flex');
           navTo('superadmin');
           initSuperAdminListener();
           return;
@@ -1324,8 +1340,20 @@
         document.getElementById('view-login').style.display = 'none';
         document.getElementById('app-header').style.display = 'flex';
         document.getElementById('top-nav-container').style.display = 'flex';
-        document.getElementById('user-display').innerText = "👤 " + found.login.toUpperCase();
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = found.role === 'admin' ? 'flex' : 'none');
+        document.getElementById('user-display').innerText = "👤 " + found.login.toUpperCase() + " (" + found.role.toUpperCase() + ")";
+        
+        // APLICANDO RESTRIÇÕES DE PERMISSÃO (Vendedor / Técnico / Admin)
+        const isAdmin = found.role === 'admin';
+        const isVendedor = found.role === 'vendedor';
+        const isTecnico = found.role === 'tecnico';
+
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'flex' : 'none');
+        
+        const tabTecnico = document.getElementById('tab-btn-tecnico');
+        const tabRh = document.getElementById('tab-btn-rh');
+        if (tabTecnico) tabTecnico.style.display = (isAdmin || isTecnico) ? 'block' : 'none';
+        if (tabRh) tabRh.style.display = isAdmin ? 'block' : 'none';
+
         initListeners();
         mudarAbaTopo('financeiro');
       } catch (error) { alert("Erro ao tentar entrar: " + error.message); }
@@ -1856,6 +1884,15 @@
       document.getElementById('tec-btn-voltar-container').style.display = 'none';
       document.querySelectorAll('.tec-secao-form').forEach(el => el.style.display = 'none');
       renderControleTecnico();
+    }
+
+    function toggleHistoricosZootecnia() {
+      const container = document.getElementById('container-historicos-detalhados');
+      if (container.style.display === 'none') {
+        container.style.display = 'block';
+      } else {
+        container.style.display = 'none';
+      }
     }
 
     function navToSub(view) {
@@ -2699,6 +2736,11 @@
         pixSectionHtml += `</div>`;
       }
 
+      let descontoHtml = '';
+      if (ped.desconto && ped.desconto > 0) {
+        descontoHtml = `<div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#b45309; margin-bottom:2px;"><span>Desconto Aplicado:</span><span>- R$ ${parseFloat(ped.desconto).toFixed(2)}</span></div>`;
+      }
+
       return `
         <div class="recibo-bloco-metade">
           <div>
@@ -2716,8 +2758,9 @@
           </div>
           <div>
             <hr class="dashed-divider">
+            ${descontoHtml}
             <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
-              <span>TOTAL:</span>
+              <span>TOTAL FINAL:</span>
               <span style="color:#2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
             </div>
             <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
@@ -2958,13 +3001,23 @@
     function renderCarrinho() {
       const lista = document.getElementById('itens-pedido-lista');
       const totalSpan = document.getElementById('ped-total-valor');
-      if (!carrinhoTemp.length) { lista.innerHTML = '<div style="text-align:center; padding:10px;">Nenhum produto.</div>'; totalSpan.innerText = "0.00"; return; }
-      let totalGeral = 0;
+      const inputDesconto = document.getElementById('ped-desconto-val');
+      const descontoVal = inputDesconto ? parseFloat(inputDesconto.value || 0) : 0;
+
+      if (!carrinhoTemp.length) { 
+        lista.innerHTML = '<div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div>'; 
+        totalSpan.innerText = "0.00"; 
+        return; 
+      }
+
+      let subtotalGeral = 0;
       lista.innerHTML = carrinhoTemp.map((i, idx) => {
-        totalGeral += i.subtotal;
+        subtotalGeral += i.subtotal;
         return '<div class="carrinho-item"><div><strong>' + i.qtd + 'x ' + i.nome + '</strong></div><div>R$ ' + i.subtotal.toFixed(2) + ' <button type="button" class="btn-danger" onclick="carrinhoTemp.splice(' + idx + ',1);renderCarrinho()">✕</button></div></div>';
       }).join('');
-      totalSpan.innerText = totalGeral.toFixed(2);
+
+      let totalFinal = Math.max(0, subtotalGeral - descontoVal);
+      totalSpan.innerText = totalFinal.toFixed(2);
     }
 
     async function finalizarPedido(e) {
@@ -2973,7 +3026,10 @@
       const cliente = state.clientes.find(c => c.id === document.getElementById('ped-cliente').value);
       if (!cliente) return alert('Selecione um cliente!');
       const proximoNumero = state.pedidos.reduce((max, p) => Math.max(max, p.numeroPedido || 0), 0) + 1;
-      const totalPedido = carrinhoTemp.reduce((acc, i) => acc + i.subtotal, 0);
+      
+      const subtotalPedido = carrinhoTemp.reduce((acc, i) => acc + i.subtotal, 0);
+      const descontoVal = parseFloat(document.getElementById('ped-desconto-val').value || 0);
+      const totalPedido = Math.max(0, subtotalPedido - descontoVal);
 
       // Calcula o total de ovos consumidos neste pedido com base nas embalagens
       let totalOvosConsumidos = 0;
@@ -3006,7 +3062,8 @@
           clienteNome: cliente.nome, 
           clienteEnd: cliente.end || '', 
           clienteTel: cliente.tel || '',
-          itens: carrinhoTemp, 
+          itens: carrinhoTemp,
+          desconto: descontoVal,
           total: totalPedido, 
           formaPgto: document.getElementById('ped-forma-pagamento').value,
           status: document.getElementById('ped-status').value, 
@@ -3019,6 +3076,7 @@
         carrinhoTemp = []; 
         renderCarrinho(); 
         e.target.reset();
+        document.getElementById('ped-desconto-val').value = '0.00';
         
         alert(`Pedido #${proximoNumero} finalizado com sucesso!\n-${totalOvosConsumidos} ovos baixados do estoque.`);
         abrirModalNota(novoPedido);
