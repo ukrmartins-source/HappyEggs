@@ -2975,17 +2975,56 @@
       const proximoNumero = state.pedidos.reduce((max, p) => Math.max(max, p.numeroPedido || 0), 0) + 1;
       const totalPedido = carrinhoTemp.reduce((acc, i) => acc + i.subtotal, 0);
 
-      const novoPedido = {
-        empresaId: state.currentUser.empresaId, numeroPedido: proximoNumero, clienteId: cliente.id,
-        clienteNome: cliente.nome, clienteEnd: cliente.end || '', clienteTel: cliente.tel || '',
-        itens: carrinhoTemp, total: totalPedido, formaPgto: document.getElementById('ped-forma-pagamento').value,
-        status: document.getElementById('ped-status').value, dataCriacao: new Date()
-      };
+      // Calcula o total de ovos consumidos neste pedido com base nas embalagens
+      let totalOvosConsumidos = 0;
+      carrinhoTemp.forEach(item => {
+        const prodRef = state.produtos.find(p => p.id === item.produtoId);
+        const qtdOvosPorUnidade = prodRef ? (prodRef.ovosUnid || 0) : (item.totalOvos ? item.totalOvos / item.qtd : 0);
+        totalOvosConsumidos += (item.qtd || 0) * qtdOvosPorUnidade;
+      });
 
-      const docRef = await db.collection("pedidos").add(novoPedido);
-      novoPedido.id = docRef.id;
-      carrinhoTemp = []; renderCarrinho(); e.target.reset();
-      abrirModalNota(novoPedido);
+      const empresaId = state.currentUser.empresaId;
+      const refEstoque = db.collection("estoque_geral").doc(empresaId);
+
+      try {
+        // 1. Verifica se há saldo suficiente no estoque geral
+        const docEstoque = await refEstoque.get();
+        let saldoAtual = docEstoque.exists ? (docEstoque.data().qtdOvos || 0) : 0;
+
+        if (saldoAtual < totalOvosConsumidos) {
+          return alert(`Estoque insuficiente! Você tem ${saldoAtual} ovos no estoque geral, mas este pedido exige ${totalOvosConsumidos} ovos.`);
+        }
+
+        // 2. Realiza a baixa imediata no estoque geral
+        await refEstoque.set({ qtdOvos: saldoAtual - totalOvosConsumidos }, { merge: true });
+
+        // 3. Salva o pedido na nuvem
+        const novoPedido = {
+          empresaId: empresaId, 
+          numeroPedido: proximoNumero, 
+          clienteId: cliente.id,
+          clienteNome: cliente.nome, 
+          clienteEnd: cliente.end || '', 
+          clienteTel: cliente.tel || '',
+          itens: carrinhoTemp, 
+          total: totalPedido, 
+          formaPgto: document.getElementById('ped-forma-pagamento').value,
+          status: document.getElementById('ped-status').value, 
+          dataCriacao: new Date()
+        };
+
+        const docRef = await db.collection("pedidos").add(novoPedido);
+        novoPedido.id = docRef.id;
+        
+        carrinhoTemp = []; 
+        renderCarrinho(); 
+        e.target.reset();
+        
+        alert(`Pedido #${proximoNumero} finalizado com sucesso!\n-${totalOvosConsumidos} ovos baixados do estoque.`);
+        abrirModalNota(novoPedido);
+      } catch (err) {
+        alert('Erro ao finalizar pedido e atualizar estoque: ' + err.message);
+      }
     }
 
     async function alternarStatusPedido(id, statusAtual) {
