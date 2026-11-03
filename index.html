@@ -204,6 +204,9 @@
     .relatorio-tabela-planilha th { background: #eff6ff; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; padding: 8px 6px; border-bottom: 2px solid #bfdbfe; border-top: 1px solid #e2e8f0; }
     .relatorio-tabela-planilha td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
     .relatorio-tabela-planilha tr:nth-child(even) { background-color: #f8fafc; }
+    
+    .qr-code-preview { max-width: 130px; max-height: 130px; margin-top: 8px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 4px; display: block; }
+    .qr-recibo-img { max-width: 90px; max-height: 90px; display: block; margin: 4px auto; }
   </style>
 </head>
 <body>
@@ -365,11 +368,20 @@
       </div>
 
       <div class="card tec-secao-form" id="tec-form-postura" style="display: none; border-left: 4px solid var(--tech);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🥚 Registo Diário de Postura & Pesagem</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--tech);">🥚 Registro Diário de Postura & Pesagem</div>
         <form onsubmit="registrarPosturaDiaria(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="postura-lote-id" required></select></div>
           <div class="form-group"><label>Data da Coleta</label><input type="date" id="postura-data" required></div>
-          <div class="form-group"><label>Ovos Colhidos no Dia (Unidades)</label><input type="number" id="postura-ovos-colhidos" min="0" placeholder="Ex: 750" required></div>
+          <div class="form-group">
+            <label>Turno / Horário da Coleta</label>
+            <select id="postura-turno" required>
+              <option value="1ª Coleta (Manhã)">1ª Coleta (Manhã)</option>
+              <option value="2ª Coleta (Tarde)">2ª Coleta (Tarde)</option>
+              <option value="3ª Coleta (Final de Tarde)">3ª Coleta (Final de Tarde)</option>
+              <option value="Coleta Única">Coleta Única Consolidada</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Ovos Colhidos nesta Coleta (Unidades)</label><input type="number" id="postura-ovos-colhidos" min="0" placeholder="Ex: 750" required></div>
           <div class="form-group"><label>Consumo de Ração no Dia (Kg - Opcional)</label><input type="number" step="0.1" id="postura-racao" placeholder="Ex: 110.5"></div>
           <div class="form-group"><label>Temperatura Média / Obs Ambiência</label><input type="text" id="postura-obs" placeholder="Ex: Temp 24°C / Luz 16h"></div>
           
@@ -382,18 +394,18 @@
           <div id="container-pesagem-individual" style="margin-bottom: 10px;"></div>
           <div id="resultado-peso-medio" style="font-size: 0.85rem; font-weight: bold; color: var(--tech); margin-bottom: 12px; display: none;"></div>
 
-          <button type="submit" class="btn btn-success">✅ Registar Produção & Pesagem</button>
+          <button type="submit" class="btn btn-success">✅ Registrar Produção & Creditar no Estoque</button>
         </form>
       </div>
 
       <div class="card tec-secao-form" id="tec-form-mortalidade" style="display: none; border-left: 4px solid var(--danger);">
-        <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">⚰️ Registo de Mortalidade / Baixas</div>
+        <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">⚰️ Registro de Mortalidade / Baixas</div>
         <form onsubmit="registrarMortalidadeTecnica(event)">
           <div class="form-group"><label>Selecione o Lote</label><select id="morte-lote-id" required></select></div>
           <div class="form-group"><label>Data do Ocorrido</label><input type="date" id="morte-data" required></div>
           <div class="form-group"><label>Quantidade de Aves Mortas</label><input type="number" id="morte-qtd" min="1" placeholder="Ex: 1" required></div>
           <div class="form-group"><label>Motivo / Observação</label><input type="text" id="morte-obs" placeholder="Ex: Doença, calor, etc."></div>
-          <button type="submit" class="btn btn-danger">⚠️ Registar Mortalidade</button>
+          <button type="submit" class="btn btn-danger">⚠️ Registrar Mortalidade</button>
         </form>
       </div>
 
@@ -404,14 +416,14 @@
           <div class="form-group"><label>Tipo / Nome da Vacina</label><input type="text" id="vacina-nome" placeholder="Ex: Newcastle / Gumboro" required></div>
           <div class="form-group"><label>Quantidade de Aves Vacinadas</label><input type="number" id="vacina-qtd-aves" min="1" placeholder="Ex: 1000" required></div>
           <div class="form-group"><label>Data da Aplicação</label><input type="date" id="vacina-data" required></div>
-          <button type="submit" class="btn btn-warning" style="color:#fff;">💉 Registar Vacinação</button>
+          <button type="submit" class="btn btn-warning" style="color:#fff;">💉 Registrar Vacinação</button>
         </form>
       </div>
 
       <div class="card" id="tec-painel-historicos">
         <div class="card-title">Indicadores Zootécnicos & Histórico Geral</div>
         <div style="margin-top: 10px; font-size: 0.85rem; background: #f8fafc; padding: 10px; border-radius: 8px; border:1px solid #e2e8f0; margin-bottom: 10px;">
-          <div>📊 <strong>Média de Postura do Mês Atual:</strong> <span id="kpi-media-mensal" style="color:var(--tech); font-weight:bold;">0%</span></div>
+          <div>📊 <strong>Média de Postura Diária (Mês Atual):</strong> <span id="kpi-media-mensal" style="color:var(--tech); font-weight:bold;">0%</span></div>
         </div>
 
         <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Lotes Alojados Atualmente</div>
@@ -420,9 +432,9 @@
           <tbody id="lista-lotes-tecnicos"></tbody>
         </table>
 
-        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:15px;">Histórico de Postura & Pesagem</div>
+        <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:15px;">Histórico de Postura Diária Consolidada & Coletas</div>
         <table>
-          <thead><tr><th>Data</th><th>Lote</th><th>Ovos</th><th>Taxa / Pesagem</th></tr></thead>
+          <thead><tr><th>Data</th><th>Lote / Turno</th><th>Ovos</th><th>Taxa Diária</th></tr></thead>
           <tbody id="lista-historico-postura"></tbody>
         </table>
 
@@ -447,8 +459,6 @@
 
     <!-- ABA 3: GESTÃO DE EQUIPE & RH -->
     <div id="view-rh" class="view-content" style="display:none;">
-      
-      <!-- BOTÕES DE AÇÃO RÁPIDA SUPERIOR -->
       <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;">
         <button class="btn btn-rh" type="button" id="btn-toggle-form-rh" onclick="toggleFormCadColaborador()" style="padding: 14px; font-size: 0.95rem; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.25);">
           ➕ CADASTRAR NOVO COLABORADOR
@@ -464,7 +474,6 @@
         </button>
       </div>
 
-      <!-- PAINEL DE GESTÃO / EXCLUSÃO DE COLABORADORES (DEDICADO) -->
       <div class="card" id="rh-card-lista-colab" style="display:none; border-left: 4px solid #475569;">
         <div class="card-header">
           <div class="card-title" style="color: #475569;">👥 Lista de Colaboradores (Gerenciar & Excluir)</div>
@@ -476,7 +485,6 @@
         </table>
       </div>
 
-      <!-- FORMULÁRIO DE CADASTRO DE COLABORADOR -->
       <div class="card" id="rh-card-cad-colab" style="display:none; border-left: 4px solid var(--rh);">
         <div class="card-header">
           <div class="card-title" style="color: var(--rh);">👤 Cadastro de Colaborador</div>
@@ -492,7 +500,6 @@
         </form>
       </div>
 
-      <!-- FORMULÁRIO DE REGISTRO DE VALES / ADIANTAMENTOS -->
       <div class="card" id="rh-card-reg-vale" style="display:none; border-left: 4px solid var(--warning);">
         <div class="card-header">
           <div class="card-title" style="color: var(--warning);">💸 Registrar Vale / Adiantamento (Histórico)</div>
@@ -508,7 +515,6 @@
         </form>
       </div>
 
-      <!-- FORMULÁRIO CENTRAL: GERAR RECIBO DE PAGAMENTO & FECHAMENTO -->
       <div class="card" id="rh-card-gerar-recibo" style="display:none; border-left: 4px solid var(--rh);">
         <div class="card-header">
           <div class="card-title" style="color: var(--rh);">📄 Gerar Recibo de Pagamento & Fechamento</div>
@@ -526,9 +532,7 @@
           </div>
 
           <div style="font-size:0.8rem; font-weight:bold; color:#0f172a; margin-bottom:8px;">💸 Vales Disponíveis para Descontar:</div>
-          <div id="lista-vales-checkbox-container" style="margin-bottom:10px;">
-            <!-- Os checkboxes dos vales cadastrados com data aparecerão aqui -->
-          </div>
+          <div id="lista-vales-checkbox-container" style="margin-bottom:10px;"></div>
 
           <div class="form-group" style="margin-bottom:8px;">
             <label>Valor de Serviço Extra / Bônus (R$)</label>
@@ -544,11 +548,8 @@
         <button type="button" class="btn btn-back" id="btn-cancelar-edicao-recibo" style="background:#64748b; margin-top:6px; display:none; width:100%; justify-content:center;" onclick="limparEdicaoRecibo()">Cancelar Edição</button>
       </div>
 
-      <!-- PAINEL DE CONTROLE DE STATUS DOS COLABORADORES & HISTÓRICO DE RECIBOS/VALES -->
       <div class="card">
-        <div class="card-header">
-          <div class="card-title">📋 Histórico de Pagamentos & Vales da Equipe</div>
-        </div>
+        <div class="card-header"><div class="card-title">📋 Histórico de Pagamentos & Vales da Equipe</div></div>
         <div class="form-group" style="margin-bottom: 12px;">
           <label>Mês para Consulta</label>
           <input type="month" id="rh-filtro-mes" onchange="renderRhPainel()">
@@ -570,7 +571,6 @@
           <tbody id="lista-vales-historico-geral"></tbody>
         </table>
       </div>
-
     </div>
 
     <!-- TELA: CLIENTES -->
@@ -761,7 +761,17 @@
           <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
           <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @granjauk"></div>
           <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
-          <button type="submit" class="btn btn-success">Salvar Dados da Empresa</button>
+          
+          <div class="form-group">
+            <label>Imagem do QR Code Pix (Para os Recibos)</label>
+            <input type="file" id="emp-pix-qr" accept="image/*" onchange="previewQrCodePix(event)">
+            <div id="container-preview-qr">
+              <img id="preview-qr-img" class="qr-code-preview" src="" alt="QR Code Pix" style="display:none;">
+              <button type="button" id="btn-remover-qr" class="btn-danger" style="margin-top:6px; display:none;" onclick="removerQrCodePix()">Excluir QR Code Pix</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success" style="margin-top:10px;">Salvar Dados da Empresa</button>
         </form>
       </div>
     </div>
@@ -1035,7 +1045,7 @@
 
     let state = {
       usuarios: [], empresasSaaS: [], todosUsuariosSaaS: [],
-      empresa: { nome: "Granja UK", cnpj: "", tel: "", end: "", social: "", pix: "" },
+      empresa: { nome: "Granja UK", cnpj: "", tel: "", end: "", social: "", pix: "", pixQrCode: "" },
       produtos: [], clientes: [], pedidos: [], producao: [], estoqueGeralOvos: 0,
       lotesTecnicos: [], historicoPosturaTecnica: [], historicoMortalidade: [], historicoVacinacao: [],
       colaboradores: [], valesHistorico: [], statusPagamentosRh: [], recibosHistorico: [],
@@ -1047,6 +1057,7 @@
     let empresaSelecionadaParaDetalhes = null;
     let pedidoSelecionadoModal = null;
     let usuarioSelecionadoId = null;
+    let tempQrBase64 = "";
 
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
@@ -1199,7 +1210,6 @@
         renderControleTecnico();
       });
 
-      // LISTENERS DO MÓDULO DE RH & COLABORADORES (COM ORDENAÇÃO CORRETA E CRONOLÓGICA)
       const unsubColaboradores = db.collection("colaboradores").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
         state.colaboradores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
           .sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
@@ -1211,7 +1221,6 @@
           let dataParsed = d.criadoEm ? (typeof d.criadoEm.toDate === 'function' ? d.criadoEm.toDate() : new Date(d.criadoEm)) : new Date();
           return { id: doc.id, ...d, _parsedDate: dataParsed };
         }).sort((a, b) => {
-          // Ordenação por data/mês decrescente (mais recente primeiro)
           const compData = (b.data || '').localeCompare(a.data || '');
           if (compData !== 0) return compData;
           return b._parsedDate - a._parsedDate;
@@ -1228,7 +1237,6 @@
           let dataParsed = d.criadoEm ? (typeof d.criadoEm.toDate === 'function' ? d.criadoEm.toDate() : new Date(d.criadoEm)) : new Date();
           return { id: doc.id, ...d, _parsedDate: dataParsed };
         }).sort((a, b) => {
-          // Ordenação por mês de referência e data de criação decrescente (mais recente primeiro)
           const compMes = (b.mesReferencia || '').localeCompare(a.mesReferencia || '');
           if (compMes !== 0) return compMes;
           return b._parsedDate - a._parsedDate;
@@ -1239,6 +1247,30 @@
       state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao, unsubColaboradores, unsubVales, unsubStatusPagRh, unsubRecibosRh);
     }
 
+    function previewQrCodePix(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        tempQrBase64 = e.target.result;
+        const img = document.getElementById('preview-qr-img');
+        const btn = document.getElementById('btn-remover-qr');
+        if (img) { img.src = tempQrBase64; img.style.display = 'block'; }
+        if (btn) { btn.style.display = 'inline-block'; }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removerQrCodePix() {
+      tempQrBase64 = "";
+      const img = document.getElementById('preview-qr-img');
+      const btn = document.getElementById('btn-remover-qr');
+      const input = document.getElementById('emp-pix-qr');
+      if (img) { img.src = ""; img.style.display = 'none'; }
+      if (btn) { btn.style.display = 'none'; }
+      if (input) { input.value = ""; }
+    }
+
     function carregarEmpresaCampos() {
       if (!document.getElementById('emp-nome')) return;
       document.getElementById('emp-nome').value = state.empresa.nome || '';
@@ -1247,6 +1279,19 @@
       document.getElementById('emp-end').value = state.empresa.end || '';
       document.getElementById('emp-social').value = state.empresa.social || '';
       document.getElementById('emp-pix').value = state.empresa.pix || '';
+
+      const qrVal = state.empresa.pixQrCode || '';
+      tempQrBase64 = qrVal;
+      const img = document.getElementById('preview-qr-img');
+      const btn = document.getElementById('btn-remover-qr');
+      if (qrVal && img) {
+        img.src = qrVal;
+        img.style.display = 'block';
+        if (btn) btn.style.display = 'inline-block';
+      } else {
+        if (img) img.style.display = 'none';
+        if (btn) btn.style.display = 'none';
+      }
     }
 
     async function autenticar(e) {
@@ -1317,7 +1362,6 @@
       render();
     }
 
-    // --- LÓGICA E FUNÇÕES DO MÓDULO DE COLABORADORES & RH ---
     function toggleFormCadColaborador() {
       const card = document.getElementById('rh-card-cad-colab');
       const btn = document.getElementById('btn-toggle-form-rh');
@@ -1796,7 +1840,6 @@
       abrirJanelaImpressaoOtimizada(conteudoHtml);
     }
 
-    // --- MANUTENÇÃO INTEGRAL DAS DEMAIS FUNÇÕES DO SISTEMA ---
     function abrirSecaoTecnica(secao) {
       document.getElementById('tec-menu-grid').style.display = 'none';
       document.getElementById('tec-painel-historicos').style.display = 'none';
@@ -1917,6 +1960,7 @@
       if (!state.currentUser) return;
       const loteId = document.getElementById('postura-lote-id').value;
       const data = document.getElementById('postura-data').value;
+      const turno = document.getElementById('postura-turno').value;
       const ovosColhidos = parseInt(document.getElementById('postura-ovos-colhidos').value || 0);
       const racaoKg = parseFloat(document.getElementById('postura-racao').value || 0);
       const obs = document.getElementById('postura-obs').value.trim();
@@ -1945,19 +1989,18 @@
       const lote = state.lotesTecnicos.find(l => l.id === loteId);
       if (!lote) return alert('Selecione um lote válido.');
 
-      const avesAtivas = lote.qtdAtual || lote.qtdInicial;
-      const taxaPostura = avesAtivas > 0 ? ((ovosColhidos / avesAtivas) * 100).toFixed(1) : 0;
+      const empresaId = state.currentUser.empresaId;
 
       try {
         await db.collection("producao_zootecnica").add({
-          empresaId: state.currentUser.empresaId,
+          empresaId: empresaId,
           loteId, 
           loteNome: lote.nome, 
           data, 
+          turno,
           ovosColhidos, 
           racaoKg, 
           obs, 
-          taxaPostura: parseFloat(taxaPostura),
           pesagem: {
             qtdAvesPesadas,
             pesosIndividuais,
@@ -1966,10 +2009,22 @@
           criadoEm: new Date()
         });
 
+        const refEstoque = db.collection("estoque_geral").doc(empresaId);
+        const docSnap = await refEstoque.get();
+        let atual = docSnap.exists ? (docSnap.data().qtdOvos || 0) : 0;
+        await refEstoque.set({ qtdOvos: atual + ovosColhidos }, { merge: true });
+
+        await db.collection("producao").add({
+          empresaId: empresaId,
+          qtdOvos: ovosColhidos,
+          dataHora: new Date(),
+          origem: `Zootecnia - ${lote.nome} (${turno})`
+        });
+
         e.target.reset();
         document.getElementById('container-pesagem-individual').innerHTML = '';
         document.getElementById('resultado-peso-medio').style.display = 'none';
-        alert(`Registo efetuado com sucesso! Taxa de Postura: ${taxaPostura}% ${pesoMedio > 0 ? '| Peso Médio: ' + pesoMedio + 'kg' : ''}`);
+        alert(`Registro de postura efetuado com sucesso!\n+${ovosColhidos} ovos adicionados ao Saldo Geral em Estoque.`);
         voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
@@ -1996,7 +2051,7 @@
         await db.collection("lotes_tecnicos").doc(loteId).update({ qtdAtual: novaQtdAtual });
 
         e.target.reset();
-        alert('Mortalidade registada com sucesso e abatida do lote!');
+        alert('Mortalidade registrada com sucesso e abatida do lote!');
         voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
@@ -2019,7 +2074,7 @@
         });
 
         e.target.reset();
-        alert('Vacinação registada com sucesso no histórico sanitário!');
+        alert('Vacinação registrada com sucesso no histórico sanitário!');
         voltarMenuTecnico();
       } catch (err) { alert('Erro: ' + err.message); }
     }
@@ -2122,9 +2177,26 @@
       mortalidadeFiltrada.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
       vacinasFiltradas.sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
 
-      let somaTaxas = 0; let totalOvosPeriodo = 0;
-      posturaFiltrada.forEach(p => { somaTaxas += (p.taxaPostura || 0); totalOvosPeriodo += (p.ovosColhidos || 0); });
-      const mediaTaxa = posturaFiltrada.length > 0 ? (somaTaxas / posturaFiltrada.length).toFixed(1) : 0;
+      let totalOvosPeriodo = 0;
+      posturaFiltrada.forEach(p => { totalOvosPeriodo += (p.ovosColhidos || 0); });
+
+      let somaTaxasDiarias = 0;
+      let diasComRegistro = 0;
+      const datasMap = {};
+      posturaFiltrada.forEach(p => {
+        if (!p.data) return;
+        datasMap[p.data] = (datasMap[p.data] || 0) + (p.ovosColhidos || 0);
+      });
+
+      Object.keys(datasMap).forEach(dKey => {
+        let totalAvesAtivas = state.lotesTecnicos.reduce((acc, l) => acc + (l.qtdAtual || l.qtdInicial || 0), 0);
+        if (totalAvesAtivas > 0) {
+          somaTaxasDiarias += (datasMap[dKey] / totalAvesAtivas) * 100;
+          diasComRegistro++;
+        }
+      });
+
+      const mediaTaxa = diasComRegistro > 0 ? (somaTaxasDiarias / diasComRegistro).toFixed(1) : 0;
 
       document.getElementById('tec-kpi-taxa').innerText = mediaTaxa + '%';
       document.getElementById('tec-kpi-ovos').innerText = totalOvosPeriodo.toLocaleString('pt-BR') + ' ovos';
@@ -2135,7 +2207,7 @@
       const listaVacinasHtml = vacinasFiltradas.length > 0 ? vacinasFiltradas.map(v => {
         const dataFmt = v.data ? new Date(v.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
         return `• [${dataFmt}] Lote: <strong>${v.loteNome || 'Lote'}</strong> — Vacina: <strong>${v.vacinaNome}</strong> (${v.qtdAves} doses/aves)`;
-      }).join('<br>') : '<span style="color:#64748b;">Nenhum registo de vacinação neste período.</span>';
+      }).join('<br>') : '<span style="color:#64748b;">Nenhum registro de vacinação neste período.</span>';
 
       document.getElementById('tec-resumo-vacinas-lista').innerHTML = listaVacinasHtml;
 
@@ -2187,29 +2259,47 @@
       const mesAtual = agora.getMonth();
       const anoAtual = agora.getFullYear();
 
-      const registrosMes = state.historicoPosturaTecnica.filter(h => {
-        if (!h.data) return false;
+      const agrupaPorData = {};
+      state.historicoPosturaTecnica.forEach(h => {
+        if (!h.data) return;
         const d = new Date(h.data + 'T00:00:00');
-        return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+        if (d.getMonth() === mesAtual && d.getFullYear() === anoAtual) {
+          agrupaPorData[h.data] = (agrupaPorData[h.data] || 0) + (h.ovosColhidos || 0);
+        }
       });
 
-      let somaTaxas = 0;
-      registrosMes.forEach(r => somaTaxas += (r.taxaPostura || 0));
-      const mediaMes = registrosMes.length > 0 ? (somaTaxas / registrosMes.length).toFixed(1) : 0;
+      let totalAvesAtivasGlobal = state.lotesTecnicos.reduce((acc, l) => acc + (l.qtdAtual || l.qtdInicial || 0), 0);
+      let somaTaxasDiarias = 0;
+      let diasContados = 0;
+
+      Object.keys(agrupaPorData).forEach(dKey => {
+        if (totalAvesAtivasGlobal > 0) {
+          somaTaxasDiarias += (agrupaPorData[dKey] / totalAvesAtivasGlobal) * 100;
+          diasContados++;
+        }
+      });
+
+      const mediaMes = diasContados > 0 ? (somaTaxasDiarias / diasContados).toFixed(1) : 0;
       if (kpiMediaMensal) kpiMediaMensal.innerText = mediaMes + '%';
 
       if (tabelaHistorico) {
-        tabelaHistorico.innerHTML = state.historicoPosturaTecnica.slice(0, 15).map(h => `
-          <tr>
-            <td>${h.data ? new Date(h.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
-            <td>${h.loteNome || 'Lote'}</td>
-            <td>${h.ovosColhidos} ovos</td>
-            <td>
-              <span class="badge badge-ativo">${h.taxaPostura || 0}%</span>
-              ${h.pesagem && h.pesagem.pesoMedio ? `<br><small style="color:var(--tech);">⚖️ Média: ${h.pesagem.pesoMedio}kg</small>` : ''}
-            </td>
-          </tr>
-        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo.</td></tr>';
+        tabelaHistorico.innerHTML = state.historicoPosturaTecnica.slice(0, 15).map(h => {
+          const loteObj = state.lotesTecnicos.find(l => l.id === h.loteId);
+          const avesLote = loteObj ? (loteObj.qtdAtual || loteObj.qtdInicial) : 0;
+          const taxaIndividual = avesLote > 0 ? ((h.ovosColhidos / avesLote) * 100).toFixed(1) : 0;
+
+          return `
+            <tr>
+              <td>${h.data ? new Date(h.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
+              <td><strong>${h.loteNome || 'Lote'}</strong><br><small style="color:#64748b;">${h.turno || 'Coleta'}</small></td>
+              <td>${h.ovosColhidos} ovos</td>
+              <td>
+                <span class="badge badge-ativo">${taxaIndividual}%</span>
+                ${h.pesagem && h.pesagem.pesoMedio ? `<br><small style="color:var(--tech);">⚖️ Média: ${h.pesagem.pesoMedio}kg</small>` : ''}
+              </td>
+            </tr>
+          `;
+        }).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registro.</td></tr>';
       }
 
       if (tabelaMortalidade) {
@@ -2220,7 +2310,7 @@
             <td><span class="badge badge-pendente">-${m.qtdMortas} aves</span></td>
             <td>${m.motivo || 'Sem obs'}</td>
           </tr>
-        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo de mortalidade.</td></tr>';
+        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registro de mortalidade.</td></tr>';
       }
 
       if (tabelaVacinacao) {
@@ -2231,7 +2321,7 @@
             <td><strong>${v.vacinaNome}</strong></td>
             <td>${v.qtdAves} aves</td>
           </tr>
-        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registo de vacinação.</td></tr>';
+        `).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registro de vacinação.</td></tr>';
       }
     }
 
@@ -2262,7 +2352,7 @@
 
       try {
         await db.collection("empresas").doc(idEmpresa).set({ nome, cnpj, email, tel, end, plano, valorPlano, vencimento, status: "Ativo", criadoEm: new Date() });
-        await db.collection("config").doc(idEmpresa).set({ nome, cnpj, tel, end, social: "", pix: "" });
+        await db.collection("config").doc(idEmpresa).set({ nome, cnpj, tel, end, social: "", pix: "", pixQrCode: "" });
         
         const queryUser = await db.collection("usuarios").where("empresaId", "==", idEmpresa).where("login", "==", adminUser).get();
         if (queryUser.empty) {
@@ -2598,6 +2688,16 @@
       const cnpjEmpresa = emp.cnpj || 'N/I';
       const telEmpresa = emp.tel || 'N/I';
       const endEmpresa = emp.end || 'N/I';
+      const chavePix = emp.pix || '';
+      const qrCodeImg = emp.pixQrCode || '';
+
+      let pixSectionHtml = '';
+      if (chavePix || qrCodeImg) {
+        pixSectionHtml = `<div style="text-align:center; margin-top:4px; padding-top:4px; border-top:1px dashed #cbd5e1;">`;
+        if (chavePix) pixSectionHtml += `<div style="font-size:0.62rem; color:#0f172a;"><strong>PIX:</strong> ${chavePix}</div>`;
+        if (qrCodeImg) pixSectionHtml += `<img src="${qrCodeImg}" class="qr-recibo-img" alt="QR Code Pix">`;
+        pixSectionHtml += `</div>`;
+      }
 
       return `
         <div class="recibo-bloco-metade">
@@ -2611,7 +2711,7 @@
             <hr class="dashed-divider">
             <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
             <div>
-              ${itens.map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
+              ${itens.map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x ${i.nome}</span><span>R$ ${parseFloat(i.subtotal || 0).toFixed(2)}</span></div>`).join('')}
             </div>
           </div>
           <div>
@@ -2621,7 +2721,8 @@
               <span style="color:#2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
             </div>
             <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
+            ${pixSectionHtml}
+            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b; margin-top:3px;">
               <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
             </div>
           </div>
@@ -2633,39 +2734,7 @@
       if (!pedidoSelecionadoModal) return;
       const ped = pedidoSelecionadoModal;
       const emp = state.empresa || {};
-      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
-      const cnpjEmpresa = emp.cnpj || 'N/I';
-      const telEmpresa = emp.tel || 'N/I';
-      const endEmpresa = emp.end || 'N/I';
-
-      let htmlBloco = `
-        <div class="recibo-bloco-metade">
-          <div>
-            <div class="recibo-sheet-header">
-              <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-              <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
-            </div>
-            <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-            <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-            <hr class="dashed-divider">
-            <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
-            <div>
-              ${(ped.itens || []).map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
-            </div>
-          </div>
-          <div>
-            <hr class="dashed-divider">
-            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
-              <span>TOTAL:</span>
-              <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
-            </div>
-            <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-            <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
-              <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
-            </div>
-          </div>
-        </div>
-      `;
+      const htmlBloco = construirHtmlReciboMetade(ped, emp);
       document.getElementById('modal-nota').style.display = 'none';
       abrirJanelaImpressaoOtimizada(htmlBloco);
     }
@@ -2717,6 +2786,7 @@
                 .relatorio-tabela-planilha { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
                 .relatorio-tabela-planilha th { background: #f1f5f9; color: #1e293b; font-weight: 800; padding: 6px; border-bottom: 2px solid #cbd5e1; }
                 .relatorio-tabela-planilha td { padding: 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+                .qr-recibo-img { max-width: 90px; max-height: 90px; display: block; margin: 4px auto; }
               </style>
             </head>
             <body>
@@ -2777,6 +2847,7 @@
             .relatorio-tabela-planilha th { background: #f1f5f9; color: #1e293b; font-weight: 800; padding: 6px; border-bottom: 2px solid #cbd5e1; }
             .relatorio-tabela-planilha td { padding: 6px; border-bottom: 1px solid #e2e8f0; color: #334155; }
             .relatorio-tabela-planilha tr:nth-child(even) { background-color: #f8fafc; }
+            .qr-recibo-img { max-width: 90px; max-height: 90px; display: block; margin: 4px auto; }
           </style>
         </head>
         <body>
@@ -2936,7 +3007,7 @@
         let novoSaldo = atual + qtd;
 
         await refEstoque.set({ qtdOvos: novoSaldo }, { merge: true });
-        await db.collection("producao").add({ empresaId: empresaId, qtdOvos: qtd, dataHora: new Date() });
+        await db.collection("producao").add({ empresaId: empresaId, qtdOvos: qtd, dataHora: new Date(), origem: "Entrada Manual Estoque" });
 
         e.target.reset();
         alert('Produção registrada e estoque atualizado com sucesso!');
@@ -2947,7 +3018,7 @@
       const tbody = document.getElementById('lista-producao-hoje');
       if (!tbody) return;
       const hoje = new Date().toDateString();
-      tbody.innerHTML = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje).map(p => '<tr><td>' + new Date(p.dataHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '</td><td>+ ' + p.qtdOvos + ' ovos</td></tr>').join('');
+      tbody.innerHTML = state.producao.filter(p => new Date(p.dataHora).toDateString() === hoje).map(p => '<tr><td>' + new Date(p.dataHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + '</td><td>+ ' + p.qtdOvos + ' ovos (' + (p.origem || 'Coleta') + ')</td></tr>').join('');
     }
 
     function abrirModalBalanco() {
@@ -2977,9 +3048,18 @@
 
     async function salvarEmpresa(e) {
       e.preventDefault();
-      const dados = { nome: document.getElementById('emp-nome').value.trim(), cnpj: document.getElementById('emp-cnpj').value.trim(), tel: document.getElementById('emp-tel').value.trim(), end: document.getElementById('emp-end').value.trim(), social: document.getElementById('emp-social').value.trim(), pix: document.getElementById('emp-pix').value.trim() };
+      const dados = { 
+        nome: document.getElementById('emp-nome').value.trim(), 
+        cnpj: document.getElementById('emp-cnpj').value.trim(), 
+        tel: document.getElementById('emp-tel').value.trim(), 
+        end: document.getElementById('emp-end').value.trim(), 
+        social: document.getElementById('emp-social').value.trim(), 
+        pix: document.getElementById('emp-pix').value.trim(),
+        pixQrCode: tempQrBase64 || ""
+      };
       await db.collection("config").doc(state.currentUser.empresaId).set(dados, { merge: true });
-      state.empresa = dados; alert('Dados da empresa salvos com sucesso!');
+      state.empresa = dados; 
+      alert('Dados da empresa salvos com sucesso!');
     }
 
     function abrirModalNota(pedidoOuId) {
@@ -2987,35 +3067,9 @@
       if (!ped) return;
       pedidoSelecionadoModal = ped;
       const emp = state.empresa || {};
-      const nomeEmpresa = emp.nome || 'HAPPY EGGS';
-      const cnpjEmpresa = emp.cnpj || 'N/I';
-      const telEmpresa = emp.tel || 'N/I';
-      const endEmpresa = emp.end || 'N/I';
+      const htmlBloco = construirHtmlReciboMetade(ped, emp);
 
-      document.getElementById('printable-receipt').innerHTML = `
-        <div>
-          <div class="recibo-sheet-header">
-            <h3 style="font-size:0.8rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-            <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
-          </div>
-          <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome}</div>
-          <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
-          <hr class="dashed-divider">
-          <div style="font-size:0.6rem; font-weight:800; color:#64748b; text-transform:uppercase; margin-bottom:1px;">ITENS DO PEDIDO</div>
-          <div>
-            ${(ped.itens || []).map(i => `<div class="item-linha-zebrado"><span>${i.qtd}x${i.nome}</span><span>R$ ${parseFloat(i.subtotal).toFixed(2)}</span></div>`).join('')}
-          </div>
-          <hr class="dashed-divider">
-          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.8rem; color:#0f172a; margin-bottom:2px;">
-            <span>TOTAL:</span>
-            <span style="color:#2563eb;">R$ ${parseFloat(ped.total).toFixed(2)}</span>
-          </div>
-          <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
-          <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b;">
-            <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
-          </div>
-        </div>
-      `;
+      document.getElementById('printable-receipt').innerHTML = htmlBloco;
       document.getElementById('modal-nota').style.display = 'flex';
     }
 
