@@ -207,25 +207,6 @@
     
     .qr-code-preview { max-width: 130px; max-height: 130px; margin-top: 8px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 4px; display: block; }
     .qr-recibo-img { max-width: 90px; max-height: 90px; display: block; margin: 4px auto; }
-
-    /* REGRAS EXCLUSIVAS DE LAYOUT MOBILE PARA RECIBOS */
-    @media screen and (max-width: 600px) {
-      .recibo-bloco-metade {
-        padding: 8px !important;
-        font-size: 0.85rem !important;
-      }
-      .recibo-bloco-metade * {
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
-      }
-      .recibo-sheet-header h3 {
-        font-size: 0.7rem !important;
-      }
-      .item-linha-zebrado {
-        font-size: 0.78rem !important;
-        padding: 6px 4px !important;
-      }
-    }
   </style>
 </head>
 <body>
@@ -239,7 +220,7 @@
     </div>
   </header>
 
-  <!-- ABAS FIXAS NO TOPO -->
+  <!-- ABAS FIXAS NO TOPO (FINANCEIRO vs TÉCNICO vs RH) -->
   <nav class="top-nav-tabs" id="top-nav-container" style="display:none;">
     <button class="top-tab-btn active" id="tab-btn-financeiro" type="button" onclick="mudarAbaTopo('financeiro')">💰 VENDAS</button>
     <button class="top-tab-btn tech-tab admin-or-tech" id="tab-btn-tecnico" type="button" onclick="mudarAbaTopo('tecnico')">📊 ZOOTECNIA</button>
@@ -346,11 +327,7 @@
         <button class="grid-btn admin-only" type="button" onclick="navToSub('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navToSub('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navToSub('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
-        
-        <!-- BOTÃO DEDICADO À SAÍDA DE DESPESAS -->
-        <button class="grid-btn full-width" type="button" style="background: linear-gradient(145deg, #b91c1c, #991b1b);" onclick="abrirModalDespesa()"><span class="icon">💸</span><span class="label">REGISTRAR SAÍDA / DESPESA</span></button>
-        
-        <button class="grid-btn full-width admin-only" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">📈</span><span class="label">RELATÓRIO DE VENDAS & CAIXA</span></button>
+        <button class="grid-btn full-width admin-only" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">📈</span><span class="label">RELATÓRIO DE VENDAS</span></button>
       </div>
       <div class="card" style="margin-top: 15px;">
         <div class="card-header">
@@ -396,12 +373,11 @@
           <div class="form-group"><label>Selecione o Lote</label><select id="postura-lote-id" required></select></div>
           <div class="form-group"><label>Data da Coleta</label><input type="date" id="postura-data" required></div>
           <div class="form-group">
-            <label>Turno / Momento da Coleta</label>
+            <label>Turno / Horário da Coleta</label>
             <select id="postura-turno" required>
-              <option value="1ª Coleta (Manhã)">1ª Coleta (Manhã - Acumula sem fechar taxa)</option>
-              <option value="2ª Coleta (Tarde)">2ª Coleta (Tarde - Acumula sem fechar taxa)</option>
-              <option value="3ª Coleta (Final de Tarde)">3ª Coleta (Final de Tarde - Acumula sem fechar taxa)</option>
-              <option value="Coleta Final / Consolidado do Dia">✨ Coleta Final / Consolidado do Dia (Soma todas e fecha a taxa)</option>
+              <option value="1ª Coleta (Manhã)">1ª Coleta (Manhã)</option>
+              <option value="2ª Coleta (Tarde)">2ª Coleta (Tarde)</option>
+              <option value="3ª Coleta (Final de Tarde)">3ª Coleta (Final de Tarde)</option>
               <option value="Coleta Única">Coleta Única Consolidada</option>
             </select>
           </div>
@@ -456,15 +432,15 @@
           <tbody id="lista-lotes-tecnicos"></tbody>
         </table>
 
-        <!-- MENU COLAPSÁVEL DE HISTÓRICOS TÉCNICOS PARA ECONOMIZAR ESPAÇO -->
+        <!-- MENU COLAPSÁVEL DE HISTÓRICOS TÉCNICOS PARA EVITAR TELA LONGA -->
         <div style="margin-top: 15px;">
           <button class="btn" type="button" style="background:#0d9488; font-size:0.8rem; padding:10px;" onclick="toggleHistoricosZootecnia()" id="btn-toggle-hist-tec">📂 Ver / Ocultar Históricos Detalhados (Postura, Mortalidade, Vacinas)</button>
         </div>
 
         <div id="container-historicos-detalhados" style="display:none; margin-top:10px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Histórico de Postura Consolidada & Turnos</div>
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Histórico de Postura Diária Consolidada & Coletas</div>
           <table>
-            <thead><tr><th>Data</th><th>Lote / Detalhe</th><th>Ovos</th><th>Taxa Postura</th></tr></thead>
+            <thead><tr><th>Data</th><th>Lote / Turno</th><th>Ovos</th><th>Taxa Diária</th></tr></thead>
             <tbody id="lista-historico-postura"></tbody>
           </table>
 
@@ -650,7 +626,7 @@
             <div style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); margin-bottom: 6px;">🛒 ITENS SELECIONADOS:</div>
             <div id="itens-pedido-lista"><div style="font-size:0.8rem; color:#64748b; text-align:center; padding:10px;">Nenhum produto adicionado.</div></div>
             
-            <!-- CAMPO DE DESCONTO PARA OVOS PEQUENOS OU CONDIÇÕES ESPECIAIS -->
+            <!-- CAMPO DE DESCONTO -->
             <div style="margin-top: 12px; border-top: 1px dashed #cbd5e1; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
               <div style="flex: 1; font-size: 0.85rem; font-weight: 700; color: #b45309;">🏷️ Desconto Aplicado (R$):</div>
               <input type="number" step="0.01" id="ped-desconto-val" min="0" value="0.00" oninput="renderCarrinho()" style="width: 120px; padding: 6px; text-align: right; font-weight: bold; color: #b45309;">
@@ -681,27 +657,15 @@
       </div>
 
       <div class="card">
-        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-          <div class="card-title">Histórico de Pedidos & Buscador</div>
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="card-title">Histórico de Pedidos Sequencial</div>
           <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">🖨️ Imprimir Recibos</button>
         </div>
-
-        <!-- BUSCADOR PRÓPRIO DE RECIBOS E PEDIDOS -->
-        <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:10px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">🔍 Buscador de Pedidos / Recibos (Data ou Cliente)</div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <input type="text" id="filtro-busca-texto" placeholder="Nome do cliente ou nº..." oninput="renderPedidos()" style="flex:1; min-width:140px; padding:8px; font-size:0.85rem;">
-            <input type="date" id="filtro-busca-data" onchange="renderPedidos()" style="width:130px; padding:8px; font-size:0.85rem;">
-            <button type="button" class="btn" style="width:auto; padding:8px 12px; font-size:0.8rem; background:#475569;" onclick="limparFiltroBuscaPedidos()">Limpar</button>
-          </div>
-          <small style="color:#64748b; font-size:0.7rem; display:block; margin-top:4px;">* Por padrão, exibe apenas os pedidos de hoje. Use a busca acima para encontrar recibos anteriores.</small>
-        </div>
-
         <table>
           <thead>
             <tr>
               <th style="width: 30px;"><input type="checkbox" id="check-todos-pedidos" onclick="alternarTodosPedidos(this)"></th>
-              <th># / Data</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th>
+              <th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th>
             </tr>
           </thead>
           <tbody id="lista-pedidos"></tbody>
@@ -828,32 +792,6 @@
     </div>
   </main>
 
-  <!-- MODAL: REGISTRAR DESPESA / SAÍDA -->
-  <div class="modal" id="modal-despesa">
-    <div class="modal-content" style="max-width: 400px;">
-      <div class="card-title" style="margin-bottom: 12px; color: #b91c1c;">💸 Registrar Saída / Despesa</div>
-      <form onsubmit="salvarDespesaFinanceira(event)">
-        <div class="form-group"><label>Data da Despesa</label><input type="date" id="desp-data" required></div>
-        <div class="form-group"><label>Categoria</label>
-          <select id="desp-categoria" required>
-            <option value="Ração">🌽 Ração / Alimentação</option>
-            <option value="Embalagens">📦 Embalagens / Caixas / Cartelas</option>
-            <option value="Combustível">⛽ Combustível / Frete</option>
-            <option value="Manutenção">🔧 Manutenção / Equipamentos</option>
-            <option value="Sanidade">💉 Medicamentos / Vacinas / Sanidade</option>
-            <option value="Outros">🏷️ Outras Despesas</option>
-          </select>
-        </div>
-        <div class="form-group"><label>Valor (R$)</label><input type="number" step="0.01" id="desp-valor" placeholder="Ex: 350.00" required></div>
-        <div class="form-group"><label>Descrição / Observação</label><input type="text" id="desp-obs" placeholder="Ex: Compra de 10 sacos de ração" required></div>
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-          <button type="submit" class="btn" style="background: #b91c1c;">Salvar Despesa</button>
-          <button type="button" class="btn" style="background: #64748b;" onclick="document.getElementById('modal-despesa').style.display='none'">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- MODAL: RECIBO DE PAGAMENTO DE COLABORADOR (RH) -->
   <div class="modal" id="modal-recibo-rh">
     <div class="modal-content" style="max-width: 520px;">
@@ -866,7 +804,7 @@
     </div>
   </div>
 
-  <!-- DEMAIS MODAIS -->
+  <!-- DEMAIS MODAIS MANUTIDOS INTEGRALMENTE -->
   <div class="modal" id="modal-relatorio-tecnico">
     <div class="modal-content" style="max-width: 520px;">
       <div class="card-title" style="margin-bottom:12px;">📊 Relatório Geral Técnico (Zootecnia)</div>
@@ -1046,7 +984,7 @@
 
   <div class="modal" id="modal-resumo">
     <div class="modal-content" style="max-width: 520px;">
-      <div class="card-title" style="margin-bottom:12px;">📊 Relatório Financeiro & Faturamento</div>
+      <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
       <div class="form-group">
         <label>Filtrar Período</label>
         <select id="filtro-periodo" onchange="atualizarFiltroRelatorio()">
@@ -1064,25 +1002,16 @@
 
       <div id="area-relatorio-impressao" class="relatorio-sheet-box">
         <div class="relatorio-sheet-header">
-          <h3>Relatório Financeiro</h3>
+          <h3>Relatório de Vendas</h3>
           <span style="font-size: 0.75rem; font-weight: 600; opacity: 0.9;" id="relatorio-data-emissao"></span>
         </div>
         <div class="relatorio-kpi-grid">
-          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Total Entradas (Vendas)</div><div class="relatorio-kpi-val" id="resumo-total-periodo" style="color: #2563eb;">R$ 0,00</div></div>
-          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Total Saídas (Despesas)</div><div class="relatorio-kpi-val" id="resumo-total-despesas" style="color: #b91c1c;">R$ 0,00</div></div>
+          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Total Faturado</div><div class="relatorio-kpi-val" id="resumo-total-periodo" style="color: #2563eb;">R$ 0,00</div></div>
+          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Nº de Pedidos</div><div class="relatorio-kpi-val" id="resumo-qtd-pedidos">0</div></div>
         </div>
-        
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #10b981; padding: 10px; border-radius: 6px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
-          <div style="font-size: 0.75rem; color: #64748b; font-weight: 800; text-transform: uppercase;">Lucro Líquido no Período</div>
-          <div style="font-size: 1.2rem; font-weight: 800; color: #10b981;" id="resumo-lucro-liquido">R$ 0,00</div>
-        </div>
-
         <div class="relatorio-section-box">
           <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Recebimento por Forma de Pagamento</div>
-          <div id="resumo-detalhe-formas" style="line-height: 1.4; color: #1e293b; margin-bottom:8px;"></div>
-
-          <div style="font-size: 0.7rem; font-weight: 800; color: #b91c1c; text-transform: uppercase; margin-bottom: 4px; border-top:1px dashed #cbd5e1; padding-top:6px;">Despesas Registradas no Período</div>
-          <div id="resumo-detalhe-despesas" style="line-height: 1.4; color: #1e293b;"></div>
+          <div id="resumo-detalhe-formas" style="line-height: 1.4; color: #1e293b;"></div>
         </div>
         <div>
           <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Vendas Listadas no Período</div>
@@ -1132,7 +1061,7 @@
     let state = {
       usuarios: [], empresasSaaS: [], todosUsuariosSaaS: [],
       empresa: { nome: "Granja UK", cnpj: "", tel: "", end: "", social: "", pix: "", pixQrCode: "" },
-      produtos: [], clientes: [], pedidos: [], despesas: [], producao: [], estoqueGeralOvos: 0,
+      produtos: [], clientes: [], pedidos: [], producao: [], estoqueGeralOvos: 0,
       lotesTecnicos: [], historicoPosturaTecnica: [], historicoMortalidade: [], historicoVacinacao: [],
       colaboradores: [], valesHistorico: [], statusPagamentosRh: [], recibosHistorico: [],
       currentUser: null, pedidoAtual: null, listenersUnsubscribe: []
@@ -1263,9 +1192,6 @@
         }).sort((a, b) => (b.numeroPedido || 0) - (a.numeroPedido || 0));
         render();
       });
-      const unsubDespesas = db.collection("despesas").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
-        state.despesas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      });
       const unsubProducao = db.collection("producao").where("empresaId", "==", empresaId).orderBy("dataHora", "desc").limit(50).onSnapshot(snapshot => {
         state.producao = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderProducaoHoje();
@@ -1333,33 +1259,7 @@
         renderRhPainel();
       });
 
-      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubDespesas, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao, unsubColaboradores, unsubVales, unsubStatusPagRh, unsubRecibosRh);
-    }
-
-    function abrirModalDespesa() {
-      const hoje = new Date().toISOString().split('T')[0];
-      const dataInput = document.getElementById('desp-data');
-      if (dataInput) dataInput.value = hoje;
-      document.getElementById('modal-despesa').style.display = 'flex';
-    }
-
-    async function salvarDespesaFinanceira(e) {
-      e.preventDefault();
-      if (!state.currentUser) return;
-      const data = document.getElementById('desp-data').value;
-      const categoria = document.getElementById('desp-categoria').value;
-      const valor = parseFloat(document.getElementById('desp-valor').value || 0);
-      const obs = document.getElementById('desp-obs').value.trim();
-
-      try {
-        await db.collection("despesas").add({
-          empresaId: state.currentUser.empresaId,
-          data, categoria, valor, obs, criadoEm: new Date()
-        });
-        e.target.reset();
-        document.getElementById('modal-despesa').style.display = 'none';
-        alert('Saída / Despesa registrada com sucesso!');
-      } catch (err) { alert('Erro ao registrar despesa: ' + err.message); }
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao, unsubColaboradores, unsubVales, unsubStatusPagRh, unsubRecibosRh);
     }
 
     function previewQrCodePix(event) {
@@ -2410,23 +2310,7 @@
         tabelaHistorico.innerHTML = state.historicoPosturaTecnica.slice(0, 15).map(h => {
           const loteObj = state.lotesTecnicos.find(l => l.id === h.loteId);
           const avesLote = loteObj ? (loteObj.qtdAtual || loteObj.qtdInicial) : 0;
-          
-          const isConsolidadoFinal = h.turno && (h.turno.includes('Consolidado') || h.turno.includes('Final') || h.turno.includes('Única'));
-          let taxaIndividual = '---';
-          let badgeSt = 'badge-pendente';
-          let textoBadge = 'Em andamento (parcial)';
-
-          if (isConsolidadoFinal || avesLote > 0) {
-            let somaOvosDoDia = h.ovosColhidos;
-            if (!isConsolidadoFinal) {
-              somaOvosDoDia = state.historicoPosturaTecnica
-                .filter(x => x.data === h.data && x.loteId === h.loteId)
-                .reduce((acc, curr) => acc + (curr.ovosColhidos || 0), 0);
-            }
-            taxaIndividual = avesLote > 0 ? ((somaOvosDoDia / avesLote) * 100).toFixed(1) + '%' : '0%';
-            badgeSt = isConsolidadoFinal ? 'badge-ativo' : 'badge-descontado';
-            textoBadge = isConsolidadoFinal ? 'Consolidado (Taxa Fechada)' : 'Soma dos turnos';
-          }
+          const taxaIndividual = avesLote > 0 ? ((h.ovosColhidos / avesLote) * 100).toFixed(1) : 0;
 
           return `
             <tr>
@@ -2434,8 +2318,7 @@
               <td><strong>${h.loteNome || 'Lote'}</strong><br><small style="color:#64748b;">${h.turno || 'Coleta'}</small></td>
               <td>${h.ovosColhidos} ovos</td>
               <td>
-                <span class="badge ${badgeSt}">${taxaIndividual}</span><br>
-                <small style="color:var(--text-muted);">${textoBadge}</small>
+                <span class="badge badge-ativo">${taxaIndividual}%</span>
                 ${h.pesagem && h.pesagem.pesoMedio ? `<br><small style="color:var(--tech);">⚖️ Média: ${h.pesagem.pesoMedio}kg</small>` : ''}
               </td>
             </tr>
@@ -2734,51 +2617,10 @@
       }
     }
 
-    function limparFiltroBuscaPedidos() {
-      const txt = document.getElementById('filtro-busca-texto');
-      const dat = document.getElementById('filtro-busca-data');
-      if (txt) txt.value = '';
-      if (dat) dat.value = '';
-      renderPedidos();
-    }
-
     function renderPedidos() {
       const tbody = document.getElementById('lista-pedidos');
       if (!tbody) return;
-
-      const txtBusca = (document.getElementById('filtro-busca-texto')?.value || '').toLowerCase().trim();
-      const dataBusca = document.getElementById('filtro-busca-data')?.value || '';
-
-      let pedidosFiltrados = state.pedidos;
-
-      if (txtBusca || dataBusca) {
-        pedidosFiltrados = state.pedidos.filter(p => {
-          const nomeCliente = (p.clienteNome || '').toLowerCase();
-          const numPed = String(p.numeroPedido || '');
-          const matchTexto = !txtBusca || nomeCliente.includes(txtBusca) || numPed.includes(txtBusca);
-
-          let matchData = true;
-          if (dataBusca && p.dataCriacao) {
-            const dataPedStr = new Date(p.dataCriacao).toISOString().split('T')[0];
-            matchData = (dataPedStr === dataBusca);
-          }
-          return matchTexto && matchData;
-        });
-      } else {
-        const hojeStr = new Date().toISOString().split('T')[0];
-        pedidosFiltrados = state.pedidos.filter(p => {
-          if (!p.dataCriacao) return false;
-          const dataPedStr = new Date(p.dataCriacao).toISOString().split('T')[0];
-          return dataPedStr === hojeStr;
-        });
-      }
-
-      if (pedidosFiltrados.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:15px;">Nenhum pedido encontrado ${txtBusca || dataBusca ? 'com esses critérios de busca' : 'para hoje (utilize o buscador acima para pesquisar datas anteriores)'}.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = pedidosFiltrados.map(p => {
+      tbody.innerHTML = state.pedidos.map(p => {
         const isPago = p.status === 'Pago';
         const isFinalizado = p.status === 'Finalizado';
         
@@ -2787,12 +2629,10 @@
         if (isFinalizado) { badgeClass = 'badge-finalizado'; badgeLabel = '🟦 Finalizado'; }
         else if (isPago) { badgeClass = 'badge-pago'; badgeLabel = '🟢 Pago'; }
 
-        const dataVendaFmt = p.dataCriacao ? new Date(p.dataCriacao).toLocaleDateString('pt-BR') : '---';
-
         return `
           <tr>
             <td><input type="checkbox" class="check-pedido" data-id="${p.id}" value="${p.id}"></td>
-            <td><strong>#${p.numeroPedido || '---'}</strong><br><small style="color:#64748b;">${dataVendaFmt}</small></td>
+            <td><strong>#${p.numeroPedido || '---'}</strong></td>
             <td>${p.clienteNome || 'Cliente'}</td>
             <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
             <td><span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">${badgeLabel}</span></td>
@@ -2875,8 +2715,6 @@
       const chavePix = emp.pix || '';
       const qrCodeImg = emp.pixQrCode || '';
 
-      const dataVendaFmt = ped.dataCriacao ? new Date(ped.dataCriacao).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
-
       let pixSectionHtml = '';
       if (chavePix || qrCodeImg) {
         pixSectionHtml = `<div style="text-align:center; margin-top:4px; padding-top:4px; border-top:1px dashed #cbd5e1;">`;
@@ -2895,7 +2733,7 @@
           <div>
             <div class="recibo-sheet-header">
               <h3 style="font-size:0.75rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
-              <span style="font-size:0.7rem; font-weight:600;">Data: ${dataVendaFmt}</span>
+              <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
             </div>
             <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
             <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
@@ -2912,7 +2750,7 @@
               <span>TOTAL FINAL:</span>
               <span style="color:#2563eb;">R$ ${parseFloat(ped.total || 0).toFixed(2)}</span>
             </div>
-            <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Data/Venda:</strong> ${dataVendaFmt} | <strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
+            <div style="font-size:0.65rem; color:#475569; margin-bottom:2px;"><strong>Pgto:</strong> ${ped.formaPgto || 'Pix'} | <strong>Status:</strong> ${ped.status || 'Pendente'}</div>
             ${pixSectionHtml}
             <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding-top:2px; text-align:center; font-size:0.6rem; color:#64748b; margin-top:3px;">
               <strong>${nomeEmpresa}</strong> | CNPJ: ${cnpjEmpresa} | Tel: ${telEmpresa} | ${endEmpresa}
@@ -3277,7 +3115,7 @@
     async function salvarBalancoEstoque(e) {
       e.preventDefault();
       const novaQtd = parseInt(document.getElementById('balanco-nova-qtd').value);
-      const motivo = document.getElementById('balanco-motivo'].value.trim();
+      const motivo = document.getElementById('balanco-motivo').value.trim();
       if (isNaN(novaQtd) || novaQtd < 0) return alert('Quantidade inválida.');
 
       try {
@@ -3318,7 +3156,7 @@
     function exportarRelatorioExcel() {
       let csv = "Pedido;Data;Cliente;Total;Status\n";
       state.pedidos.forEach(p => {
-        csv += "#" + (p.numeroPedido || '') + ";" + new Date(p.dataCriacao).toLocaleDateString('pt-BR') + ";\"" + (p.clienteNome || '') + "\";R$ " + (p.total || 0).toFixed(2).replace('.', ',') + ";" + (p.status || '') + "\n";
+        csv += "#" + (p.numeroPedido || '') + ";" + p.dataCriacao.toLocaleDateString('pt-BR') + ";\"" + (p.clienteNome || '') + "\";R$ " + (p.total || 0).toFixed(2).replace('.', ',') + ";" + (p.status || '') + "\n";
       });
       const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
@@ -3343,7 +3181,6 @@
       const tipo = document.getElementById('filtro-periodo').value;
       const agora = new Date();
       let pedidosFiltrados = state.pedidos;
-      let despesasFiltradas = state.despesas;
       document.getElementById('relatorio-data-emissao').innerText = "Emitido em: " + agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
       if (tipo === 'hoje') {
@@ -3351,24 +3188,17 @@
           const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
           return d.toDateString() === agora.toDateString();
         });
-        const hojeStr = agora.toISOString().split('T')[0];
-        despesasFiltradas = state.despesas.filter(d => d.data === hojeStr);
       } else if (tipo === 'semana') {
         const limite = new Date(); limite.setDate(agora.getDate() - 7); limite.setHours(0,0,0,0);
         pedidosFiltrados = state.pedidos.filter(p => {
           const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
           return d >= limite;
         });
-        const limiteStr = limite.toISOString().split('T')[0];
-        const hojeStr = agora.toISOString().split('T')[0];
-        despesasFiltradas = state.despesas.filter(d => d.data >= limiteStr && d.data <= hojeStr);
       } else if (tipo === 'mes') {
         pedidosFiltrados = state.pedidos.filter(p => {
           const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
           return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
         });
-        const mesAtualStr = agora.toISOString().slice(0, 7);
-        despesasFiltradas = state.despesas.filter(d => (d.data || '').startsWith(mesAtualStr));
       } else if (tipo === 'personalizado') {
         const dataInicio = document.getElementById('data-inicio').value;
         const dataFim = document.getElementById('data-fim').value;
@@ -3379,31 +3209,18 @@
             const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
             return d >= ini && d <= fim;
           });
-          despesasFiltradas = state.despesas.filter(d => d.data >= dataInicio && d.data <= dataFim);
         } else {
-          pedidosFiltrados = []; despesasFiltradas = [];
+          pedidosFiltrados = [];
         }
       }
 
-      const totalEntradas = pedidosFiltrados.reduce((acc, p) => acc + (parseFloat(p.total) || 0), 0);
-      const totalDespesas = despesasFiltradas.reduce((acc, d) => acc + (parseFloat(d.valor) || 0), 0);
-      const lucroLiquido = totalEntradas - totalDespesas;
-
-      document.getElementById('resumo-total-periodo').innerText = "R$ " + totalEntradas.toFixed(2);
-      document.getElementById('resumo-total-despesas').innerText = "R$ " + totalDespesas.toFixed(2);
-      
-      const lucroEl = document.getElementById('resumo-lucro-liquido');
-      lucroEl.innerText = "R$ " + lucroLiquido.toFixed(2);
-      lucroEl.style.color = lucroLiquido >= 0 ? '#10b981' : '#ef4444';
+      const totalPeriodo = pedidosFiltrados.reduce((acc, p) => acc + (parseFloat(p.total) || 0), 0);
+      document.getElementById('resumo-total-periodo').innerText = "R$ " + totalPeriodo.toFixed(2);
+      document.getElementById('resumo-qtd-pedidos').innerText = pedidosFiltrados.length;
 
       const formas = {};
       pedidosFiltrados.forEach(p => { const pgto = p.formaPgto || 'Outros'; formas[pgto] = (formas[pgto] || 0) + (parseFloat(p.total) || 0); });
-      document.getElementById('resumo-detalhe-formas').innerHTML = Object.keys(formas).map(f => "• " + f + ": <strong>R$ " + formas[f].toFixed(2) + "</strong>").join('<br>') || 'Nenhuma venda no período.';
-
-      document.getElementById('resumo-detalhe-despesas').innerHTML = despesasFiltradas.map(d => {
-        const dataFmt = d.data ? new Date(d.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---';
-        return `• [${dataFmt}] <strong>${d.categoria}</strong> (${d.obs}): <span style="color:#b91c1c;">- R$ ${(d.valor || 0).toFixed(2)}</span>`;
-      }).join('<br>') || '<span style="color:#64748b;">Nenhuma despesa registrada no período.</span>';
+      document.getElementById('resumo-detalhe-formas').innerHTML = Object.keys(formas).map(f => "• " + f + ": <strong>R$ " + formas[f].toFixed(2) + "</strong>").join('<br>') || 'Nenhum registro no período.';
 
       document.getElementById('resumo-tabela-periodo').innerHTML = pedidosFiltrados.length > 0 ? pedidosFiltrados.map(p => `
         <tr><td>#${p.numeroPedido || '---'}</td><td>${new Date(p.dataCriacao).toLocaleDateString('pt-BR')}</td><td>${p.clienteNome || 'Cliente'}</td><td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td><td>${p.status || 'Pendente'}</td></tr>
