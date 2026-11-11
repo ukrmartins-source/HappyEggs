@@ -74,13 +74,14 @@
     .grid-btn .icon { font-size: 2rem; }
     .grid-btn .label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
     .grid-btn.full-width { grid-column: span 2; background: linear-gradient(145deg, #2563eb, #1d4ed8); border-color: var(--accent-light); }
+    .grid-btn.danger-full { grid-column: span 2; background: linear-gradient(145deg, #ef4444, #dc2626); border-color: #f87171; }
     .grid-btn.tech-btn { grid-column: span 2; background: linear-gradient(145deg, #0d9488, #115e59); border-color: #2dd4bf; }
     .grid-btn.rh-btn { grid-column: span 2; background: linear-gradient(145deg, #6d28d9, #4c1d95); border-color: #a78bfa; }
     .grid-btn.tech-action { background: linear-gradient(145deg, #334155, #1e293b); }
     .grid-btn.danger-action { background: linear-gradient(145deg, #7f1d1d, #450a0a); border-color: #f87171; }
 
     .card { background: white; border-radius: 12px; padding: 18px; border: 1px solid var(--border); margin-bottom: 15px; box-shadow: 0 2px 8px rgba(15,23,42,0.05); }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; flex-wrap: wrap; gap: 8px; }
     .card-title { font-size: 1rem; font-weight: 700; color: var(--primary-dark); display: flex; align-items: center; gap: 6px; }
     
     .form-group { margin-bottom: 12px; text-align: left; }
@@ -114,8 +115,8 @@
     th, td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #e2e8f0; word-break: break-word; }
     th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
 
-    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; }
-    .modal-content { background: white; width: 92%; max-width: 480px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15,23,42,0.85); align-items: center; justify-content: center; z-index: 1000; padding: 10px; }
+    .modal-content { background: white; width: 100%; max-width: 480px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
     
     .receipt-box { 
       background: #ffffff; 
@@ -153,6 +154,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .dashed-divider { border: none; border-top: 1px dashed #cbd5e1; margin: 6px 0; }
@@ -193,6 +195,7 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 3px solid #2563eb;
+      flex-wrap: wrap;
     }
     .relatorio-sheet-header h3 { font-size: 0.95rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
     .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
@@ -207,6 +210,14 @@
     
     .qr-code-preview { max-width: 130px; max-height: 130px; margin-top: 8px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 4px; display: block; }
     .qr-recibo-img { max-width: 90px; max-height: 90px; display: block; margin: 4px auto; }
+
+    @media (max-width: 600px) {
+      main { padding: 0 8px; margin: 10px auto; }
+      .card { padding: 12px; }
+      .relatorio-kpi-grid { grid-template-columns: 1fr; }
+      .modal-content { padding: 14px; }
+      th, td { font-size: 0.78rem; padding: 8px 4px; }
+    }
   </style>
 </head>
 <body>
@@ -323,11 +334,12 @@
     <div id="view-financeiro" class="view-content" style="display:none;">
       <div class="grid-menu">
         <button class="grid-btn full-width" type="button" onclick="navToSub('pedidos')"><span class="icon">🛒</span><span class="label">NOVO PEDIDO / VENDAS</span></button>
+        <button class="grid-btn danger-full" type="button" onclick="abrirModalDespesa()"><span class="icon">💸</span><span class="label">REGISTRAR DESPESA / SAÍDA</span></button>
         <button class="grid-btn" type="button" onclick="navToSub('clientes')"><span class="icon">👥</span><span class="label">CLIENTES</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navToSub('produtos')"><span class="icon">📦</span><span class="label">ESTOQUE</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navToSub('usuarios')"><span class="icon">🔑</span><span class="label">USUÁRIOS</span></button>
         <button class="grid-btn admin-only" type="button" onclick="navToSub('empresa')"><span class="icon">⚙️</span><span class="label">EMPRESA</span></button>
-        <button class="grid-btn full-width admin-only" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">📈</span><span class="label">RELATÓRIO DE VENDAS</span></button>
+        <button class="grid-btn full-width admin-only" type="button" style="background: linear-gradient(145deg, #0f172a, #1e293b);" onclick="abrirResumoVendas()"><span class="icon">📈</span><span class="label">RELATÓRIO DE VENDAS & FLUXO</span></button>
       </div>
       <div class="card" style="margin-top: 15px;">
         <div class="card-header">
@@ -423,7 +435,7 @@
       <div class="card" id="tec-painel-historicos">
         <div class="card-title">Indicadores Zootécnicos & Histórico Geral</div>
         <div style="margin-top: 10px; font-size: 0.85rem; background: #f8fafc; padding: 10px; border-radius: 8px; border:1px solid #e2e8f0; margin-bottom: 10px;">
-          <div>📊 <strong>Média de Postura Diária (Mês Atual):</strong> <span id="kpi-media-mensal" style="color:var(--tech); font-weight:bold;">0%</span></div>
+          <div>📊 <strong>Média de Postura Diária Consolidada (Mês Atual):</strong> <span id="kpi-media-mensal" style="color:var(--tech); font-weight:bold;">0%</span></div>
         </div>
 
         <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Lotes Alojados Atualmente</div>
@@ -438,9 +450,9 @@
         </div>
 
         <div id="container-historicos-detalhados" style="display:none; margin-top:10px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Histórico de Postura Diária Consolidada & Coletas</div>
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase; margin-top:10px;">Histórico de Postura Diária Consolidada</div>
           <table>
-            <thead><tr><th>Data</th><th>Lote / Turno</th><th>Ovos</th><th>Taxa Diária</th></tr></thead>
+            <thead><tr><th>Data</th><th>Lote</th><th>Ovos (Total Dia)</th><th>Taxa Diária</th></tr></thead>
             <tbody id="lista-historico-postura"></tbody>
           </table>
 
@@ -656,16 +668,40 @@
         </form>
       </div>
 
+      <!-- HISTÓRICO E BUSCADOR DEDICADO DE PEDIDOS DO DIA -->
       <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-          <div class="card-title">Histórico de Pedidos Sequencial</div>
-          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">🖨️ Imprimir Recibos</button>
+          <div class="card-title">🔍 Buscador & Recibos de Pedidos</div>
+          <button class="btn" type="button" style="width:auto; background:#2563eb; padding:6px 12px; font-size:0.8rem;" onclick="preVisualizarRecibosSelecionados()">🖨️ Imprimir Selecionados</button>
         </div>
+        
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:10px; border-radius:8px; margin-bottom:12px;">
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); margin-bottom:6px;">FILTRAR BUSCA DE RECIBOS</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <select id="pedidos-filtro-tempo" onchange="atualizarFiltroPedidosLista()">
+                <option value="hoje">Apenas Hoje (Padrão)</option>
+                <option value="mes">Todo este Mês</option>
+                <option value="semana">Últimos 7 Dias</option>
+                <option value="todos">Todos os Pedidos</option>
+                <option value="personalizado">Período Personalizado</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <input type="text" id="pedidos-busca-nome" placeholder="🔍 Cliente / Nº Pedido..." oninput="renderPedidos()">
+            </div>
+          </div>
+          <div id="container-datas-pedidos-busca" style="display:none; grid-template-columns: 1fr 1fr; gap:8px;">
+            <div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;">Data Inicial</label><input type="date" id="busca-ped-inicio" onchange="renderPedidos()"></div>
+            <div class="form-group" style="margin-bottom:0;"><label style="font-size:0.7rem;">Data Final</label><input type="date" id="busca-ped-fim" onchange="renderPedidos()"></div>
+          </div>
+        </div>
+
         <table>
           <thead>
             <tr>
               <th style="width: 30px;"><input type="checkbox" id="check-todos-pedidos" onclick="alternarTodosPedidos(this)"></th>
-              <th># Pedido</th><th>Cliente</th><th>Total</th><th>Status</th><th>Ações</th>
+              <th># Pedido</th><th>Data/Cliente</th><th>Total</th><th>Status</th><th>Ações</th>
             </tr>
           </thead>
           <tbody id="lista-pedidos"></tbody>
@@ -792,6 +828,31 @@
     </div>
   </main>
 
+  <!-- MODAL: REGISTRO DE SAÍDAS E DESPESAS -->
+  <div class="modal" id="modal-despesa">
+    <div class="modal-content" style="max-width: 420px;">
+      <div class="card-title" style="margin-bottom: 12px; color: var(--danger);">💸 Registrar Saída / Despesa do Dia</div>
+      <form onsubmit="salvarDespesaFinanceira(event)">
+        <div class="form-group">
+          <label>Data da Despesa</label>
+          <input type="date" id="despesa-data" required>
+        </div>
+        <div class="form-group">
+          <label>Valor da Despesa (R$)</label>
+          <input type="number" step="0.01" min="0.01" id="despesa-valor" placeholder="Ex: 30.00" required>
+        </div>
+        <div class="form-group">
+          <label>Motivo / Descrição</label>
+          <input type="text" id="despesa-motivo" placeholder="Ex: Embalagens, Combustível, Ração..." required>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button type="submit" class="btn btn-danger" style="flex:1;">💾 Salvar Despesa</button>
+          <button type="button" class="btn" style="background: #64748b; flex:1;" onclick="document.getElementById('modal-despesa').style.display='none'">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: RECIBO DE PAGAMENTO DE COLABORADOR (RH) -->
   <div class="modal" id="modal-recibo-rh">
     <div class="modal-content" style="max-width: 520px;">
@@ -804,7 +865,7 @@
     </div>
   </div>
 
-  <!-- DEMAIS MODAIS MANUTIDOS INTEGRALMENTE -->
+  <!-- MODAIS DE ZOOTECNIA E SAAS -->
   <div class="modal" id="modal-relatorio-tecnico">
     <div class="modal-content" style="max-width: 520px;">
       <div class="card-title" style="margin-bottom:12px;">📊 Relatório Geral Técnico (Zootecnia)</div>
@@ -982,9 +1043,10 @@
     </div>
   </div>
 
+  <!-- RELATÓRIO DE VENDAS E FLUXO DE CAIXA DE DESPESAS -->
   <div class="modal" id="modal-resumo">
-    <div class="modal-content" style="max-width: 520px;">
-      <div class="card-title" style="margin-bottom:12px;">📊 Relatório de Vendas e Faturamento</div>
+    <div class="modal-content" style="max-width: 540px;">
+      <div class="card-title" style="margin-bottom:12px;">📊 Relatório Financeiro e Fluxo de Caixa</div>
       <div class="form-group">
         <label>Filtrar Período</label>
         <select id="filtro-periodo" onchange="atualizarFiltroRelatorio()">
@@ -1002,22 +1064,43 @@
 
       <div id="area-relatorio-impressao" class="relatorio-sheet-box">
         <div class="relatorio-sheet-header">
-          <h3>Relatório de Vendas</h3>
+          <h3>Balanço & Vendas</h3>
           <span style="font-size: 0.75rem; font-weight: 600; opacity: 0.9;" id="relatorio-data-emissao"></span>
         </div>
-        <div class="relatorio-kpi-grid">
-          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Total Faturado</div><div class="relatorio-kpi-val" id="resumo-total-periodo" style="color: #2563eb;">R$ 0,00</div></div>
-          <div class="relatorio-kpi-item"><div class="relatorio-kpi-label">Nº de Pedidos</div><div class="relatorio-kpi-val" id="resumo-qtd-pedidos">0</div></div>
+        
+        <div class="relatorio-kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="relatorio-kpi-item" style="border-left-color: #10b981;">
+            <div class="relatorio-kpi-label">Vendas (Entradas)</div>
+            <div class="relatorio-kpi-val" id="resumo-total-periodo" style="color: #10b981;">R$ 0,00</div>
+          </div>
+          <div class="relatorio-kpi-item" style="border-left-color: #ef4444;">
+            <div class="relatorio-kpi-label">Despesas (Saídas)</div>
+            <div class="relatorio-kpi-val" id="resumo-total-despesas" style="color: #ef4444;">R$ 0,00</div>
+          </div>
+          <div class="relatorio-kpi-item" style="border-left-color: #2563eb;">
+            <div class="relatorio-kpi-label">Lucro Líquido</div>
+            <div class="relatorio-kpi-val" id="resumo-lucro-liquido" style="color: #2563eb;">R$ 0,00</div>
+          </div>
         </div>
+
         <div class="relatorio-section-box">
           <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Recebimento por Forma de Pagamento</div>
           <div id="resumo-detalhe-formas" style="line-height: 1.4; color: #1e293b;"></div>
         </div>
+
         <div>
-          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Vendas Listadas no Período</div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Vendas no Período (<span id="resumo-qtd-pedidos">0</span>)</div>
           <table class="relatorio-tabela-planilha">
             <thead><tr><th># Pedido</th><th>Data</th><th>Cliente</th><th>Total</th><th>Status</th></tr></thead>
             <tbody id="resumo-tabela-periodo"></tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:15px;">
+          <div style="font-size: 0.7rem; font-weight: 800; color: #ef4444; text-transform: uppercase; margin-bottom: 4px;">Detalhamento de Saídas e Despesas</div>
+          <table class="relatorio-tabela-planilha">
+            <thead><tr><th>Data</th><th>Motivo / Descrição</th><th>Valor</th></tr></thead>
+            <tbody id="resumo-tabela-despesas"></tbody>
           </table>
         </div>
       </div>
@@ -1061,7 +1144,7 @@
     let state = {
       usuarios: [], empresasSaaS: [], todosUsuariosSaaS: [],
       empresa: { nome: "Granja UK", cnpj: "", tel: "", end: "", social: "", pix: "", pixQrCode: "" },
-      produtos: [], clientes: [], pedidos: [], producao: [], estoqueGeralOvos: 0,
+      produtos: [], clientes: [], pedidos: [], despesas: [], producao: [], estoqueGeralOvos: 0,
       lotesTecnicos: [], historicoPosturaTecnica: [], historicoMortalidade: [], historicoVacinacao: [],
       colaboradores: [], valesHistorico: [], statusPagamentosRh: [], recibosHistorico: [],
       currentUser: null, pedidoAtual: null, listenersUnsubscribe: []
@@ -1192,6 +1275,12 @@
         }).sort((a, b) => (b.numeroPedido || 0) - (a.numeroPedido || 0));
         render();
       });
+
+      const unsubDespesas = db.collection("despesas").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
+        state.despesas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+      });
+
       const unsubProducao = db.collection("producao").where("empresaId", "==", empresaId).orderBy("dataHora", "desc").limit(50).onSnapshot(snapshot => {
         state.producao = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderProducaoHoje();
@@ -1259,7 +1348,7 @@
         renderRhPainel();
       });
 
-      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao, unsubColaboradores, unsubVales, unsubStatusPagRh, unsubRecibosRh);
+      state.listenersUnsubscribe.push(unsubClientes, unsubProdutos, unsubEstoque, unsubPedidos, unsubDespesas, unsubProducao, unsubEmpresa, unsubUsuarios, unsubLotesTecnicos, unsubPosturaTecnica, unsubMortalidade, unsubVacinacao, unsubColaboradores, unsubVales, unsubStatusPagRh, unsubRecibosRh);
     }
 
     function previewQrCodePix(event) {
@@ -1387,6 +1476,43 @@
         renderRhPainel();
       }
       render();
+    }
+
+    function abrirModalDespesa() {
+      const hoje = new Date().toISOString().split('T')[0];
+      document.getElementById('despesa-data').value = hoje;
+      document.getElementById('despesa-valor').value = '';
+      document.getElementById('despesa-motivo').value = '';
+      document.getElementById('modal-despesa').style.display = 'flex';
+    }
+
+    async function salvarDespesaFinanceira(e) {
+      e.preventDefault();
+      if (!state.currentUser) return;
+
+      const data = document.getElementById('despesa-data').value;
+      const valor = parseFloat(document.getElementById('despesa-valor').value || 0);
+      const motivo = document.getElementById('despesa-motivo').value.trim();
+
+      if (!data || valor <= 0 || !motivo) {
+        return alert("Preencha todos os campos da despesa corretamente!");
+      }
+
+      try {
+        await db.collection("despesas").add({
+          empresaId: state.currentUser.empresaId,
+          data,
+          valor,
+          motivo,
+          registradoPor: state.currentUser.login,
+          criadoEm: new Date()
+        });
+
+        document.getElementById('modal-despesa').style.display = 'none';
+        alert('Saída/Despesa registrada com sucesso!');
+      } catch (err) {
+        alert("Erro ao registrar despesa: " + err.message);
+      }
     }
 
     function toggleFormCadColaborador() {
@@ -2246,6 +2372,7 @@
       abrirJanelaImpressaoOtimizada(conteudoHtml);
     }
 
+    /* ZOOTECNIA COM AGREGAMENTO DIÁRIO DE POSTURA CONSOLIDADA */
     function renderControleTecnico() {
       const selectLotePostura = document.getElementById('postura-lote-id');
       const selectLoteMorte = document.getElementById('morte-lote-id');
@@ -2307,20 +2434,35 @@
       if (kpiMediaMensal) kpiMediaMensal.innerText = mediaMes + '%';
 
       if (tabelaHistorico) {
-        tabelaHistorico.innerHTML = state.historicoPosturaTecnica.slice(0, 15).map(h => {
-          const loteObj = state.lotesTecnicos.find(l => l.id === h.loteId);
+        // Agrupar registros de postura por Data + Lote para a tabela de resumo
+        const posturaConsolidadaMap = {};
+        state.historicoPosturaTecnica.forEach(h => {
+          const key = `${h.data}_${h.loteId}`;
+          if (!posturaConsolidadaMap[key]) {
+            posturaConsolidadaMap[key] = {
+              data: h.data,
+              loteId: h.loteId,
+              loteNome: h.loteNome,
+              totalOvos: 0
+            };
+          }
+          posturaConsolidadaMap[key].totalOvos += (h.ovosColhidos || 0);
+        });
+
+        const listaConsolidada = Object.values(posturaConsolidadaMap)
+          .sort((a, b) => new Date(b.data || 0) - new Date(a.data || 0));
+
+        tabelaHistorico.innerHTML = listaConsolidada.slice(0, 15).map(c => {
+          const loteObj = state.lotesTecnicos.find(l => l.id === c.loteId);
           const avesLote = loteObj ? (loteObj.qtdAtual || loteObj.qtdInicial) : 0;
-          const taxaIndividual = avesLote > 0 ? ((h.ovosColhidos / avesLote) * 100).toFixed(1) : 0;
+          const taxaDiariaConsolidada = avesLote > 0 ? ((c.totalOvos / avesLote) * 100).toFixed(1) : 0;
 
           return `
             <tr>
-              <td>${h.data ? new Date(h.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
-              <td><strong>${h.loteNome || 'Lote'}</strong><br><small style="color:#64748b;">${h.turno || 'Coleta'}</small></td>
-              <td>${h.ovosColhidos} ovos</td>
-              <td>
-                <span class="badge badge-ativo">${taxaIndividual}%</span>
-                ${h.pesagem && h.pesagem.pesoMedio ? `<br><small style="color:var(--tech);">⚖️ Média: ${h.pesagem.pesoMedio}kg</small>` : ''}
-              </td>
+              <td>${c.data ? new Date(c.data + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</td>
+              <td><strong>${c.loteNome || 'Lote'}</strong></td>
+              <td><strong>${c.totalOvos} ovos</strong></td>
+              <td><span class="badge badge-ativo">${taxaDiariaConsolidada}%</span></td>
             </tr>
           `;
         }).join('') || '<tr><td colspan="4" style="text-align:center; color:#64748b;">Nenhum registro.</td></tr>';
@@ -2617,10 +2759,62 @@
       }
     }
 
+    function atualizarFiltroPedidosLista() {
+      const tipo = document.getElementById('pedidos-filtro-tempo').value;
+      const containerDatas = document.getElementById('container-datas-pedidos-busca');
+      if (containerDatas) {
+        containerDatas.style.display = (tipo === 'personalizado') ? 'grid' : 'none';
+      }
+      renderPedidos();
+    }
+
+    /* FILTRAGEM INTELIGENTE DOS PEDIDOS NA TELA INICIAL (PADRÃO: HOJE) */
     function renderPedidos() {
       const tbody = document.getElementById('lista-pedidos');
       if (!tbody) return;
-      tbody.innerHTML = state.pedidos.map(p => {
+
+      const filtroTempo = document.getElementById('pedidos-filtro-tempo')?.value || 'hoje';
+      const buscaTexto = (document.getElementById('pedidos-busca-nome')?.value || '').toLowerCase().trim();
+      const agora = new Date();
+
+      let filtrados = state.pedidos.filter(p => {
+        const dataPed = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
+
+        // Filtro por Texto (Nome do cliente ou número do pedido)
+        if (buscaTexto) {
+          const numPedStr = (p.numeroPedido || '').toString();
+          const nomeCli = (p.clienteNome || '').toLowerCase();
+          if (!numPedStr.includes(buscaTexto) && !nomeCli.includes(buscaTexto)) {
+            return false;
+          }
+        }
+
+        // Filtro Temporal
+        if (filtroTempo === 'hoje') {
+          return dataPed.toDateString() === agora.toDateString();
+        } else if (filtroTempo === 'semana') {
+          const limite = new Date(); limite.setDate(agora.getDate() - 7); limite.setHours(0,0,0,0);
+          return dataPed >= limite;
+        } else if (filtroTempo === 'mes') {
+          return dataPed.getMonth() === agora.getMonth() && dataPed.getFullYear() === agora.getFullYear();
+        } else if (filtroTempo === 'personalizado') {
+          const iniStr = document.getElementById('busca-ped-inicio')?.value;
+          const fimStr = document.getElementById('busca-ped-fim')?.value;
+          if (iniStr && fimStr) {
+            const ini = new Date(iniStr + 'T00:00:00');
+            const fim = new Date(fimStr + 'T23:59:59');
+            return dataPed >= ini && dataPed <= fim;
+          }
+        }
+        return true;
+      });
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:15px;">Nenhum pedido encontrado para o período/filtro selecionado.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtrados.map(p => {
         const isPago = p.status === 'Pago';
         const isFinalizado = p.status === 'Finalizado';
         
@@ -2629,11 +2823,13 @@
         if (isFinalizado) { badgeClass = 'badge-finalizado'; badgeLabel = '🟦 Finalizado'; }
         else if (isPago) { badgeClass = 'badge-pago'; badgeLabel = '🟢 Pago'; }
 
+        const dataFmt = p.dataCriacao ? p.dataCriacao.toLocaleDateString('pt-BR') : '---';
+
         return `
           <tr>
             <td><input type="checkbox" class="check-pedido" data-id="${p.id}" value="${p.id}"></td>
             <td><strong>#${p.numeroPedido || '---'}</strong></td>
-            <td>${p.clienteNome || 'Cliente'}</td>
+            <td>${p.clienteNome || 'Cliente'}<br><small style="color:#64748b;">📅 ${dataFmt}</small></td>
             <td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td>
             <td><span class="badge ${badgeClass}" onclick="alternarStatusPedido('${p.id}', '${p.status}')">${badgeLabel}</span></td>
             <td>
@@ -2715,6 +2911,8 @@
       const chavePix = emp.pix || '';
       const qrCodeImg = emp.pixQrCode || '';
 
+      const dataVendaFmt = ped.dataCriacao ? `${ped.dataCriacao.toLocaleDateString('pt-BR')} às ${ped.dataCriacao.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}` : '---';
+
       let pixSectionHtml = '';
       if (chavePix || qrCodeImg) {
         pixSectionHtml = `<div style="text-align:center; margin-top:4px; padding-top:4px; border-top:1px dashed #cbd5e1;">`;
@@ -2735,6 +2933,7 @@
               <h3 style="font-size:0.75rem; font-weight:800; text-transform:uppercase;">PEDIDO #${ped.numeroPedido || '---'}</h3>
               <span style="font-size:0.7rem; font-weight:600;">${nomeEmpresa}</span>
             </div>
+            <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Data da Venda:</strong> ${dataVendaFmt}</div>
             <div style="font-size:0.7rem; margin-bottom:1px;"><strong>Cliente:</strong> ${ped.clienteNome || 'Cliente'}</div>
             <div style="font-size:0.7rem; margin-bottom:2px;"><strong>Endereço:</strong> ${ped.clienteEnd || 'Não informado'}</div>
             <hr class="dashed-divider">
@@ -2808,7 +3007,7 @@
                 .item-linha-zebrado:nth-child(odd) { background-color: #f8fafc; }
                 .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; width: 100%; page-break-inside: avoid !important; break-inside: avoid !important; }
                 .relatorio-sheet-header { background: #0f172a; color: #ffffff; padding: 12px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-                .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+                .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
                 .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; }
                 .relatorio-kpi-label { font-size: 0.7rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
                 .relatorio-kpi-val { font-size: 1.2rem; font-weight: 800; color: #0f172a; }
@@ -2868,7 +3067,7 @@
 
             .relatorio-sheet-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; color: #0f172a; width: 100%; }
             .relatorio-sheet-header { background: #0f172a; color: #ffffff; padding: 10px; border-radius: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+            .relatorio-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
             .relatorio-kpi-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; }
             .relatorio-kpi-label { font-size: 0.65rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
             .relatorio-kpi-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
@@ -3177,10 +3376,13 @@
       renderizarDadosRelatorio();
     }
 
+    /* CÁLCULO FINANCEIRO COMPLETO (ENTRADAS DE VENDAS - SAÍDAS DE DESPESAS = LUCRO LÍQUIDO) */
     function renderizarDadosRelatorio() {
       const tipo = document.getElementById('filtro-periodo').value;
       const agora = new Date();
       let pedidosFiltrados = state.pedidos;
+      let despesasFiltradas = state.despesas;
+
       document.getElementById('relatorio-data-emissao').innerText = "Emitido em: " + agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
       if (tipo === 'hoje') {
@@ -3188,16 +3390,27 @@
           const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
           return d.toDateString() === agora.toDateString();
         });
+        despesasFiltradas = state.despesas.filter(d => {
+          return d.data === agora.toISOString().split('T')[0];
+        });
       } else if (tipo === 'semana') {
         const limite = new Date(); limite.setDate(agora.getDate() - 7); limite.setHours(0,0,0,0);
         pedidosFiltrados = state.pedidos.filter(p => {
           const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
           return d >= limite;
         });
+        despesasFiltradas = state.despesas.filter(d => {
+          const dObj = new Date(d.data + 'T00:00:00');
+          return dObj >= limite;
+        });
       } else if (tipo === 'mes') {
         pedidosFiltrados = state.pedidos.filter(p => {
           const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
           return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+        });
+        despesasFiltradas = state.despesas.filter(d => {
+          const dObj = new Date(d.data + 'T00:00:00');
+          return dObj.getMonth() === agora.getMonth() && dObj.getFullYear() === agora.getFullYear();
         });
       } else if (tipo === 'personalizado') {
         const dataInicio = document.getElementById('data-inicio').value;
@@ -3209,13 +3422,23 @@
             const d = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
             return d >= ini && d <= fim;
           });
+          despesasFiltradas = state.despesas.filter(d => {
+            const dObj = new Date(d.data + 'T00:00:00');
+            return dObj >= ini && dObj <= fim;
+          });
         } else {
           pedidosFiltrados = [];
+          despesasFiltradas = [];
         }
       }
 
-      const totalPeriodo = pedidosFiltrados.reduce((acc, p) => acc + (parseFloat(p.total) || 0), 0);
-      document.getElementById('resumo-total-periodo').innerText = "R$ " + totalPeriodo.toFixed(2);
+      const totalVendas = pedidosFiltrados.reduce((acc, p) => acc + (parseFloat(p.total) || 0), 0);
+      const totalDespesas = despesasFiltradas.reduce((acc, d) => acc + (parseFloat(d.valor) || 0), 0);
+      const lucroLiquido = totalVendas - totalDespesas;
+
+      document.getElementById('resumo-total-periodo').innerText = "R$ " + totalVendas.toFixed(2);
+      document.getElementById('resumo-total-despesas').innerText = "R$ " + totalDespesas.toFixed(2);
+      document.getElementById('resumo-lucro-liquido').innerText = "R$ " + lucroLiquido.toFixed(2);
       document.getElementById('resumo-qtd-pedidos').innerText = pedidosFiltrados.length;
 
       const formas = {};
@@ -3224,7 +3447,11 @@
 
       document.getElementById('resumo-tabela-periodo').innerHTML = pedidosFiltrados.length > 0 ? pedidosFiltrados.map(p => `
         <tr><td>#${p.numeroPedido || '---'}</td><td>${new Date(p.dataCriacao).toLocaleDateString('pt-BR')}</td><td>${p.clienteNome || 'Cliente'}</td><td>R$ ${parseFloat(p.total || 0).toFixed(2)}</td><td>${p.status || 'Pendente'}</td></tr>
-      `).join('') : '<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhum pedido encontrado neste período.</td></tr>';
+      `).join('') : '<tr><td colspan="5" style="text-align:center; color:#64748b;">Nenhuma venda encontrada neste período.</td></tr>';
+
+      document.getElementById('resumo-tabela-despesas').innerHTML = despesasFiltradas.length > 0 ? despesasFiltradas.map(d => `
+        <tr><td>${new Date(d.data + 'T00:00:00').toLocaleDateString('pt-BR')}</td><td>${d.motivo}</td><td style="color:#ef4444; font-weight:bold;">- R$ ${parseFloat(d.valor || 0).toFixed(2)}</td></tr>
+      `).join('') : '<tr><td colspan="3" style="text-align:center; color:#64748b;">Nenhuma despesa lançada neste período.</td></tr>';
     }
 
     initApp();
