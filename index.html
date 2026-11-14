@@ -596,15 +596,17 @@
     <div id="view-clientes" class="view-content" style="display:none;">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">Cadastrar Cliente</div>
+          <div class="card-title" id="form-cliente-title">Cadastrar Cliente</div>
           <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
         </div>
-        <form onsubmit="cadastrarCliente(event)">
+        <form onsubmit="salvarCliente(event)">
+          <input type="hidden" id="cli-id-edit" value="">
           <div class="form-group"><label>Nome / Razão Social</label><input type="text" id="cli-nome" required></div>
           <div class="form-group"><label>Documento (CPF / RG / CNPJ)</label><input type="text" id="cli-doc" placeholder="Ex: 000.000.000-00"></div>
           <div class="form-group"><label>WhatsApp / Telefone</label><input type="tel" id="cli-tel" placeholder="Ex: 5511999998888" required></div>
           <div class="form-group"><label>Endereço Completo</label><input type="text" id="cli-end" placeholder="Rua, Nº, Bairro, Cidade" required></div>
-          <button type="submit" class="btn">Salvar Cliente na Nuvem</button>
+          <button type="submit" class="btn" id="btn-salvar-cli">Salvar Cliente na Nuvem</button>
+          <button type="button" class="btn" id="btn-cancelar-cli-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormCliente()">Cancelar Edição</button>
         </form>
       </div>
       <div class="card">
@@ -628,9 +630,9 @@
           <div class="form-group"><label>Selecione o Cliente</label><select id="ped-cliente" required></select></div>
           <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
           <div style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border:1px solid #e2e8f0;">
-            <div class="form-group"><label>Selecione a Embalagem / Produto</label><select id="ped-produto"></select></div>
+            <div class="form-group"><label>Selecione o Produto (Ovos ou Frangos)</label><select id="ped-produto"></select></div>
             <div style="display: flex; gap: 8px; align-items: flex-end;">
-              <div class="form-group" style="flex: 1; margin-bottom: 0;"><label>Quantidade de Embalagens</label><input type="number" id="ped-qtd" min="1" value="1"></div>
+              <div class="form-group" style="flex: 1; margin-bottom: 0;"><label>Quantidade</label><input type="number" id="ped-qtd" min="1" value="1"></div>
               <button type="button" class="btn" style="width: auto; background: var(--primary-dark);" onclick="adicionarItemAoPedido()">➕ Adicionar</button>
             </div>
           </div>
@@ -663,7 +665,7 @@
               <option value="Pendente">🔴 Pendente (A Pagar)</option>
             </select>
           </div>
-          <div class="form-group"><label>Observações do Pedido (Sairá na Nota)</label><textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h / Ovos menores (desconto aplicado)"></textarea></div>
+          <div class="form-group"><label>Observações do Pedido (Sairá na Nota)</label><textarea id="ped-obs" rows="2" placeholder="Ex: Entregar até 14h"></textarea></div>
           <button type="submit" class="btn btn-success">Finalizar Pedido</button>
         </form>
       </div>
@@ -711,9 +713,10 @@
 
     <!-- TELA: ESTOQUE E EMBALAGENS -->
     <div id="view-produtos" class="view-content" style="display:none;">
+      <!-- ESTOQUE DE OVOS -->
       <div class="card" style="border-left: 4px solid var(--accent);">
         <div class="card-header">
-          <div class="card-title">🥚 Registrar Entrada de Produção</div>
+          <div class="card-title">🥚 Registrar Entrada de Produção de Ovos</div>
           <button class="btn btn-back" type="button" onclick="mudarAbaTopo('financeiro')">🏠 Voltar</button>
         </div>
         <div class="stat-card" style="background: #eff6ff; border-color: #bfdbfe; display: flex; justify-content: space-between; align-items: center;">
@@ -725,21 +728,67 @@
         </div>
         <form onsubmit="registrarEntradaProducao(event)">
           <div class="form-group"><label>Quantidade Coletada/Produzida (Ovos Individuais)</label><input type="number" id="prod-ent-qtd" min="1" placeholder="Ex: 5000" required></div>
-          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Direto para o Estoque Geral</button>
+          <button type="submit" class="btn" style="background:var(--accent);">➕ Lançar Direto para o Estoque de Ovos</button>
         </form>
         <div style="margin-top: 15px;">
-          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Coletas de Hoje</div>
+          <div style="font-size:0.75rem; font-weight:bold; color:var(--text-muted); text-transform:uppercase;">Histórico de Coletas de Ovos de Hoje</div>
           <table><thead><tr><th>Hora</th><th>Unidades</th></tr></thead><tbody id="lista-producao-hoje"></tbody></table>
         </div>
       </div>
 
+      <!-- ESTOQUE DE FRANGOS (VIVO / LIMPO) -->
+      <div class="card" style="border-left: 4px solid #10b981;">
+        <div class="card-header">
+          <div class="card-title" style="color: #065f46;">🐔 Registrar Entrada de Frangos (Estoque)</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div class="stat-card" style="background: #f0fdf4; border-color: #bbf7d0;">
+            <div class="stat-title">Frangos Vivos</div>
+            <div class="stat-value" id="estoque-frango-vivo" style="color: #16a34a; font-size: 1.4rem;">0 un</div>
+          </div>
+          <div class="stat-card" style="background: #f0fdf4; border-color: #bbf7d0;">
+            <div class="stat-title">Frangos Limpos / Picados</div>
+            <div class="stat-value" id="estoque-frango-limpo" style="color: #16a34a; font-size: 1.4rem;">0 un</div>
+          </div>
+        </div>
+        <form onsubmit="registrarEntradaFrango(event)">
+          <div class="form-group">
+            <label>Tipo de Frango para Dar Entrada</label>
+            <select id="entrada-frango-tipo" required>
+              <option value="vivo">Frango Vivo</option>
+              <option value="limpo">Frango Limpo / Picado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Quantidade de Unidades</label>
+            <input type="number" id="entrada-frango-qtd" min="1" placeholder="Ex: 15" required>
+          </div>
+          <button type="submit" class="btn btn-success">➕ Dar Entrada no Estoque de Frangos</button>
+        </form>
+      </div>
+
+      <!-- CADASTRAR PRODUTO -->
       <div class="card">
         <div class="card-header"><div class="card-title" id="form-prod-title">Cadastrar Novo Produto / Embalagem</div></div>
         <form id="form-produto" onsubmit="salvarProduto(event)">
           <input type="hidden" id="prod-id-edit" value="">
-          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / CAIXA 360 OVOS" required></div>
+          <div class="form-group"><label>Descrição do Item</label><input type="text" id="prod-nome" placeholder="Ex: CARTELA COM 12 OVOS / FRANGO VIVO / FRANGO LIMPO" required></div>
           <div class="form-group"><label>Preço Unitário (R$)</label><input type="number" step="0.01" id="prod-preco" placeholder="Ex: 12.00" required></div>
-          <div class="form-group"><label>Quantidade de Ovos nesta Embalagem</label><input type="number" id="prod-ovos-unid" min="1" placeholder="Ex: 12" required></div>
+          
+          <div class="form-group">
+            <label>Tipo de Item (Define qual estoque será movimentado)</label>
+            <select id="prod-tipo-item" onchange="alternarCamposTipoProduto()" required>
+              <option value="ovo">Ovos (Controlado por ovos individuais)</option>
+              <option value="frango_vivo">Frango Vivo (Controlado por unidades)</option>
+              <option value="frango_limpo">Frango Limpo / Picado (Controlado por unidades)</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="grupo-ovos-unid">
+            <label>Quantidade de Ovos nesta Embalagem</label>
+            <input type="number" id="prod-ovos-unid" min="1" value="12" placeholder="Ex: 12">
+          </div>
+
           <button type="submit" class="btn" id="btn-salvar-prod">Salvar Produto na Nuvem</button>
           <button type="button" class="btn" id="btn-cancelar-edit" style="background:#64748b; margin-top:6px; display:none;" onclick="limparFormProduto()">Cancelar Edição</button>
         </form>
@@ -747,7 +796,7 @@
 
       <div class="card">
         <div class="card-title">Produtos / Apresentações Disponíveis</div>
-        <table><thead><tr><th>Descrição</th><th>Preço</th><th>Ovos/Emb</th><th>Ações</th></tr></thead><tbody id="lista-produtos"></tbody></table>
+        <table><thead><tr><th>Descrição</th><th>Tipo</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="lista-produtos"></tbody></table>
       </div>
     </div>
 
@@ -810,7 +859,7 @@
           <div class="form-group"><label>CNPJ / CPF</label><input type="text" id="emp-cnpj" required></div>
           <div class="form-group"><label>Telefone / WhatsApp Comercial</label><input type="text" id="emp-tel" placeholder="Ex: (11) 99999-8888" required></div>
           <div class="form-group"><label>Endereço Completo</label><input type="text" id="emp-end" placeholder="Rua, Nº, Bairro, Cidade/UF" required></div>
-          <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @granjauk"></div>
+          <div class="form-group"><label>Redes Sociais / Site</label><input type="text" id="emp-social" placeholder="Ex: @granja_uk"></div>
           <div class="form-group"><label>Chave Pix Oficial Padrão</label><input type="text" id="emp-pix" required></div>
           
           <div class="form-group">
@@ -1115,7 +1164,7 @@
 
   <div class="modal" id="modal-balanco">
     <div class="modal-content" style="max-width: 380px;">
-      <div class="card-title" style="margin-bottom: 12px;">⚖️ Balanço Manual de Estoque</div>
+      <div class="card-title" style="margin-bottom: 12px;">⚖️ Balanço Manual de Estoque de Ovos</div>
       <form onsubmit="salvarBalancoEstoque(event)">
         <div class="form-group"><label>Novo Saldo Real de Ovos</label><input type="number" id="balanco-nova-qtd" min="0" placeholder="Ex: 12500" required></div>
         <div class="form-group"><label>Motivo / Observação do Ajuste</label><input type="text" id="balanco-motivo" placeholder="Ex: Contagem física" required></div>
@@ -1144,7 +1193,8 @@
     let state = {
       usuarios: [], empresasSaaS: [], todosUsuariosSaaS: [],
       empresa: { nome: "Granja UK", cnpj: "", tel: "", end: "", social: "", pix: "", pixQrCode: "" },
-      produtos: [], clientes: [], pedidos: [], despesas: [], producao: [], estoqueGeralOvos: 0,
+      produtos: [], clientes: [], pedidos: [], despesas: [], producao: [], 
+      estoqueGeralOvos: 0, estoqueFrangoVivo: 0, estoqueFrangoLimpo: 0,
       lotesTecnicos: [], historicoPosturaTecnica: [], historicoMortalidade: [], historicoVacinacao: [],
       colaboradores: [], valesHistorico: [], statusPagamentosRh: [], recibosHistorico: [],
       currentUser: null, pedidoAtual: null, listenersUnsubscribe: []
@@ -1258,6 +1308,8 @@
       });
       const unsubEstoque = db.collection("estoque_geral").doc(empresaId).onSnapshot(doc => {
         state.estoqueGeralOvos = doc.exists ? (doc.data().qtdOvos || 0) : 0;
+        state.estoqueFrangoVivo = doc.exists ? (doc.data().qtdFrangoVivo || 0) : 0;
+        state.estoqueFrangoLimpo = doc.exists ? (doc.data().qtdFrangoLimpo || 0) : 0;
         renderEstoqueGeral();
       });
       const unsubPedidos = db.collection("pedidos").where("empresaId", "==", empresaId).onSnapshot(snapshot => {
@@ -2027,8 +2079,14 @@
     }
 
     function renderEstoqueGeral() {
-      const el = document.getElementById('estoque-geral-ovos');
-      if (el) el.innerText = (state.estoqueGeralOvos || 0).toLocaleString('pt-BR') + ' Ovos';
+      const elOvos = document.getElementById('estoque-geral-ovos');
+      if (elOvos) elOvos.innerText = (state.estoqueGeralOvos || 0).toLocaleString('pt-BR') + ' Ovos';
+
+      const elVivo = document.getElementById('estoque-frango-vivo');
+      if (elVivo) elVivo.innerText = (state.estoqueFrangoVivo || 0).toLocaleString('pt-BR') + ' un';
+
+      const elLimpo = document.getElementById('estoque-frango-limpo');
+      if (elLimpo) elLimpo.innerText = (state.estoqueFrangoLimpo || 0).toLocaleString('pt-BR') + ' un';
     }
 
     async function cadastrarLoteTecnico(e) {
@@ -2372,7 +2430,6 @@
       abrirJanelaImpressaoOtimizada(conteudoHtml);
     }
 
-    /* ZOOTECNIA COM AGREGAMENTO DIÁRIO DE POSTURA CONSOLIDADA */
     function renderControleTecnico() {
       const selectLotePostura = document.getElementById('postura-lote-id');
       const selectLoteMorte = document.getElementById('morte-lote-id');
@@ -2434,7 +2491,6 @@
       if (kpiMediaMensal) kpiMediaMensal.innerText = mediaMes + '%';
 
       if (tabelaHistorico) {
-        // Agrupar registros de postura por Data + Lote para a tabela de resumo
         const posturaConsolidadaMap = {};
         state.historicoPosturaTecnica.forEach(h => {
           const key = `${h.data}_${h.loteId}`;
@@ -2705,9 +2761,66 @@
         <tr>
           <td><strong>${c.nome}</strong><br><small style="color:#64748b;">${c.doc || 'Sem Doc'}</small></td>
           <td>${c.tel}<br><small style="color:#64748b;">${c.end || ''}</small></td>
-          <td><button class="btn-danger" type="button" onclick="excluirCliente('${c.id}')">Excluir</button></td>
+          <td>
+            <div style="display:flex; gap:4px; flex-wrap:wrap;">
+              <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.7rem; background:#2563eb;" onclick="editarCliente('${c.id}')">✏️ Editar</button>
+              <button class="btn-danger" type="button" style="padding:4px 8px; font-size:0.7rem;" onclick="excluirCliente('${c.id}')">🗑️ Excluir</button>
+            </div>
+          </td>
         </tr>
       `).join('');
+    }
+
+    function editarCliente(id) {
+      const cliente = state.clientes.find(c => c.id === id);
+      if (!cliente) return;
+
+      document.getElementById('cli-id-edit').value = cliente.id;
+      document.getElementById('cli-nome').value = cliente.nome || '';
+      document.getElementById('cli-doc').value = cliente.doc || '';
+      document.getElementById('cli-tel').value = cliente.tel || '';
+      document.getElementById('cli-end').value = cliente.end || '';
+
+      document.getElementById('form-cliente-title').innerText = '✏️ Editar Cliente';
+      document.getElementById('btn-salvar-cli').innerText = 'Salvar Alterações';
+      document.getElementById('btn-cancelar-cli-edit').style.display = 'inline-block';
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function limparFormCliente() {
+      document.getElementById('cli-id-edit').value = '';
+      document.getElementById('cli-nome').value = '';
+      document.getElementById('cli-doc').value = '';
+      document.getElementById('cli-tel').value = '';
+      document.getElementById('cli-end').value = '';
+
+      document.getElementById('form-cliente-title').innerText = 'Cadastrar Cliente';
+      document.getElementById('btn-salvar-cli').innerText = 'Salvar Cliente na Nuvem';
+      document.getElementById('btn-cancelar-cli-edit').style.display = 'none';
+    }
+
+    async function salvarCliente(e) {
+      e.preventDefault();
+      if (!state.currentUser) return;
+      const clienteId = document.getElementById('cli-id-edit').value;
+      const nome = document.getElementById('cli-nome').value.trim();
+      const doc = document.getElementById('cli-doc').value.trim();
+      const tel = document.getElementById('cli-tel').value.trim();
+      const end = document.getElementById('cli-end').value.trim();
+
+      try {
+        if (clienteId) {
+          await db.collection("clientes").doc(clienteId).update({ nome, doc, tel, end });
+          alert('Dados do cliente atualizados com sucesso!');
+        } else {
+          await db.collection("clientes").add({ empresaId: state.currentUser.empresaId, nome, doc, tel, end });
+          alert('Cliente cadastrado com sucesso!');
+        }
+        limparFormCliente();
+      } catch (err) {
+        alert('Erro ao salvar cliente: ' + err.message);
+      }
     }
 
     async function excluirCliente(id) {
@@ -2729,12 +2842,88 @@
       tbody.innerHTML = filtrados.slice(0, 10).map(c => `<tr><td><strong>${c.nome}</strong><br><small style="color:#64748b;">Doc: ${c.doc || 'N/I'}</small></td><td>📞 ${c.tel}</td></tr>`).join('');
     }
 
+    function alternarCamposTipoProduto() {
+      const tipo = document.getElementById('prod-tipo-item').value;
+      const grupoOvos = document.getElementById('grupo-ovos-unid');
+      if (tipo === 'ovo') {
+        grupoOvos.style.display = 'block';
+      } else {
+        grupoOvos.style.display = 'none';
+      }
+    }
+
+    async function salvarProduto(e) {
+      e.preventDefault();
+      if (!state.currentUser) return;
+      const prodId = document.getElementById('prod-id-edit').value;
+      const nome = document.getElementById('prod-nome').value.trim();
+      const preco = parseFloat(document.getElementById('prod-preco').value || 0);
+      const tipoItem = document.getElementById('prod-tipo-item').value;
+      const ovosUnid = tipoItem === 'ovo' ? parseInt(document.getElementById('prod-ovos-unid').value || 1) : 1;
+
+      try {
+        const dadosProd = {
+          empresaId: state.currentUser.empresaId,
+          nome,
+          preco,
+          tipoItem,
+          ovosUnid
+        };
+
+        if (prodId) {
+          await db.collection("produtos").doc(prodId).update(dadosProd);
+          alert('Produto atualizado com sucesso!');
+        } else {
+          await db.collection("produtos").add(dadosProd);
+          alert('Produto cadastrado com sucesso!');
+        }
+        limparFormProduto();
+      } catch (err) {
+        alert('Erro ao salvar produto: ' + err.message);
+      }
+    }
+
     function renderProdutos() {
       const tbody = document.getElementById('lista-produtos');
       if (!tbody) return;
-      tbody.innerHTML = state.produtos.map(p => `
-        <tr><td><strong>${p.nome}</strong></td><td>R$ ${parseFloat(p.preco).toFixed(2)}</td><td>${p.ovosUnid} ovos</td><td><button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑️</button></td></tr>
-      `).join('');
+      tbody.innerHTML = state.produtos.map(p => {
+        let tipoLabel = '🥚 Ovos';
+        if (p.tipoItem === 'frango_vivo') tipoLabel = '🐔 Frango Vivo';
+        if (p.tipoItem === 'frango_limpo') tipoLabel = '🍗 Frango Limpo';
+
+        return `
+          <tr>
+            <td><strong>${p.nome}</strong></td>
+            <td><span class="badge" style="background:#e2e8f0; color:#1e293b;">${tipoLabel}</span></td>
+            <td>R$ ${parseFloat(p.preco || 0).toFixed(2)}</td>
+            <td>
+              <div style="display:flex; gap:4px;">
+                <button class="btn" type="button" style="width:auto; padding:4px 8px; font-size:0.7rem; background:#2563eb;" onclick="editarProduto('${p.id}')">✏️</button>
+                <button class="btn-danger" type="button" onclick="excluirProduto('${p.id}')">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function editarProduto(id) {
+      const prod = state.produtos.find(p => p.id === id);
+      if (!prod) return;
+
+      document.getElementById('prod-id-edit').value = prod.id;
+      document.getElementById('prod-nome').value = prod.nome || '';
+      document.getElementById('prod-preco').value = prod.preco || 0;
+      document.getElementById('prod-tipo-item').value = prod.tipoItem || 'ovo';
+      document.getElementById('prod-ovos-unid').value = prod.ovosUnid || 12;
+
+      alternarCamposTipoProduto();
+
+      document.getElementById('form-prod-title').innerText = '✏️ Editar Produto / Embalagem';
+      document.getElementById('btn-salvar-prod').innerText = 'Salvar Alterações';
+      document.getElementById('btn-cancelar-edit').style.display = 'inline-block';
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function limparFormProduto() {
@@ -2748,6 +2937,7 @@
       if (btnSalvar) btnSalvar.innerText = 'Salvar Produto na Nuvem';
       const formTitle = document.getElementById('form-prod-title');
       if (formTitle) formTitle.innerText = 'Cadastrar Novo Produto / Embalagem';
+      alternarCamposTipoProduto();
     }
 
     async function excluirProduto(id) {
@@ -2768,7 +2958,6 @@
       renderPedidos();
     }
 
-    /* FILTRAGEM INTELIGENTE DOS PEDIDOS NA TELA INICIAL (PADRÃO: HOJE) */
     function renderPedidos() {
       const tbody = document.getElementById('lista-pedidos');
       if (!tbody) return;
@@ -2780,7 +2969,6 @@
       let filtrados = state.pedidos.filter(p => {
         const dataPed = p.dataCriacao ? new Date(p.dataCriacao) : new Date();
 
-        // Filtro por Texto (Nome do cliente ou número do pedido)
         if (buscaTexto) {
           const numPedStr = (p.numeroPedido || '').toString();
           const nomeCli = (p.clienteNome || '').toLowerCase();
@@ -2789,7 +2977,6 @@
           }
         }
 
-        // Filtro Temporal
         if (filtroTempo === 'hoje') {
           return dataPed.toDateString() === agora.toDateString();
         } else if (filtroTempo === 'semana') {
@@ -2845,7 +3032,7 @@
     }
 
     async function cancelarExcluirPedido(id) {
-      if (!confirm("Deseja realmente cancelar e excluir este pedido? As quantidades de ovos dos produtos serão devolvidas para o estoque.")) return;
+      if (!confirm("Deseja realmente cancelar e excluir este pedido? Os itens vendidos (ovos ou frangos) serão devolvidos para seus respectivos estoques.")) return;
       
       const ped = state.pedidos.find(p => p.id === id);
       if (!ped) return;
@@ -2853,22 +3040,38 @@
       try {
         const empresaId = state.currentUser.empresaId;
         const refEstoque = db.collection("estoque_geral").doc(empresaId);
-        
-        let totalOvosDevolucao = 0;
+        const docEstoque = await refEstoque.get();
+        let dadosEstoque = docEstoque.exists ? docEstoque.data() : {};
+
+        let devolucaoOvos = 0;
+        let devolucaoVivo = 0;
+        let devolucaoLimpo = 0;
+
         if (ped.itens && Array.isArray(ped.itens)) {
           ped.itens.forEach(item => {
             const prodRef = state.produtos.find(p => p.id === item.produtoId);
-            const qtdOvosPorUnidade = prodRef ? (prodRef.ovosUnid || 0) : (item.totalOvos ? item.totalOvos / item.qtd : 0);
-            totalOvosDevolucao += (item.qtd || 0) * qtdOvosPorUnidade;
+            const tipo = prodRef ? (prodRef.tipoItem || 'ovo') : 'ovo';
+            const qtd = item.qtd || 0;
+
+            if (tipo === 'ovo') {
+              const qtdOvosPorUnidade = prodRef ? (prodRef.ovosUnid || 12) : 12;
+              devolucaoOvos += qtd * qtdOvosPorUnidade;
+            } else if (tipo === 'frango_vivo') {
+              devolucaoVivo += qtd;
+            } else if (tipo === 'frango_limpo') {
+              devolucaoLimpo += qtd;
+            }
           });
         }
 
-        const docEstoque = await refEstoque.get();
-        let saldoAtual = docEstoque.exists ? (docEstoque.data().qtdOvos || 0) : 0;
-        await refEstoque.set({ qtdOvos: saldoAtual + totalOvosDevolucao }, { merge: true });
+        await refEstoque.set({
+          qtdOvos: (dadosEstoque.qtdOvos || 0) + devolucaoOvos,
+          qtdFrangoVivo: (dadosEstoque.qtdFrangoVivo || 0) + devolucaoVivo,
+          qtdFrangoLimpo: (dadosEstoque.qtdFrangoLimpo || 0) + devolucaoLimpo
+        }, { merge: true });
 
         await db.collection("pedidos").doc(id).delete();
-        alert("Pedido cancelado e excluído com sucesso! Estoque atualizado.");
+        alert("Pedido cancelado e excluído com sucesso! Estoques estornados.");
       } catch (err) {
         alert("Erro ao cancelar pedido: " + err.message);
       }
@@ -3152,7 +3355,12 @@
     function renderDropdowns() {
       filtrarClientesDropdown();
       const prodSelect = document.getElementById('ped-produto');
-      if (prodSelect) prodSelect.innerHTML = state.produtos.map(p => '<option value="' + p.id + '">' + p.nome + ' - R$ ' + parseFloat(p.preco).toFixed(2) + ' (' + p.ovosUnid + ' ovos)</option>').join('');
+      if (prodSelect) prodSelect.innerHTML = state.produtos.map(p => {
+        let tipoIcon = '🥚';
+        if (p.tipoItem === 'frango_vivo') tipoIcon = '🐔';
+        if (p.tipoItem === 'frango_limpo') tipoIcon = '🍗';
+        return '<option value="' + p.id + '">' + tipoIcon + ' ' + p.nome + ' - R$ ' + parseFloat(p.preco || 0).toFixed(2) + '</option>';
+      }).join('');
     }
 
     function filtrarClientesDropdown() {
@@ -3163,24 +3371,12 @@
       cliSelect.innerHTML = filtrados.length ? filtrados.map(c => '<option value="' + c.id + '">' + c.nome + ' (' + c.tel + ')</option>').join('') : '<option value="">Nenhum cliente</option>';
     }
 
-    async function cadastrarCliente(e) {
-      e.preventDefault();
-      await db.collection("clientes").add({ empresaId: state.currentUser.empresaId, nome: document.getElementById('cli-nome').value.trim(), doc: document.getElementById('cli-doc').value.trim(), tel: document.getElementById('cli-tel').value.trim(), end: document.getElementById('cli-end').value.trim() });
-      e.target.reset(); alert('Cliente cadastrado!');
-    }
-
-    async function salvarProduto(e) {
-      e.preventDefault();
-      await db.collection("produtos").add({ empresaId: state.currentUser.empresaId, nome: document.getElementById('prod-nome').value.trim(), preco: parseFloat(document.getElementById('prod-preco').value || 0), ovosUnid: parseInt(document.getElementById('prod-ovos-unid').value || 0) });
-      e.target.reset(); alert('Produto salvo!');
-    }
-
     function adicionarItemAoPedido() {
       const prodId = document.getElementById('ped-produto').value;
       const qtd = parseInt(document.getElementById('ped-qtd').value || 1);
       const prod = state.produtos.find(p => p.id === prodId);
       if (!prod || qtd <= 0) return;
-      carrinhoTemp.push({ produtoId: prod.id, nome: prod.nome, preco: prod.preco, qtd, totalOvos: qtd * prod.ovosUnid, subtotal: qtd * prod.preco });
+      carrinhoTemp.push({ produtoId: prod.id, nome: prod.nome, preco: prod.preco, qtd, tipoItem: prod.tipoItem || 'ovo', subtotal: qtd * prod.preco });
       renderCarrinho();
     }
 
@@ -3218,10 +3414,22 @@
       const totalPedido = Math.max(0, subtotalPedido - descontoVal);
 
       let totalOvosConsumidos = 0;
+      let totalFrangoVivoConsumido = 0;
+      let totalFrangoLimpoConsumido = 0;
+
       carrinhoTemp.forEach(item => {
         const prodRef = state.produtos.find(p => p.id === item.produtoId);
-        const qtdOvosPorUnidade = prodRef ? (prodRef.ovosUnid || 0) : (item.totalOvos ? item.totalOvos / item.qtd : 0);
-        totalOvosConsumidos += (item.qtd || 0) * qtdOvosPorUnidade;
+        const tipo = prodRef ? (prodRef.tipoItem || 'ovo') : 'ovo';
+        const qtd = item.qtd || 0;
+
+        if (tipo === 'ovo') {
+          const qtdOvosPorUnidade = prodRef ? (prodRef.ovosUnid || 12) : 12;
+          totalOvosConsumidos += qtd * qtdOvosPorUnidade;
+        } else if (tipo === 'frango_vivo') {
+          totalFrangoVivoConsumido += qtd;
+        } else if (tipo === 'frango_limpo') {
+          totalFrangoLimpoConsumido += qtd;
+        }
       });
 
       const empresaId = state.currentUser.empresaId;
@@ -3229,13 +3437,26 @@
 
       try {
         const docEstoque = await refEstoque.get();
-        let saldoAtual = docEstoque.exists ? (docEstoque.data().qtdOvos || 0) : 0;
+        let dadosEstoque = docEstoque.exists ? docEstoque.data() : {};
+        let saldoOvosAtual = dadosEstoque.qtdOvos || 0;
+        let saldoVivoAtual = dadosEstoque.qtdFrangoVivo || 0;
+        let saldoLimpoAtual = dadosEstoque.qtdFrangoLimpo || 0;
 
-        if (saldoAtual < totalOvosConsumidos) {
-          return alert(`Estoque insuficiente! Você tem ${saldoAtual} ovos no estoque geral, mas este pedido exige ${totalOvosConsumidos} ovos.`);
+        if (saldoOvosAtual < totalOvosConsumidos) {
+          return alert(`Estoque insuficiente de Ovos! Saldo atual: ${saldoOvosAtual} ovos.`);
+        }
+        if (saldoVivoAtual < totalFrangoVivoConsumido) {
+          return alert(`Estoque insuficiente de Frango Vivo! Saldo atual: ${saldoVivoAtual} un.`);
+        }
+        if (saldoLimpoAtual < totalFrangoLimpoConsumido) {
+          return alert(`Estoque insuficiente de Frango Limpo! Saldo atual: ${saldoLimpoAtual} un.`);
         }
 
-        await refEstoque.set({ qtdOvos: saldoAtual - totalOvosConsumidos }, { merge: true });
+        await refEstoque.set({
+          qtdOvos: saldoOvosAtual - totalOvosConsumidos,
+          qtdFrangoVivo: saldoVivoAtual - totalFrangoVivoConsumido,
+          qtdFrangoLimpo: saldoLimpoAtual - totalFrangoLimpoConsumido
+        }, { merge: true });
 
         const novoPedido = {
           empresaId: empresaId, 
@@ -3260,7 +3481,7 @@
         e.target.reset();
         document.getElementById('ped-desconto-val').value = '0.00';
         
-        alert(`Pedido #${proximoNumero} finalizado com sucesso!\n-${totalOvosConsumidos} ovos baixados do estoque.`);
+        alert(`Pedido #${proximoNumero} finalizado com sucesso! Estoques atualizados.`);
         abrirModalNota(novoPedido);
       } catch (err) {
         alert('Erro ao finalizar pedido e atualizar estoque: ' + err.message);
@@ -3286,11 +3507,45 @@
         let novoSaldo = atual + qtd;
 
         await refEstoque.set({ qtdOvos: novoSaldo }, { merge: true });
-        await db.collection("producao").add({ empresaId: empresaId, qtdOvos: qtd, dataHora: new Date(), origem: "Entrada Manual Estoque" });
+        await db.collection("producao").add({ empresaId: empresaId, qtdOvos: qtd, dataHora: new Date(), origem: "Entrada Manual Estoque Ovos" });
 
         e.target.reset();
-        alert('Produção registrada e estoque atualizado com sucesso!');
+        alert('Produção de ovos registrada e estoque atualizado com sucesso!');
       } catch (err) { alert("Erro ao atualizar o estoque."); }
+    }
+
+    async function registrarEntradaFrango(e) {
+      e.preventDefault();
+      const tipo = document.getElementById('entrada-frango-tipo').value;
+      const qtd = parseInt(document.getElementById('entrada-frango-qtd').value || 0);
+      if (qtd <= 0) return;
+
+      const empresaId = state.currentUser.empresaId;
+      const refEstoque = db.collection("estoque_geral").doc(empresaId);
+
+      try {
+        const docSnap = await refEstoque.get();
+        let dados = docSnap.exists ? docSnap.data() : {};
+        
+        let atualVivo = dados.qtdFrangoVivo || 0;
+        let atualLimpo = dados.qtdFrangoLimpo || 0;
+
+        if (tipo === 'vivo') {
+          atualVivo += qtd;
+        } else {
+          atualLimpo += qtd;
+        }
+
+        await refEstoque.set({
+          qtdFrangoVivo: atualVivo,
+          qtdFrangoLimpo: atualLimpo
+        }, { merge: true });
+
+        e.target.reset();
+        alert(`Entrada de ${qtd} unidades de frango (${tipo}) registrada com sucesso!`);
+      } catch (err) {
+        alert("Erro ao registrar entrada de frangos: " + err.message);
+      }
     }
 
     function renderProducaoHoje() {
@@ -3320,7 +3575,7 @@
       try {
         const refEstoque = db.collection("estoque_geral").doc(state.currentUser.empresaId);
         await refEstoque.set({ qtdOvos: novaQtd, ultimoAjusteEm: new Date(), ajustadoPor: state.currentUser.login, motivoAjuste: motivo }, { merge: true });
-        alert('Estoque atualizado com sucesso!');
+        alert('Estoque de ovos atualizado com sucesso!');
         fecharModalBalanco();
       } catch (err) { alert('Erro ao salvar.'); }
     }
@@ -3376,7 +3631,6 @@
       renderizarDadosRelatorio();
     }
 
-    /* CÁLCULO FINANCEIRO COMPLETO (ENTRADAS DE VENDAS - SAÍDAS DE DESPESAS = LUCRO LÍQUIDO) */
     function renderizarDadosRelatorio() {
       const tipo = document.getElementById('filtro-periodo').value;
       const agora = new Date();
@@ -3456,6 +3710,7 @@
 
     initApp();
     atualizarComportamentoPlano();
+    alternarCamposTipoProduto();
   </script>
 </body>
 </html>
